@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --dmk-red: #E31E24;
+  --dmk-red-dark: #B81318;
+  --dmk-black: #000000;
+  --dmk-charcoal: #141416;
+  --dmk-cream: #FAF8F5;
+  --dmk-gold: #FFB703;
+  --border-light: #E2DDD5;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FAF8F5;
+  color: #1A1A1A;
+  font-family: 'Helvetica Neue', Arial, 'Mukta Malar', 'Anek Tamil', sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Primary Typography:
+   - English: 'Helvetica Neue', Arial, sans-serif
+   - Tamil Headlines: Catamaran & Anek Tamil
+   - Tamil Slogans: Kavivanar & Arima
+   - Body Tamil: Mukta Malar
+*/
+.font-dmk-headline {
+  font-family: 'Catamaran', 'Anek Tamil', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: -0.015em;
+  font-weight: 800;
+}
+
+.font-dmk-slogan {
+  font-family: 'Kavivanar', 'Arima', 'Mukta Malar', cursive, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.font-dmk-nav {
+  font-family: 'Helvetica Neue', Arial, 'Catamaran', 'Anek Tamil', sans-serif;
+}
+
+.font-dmk-body {
+  font-family: 'Helvetica Neue', Arial, 'Mukta Malar', 'Anek Tamil', sans-serif;
+}
+
+.font-tamil-sans {
+  font-family: 'Helvetica Neue', Arial, 'Catamaran', 'Anek Tamil', sans-serif;
+}
+
+.font-tamil-serif {
+  font-family: 'Kavivanar', 'Catamaran', 'Anek Tamil', 'Helvetica Neue', Arial, serif;
+}
+
+.font-editorial {
+  font-family: 'Helvetica Neue', Arial, 'Anek Tamil', Georgia, serif;
+}
+
+.font-english {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Broadsheet Newspaper & Editorial Print Styling */
+.border-broadsheet-heavy {
+  border-top: 4px solid #111111;
+  border-bottom: 1px solid #111111;
+}
+
+.border-broadsheet-double {
+  border-top: 3px double #111111;
+  border-bottom: 3px double #111111;
+}
+
+.broadsheet-col-divider {
+  border-right: 1px solid #E2DDD5;
+}
+
+.broadsheet-dropcap::first-letter {
+  float: left;
+  font-size: 3.4rem;
+  line-height: 0.85;
+  font-weight: 900;
+  padding-right: 0.6rem;
+  padding-top: 0.15rem;
+  color: #E31E24;
+  font-family: 'Catamaran', 'Anek Tamil', serif;
+}
+
+.newsprint-bg {
+  background-color: #FAF7F2;
+}
+
+.editorial-stamp {
+  border: 1.5px solid #111111;
+  box-shadow: 2px 2px 0px #111111;
+}
+
+.editorial-stamp-red {
+  border: 1.5px solid #E31E24;
+  box-shadow: 2px 2px 0px #E31E24;
+}
+
+/* Authentic Interactive Hover States */
+.dmk-hover-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dmk-hover-card:hover {
+  transform: translateY(-2px);
+}
+
+.dmk-btn-primary {
+  transition: all 0.2s ease;
+}
+
+.dmk-btn-primary:hover {
+  box-shadow: 0 4px 12px rgba(227, 30, 36, 0.25);
+  transform: translateY(-1px);
+}
+
+.dmk-btn-secondary {
+  transition: all 0.2s ease;
+}
+
+.dmk-btn-secondary:hover {
+  transform: translateY(-1px);
 }
