@@ -282,16 +282,16 @@ export const DmkHeroSlider: React.FC = () => {
             {/* Gradient shadow for text contrast */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
 
-            {/* Interactive Quick Action Card at Bottom Right */}
+            {/* Interactive Quick Action Button at Bottom Right */}
             <div className="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex flex-col items-end gap-2 animate-in fade-in duration-500">
               <Link
                 href={slide.ctaLink}
-                className="px-6 py-3.5 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs sm:text-sm font-bold uppercase tracking-wider shadow-xl flex items-center gap-2 border-2 border-white transition-all hover:scale-105"
+                className="px-6 py-3 bg-[#E31E24] hover:bg-neutral-900 text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white transition-colors"
               >
                 <UserPlus className="w-4 h-4" />
                 <span className="font-dmk-headline font-bold">{slide.ctaText[language]}</span>
               </Link>
-              <span className="text-[11px] font-dmk-body text-white font-semibold bg-black/75 px-3 py-1 rounded backdrop-blur-xs border border-white/20">
+              <span className="text-[11px] font-english text-white font-semibold bg-black/80 px-3 py-1 border border-white/20">
                 {language === 'ta' ? 'திமுக வழக்கறிஞர் அணித் தலைமை' : 'DMK Legal Wing Secretariat'}
               </span>
             </div>
@@ -312,29 +312,29 @@ export const DmkHeroSlider: React.FC = () => {
                 {/* Vertical Stack of Mentors: Periyar, Anna, Kalaignar */}
                 <div className="flex flex-col gap-3 shrink-0">
                   <div className="flex flex-col items-center group/p">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white p-1 border-2 border-white shadow-md overflow-hidden flex items-center justify-center transition-transform group-hover/p:scale-110">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white p-1 border border-white/40 overflow-hidden flex items-center justify-center transition-transform group-hover/p:scale-105">
                       <span className="text-xs font-bold text-black font-dmk-headline">பெரியார்</span>
                     </div>
-                    <span className="text-[10px] text-white font-mono mt-0.5 font-bold">Periyar</span>
+                    <span className="text-[10px] text-white font-english mt-0.5 font-bold">Periyar</span>
                   </div>
 
                   <div className="flex flex-col items-center group/a">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white p-1 border-2 border-white shadow-md overflow-hidden flex items-center justify-center transition-transform group-hover/a:scale-110">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white p-1 border border-white/40 overflow-hidden flex items-center justify-center transition-transform group-hover/a:scale-105">
                       <span className="text-xs font-bold text-black font-dmk-headline">அண்ணா</span>
                     </div>
-                    <span className="text-[10px] text-white font-mono mt-0.5 font-bold">Anna</span>
+                    <span className="text-[10px] text-white font-english mt-0.5 font-bold">Anna</span>
                   </div>
 
                   <div className="flex flex-col items-center group/k">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white p-1 border-2 border-white shadow-md overflow-hidden flex items-center justify-center transition-transform group-hover/k:scale-110">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white p-1 border border-white/40 overflow-hidden flex items-center justify-center transition-transform group-hover/k:scale-105">
                       <span className="text-xs font-bold text-black font-dmk-headline">கலைஞர்</span>
                     </div>
-                    <span className="text-[10px] text-white font-mono mt-0.5 font-bold">Kalaignar</span>
+                    <span className="text-[10px] text-white font-english mt-0.5 font-bold">Kalaignar</span>
                   </div>
                 </div>
 
                 {/* Central Emblem Frame */}
-                <div className="w-40 h-40 sm:w-48 sm:h-48 bg-white p-3 rounded-2xl border-4 border-white shadow-2xl flex items-center justify-center shrink-0 transition-transform hover:scale-105">
+                <div className="w-40 h-40 sm:w-48 sm:h-48 bg-white p-2 border-2 border-white flex items-center justify-center shrink-0">
                   <img
                     src="/images/dmk-flag-sun.jpg"
                     alt="DMK Flag & Rising Sun"
@@ -347,16 +347,16 @@ export const DmkHeroSlider: React.FC = () => {
               {/* Right Column: Hero Bold Typography in exact Anek Tamil / Mukta Malar font */}
               <div className="lg:col-span-8 space-y-4 text-left">
                 
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-black/40 border border-white/20 text-xs font-mono font-bold tracking-widest uppercase">
-                  <span className="w-2 h-2 rounded-full bg-[#E31E24] animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/40 border border-white/20 text-xs font-english font-bold tracking-widest uppercase">
+                  <span className="w-2 h-2 bg-[#E31E24]" />
                   <span>{slide.tagline[language]}</span>
                 </div>
 
                 <div className="space-y-1">
-                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black font-dmk-headline tracking-tight leading-[1.1] text-white drop-shadow-md">
+                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black font-dmk-headline tracking-tight leading-[1.1] text-white">
                     {slide.titlePrimary[language]}
                   </h2>
-                  <h3 className="text-xl sm:text-3xl lg:text-4xl font-extrabold font-dmk-headline text-[#FFD166] drop-shadow-sm">
+                  <h3 className="text-xl sm:text-3xl lg:text-4xl font-extrabold font-dmk-headline text-[#FFD166]">
                     {slide.titleSecondary[language]}
                   </h3>
                 </div>
@@ -368,7 +368,7 @@ export const DmkHeroSlider: React.FC = () => {
                 <div className="pt-3 flex flex-wrap items-center gap-4">
                   <Link
                     href={slide.ctaLink}
-                    className="px-6 py-3 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 border border-white/30 transition-all hover:scale-105"
+                    className="px-6 py-3 bg-[#E31E24] hover:bg-neutral-900 text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white/40 transition-colors"
                   >
                     <span>{slide.ctaText[language]}</span>
                     <ChevronRight className="w-4 h-4" />
@@ -376,7 +376,7 @@ export const DmkHeroSlider: React.FC = () => {
 
                   <Link
                     href="/structure"
-                    className="px-6 py-3 bg-black/60 hover:bg-black/80 text-white rounded-md text-xs sm:text-sm font-bold uppercase tracking-wider border border-white/30 transition-all hover:bg-black"
+                    className="px-6 py-3 bg-black/60 hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider border border-white/30 transition-colors"
                   >
                     {language === 'ta' ? 'அமைப்பு விவரம்' : 'Organisation Chart'}
                   </Link>
@@ -389,11 +389,11 @@ export const DmkHeroSlider: React.FC = () => {
           </div>
         )}
 
-        {/* Previous & Next Control Arrows with smooth hover liftoff */}
+        {/* Previous & Next Control Arrows */}
         <button
           onClick={prevSlide}
           aria-label="Previous Slide"
-          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/75 hover:bg-[#E31E24] text-white border-2 border-white/40 flex items-center justify-center transition-all hover:scale-110 shadow-lg cursor-pointer"
+          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-black/75 hover:bg-[#E31E24] text-white border border-white/40 flex items-center justify-center transition-colors cursor-pointer"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -401,22 +401,22 @@ export const DmkHeroSlider: React.FC = () => {
         <button
           onClick={nextSlide}
           aria-label="Next Slide"
-          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/75 hover:bg-[#E31E24] text-white border-2 border-white/40 flex items-center justify-center transition-all hover:scale-110 shadow-lg cursor-pointer"
+          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-black/75 hover:bg-[#E31E24] text-white border border-white/40 flex items-center justify-center transition-colors cursor-pointer"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
 
         {/* Bottom Slide Dot Indicators + Play/Pause Control */}
-        <div className="absolute bottom-16 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 bg-black/70 px-4 py-2 rounded-full border border-white/20 backdrop-blur-xs shadow-lg">
+        <div className="absolute bottom-16 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 bg-black/80 px-4 py-2 border border-white/20">
           {slides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => goToSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`h-2.5 rounded-full transition-all cursor-pointer ${
+              className={`h-2 transition-all cursor-pointer ${
                 currentSlide === idx
-                  ? 'w-8 bg-[#E31E24]'
-                  : 'w-2.5 bg-white/60 hover:bg-white'
+                  ? 'w-6 bg-[#E31E24]'
+                  : 'w-2 bg-white/60 hover:bg-white'
               }`}
             />
           ))}
@@ -434,12 +434,12 @@ export const DmkHeroSlider: React.FC = () => {
 
       </div>
 
-      {/* BOTTOM TICKER / CAMPAIGN ACTION BAR (as seen in the reference screenshot) */}
-      <div className="bg-[#0C0C0E] border-t-2 border-[#E31E24] text-white py-3 px-4 sm:px-6">
+      {/* BOTTOM TICKER / CAMPAIGN ACTION BAR */}
+      <div className="bg-[#0C0C0E] border-t border-neutral-800 text-white py-3 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           
           <div className="flex items-center gap-2.5 overflow-hidden text-center sm:text-left">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#E31E24] animate-pulse shrink-0 hidden sm:inline-block" />
+            <span className="w-2 h-2 bg-[#E31E24] shrink-0 hidden sm:inline-block" />
             <span className="font-dmk-body text-neutral-200 text-xs sm:text-sm font-semibold">
               {slide.tickerText[language]}
             </span>
@@ -447,7 +447,7 @@ export const DmkHeroSlider: React.FC = () => {
 
           <Link
             href={slide.ctaLink}
-            className="shrink-0 px-5 py-1.5 rounded-full bg-[#E31E24] hover:bg-[#B81318] text-white font-dmk-headline font-bold text-xs uppercase tracking-wider border border-white/20 transition-all hover:scale-105 shadow-xs"
+            className="shrink-0 px-4 py-1.5 bg-[#E31E24] hover:bg-neutral-900 text-white font-dmk-headline font-bold text-xs uppercase tracking-wider border border-white/20 transition-colors"
           >
             {slide.tickerButton[language]} &rarr;
           </Link>

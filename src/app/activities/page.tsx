@@ -41,20 +41,20 @@ export default function ActivitiesPage() {
       
       {/* Broadsheet Masthead Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-[#FAF7F2] border-2 border-neutral-900 shadow-[4px_4px_0px_#111111] p-6 sm:p-10 relative overflow-hidden">
+        <div className="bg-white border-y-2 border-neutral-900 p-6 sm:p-10 relative overflow-hidden">
           {/* Dual Party Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 flex">
+          <div className="absolute top-0 left-0 right-0 h-1 flex">
             <div className="w-1/2 bg-black" />
             <div className="w-1/2 bg-[#E31E24]" />
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-neutral-900 pb-5 mb-6 pt-2">
+          <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-neutral-300 pb-5 mb-6 pt-2">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-[#111111] text-white text-[10px] font-mono uppercase px-2 py-0.5 tracking-widest font-bold">
+                <span className="bg-[#111111] text-white text-[10px] font-english uppercase px-2 py-0.5 tracking-widest font-bold">
                   {language === 'ta' ? 'செய்திப் பதிவேடு & களப் புகைப்படங்கள்' : 'PHOTOJOURNALISM & SPECIAL DISPATCHES'}
                 </span>
-                <span className="text-[11px] font-mono text-[#E31E24] font-bold">
+                <span className="text-[11px] font-english text-[#E31E24] font-bold">
                   VOL. LIV • SEC. VII (ACTIVITIES)
                 </span>
               </div>
@@ -64,7 +64,7 @@ export default function ActivitiesPage() {
                   : 'Conferences, Legal Clinics & Dispatches'}
               </h1>
             </div>
-            <div className="mt-4 md:mt-0 text-left md:text-right font-mono text-[11px] text-neutral-600">
+            <div className="mt-4 md:mt-0 text-left md:text-right font-english text-[11px] text-neutral-600">
               <p className="font-bold text-[#111111]">STATEWIDE ACTION DOSSIER</p>
               <p>Legal Awareness & Mass Advocacy Drives</p>
             </div>
@@ -78,12 +78,12 @@ export default function ActivitiesPage() {
                   : 'A rich photojournalistic chronicle of State Legal Conferences, Constitutional Seminars, pro-bono citizen legal clinics, and trial advocate workshops organized across all 38 districts of Tamil Nadu.'}
               </p>
             </div>
-            <div className="lg:col-span-4 bg-[#F3EFE6] border border-neutral-900 p-4">
-              <div className="flex items-center justify-between font-mono text-xs text-neutral-700 pb-2 border-b border-neutral-400">
+            <div className="lg:col-span-4 bg-[#FAF7F2] border border-neutral-300 p-4">
+              <div className="flex items-center justify-between font-english text-xs text-neutral-700 pb-2 border-b border-neutral-300">
                 <span>CONFERENCE RECORD</span>
                 <span className="font-bold text-[#E31E24]">STATEWIDE COVERAGE</span>
               </div>
-              <p className="text-xs text-neutral-600 mt-2 font-mono">
+              <p className="text-xs text-neutral-600 mt-2 font-english">
                 Dispatches from High Court Benches, district bar associations, and grassroots sessions.
               </p>
             </div>
@@ -93,13 +93,13 @@ export default function ActivitiesPage() {
 
       {/* Broadsheet Search & Filter Bar */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-white border-2 border-neutral-900 shadow-[3px_3px_0px_#111111] p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="bg-white border border-neutral-300 p-4 flex flex-col md:flex-row items-center justify-between gap-4">
           
           <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-            <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 border border-neutral-900">
+            <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 border border-neutral-300">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`px-3 py-1 text-xs font-mono font-bold uppercase transition-all ${
+                className={`px-3 py-1 text-xs font-english font-bold uppercase transition-colors ${
                   activeTab === 'all'
                     ? 'bg-[#E31E24] text-white'
                     : 'text-neutral-700 hover:text-black'
@@ -109,7 +109,7 @@ export default function ActivitiesPage() {
               </button>
               <button
                 onClick={() => setActiveTab('upcoming')}
-                className={`px-3 py-1 text-xs font-mono font-bold uppercase transition-all ${
+                className={`px-3 py-1 text-xs font-english font-bold uppercase transition-colors ${
                   activeTab === 'upcoming'
                     ? 'bg-[#E31E24] text-white'
                     : 'text-neutral-700 hover:text-black'
@@ -119,7 +119,7 @@ export default function ActivitiesPage() {
               </button>
               <button
                 onClick={() => setActiveTab('completed')}
-                className={`px-3 py-1 text-xs font-mono font-bold uppercase transition-all ${
+                className={`px-3 py-1 text-xs font-english font-bold uppercase transition-colors ${
                   activeTab === 'completed'
                     ? 'bg-[#E31E24] text-white'
                     : 'text-neutral-700 hover:text-black'
@@ -134,7 +134,7 @@ export default function ActivitiesPage() {
                 <button
                   key={c}
                   onClick={() => setActiveCategory(c)}
-                  className={`px-2.5 py-1 text-xs font-mono font-bold uppercase transition-all border ${
+                  className={`px-2.5 py-1 text-xs font-english font-bold uppercase transition-colors border ${
                     activeCategory === c
                       ? 'bg-[#111111] text-white border-neutral-900'
                       : 'bg-white text-neutral-600 border-neutral-300 hover:border-neutral-900'
@@ -153,7 +153,7 @@ export default function ActivitiesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={language === 'ta' ? 'நிகழ்வு தேடுக...' : 'Search events or venues...'}
-              className="w-full bg-[#FAF7F2] border-2 border-neutral-900 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-mono placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
+              className="w-full bg-[#FAF7F2] border border-neutral-300 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-english placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
             />
           </div>
 
@@ -166,7 +166,7 @@ export default function ActivitiesPage() {
           {filteredEvents.map((evt) => (
             <article
               key={evt.id}
-              className="bg-white border-2 border-neutral-900 shadow-[4px_4px_0px_#111111] hover:shadow-[6px_6px_0px_#E31E24] transition-all flex flex-col justify-between group"
+              className="bg-white border border-neutral-300 hover:border-neutral-900 transition-colors flex flex-col justify-between group"
             >
               <div>
                 {/* Dual Party Stripe */}
@@ -176,7 +176,7 @@ export default function ActivitiesPage() {
                 </div>
 
                 {/* Photojournalism Framing */}
-                <div className="relative h-56 overflow-hidden bg-[#111111] border-b-2 border-neutral-900">
+                <div className="relative h-56 overflow-hidden bg-[#111111] border-b border-neutral-300">
                   <img
                     src={evt.image}
                     alt={evt.title[language]}
@@ -186,20 +186,20 @@ export default function ActivitiesPage() {
 
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex gap-1.5 z-10">
-                    <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 border border-black ${
+                    <span className={`text-[10px] font-english font-bold uppercase tracking-wider px-2 py-0.5 border border-black ${
                       evt.status === 'upcoming' ? 'bg-[#E31E24] text-white' : 'bg-[#111111] text-white'
                     }`}>
                       {evt.status === 'upcoming'
                         ? language === 'ta' ? 'வரவிருக்கும் நிகழ்வு' : 'UPCOMING'
                         : language === 'ta' ? 'நிறைவடைந்தது' : 'CONCLUDED'}
                     </span>
-                    <span className="text-[10px] font-mono bg-white px-2 py-0.5 text-neutral-900 border border-neutral-900 font-bold uppercase">
+                    <span className="text-[10px] font-english bg-white px-2 py-0.5 text-neutral-900 border border-neutral-300 font-bold uppercase">
                       {evt.category}
                     </span>
                   </div>
 
                   {evt.attendeesCount && (
-                    <div className="absolute bottom-3 right-3 text-[10px] font-mono bg-black/90 px-2 py-0.5 text-white border border-white/20 z-10">
+                    <div className="absolute bottom-3 right-3 text-[10px] font-english bg-black/90 px-2 py-0.5 text-white border border-white/20 z-10">
                       {evt.attendeesCount.toLocaleString()} {language === 'ta' ? 'பங்கேற்பாளர்கள்' : 'ATTENDEES'}
                     </div>
                   )}
@@ -207,7 +207,7 @@ export default function ActivitiesPage() {
 
                 {/* Editorial Body */}
                 <div className="p-5 space-y-2.5">
-                  <div className="flex items-center gap-2 text-xs font-mono text-neutral-600 border-b border-neutral-300 pb-2">
+                  <div className="flex items-center gap-2 text-xs font-english text-neutral-600 border-b border-neutral-200 pb-2">
                     <div className="flex items-center gap-1 font-bold text-neutral-800">
                       <Calendar className="w-3.5 h-3.5 text-[#E31E24]" />
                       <span>{evt.date}</span>
@@ -238,7 +238,7 @@ export default function ActivitiesPage() {
               <div className="p-5 pt-0">
                 <button
                   onClick={() => setSelectedEvent(evt)}
-                  className="w-full py-2.5 bg-[#FAF7F2] hover:bg-[#E31E24] hover:text-white border-2 border-neutral-900 text-xs font-mono font-bold uppercase tracking-wider text-[#111111] transition-all flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#111111]"
+                  className="w-full py-2.5 bg-[#FAF7F2] hover:bg-[#E31E24] hover:text-white border border-neutral-300 hover:border-neutral-900 text-xs font-english font-bold uppercase tracking-wider text-[#111111] transition-colors flex items-center justify-center gap-1.5"
                 >
                   <span>{language === 'ta' ? 'நிகழ்ச்சி அறிக்கை & விவரம்' : 'View Full Dispatch'}</span>
                   <span>&rarr;</span>
@@ -252,28 +252,28 @@ export default function ActivitiesPage() {
       {/* Event Details Broadsheet Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FAF7F2] border-4 border-neutral-900 rounded-none max-w-2xl w-full p-6 sm:p-8 relative shadow-[8px_8px_0px_#111111] max-h-[90vh] overflow-y-auto font-dmk-body">
+          <div className="bg-[#FAF7F2] border border-neutral-900 rounded-none max-w-2xl w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto font-dmk-body">
             
             {/* Top Modal Flag Bar */}
-            <div className="w-full h-1.5 flex absolute top-0 left-0">
+            <div className="w-full h-1 flex absolute top-0 left-0">
               <div className="w-1/2 bg-black" />
               <div className="w-1/2 bg-[#E31E24]" />
             </div>
 
             <button
               onClick={() => setSelectedEvent(null)}
-              className="absolute top-5 right-5 w-8 h-8 bg-white hover:bg-[#E31E24] hover:text-white text-neutral-900 border-2 border-neutral-900 shadow-[2px_2px_0px_#111111] flex items-center justify-center font-bold text-sm transition-all"
+              className="absolute top-5 right-5 w-8 h-8 bg-white hover:bg-[#E31E24] hover:text-white text-neutral-900 border border-neutral-300 flex items-center justify-center font-bold text-sm transition-colors"
               aria-label="Close modal"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="space-y-4 mt-2">
-              <div className="flex flex-wrap gap-2 text-xs font-mono">
+              <div className="flex flex-wrap gap-2 text-xs font-english">
                 <span className="bg-[#E31E24] text-white font-bold px-2.5 py-0.5 border border-neutral-900">
                   {selectedEvent.category}
                 </span>
-                <span className="bg-white text-neutral-900 px-2.5 py-0.5 border border-neutral-900 font-bold">
+                <span className="bg-white text-neutral-900 px-2.5 py-0.5 border border-neutral-300 font-bold">
                   {selectedEvent.date} ({selectedEvent.time})
                 </span>
               </div>
@@ -282,19 +282,19 @@ export default function ActivitiesPage() {
                 {selectedEvent.title[language]}
               </h2>
 
-              <div className="p-3 bg-white border-2 border-neutral-900 text-xs text-neutral-900 flex items-center gap-2 shadow-[2px_2px_0px_#111111]">
+              <div className="p-3 bg-white border border-neutral-300 text-xs text-neutral-900 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[#E31E24]" />
                 <span><strong>{language === 'ta' ? 'இடம்:' : 'Venue:'}</strong> {selectedEvent.venue[language]}</span>
               </div>
 
               {selectedEvent.chiefGuest && (
-                <div className="p-3 bg-[#F3EFE6] border-2 border-neutral-900 text-xs text-neutral-900 flex items-center gap-2 shadow-[2px_2px_0px_#111111]">
+                <div className="p-3 bg-[#F3EFE6] border border-neutral-300 text-xs text-neutral-900 flex items-center gap-2">
                   <Award className="w-4 h-4 text-[#E31E24]" />
                   <span><strong>{language === 'ta' ? 'தலைமை:' : 'Presided By:'}</strong> {selectedEvent.chiefGuest[language]}</span>
                 </div>
               )}
 
-              <div className="border-2 border-neutral-900 overflow-hidden max-h-72 bg-neutral-900">
+              <div className="border border-neutral-300 overflow-hidden max-h-72 bg-neutral-900">
                 <img
                   src={selectedEvent.image}
                   alt={selectedEvent.title[language]}
@@ -303,7 +303,7 @@ export default function ActivitiesPage() {
               </div>
 
               <div className="space-y-1.5 pt-2">
-                <h4 className="font-mono text-xs font-bold text-neutral-900 uppercase tracking-wider pb-1 border-b border-neutral-300">
+                <h4 className="font-english text-xs font-bold text-neutral-900 uppercase tracking-wider pb-1 border-b border-neutral-300">
                   {language === 'ta' ? 'நிகழ்ச்சி அறிக்கை & தீர்மானங்கள்' : 'EVENT CHRONICLE & OFFICIAL DELIBERATIONS'}
                 </h4>
                 <p className="text-sm text-neutral-800 leading-relaxed font-dmk-body">
@@ -311,13 +311,13 @@ export default function ActivitiesPage() {
                 </p>
               </div>
 
-              <div className="pt-4 border-t-2 border-neutral-900 flex items-center justify-between">
-                <span className="text-xs text-neutral-600 font-mono">
+              <div className="pt-4 border-t border-neutral-300 flex items-center justify-between">
+                <span className="text-xs text-neutral-600 font-english">
                   DMK Legal Wing Secretariat Archives
                 </span>
                 <button
                   onClick={() => setSelectedEvent(null)}
-                  className="px-4 py-1.5 bg-[#111111] hover:bg-[#E31E24] text-white border border-neutral-900 text-xs font-mono font-bold uppercase tracking-wider"
+                  className="px-4 py-1.5 bg-[#111111] hover:bg-[#E31E24] text-white border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider"
                 >
                   {language === 'ta' ? 'மூடுக' : 'Close Dispatch'}
                 </button>

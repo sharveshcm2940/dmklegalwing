@@ -13,14 +13,14 @@ export default function StructurePage() {
       
       {/* 1. Broadsheet Directory Header Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-white border-4 border-neutral-900 p-8 sm:p-12 shadow-[4px_4px_0px_#111111]">
+        <div className="bg-white border-y-2 border-neutral-900 p-8 sm:p-12">
           <div className="max-w-3xl space-y-3">
-            <div className="flex items-center gap-2 border-b-2 border-neutral-900 pb-2">
-              <span className="text-xs font-mono font-bold text-[#E31E24] tracking-[0.2em] uppercase">
+            <div className="flex items-center gap-2 border-b border-neutral-300 pb-2">
+              <span className="text-xs font-english font-bold text-[#E31E24] tracking-[0.2em] uppercase">
                 {language === 'ta' ? 'அமைப்பு கட்டமைப்பு & பொறுப்பாளர்கள்' : 'ORGANISATIONAL DIRECTORY & CADRE'}
               </span>
               <span className="text-neutral-300">•</span>
-              <span className="text-xs font-mono text-neutral-500">OFFICIAL GAZETTE ROLL</span>
+              <span className="text-xs font-english text-neutral-500">OFFICIAL GAZETTE ROLL</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black text-neutral-900 font-dmk-headline tracking-tight leading-tight">
@@ -29,7 +29,7 @@ export default function StructurePage() {
                 : 'DMK Legal Wing Organisational Structure'}
             </h1>
 
-            <p className="text-sm sm:text-base text-neutral-700 leading-relaxed font-serif italic border-l-4 border-[#E31E24] pl-4 py-1">
+            <p className="text-sm sm:text-base text-neutral-700 leading-relaxed font-english border-l-4 border-[#E31E24] pl-4 py-1">
               {language === 'ta'
                 ? 'மாநில தலைமைச் செயலகம் முதல் 38 மாவட்ட நீதிமன்ற வழக்கறிஞர் பிரிவுகள் வரை இயங்கும் முழுமையான ஜனநாயகப் படிநிலை அமைப்பு.'
                 : 'A structured constitutional vanguard operating from the Apex State Secretariat to 38 District Court units across Tamil Nadu and Puducherry.'}
@@ -45,10 +45,10 @@ export default function StructurePage() {
 
       {/* 3. Structural Roles & Jurisdiction Notes (Broadsheet Classified Columns) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 bg-white border-2 border-neutral-900 shadow-[3px_3px_0px_#111111] space-y-2">
-            <div className="flex items-center justify-between border-b border-neutral-300 pb-1.5">
-              <span className="text-[10px] font-mono font-bold uppercase text-[#B81318]">CHAMBER I</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-neutral-300 border border-neutral-300 bg-white">
+          <div className="p-6 space-y-2">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-1.5">
+              <span className="text-[10px] font-english font-bold uppercase text-[#B81318]">CHAMBER I</span>
               <Award className="w-5 h-5 text-[#E31E24]" />
             </div>
             <h4 className="text-lg font-bold text-neutral-900 font-dmk-headline">
@@ -61,9 +61,9 @@ export default function StructurePage() {
             </p>
           </div>
 
-          <div className="p-6 bg-white border-2 border-neutral-900 shadow-[3px_3px_0px_#111111] space-y-2">
-            <div className="flex items-center justify-between border-b border-neutral-300 pb-1.5">
-              <span className="text-[10px] font-mono font-bold uppercase text-[#B81318]">CHAMBER II</span>
+          <div className="p-6 space-y-2">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-1.5">
+              <span className="text-[10px] font-english font-bold uppercase text-[#B81318]">CHAMBER II</span>
               <Layers className="w-5 h-5 text-[#E31E24]" />
             </div>
             <h4 className="text-lg font-bold text-neutral-900 font-dmk-headline">
@@ -76,9 +76,9 @@ export default function StructurePage() {
             </p>
           </div>
 
-          <div className="p-6 bg-white border-2 border-neutral-900 shadow-[3px_3px_0px_#111111] space-y-2">
-            <div className="flex items-center justify-between border-b border-neutral-300 pb-1.5">
-              <span className="text-[10px] font-mono font-bold uppercase text-[#B81318]">CHAMBER III</span>
+          <div className="p-6 space-y-2">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-1.5">
+              <span className="text-[10px] font-english font-bold uppercase text-[#B81318]">CHAMBER III</span>
               <Users className="w-5 h-5 text-[#E31E24]" />
             </div>
             <h4 className="text-lg font-bold text-neutral-900 font-dmk-headline">

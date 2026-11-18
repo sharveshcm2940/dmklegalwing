@@ -71,14 +71,14 @@ export const TamilNaduMap: React.FC = () => {
   const zones = ['All', 'Chennai', 'North', 'West', 'Central', 'South'];
 
   return (
-    <div className="bg-[#FAF7F2] border-2 border-neutral-900 shadow-[4px_4px_0px_#111111] overflow-hidden font-dmk-body">
+    <div className="bg-white border border-neutral-300 overflow-hidden font-dmk-body">
       
       {/* Newspaper Top Bar */}
-      <div className="bg-[#FAF7F2] p-5 border-b-2 border-neutral-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 border-b border-neutral-300 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2.5 h-2.5 bg-[#E31E24]" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#E31E24]">
+            <span className="font-english text-[10px] font-bold uppercase tracking-widest text-[#E31E24]">
               {language === 'ta' ? 'அதிகாரப்பூர்வ நிலவியல் அரசிதழ்' : 'OFFICIAL CARTOGRAPHIC GAZETTE'}
             </span>
           </div>
@@ -100,14 +100,14 @@ export const TamilNaduMap: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={language === 'ta' ? 'மாவட்டம் அல்லது பொறுப்பாளர்...' : 'Search district or organizer...'}
-            className="w-full bg-white border-2 border-neutral-900 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-mono placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
+            className="w-full bg-[#FAF7F2] border border-neutral-300 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-english placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
           />
         </div>
       </div>
 
       {/* Zone Filters Bar */}
-      <div className="bg-[#F3EFE6] px-5 py-2.5 border-b-2 border-neutral-900 flex items-center gap-2 overflow-x-auto text-xs">
-        <span className="font-mono font-bold text-neutral-800 uppercase tracking-wider text-[11px] shrink-0 flex items-center gap-1">
+      <div className="bg-[#FAF7F2] px-5 py-2.5 border-b border-neutral-300 flex items-center gap-2 overflow-x-auto text-xs">
+        <span className="font-english font-bold text-neutral-800 uppercase tracking-wider text-[11px] shrink-0 flex items-center gap-1">
           <Filter className="w-3.5 h-3.5 text-[#E31E24]" />
           {language === 'ta' ? 'மண்டலம்:' : 'ZONE:'}
         </span>
@@ -115,10 +115,10 @@ export const TamilNaduMap: React.FC = () => {
           <button
             key={zone}
             onClick={() => setActiveZone(zone)}
-            className={`px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider transition-all border ${
+            className={`px-3 py-1 text-xs font-english font-bold uppercase tracking-wider transition-all border ${
               activeZone === zone
-                ? 'bg-[#E31E24] text-white border-neutral-900 shadow-[2px_2px_0px_#111111]'
-                : 'bg-white text-neutral-700 border-neutral-400 hover:border-neutral-900 hover:bg-neutral-100'
+                ? 'bg-[#E31E24] text-white border-neutral-900'
+                : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-900 hover:bg-neutral-100'
             }`}
           >
             {zone === 'All' ? (language === 'ta' ? 'அனைத்தும்' : 'All Zones') : zone}
@@ -130,14 +130,14 @@ export const TamilNaduMap: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[520px]">
         
         {/* Left: Vintage Cartographic SVG Map */}
-        <div className="lg:col-span-6 bg-[#FAF7F2] p-6 flex flex-col items-center justify-center relative border-b lg:border-b-0 lg:border-r-2 border-neutral-900">
+        <div className="lg:col-span-6 bg-[#FAF7F2] p-6 flex flex-col items-center justify-center relative border-b lg:border-b-0 lg:border-r border-neutral-300">
           <div className="text-center mb-3">
-            <span className="text-[11px] font-mono text-[#E31E24] tracking-widest uppercase font-bold">
+            <span className="text-[11px] font-english text-[#E31E24] tracking-widest uppercase font-bold">
               {language === 'ta' ? 'தமிழ்நாடு அரசமைப்பு கள வரைபடம்' : 'TAMIL NADU SESSIONS JURISDICTIONS'}
             </span>
           </div>
 
-          <div className="relative w-full max-w-[390px] aspect-[4/5] flex items-center justify-center bg-[#F3EFE6] border-2 border-neutral-900 p-2 shadow-[2px_2px_0px_#111111]">
+          <div className="relative w-full max-w-[390px] aspect-[4/5] flex items-center justify-center bg-[#F3EFE6] border border-neutral-400 p-2">
             <svg
               viewBox="100 30 330 470"
               className="w-full h-full"
@@ -228,7 +228,7 @@ export const TamilNaduMap: React.FC = () => {
             </svg>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] font-mono text-neutral-800 mt-4 bg-white px-3 py-1.5 border border-neutral-900 shadow-[1px_1px_0px_#111111]">
+          <div className="flex items-center gap-4 text-[11px] font-english text-neutral-800 mt-4 bg-white px-3 py-1.5 border border-neutral-300">
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 bg-[#E31E24] border border-neutral-900" />
               <span>{language === 'ta' ? 'தேர்ந்தெடுக்கப்பட்டது' : 'Selected District'}</span>
@@ -244,15 +244,15 @@ export const TamilNaduMap: React.FC = () => {
         <div className="lg:col-span-6 p-6 flex flex-col justify-between bg-white">
           <div>
             {/* District Header Plate */}
-            <div className="flex items-start justify-between border-b-2 border-neutral-900 pb-4 mb-4">
+            <div className="flex items-start justify-between border-b border-neutral-300 pb-4 mb-4">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#E31E24] tracking-widest uppercase block">
+                <span className="text-[10px] font-english font-bold text-[#E31E24] tracking-widest uppercase block">
                   {selectedDistrict.zone} {language === 'ta' ? 'மண்டலப் பிரிவு' : 'ZONE JURISDICTION'}
                 </span>
                 <h4 className="text-2xl sm:text-3xl font-black text-[#111111] font-dmk-headline leading-tight mt-0.5">
                   {selectedDistrict.name[language]}
                 </h4>
-                <p className="text-xs font-mono text-neutral-600 mt-1">
+                <p className="text-xs font-english text-neutral-600 mt-1">
                   {language === 'ta' ? 'தலைமையகம்:' : 'Headquarters:'}{' '}
                   <span className="text-[#111111] font-bold">
                     {selectedDistrict.headquarters[language]}
@@ -260,24 +260,24 @@ export const TamilNaduMap: React.FC = () => {
                 </p>
               </div>
 
-              <div className="text-right bg-[#F3EFE6] border border-neutral-900 p-2.5">
-                <span className="text-xl font-black text-[#111111] font-mono block">
+              <div className="text-right bg-[#FAF7F2] border border-neutral-300 p-2.5">
+                <span className="text-xl font-black text-[#111111] font-english block">
                   {selectedDistrict.memberCount.toLocaleString()}+
                 </span>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-700">
+                <span className="text-[10px] font-english font-bold uppercase tracking-wider text-neutral-700">
                   {language === 'ta' ? 'வழக்கறிஞர்கள்' : 'Advocates'}
                 </span>
               </div>
             </div>
 
-            {/* Information Cards */}
+            {/* Information Rows */}
             <div className="space-y-3 text-xs">
               
-              <div className="p-3.5 bg-[#FAF7F2] border-2 border-neutral-900 shadow-[2px_2px_0px_#111111]">
+              <div className="p-3.5 bg-[#FAF7F2] border border-neutral-300">
                 <div className="flex items-start gap-2.5">
                   <Building2 className="w-4 h-4 text-[#E31E24] shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-mono text-[10px] uppercase font-bold text-neutral-600 block">
+                    <span className="font-english text-[10px] uppercase font-bold text-neutral-600 block">
                       {language === 'ta' ? 'முதன்மை நீதிமன்ற வளாகம்:' : 'PRIMARY COURT COMPLEX:'}
                     </span>
                     <span className="text-[#111111] font-bold text-xs font-dmk-body block mt-0.5">
@@ -287,11 +287,11 @@ export const TamilNaduMap: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-3.5 bg-[#FAF7F2] border-2 border-neutral-900 shadow-[2px_2px_0px_#111111]">
+              <div className="p-3.5 bg-[#FAF7F2] border border-neutral-300">
                 <div className="flex items-start gap-2.5">
                   <Scale className="w-4 h-4 text-[#E31E24] shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <span className="font-mono text-[10px] uppercase font-bold text-neutral-600 block">
+                    <span className="font-english text-[10px] uppercase font-bold text-neutral-600 block">
                       {language === 'ta' ? 'மாவட்ட வழக்கறிஞர் அணி அமைப்பாளர்:' : 'DISTRICT LEGAL WING ORGANIZER:'}
                     </span>
                     <span className="text-sm text-[#111111] font-black font-dmk-headline block mt-0.5">
@@ -300,14 +300,14 @@ export const TamilNaduMap: React.FC = () => {
 
                     {selectedDistrict.jointOrganizers && selectedDistrict.jointOrganizers.length > 0 && (
                       <div className="mt-2.5 pt-2 border-t border-neutral-300">
-                        <span className="font-mono text-[10px] uppercase font-bold text-neutral-600 block mb-1">
+                        <span className="font-english text-[10px] uppercase font-bold text-neutral-600 block mb-1">
                           {language === 'ta' ? 'இணை அமைப்பாளர்கள்:' : 'JOINT ORGANIZERS:'}
                         </span>
                         <div className="flex flex-wrap gap-1.5">
                           {selectedDistrict.jointOrganizers.map((jo, i) => (
                             <span
                               key={i}
-                              className="text-[11px] bg-white text-neutral-800 px-2 py-0.5 border border-neutral-900 font-semibold"
+                              className="text-[11px] bg-white text-neutral-800 px-2 py-0.5 border border-neutral-300 font-semibold"
                             >
                               {jo[language]}
                             </span>
@@ -323,14 +323,14 @@ export const TamilNaduMap: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 <a
                   href={`tel:${selectedDistrict.contactPhone}`}
-                  className="flex items-center gap-2 p-3 bg-white border-2 border-neutral-900 shadow-[2px_2px_0px_#111111] hover:bg-[#FAF7F2] transition-colors"
+                  className="flex items-center gap-2 p-3 bg-white border border-neutral-300 hover:border-neutral-900 transition-colors"
                 >
                   <Phone className="w-4 h-4 text-[#E31E24]" />
                   <div>
-                    <span className="text-[10px] font-mono uppercase text-neutral-600 block">
+                    <span className="text-[10px] font-english uppercase text-neutral-600 block">
                       {language === 'ta' ? 'தொலைபேசி' : 'PHONE DESPATCH'}
                     </span>
-                    <span className="text-xs text-[#111111] font-mono font-bold">
+                    <span className="text-xs text-[#111111] font-english font-bold">
                       {selectedDistrict.contactPhone}
                     </span>
                   </div>
@@ -338,14 +338,14 @@ export const TamilNaduMap: React.FC = () => {
 
                 <a
                   href={`mailto:${selectedDistrict.contactEmail}`}
-                  className="flex items-center gap-2 p-3 bg-white border-2 border-neutral-900 shadow-[2px_2px_0px_#111111] hover:bg-[#FAF7F2] transition-colors"
+                  className="flex items-center gap-2 p-3 bg-white border border-neutral-300 hover:border-neutral-900 transition-colors"
                 >
                   <Mail className="w-4 h-4 text-[#E31E24]" />
                   <div>
-                    <span className="text-[10px] font-mono uppercase text-neutral-600 block">
+                    <span className="text-[10px] font-english uppercase text-neutral-600 block">
                       {language === 'ta' ? 'மின்னஞ்சல்' : 'OFFICIAL EMAIL'}
                     </span>
-                    <span className="text-xs text-[#111111] font-mono font-bold truncate max-w-[140px] block">
+                    <span className="text-xs text-[#111111] font-english font-bold truncate max-w-[140px] block">
                       {selectedDistrict.contactEmail}
                     </span>
                   </div>

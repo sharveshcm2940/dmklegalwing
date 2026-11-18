@@ -28,20 +28,20 @@ export default function DistrictsPage() {
       
       {/* Broadsheet Masthead Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-[#FAF7F2] border-2 border-neutral-900 shadow-[4px_4px_0px_#111111] p-6 sm:p-10 relative overflow-hidden">
+        <div className="bg-white border-y-2 border-neutral-900 p-6 sm:p-10 relative overflow-hidden">
           {/* Dual Party Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 flex">
+          <div className="absolute top-0 left-0 right-0 h-1 flex">
             <div className="w-1/2 bg-black" />
             <div className="w-1/2 bg-[#E31E24]" />
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-neutral-900 pb-5 mb-6 pt-2">
+          <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-neutral-300 pb-5 mb-6 pt-2">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-[#111111] text-white text-[10px] font-mono uppercase px-2 py-0.5 tracking-widest font-bold">
+                <span className="bg-[#111111] text-white text-[10px] font-english uppercase px-2 py-0.5 tracking-widest font-bold">
                   {language === 'ta' ? 'அரசிதழ் பிராந்தியப் பதிவேடு' : 'REGIONAL JURISDICTION GAZETTE'}
                 </span>
-                <span className="text-[11px] font-mono text-[#E31E24] font-bold">
+                <span className="text-[11px] font-english text-[#E31E24] font-bold">
                   VOL. LIV • SEC. VI (DISTRICTS)
                 </span>
               </div>
@@ -51,7 +51,7 @@ export default function DistrictsPage() {
                   : '38 District Legal Wing Directory'}
               </h1>
             </div>
-            <div className="mt-4 md:mt-0 text-left md:text-right font-mono text-[11px] text-neutral-600">
+            <div className="mt-4 md:mt-0 text-left md:text-right font-english text-[11px] text-neutral-600">
               <p className="font-bold text-[#111111]">COURT SESSIONS DIRECTORY</p>
               <p>Principal District & Munsif Courts Network</p>
             </div>
@@ -65,12 +65,12 @@ export default function DistrictsPage() {
                   : 'From the Madras High Court to subordinate district courts across Tamil Nadu, our verified district coordinators champion citizen legal aid, grassroots defense, and social justice constitutional representation.'}
               </p>
             </div>
-            <div className="lg:col-span-4 bg-[#F3EFE6] border border-neutral-900 p-4">
-              <div className="flex items-center justify-between font-mono text-xs text-neutral-700 pb-2 border-b border-neutral-400">
+            <div className="lg:col-span-4 bg-[#FAF7F2] border border-neutral-300 p-4">
+              <div className="flex items-center justify-between font-english text-xs text-neutral-700 pb-2 border-b border-neutral-300">
                 <span>DISTRICT CADRE</span>
                 <span className="font-bold text-[#E31E24]">38 SESSIONS WINGS</span>
               </div>
-              <p className="text-xs text-neutral-600 mt-2 font-mono">
+              <p className="text-xs text-neutral-600 mt-2 font-english">
                 Grassroots defense clinics active across all revenue districts.
               </p>
             </div>
@@ -85,11 +85,11 @@ export default function DistrictsPage() {
 
       {/* Complete District Classified Directory */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pb-4 border-b-2 border-neutral-900">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pb-4 border-b border-neutral-300">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2.5 h-2.5 bg-[#E31E24]" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#E31E24]">
+              <span className="font-english text-[10px] font-bold uppercase tracking-widest text-[#E31E24]">
                 {language === 'ta' ? 'அனைத்து மாவட்டங்களின் விவரங்கள்' : 'CLASSIFIED DISTRICT GAZETTE'}
               </span>
             </div>
@@ -104,10 +104,10 @@ export default function DistrictsPage() {
                 <button
                   key={zone}
                   onClick={() => setSelectedZone(zone)}
-                  className={`px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider transition-all border ${
+                  className={`px-3 py-1 text-xs font-english font-bold uppercase tracking-wider transition-all border ${
                     selectedZone === zone
-                      ? 'bg-[#E31E24] text-white border-neutral-900 shadow-[2px_2px_0px_#111111]'
-                      : 'bg-white text-neutral-700 border-neutral-400 hover:border-neutral-900'
+                      ? 'bg-[#E31E24] text-white border-neutral-900'
+                      : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-900'
                   }`}
                 >
                   {zone === 'All' ? (language === 'ta' ? 'அனைத்தும்' : 'All') : zone}
@@ -122,7 +122,7 @@ export default function DistrictsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={language === 'ta' ? 'மாவட்டம் தேடுக...' : 'Search district...'}
-                className="w-full bg-white border-2 border-neutral-900 pl-8 pr-3 py-1 text-xs font-mono text-[#111111] placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
+                className="w-full bg-white border border-neutral-300 pl-8 pr-3 py-1 text-xs font-english text-[#111111] placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
               />
             </div>
           </div>
@@ -132,23 +132,23 @@ export default function DistrictsPage() {
           {filteredDistricts.map((d) => (
             <article
               key={d.id}
-              className="bg-white border-2 border-neutral-900 shadow-[4px_4px_0px_#111111] hover:shadow-[6px_6px_0px_#E31E24] p-5 flex flex-col justify-between transition-all"
+              className="bg-white border border-neutral-300 hover:border-neutral-900 p-5 flex flex-col justify-between transition-colors"
             >
               <div>
-                <div className="flex items-center justify-between border-b-2 border-neutral-900 pb-3 mb-3">
+                <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
                   <div>
-                    <span className="text-[10px] font-mono text-[#E31E24] uppercase tracking-wider block font-bold">
+                    <span className="text-[10px] font-english text-[#E31E24] uppercase tracking-wider block font-bold">
                       {d.zone} ZONE
                     </span>
                     <h4 className="text-xl font-black text-[#111111] font-dmk-headline">
                       {d.name[language]}
                     </h4>
                   </div>
-                  <div className="text-right bg-[#FAF7F2] border border-neutral-900 px-2 py-1">
-                    <span className="text-base font-black text-[#111111] font-mono block leading-none">
+                  <div className="text-right bg-[#FAF7F2] border border-neutral-300 px-2 py-1">
+                    <span className="text-base font-black text-[#111111] font-english block leading-none">
                       {d.memberCount.toLocaleString()}+
                     </span>
-                    <span className="text-[9px] font-mono uppercase text-neutral-600 font-bold">
+                    <span className="text-[9px] font-english uppercase text-neutral-600 font-bold">
                       {language === 'ta' ? 'வழக்கறிஞர்கள்' : 'Advocates'}
                     </span>
                   </div>
@@ -156,7 +156,7 @@ export default function DistrictsPage() {
 
                 <div className="space-y-2.5 text-xs font-dmk-body">
                   <div>
-                    <span className="font-mono text-[10px] uppercase font-bold text-neutral-500 block">
+                    <span className="font-english text-[10px] uppercase font-bold text-neutral-500 block">
                       {language === 'ta' ? 'மாவட்ட அமைப்பாளர்:' : 'DISTRICT ORGANIZER:'}
                     </span>
                     <span className="text-[#111111] font-bold text-sm block mt-0.5 font-dmk-headline">
@@ -165,7 +165,7 @@ export default function DistrictsPage() {
                   </div>
 
                   <div>
-                    <span className="font-mono text-[10px] uppercase font-bold text-neutral-500 block">
+                    <span className="font-english text-[10px] uppercase font-bold text-neutral-500 block">
                       {language === 'ta' ? 'நீதிமன்ற வளாகம்:' : 'COURT COMPLEX:'}
                     </span>
                     <span className="text-neutral-700 block line-clamp-2 mt-0.5 text-xs">
@@ -175,7 +175,7 @@ export default function DistrictsPage() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t-2 border-neutral-900 flex items-center justify-between text-xs font-mono">
+              <div className="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between text-xs font-english">
                 <a
                   href={`tel:${d.contactPhone}`}
                   className="flex items-center gap-1.5 text-neutral-800 hover:text-[#E31E24] transition-colors font-bold"
