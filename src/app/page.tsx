@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
@@ -11,15 +11,22 @@ import {
   ArrowRight, 
   ChevronRight, 
   ExternalLink,
-  Scale
+  Scale,
+  Quote,
+  CheckCircle2,
+  BookOpen,
+  Award,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function HomePage() {
   const { language, t } = useLanguage();
   const { events, news } = useData();
+  const [activePillarIndex, setActivePillarIndex] = useState(0);
 
   const latestNews = news.slice(0, 3);
   const upcomingEvents = events.slice(0, 2);
+  const activePillar = IDEOLOGY_PILLARS[activePillarIndex] || IDEOLOGY_PILLARS[0];
 
   return (
     <div className="w-full bg-[#FAF8F5] text-[#111111] font-dmk-body">
@@ -166,67 +173,186 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. THE IDEOLOGICAL MANIFESTO (Clean Newspaper Columns with Dividers, No Cards) */}
+      {/* 4. THE IDEOLOGICAL MANIFESTO (Handcrafted Interactive Broadsheet Jurisprudence Desk) */}
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10 border-b border-neutral-300">
-        <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-neutral-900 pb-3 mb-8">
+        
+        {/* Editorial Section Masthead */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-neutral-900 pb-4 mb-6">
           <div>
-            <span className="text-xs font-mono font-bold text-[#E31E24] tracking-[0.25em] uppercase block mb-1">
-              {t.ideologyPreview.tag}
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline tracking-tight uppercase">
-              {t.ideologyPreview.title}
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="w-2.5 h-2.5 bg-[#E31E24]" />
+              <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#E31E24]">
+                DRAVIDIAN JURISPRUDENCE GAZETTE • SECTION IV • VOL. LIV
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 font-dmk-headline tracking-tight uppercase leading-none">
+              {language === 'ta'
+                ? 'திராவிட இயக்கத்தின் 6 முதன்மை அரசமைப்பு விழுமியங்கள்'
+                : 'The Six Ideological Pillars of Dravidian Jurisprudence'}
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 font-serif italic mt-0.5">
-              {t.ideologyPreview.subtitle}
+            <p className="text-xs sm:text-sm text-neutral-600 font-serif italic mt-1.5 max-w-3xl">
+              {language === 'ta'
+                ? 'நீதிமன்றங்களில் சமூக நீதி, மாநில சுயாட்சி, மொழி உரிமை மற்றும் பகுத்தறிவு விழுமியங்களை நிலைநிறுத்தும் அரை நூற்றாண்டு கால சட்டப் போர்ப்படை.'
+                : 'Five decades of constitutional defense before the Madras High Court and Supreme Court of India, safeguarding affirmative action, federal autonomy, and egalitarian democracy.'}
             </p>
           </div>
 
           <Link
             href="/ideology"
-            className="font-mono text-xs font-bold text-[#E31E24] hover:underline uppercase tracking-wider mt-2 md:mt-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-english font-bold text-neutral-900 hover:text-white hover:bg-neutral-900 border border-neutral-300 hover:border-neutral-900 uppercase tracking-wider transition-colors shrink-0 mt-3 md:mt-0"
           >
-            {t.ideologyPreview.viewAll} &rarr;
+            <span>{language === 'ta' ? 'அனைத்து 6 கொள்கை விளக்கங்கள்' : 'View All 6 Treatises'}</span>
+            <ChevronRight className="w-3.5 h-3.5 text-[#E31E24]" />
           </Link>
         </div>
 
-        {/* Seamless 3-Column Newspaper Flow */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 divide-y lg:divide-y-0 lg:divide-x divide-neutral-300">
-          {IDEOLOGY_PILLARS.slice(0, 6).map((pillar, idx) => (
-            <div
-              key={pillar.id}
-              className={`flex flex-col justify-between pt-6 lg:pt-0 ${idx > 0 ? 'lg:pl-8' : ''} space-y-3 group`}
-            >
-              <div>
-                <div className="flex items-center justify-between border-b border-neutral-300 pb-1.5 mb-2">
-                  <span className="text-xl font-mono font-black text-[#E31E24]">
-                    § {pillar.number}
-                  </span>
-                  <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono">
-                    {pillar.subtitle[language]}
-                  </span>
+        {/* 1. Interactive Broadsheet Doctrine Selector Tabs */}
+        <div className="border border-neutral-300 bg-white grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-y sm:divide-y-0 sm:divide-x divide-neutral-200 mb-6">
+          {IDEOLOGY_PILLARS.slice(0, 6).map((pillar, idx) => {
+            const isActive = activePillarIndex === idx;
+            return (
+              <button
+                key={pillar.id}
+                onClick={() => setActivePillarIndex(idx)}
+                className={`p-3 text-left transition-all relative flex flex-col justify-between group cursor-pointer ${
+                  isActive
+                    ? 'bg-[#111111] text-white'
+                    : 'bg-white hover:bg-[#FAF7F2] text-neutral-800'
+                }`}
+              >
+                <div className="w-full">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={`text-xs font-english font-black ${
+                      isActive ? 'text-[#FFD166]' : 'text-[#E31E24] group-hover:underline'
+                    }`}>
+                      § {pillar.number}
+                    </span>
+                    {isActive && (
+                      <span className="w-1.5 h-1.5 bg-[#E31E24]" />
+                    )}
+                  </div>
+                  <h4 className={`text-xs font-black font-dmk-headline line-clamp-1 ${
+                    isActive ? 'text-white' : 'text-neutral-900'
+                  }`}>
+                    {pillar.title[language].split('&')[0].trim()}
+                  </h4>
                 </div>
+                
+                {/* Active Underline Strip */}
+                <div className={`h-1 w-full mt-2 transition-all ${
+                  isActive ? 'bg-[#E31E24]' : 'bg-transparent group-hover:bg-neutral-200'
+                }`} />
+              </button>
+            );
+          })}
+        </div>
 
-                <h3 className="text-lg font-bold text-neutral-900 font-dmk-headline mb-2 group-hover:text-[#E31E24] transition-colors leading-snug">
-                  {pillar.title[language]}
+        {/* 2. Featured In-Depth Doctrine Display Plate */}
+        <div className="border border-neutral-300 bg-white divide-y lg:divide-y-0 lg:divide-x divide-neutral-300 grid grid-cols-1 lg:grid-cols-12 min-h-[460px]">
+          
+          {/* Left Column (7 cols / ~60%): Detailed Constitutional Doctrine & Precedents */}
+          <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+            <div className="space-y-4">
+              
+              {/* Pillar Number & Statute Header */}
+              <div className="flex flex-wrap items-center gap-2.5 pb-2 border-b border-neutral-200">
+                <span className="text-2xl sm:text-3xl font-black font-english text-[#E31E24] tracking-tight">
+                  § {activePillar.number}
+                </span>
+                <span className="text-neutral-300">•</span>
+                <span className="text-[11px] font-english font-bold uppercase tracking-wider text-[#B81318] bg-[#FFF5F5] px-2.5 py-0.5 border border-[#E31E24]/30">
+                  {activePillar.subtitle[language]}
+                </span>
+              </div>
+
+              {/* Title & Narrative */}
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline leading-tight mb-3">
+                  {activePillar.title[language]}
                 </h3>
-
-                <p className="text-xs text-neutral-700 leading-relaxed font-dmk-body">
-                  {pillar.description[language]}
+                <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-dmk-body">
+                  {activePillar.description[language]}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-neutral-200">
-                <Link
-                  href={`/ideology#${pillar.id}`}
-                  className="inline-flex items-center gap-1 text-xs text-neutral-900 hover:text-[#E31E24] font-bold font-dmk-headline"
-                >
-                  <span>{language === 'ta' ? 'விளக்கம்' : 'Read Doctrine'}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-[#E31E24]" />
-                </Link>
+              {/* 3 Core Constitutional Principles Checklist */}
+              <div className="space-y-2 pt-2">
+                <span className="text-[10px] font-english font-bold uppercase tracking-wider text-neutral-500 block">
+                  {language === 'ta' ? 'அடிப்படை அரசமைப்புப் பிரிவுகள் & இலக்குகள்:' : 'CONSTITUTIONAL TENETS & CADRE MANDATE:'}
+                </span>
+                <div className="grid grid-cols-1 gap-2">
+                  {activePillar.keyPrinciples.map((principle, pIdx) => (
+                    <div
+                      key={pIdx}
+                      className="flex items-start gap-2.5 p-2.5 bg-[#FAF7F2] border border-neutral-200 text-xs text-neutral-800"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#E31E24] shrink-0 mt-0.5" />
+                      <span className="font-dmk-body font-medium leading-relaxed">{principle[language]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Landmark Case Precedent Banner */}
+            <div className="p-3.5 bg-[#FAF7F2] border-l-4 border-[#E31E24] text-xs text-neutral-800 mt-4">
+              <div className="flex items-center gap-1.5 font-english font-bold text-[#E31E24] uppercase text-[10px] tracking-wider mb-1">
+                <Scale className="w-3.5 h-3.5" />
+                <span>{language === 'ta' ? 'வரலாற்றுச் சிறப்புமிக்க சட்டப் போராட்டம்:' : 'LANDMARK CONSTITUTIONAL LITIGATION:'}</span>
+              </div>
+              <p className="font-dmk-body text-neutral-700 leading-relaxed">
+                {activePillar.legalRelevance[language]}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column (5 cols / ~40%): Archival Leadership Quote & Historical Context */}
+          <div className="lg:col-span-5 bg-[#FAF7F2] p-6 sm:p-8 flex flex-col justify-between space-y-6">
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-neutral-300 pb-2">
+                <span className="text-[10px] font-english font-bold uppercase tracking-widest text-neutral-500">
+                  {language === 'ta' ? 'கொள்கைப் பிரகடனம்' : 'HISTORICAL PROCLAMATION'}
+                </span>
+                <Quote className="w-6 h-6 text-[#E31E24]" />
+              </div>
+
+              {/* Authentic Historical Quotation */}
+              <blockquote className="font-serif italic text-base sm:text-lg text-neutral-900 leading-relaxed border-l-2 border-neutral-900 pl-4 py-1">
+                "{activePillar.quote.text[language]}"
+              </blockquote>
+
+              {/* Leader Attribution & Historical Context */}
+              <div className="pt-2">
+                <p className="text-xs font-english font-black uppercase tracking-wider text-neutral-900">
+                  — {activePillar.quote.author[language]}
+                </p>
+                <p className="text-[11px] font-english text-neutral-600 mt-0.5 font-medium">
+                  {activePillar.quote.context[language]}
+                </p>
               </div>
             </div>
-          ))}
+
+            {/* Direct Action Link to In-Depth Treatise */}
+            <div className="pt-4 border-t border-neutral-300">
+              <Link
+                href={`/ideology#${activePillar.id}`}
+                className="w-full inline-flex items-center justify-between p-3 bg-white hover:bg-neutral-900 hover:text-white border border-neutral-300 hover:border-neutral-900 text-xs font-english font-bold uppercase tracking-wider transition-colors group"
+              >
+                <span>
+                  {language === 'ta'
+                    ? `${activePillar.title.ta} - முழுமையான சட்ட விளக்கம்`
+                    : `Read ${activePillar.title.en} Treatise`}
+                </span>
+                <ArrowRight className="w-4 h-4 text-[#E31E24] group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+
+          </div>
+
         </div>
+
       </section>
 
       {/* 5. PHOTOJOURNALISM & FIELD DISPATCHES (Editorial Press Layout, No Bulky Cards) */}
