@@ -12,9 +12,6 @@ import {
   ChevronDown, 
   ChevronUp, 
   HelpCircle,
-  BookOpen,
-  Scale,
-  FileText,
   X
 } from 'lucide-react';
 
@@ -91,16 +88,10 @@ export default function ResourcesPage() {
   return (
     <div className="w-full flex flex-col space-y-10 py-8 bg-[#FAF7F2] text-[#111111] font-dmk-body">
       
-      {/* Law Journal Masthead Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-[#FAF7F2] border-2 border-neutral-900 shadow-[4px_4px_0px_#111111] p-6 sm:p-10 relative overflow-hidden">
-          {/* Dual Party Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 flex">
-            <div className="w-1/2 bg-black" />
-            <div className="w-1/2 bg-[#E31E24]" />
-          </div>
-
-          <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-neutral-900 pb-5 mb-6 pt-2">
+      {/* Law Journal Header Banner */}
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
+        <div className="border-b-2 border-neutral-900 pb-6 pt-2">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="bg-[#111111] text-white text-[10px] font-mono uppercase px-2 py-0.5 tracking-widest font-bold">
@@ -116,36 +107,23 @@ export default function ResourcesPage() {
                   : 'Constitutional Reports, Judgments & Statutes'}
               </h1>
             </div>
-            <div className="mt-4 md:mt-0 text-left md:text-right font-mono text-[11px] text-neutral-600">
+            <div className="text-left md:text-right font-mono text-[11px] text-neutral-600">
               <p className="font-bold text-[#111111]">JURISPRUDENCE ARCHIVE</p>
               <p>Social Justice & State Autonomy Doctrines</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            <div className="lg:col-span-8">
-              <p className="text-base sm:text-lg text-neutral-800 leading-relaxed font-dmk-body">
-                {language === 'ta'
-                  ? '69% இடஒதுக்கீடு அரசமைப்பு ஆவணங்கள், ராஜமன்னார் மாநில சுயாட்சி அறிக்கை, ஆளுநர் அதிகார வரம்புத் தீர்ப்புகள் மற்றும் மக்கள் சட்ட உதவி கையேடுகளின் அதிகாரப்பூர்வ சட்டப் பதிவேடு.'
-                  : 'Primary constitutional materials, landmark Supreme Court judgments, statutory defenses, and citizen advocacy digests curated for advocate research and democratic legal awareness.'}
-              </p>
-            </div>
-            <div className="lg:col-span-4 bg-[#F3EFE6] border border-neutral-900 p-4">
-              <div className="flex items-center justify-between font-mono text-xs text-neutral-700 pb-2 border-b border-neutral-400">
-                <span>DIGEST REPOSITORY</span>
-                <span className="font-bold text-[#E31E24]">{filteredResources.length} ARCHIVES ACTIVE</span>
-              </div>
-              <p className="text-xs text-neutral-600 mt-2 font-mono">
-                Indexed under Article 15(4), 16(4), 200, 246 & federalism precedent.
-              </p>
-            </div>
-          </div>
+          <p className="text-base sm:text-lg text-neutral-800 leading-relaxed font-dmk-body max-w-4xl">
+            {language === 'ta'
+              ? '69% இடஒதுக்கீடு அரசமைப்பு ஆவணங்கள், ராஜமன்னார் மாநில சுயாட்சி அறிக்கை, ஆளுநர் அதிகார வரம்புத் தீர்ப்புகள் மற்றும் மக்கள் சட்ட உதவி கையேடுகளின் அதிகாரப்பூர்வ சட்டப் பதிவேடு.'
+              : 'Primary constitutional materials, landmark Supreme Court judgments, statutory defenses, and citizen advocacy digests curated for advocate research and democratic legal awareness.'}
+          </p>
         </div>
       </section>
 
       {/* Filter and Search Bar */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-white border-2 border-neutral-900 shadow-[3px_3px_0px_#111111] p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
+        <div className="bg-white border-y border-neutral-300 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           
           <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1 shrink-0">
@@ -156,10 +134,10 @@ export default function ResourcesPage() {
               <button
                 key={c}
                 onClick={() => setActiveCategory(c)}
-                className={`px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all border ${
+                className={`px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider transition-all border ${
                   activeCategory === c
-                    ? 'bg-[#E31E24] text-white border-neutral-900 shadow-[2px_2px_0px_#111111]'
-                    : 'bg-[#FAF7F2] text-neutral-800 border-neutral-400 hover:border-neutral-900'
+                    ? 'bg-[#E31E24] text-white border-neutral-900'
+                    : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-900'
                 }`}
               >
                 {c === 'All' ? (language === 'ta' ? 'அனைத்து ஆவணங்கள்' : 'All Series') : c}
@@ -168,13 +146,13 @@ export default function ResourcesPage() {
           </div>
 
           <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-neutral-600 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={language === 'ta' ? 'ஆவணம் அல்லது வழக்கு எண் தேடுக...' : 'Search dossier or citation...'}
-              className="w-full bg-[#FAF7F2] border-2 border-neutral-900 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-mono placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
+              className="w-full bg-[#FAF7F2] border border-neutral-300 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-mono placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
             />
           </div>
 
@@ -183,7 +161,7 @@ export default function ResourcesPage() {
 
       {/* Download Alert Toast */}
       {downloadSuccessToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#111111] text-white border-2 border-[#E31E24] px-5 py-3 shadow-[4px_4px_0px_#E31E24] flex items-center gap-3 font-mono">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#111111] text-white border-2 border-[#E31E24] px-5 py-3 shadow-md flex items-center gap-3 font-mono">
           <CheckCircle2 className="w-5 h-5 text-[#E31E24] shrink-0" />
           <div className="text-xs">
             <strong className="block font-bold text-white">
@@ -194,22 +172,21 @@ export default function ResourcesPage() {
         </div>
       )}
 
-      {/* Legal Resources Law Journal Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      {/* Legal Resources Law Journal Grid (Clean Border, No Card Appearance) */}
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredResources.map((res) => (
             <article
               key={res.id}
-              className="bg-white border-2 border-neutral-900 shadow-[4px_4px_0px_#111111] hover:shadow-[6px_6px_0px_#E31E24] p-6 sm:p-7 flex flex-col justify-between transition-all group"
+              className="bg-white border border-neutral-300 hover:border-neutral-900 p-6 flex flex-col justify-between transition-colors group"
             >
-              <div className="space-y-3.5">
-                {/* Journal Series Header Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-neutral-900 pb-3">
-                  <span className="text-xs font-mono font-bold text-[#E31E24] bg-red-50 border border-red-300 px-2.5 py-0.5 uppercase">
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-300 pb-2">
+                  <span className="text-xs font-mono font-bold text-[#E31E24] bg-red-50 border border-red-200 px-2 py-0.5 uppercase">
                     {res.category}
                   </span>
                   {res.citation && (
-                    <span className="text-[11px] font-mono font-bold text-neutral-800 bg-[#FAF7F2] px-2.5 py-0.5 border border-neutral-900">
+                    <span className="text-[11px] font-mono font-bold text-neutral-700 bg-[#FAF7F2] px-2 py-0.5 border border-neutral-300">
                       CITATION: {res.citation}
                     </span>
                   )}
@@ -224,11 +201,11 @@ export default function ResourcesPage() {
                 </p>
 
                 {/* Key Legal Highlights Box */}
-                <div className="p-3.5 bg-[#FAF7F2] border-2 border-neutral-900 space-y-1.5 shadow-[2px_2px_0px_#111111]">
-                  <span className="text-[11px] font-mono font-bold text-neutral-900 uppercase tracking-wider block border-b border-neutral-300 pb-1">
-                    {language === 'ta' ? 'முக்கிய சட்டக் கூறுகள்:' : 'JURISPRUDENCE RECORD & PRINCIPLES:'}
+                <div className="p-3 bg-[#FAF7F2] border-l-2 border-[#E31E24] space-y-1">
+                  <span className="text-[10px] font-mono font-bold text-neutral-900 uppercase tracking-wider block">
+                    {language === 'ta' ? 'முக்கிய சட்டக் கூறுகள்:' : 'JURISPRUDENCE RECORD:'}
                   </span>
-                  <div className="space-y-1.5 pt-1">
+                  <div className="space-y-1">
                     {res.keyHighlights[language].map((h, i) => (
                       <div key={i} className="flex items-start gap-2 text-xs text-neutral-800 font-dmk-body">
                         <span className="w-1.5 h-1.5 bg-[#E31E24] shrink-0 mt-1.5" />
@@ -239,8 +216,8 @@ export default function ResourcesPage() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="pt-5 mt-5 border-t-2 border-neutral-900 flex items-center justify-between">
+              {/* Action Strip */}
+              <div className="pt-4 mt-4 border-t border-neutral-200 flex items-center justify-between">
                 <span className="text-xs font-mono text-neutral-600 font-bold">
                   PDF • {res.fileSize}
                 </span>
@@ -248,14 +225,14 @@ export default function ResourcesPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setSelectedResource(res)}
-                    className="text-xs font-mono font-bold text-neutral-900 hover:text-[#E31E24] px-3 py-1.5 bg-[#FAF7F2] hover:bg-neutral-200 border-2 border-neutral-900 transition-colors"
+                    className="text-xs font-mono font-bold text-neutral-900 hover:text-[#E31E24] px-3 py-1 bg-[#FAF7F2] hover:bg-neutral-200 border border-neutral-300 transition-colors"
                   >
                     {language === 'ta' ? 'விளக்கம்' : 'Digest'}
                   </button>
 
                   <button
                     onClick={() => handleDownload(res)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E31E24] hover:bg-[#111111] text-white border-2 border-neutral-900 text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-[2px_2px_0px_#111111]"
+                    className="flex items-center gap-1.5 px-3 py-1 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>{language === 'ta' ? 'பதிவிறக்குக' : 'Download'}</span>
@@ -268,8 +245,8 @@ export default function ResourcesPage() {
       </section>
 
       {/* Frequently Asked Legal Questions Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="p-6 sm:p-10 bg-[#FAF7F2] border-2 border-neutral-900 shadow-[4px_4px_0px_#111111]">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
+        <div className="border-t-2 border-neutral-900 pt-8">
           <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#E31E24] uppercase tracking-widest mb-1">
             <HelpCircle className="w-4 h-4" />
             <span>{language === 'ta' ? 'அடிக்கடி கேட்கப்படும் சட்டக் கேள்விகள்' : 'CONSTITUTIONAL & STATUTORY FAQ'}</span>
@@ -284,7 +261,7 @@ export default function ResourcesPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border-2 border-neutral-900 shadow-[2px_2px_0px_#111111] overflow-hidden"
+                  className="bg-white border border-neutral-300 overflow-hidden"
                 >
                   <button
                     onClick={() => setExpandedFaq(isOpen ? null : idx)}
@@ -301,7 +278,7 @@ export default function ResourcesPage() {
                   </button>
 
                   {isOpen && (
-                    <div className="p-4 sm:p-5 pt-0 text-xs sm:text-sm text-neutral-800 leading-relaxed border-t border-neutral-300 bg-[#FAF7F2] font-dmk-body">
+                    <div className="p-4 sm:p-5 pt-0 text-xs sm:text-sm text-neutral-800 leading-relaxed border-t border-neutral-200 bg-[#FAF7F2] font-dmk-body">
                       {faq.a[language]}
                     </div>
                   )}
@@ -312,20 +289,19 @@ export default function ResourcesPage() {
         </div>
       </section>
 
-      {/* Resource Detail Broadsheet Modal */}
+      {/* Resource Detail Modal */}
       {selectedResource && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FAF7F2] border-4 border-neutral-900 rounded-none max-w-2xl w-full p-6 sm:p-8 relative shadow-[8px_8px_0px_#111111] max-h-[85vh] overflow-y-auto font-dmk-body">
+          <div className="bg-[#FAF7F2] border-2 border-neutral-900 max-w-2xl w-full p-6 sm:p-8 relative max-h-[85vh] overflow-y-auto font-dmk-body">
             
-            {/* Top Modal Flag Bar */}
-            <div className="w-full h-1.5 flex absolute top-0 left-0">
+            <div className="w-full h-1 flex absolute top-0 left-0">
               <div className="w-1/2 bg-black" />
               <div className="w-1/2 bg-[#E31E24]" />
             </div>
 
             <button
               onClick={() => setSelectedResource(null)}
-              className="absolute top-5 right-5 w-8 h-8 bg-white hover:bg-[#E31E24] hover:text-white text-neutral-900 border-2 border-neutral-900 shadow-[2px_2px_0px_#111111] flex items-center justify-center font-bold text-sm transition-all"
+              className="absolute top-5 right-5 w-8 h-8 bg-white hover:bg-[#E31E24] hover:text-white text-neutral-900 border border-neutral-900 flex items-center justify-center font-bold text-sm transition-all"
               aria-label="Close modal"
             >
               <X className="w-4 h-4" />
@@ -341,7 +317,7 @@ export default function ResourcesPage() {
               </h2>
 
               {selectedResource.citation && (
-                <div className="p-2.5 bg-white border-2 border-neutral-900 text-xs font-mono text-neutral-900 font-bold shadow-[2px_2px_0px_#111111]">
+                <div className="p-2.5 bg-white border border-neutral-300 text-xs font-mono text-neutral-900 font-bold">
                   CITATION: {selectedResource.citation}
                 </div>
               )}
@@ -364,10 +340,10 @@ export default function ResourcesPage() {
                 </div>
               </div>
 
-              <div className="pt-6 border-t-2 border-neutral-900 flex items-center justify-between">
+              <div className="pt-6 border-t border-neutral-300 flex items-center justify-between">
                 <button
                   onClick={() => setSelectedResource(null)}
-                  className="px-4 py-2 bg-white hover:bg-neutral-200 border-2 border-neutral-900 text-neutral-900 text-xs font-mono font-bold uppercase"
+                  className="px-4 py-2 bg-white hover:bg-neutral-200 border border-neutral-300 text-neutral-900 text-xs font-mono font-bold uppercase"
                 >
                   {language === 'ta' ? 'மூடுக' : 'Close Digest'}
                 </button>
@@ -377,7 +353,7 @@ export default function ResourcesPage() {
                     handleDownload(selectedResource);
                     setSelectedResource(null);
                   }}
-                  className="px-5 py-2 bg-[#E31E24] hover:bg-neutral-900 text-white border-2 border-neutral-900 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 shadow-[2px_2px_0px_#111111]"
+                  className="px-5 py-2 bg-[#E31E24] hover:bg-neutral-900 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>{language === 'ta' ? 'பதிவிறக்குக' : 'Download Complete Dossier'}</span>
