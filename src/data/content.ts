@@ -244,6 +244,16 @@ export const HISTORICAL_MILESTONES: HistoricalMilestone[] = [
     significance: { en: 'First comprehensive institutional study by any Indian state on restructuring federalism', ta: 'மாநில சுயாட்சி குறித்து ஒரு மாநில அரசால் அமைக்கப்பட்ட முதலாவது உயர் மட்டக் குழு' }
   },
   {
+    year: '1975',
+    title: { en: 'Emergency Defense & MISA Habeas Corpus Petitions', ta: 'எமர்ஜென்சி எதிர்ப்பு & மிசா ஆட்கொணர்வு சட்டப்போராட்டம்' },
+    description: { 
+      en: 'During the 1975 Internal Emergency, when democratic rights were suspended, DMK advocates filed over 100 habeas corpus petitions in the Madras High Court defending detained leaders and civil liberties.', 
+      ta: '1975 அவசரநிலைப் பிரகடனத்தின் போது ஜனநாயக உரிமைகள் பறிக்கப்பட்ட சூழலில், கைது செய்யப்பட்ட தலைவர்களுக்காக சென்னை உயர் நீதிமன்றத்தில் நூற்றுக்கும் மேற்பட்ட ஆட்கொணர்வு மனுக்களைத் தாக்கல் செய்து திமுக வழக்கறிஞர்கள் போராடினர்.' 
+    },
+    category: 'Constitutional',
+    significance: { en: 'Historic defense of fundamental rights and judicial review during constitutional crisis', ta: 'ஜனநாயக நெருக்கடி காலத்தில் மனித உரிமைகள் மற்றும் நீதிமன்ற மறுஆய்வு அதிகாரத்தைப் பாதுகாத்த வரலாற்றுப் பணி' }
+  },
+  {
     year: '1989',
     title: { en: 'Equal Property Rights for Women Act', ta: 'பெண்களுக்குச் சொத்தில் சம உரிமை வழங்கும் சட்டம்' },
     description: { 
@@ -260,12 +270,32 @@ export const HISTORICAL_MILESTONES: HistoricalMilestone[] = [
       en: 'Tamil Nadu Act 45 of 1994 was passed and placed in the Ninth Schedule through the 76th Constitutional Amendment, defended through dozens of Supreme Court hearings by DMK legal stalwarts.', 
       ta: 'தமிழ்நாடு சட்டம் 45/1994 நிறைவேற்றப்பட்டு, 76-வது அரசமைப்புத் திருத்தம் மூலம் 9-வது அட்டவணையில் சேர்க்கப்பட்டு உச்ச நீதிமன்றத்தில் திமுக வழக்கறிஞர்களால் தொடர்ச்சியாகப் பாதுகாக்கப்பட்டது.' 
     },
-    category: 'Constitutional',
+    category: 'Reservation',
     significance: { en: 'Protected Tamil Nadu’s pioneering quota against the judicial 50% ceiling', ta: 'நீதிமன்றங்களின் 50% வரம்பை மீறி தமிழ்நாட்டின் 69% இடஒதுக்கீட்டை நிலைநிறுத்திய சாதனை' }
   },
   {
-    year: '2021-2026',
-    title: { en: 'Federal Rights, Governor Assent Precedent & NEET Legal Challenges', ta: 'மாநில உரிமைகள், ஆளுநர் அதிகார வரம்பு & நீட் தேர்வு சட்டப் போராட்டம்' },
+    year: '2006',
+    title: { en: 'Archakas of All Castes Ordinance & Legislation', ta: 'அனைத்து சாதியினரும் அர்ச்சகர் ஆகும் வரலாற்றுச் சட்டம்' },
+    description: { 
+      en: 'Fulfilling the dream of Thanthai Periyar, Chief Minister Kalaignar Karunanidhi enacted legislation enabling qualified individuals from all communities to become temple priests, defended successfully in the courts.', 
+      ta: 'பெரியாரின் நெஞ்சில் தைத்த முள்ளை அகற்றும் வகையில், தகுதியுள்ள அனைத்து சாதியினரும் கோயில் அர்ச்சகராகும் வரலாற்றுச் சட்டத்தை கலைஞர் அரசு நிறைவேற்றி நீதிமன்றங்களில் உறுதி செய்தது.' 
+    },
+    category: 'Legislation',
+    significance: { en: 'Shattered caste-based priesthood monopolies through constitutional equality', ta: 'சமத்துவக் கோட்பாட்டின் மூலம் பிறப்பு அடிப்படையிலான பாகுபாடுகளைத் தகர்த்த சமூக நீதி மைல்கல்' }
+  },
+  {
+    year: '2021',
+    title: { en: '27% OBC Reservation in All-India Medical Quota', ta: 'அகில இந்திய மருத்துவ இடங்களில் ஓபிசி 27% இடஒதுக்கீட்டு வெற்றி' },
+    description: { 
+      en: 'DMK and Senior Advocate P. Wilson moved the Madras High Court and Supreme Court, securing 27% reservation for OBC candidates in All-India Quota medical seats, benefiting thousands of students annually.', 
+      ta: 'அகில இந்திய மருத்துவ இடங்களில் ஓபிசி மாணவர்களுக்கு 27% இடஒதுக்கீடு பெற்றுத்தர திமுக மூத்த வழக்கறிஞர் பி. வில்சன் சென்னை உயர் நீதிமன்றம் மற்றும் உச்ச நீதிமன்றத்தில் போராடி வரலாற்றுத் தீர்ப்பு பெற்றார்.' 
+    },
+    category: 'Reservation',
+    significance: { en: 'Secured thousands of medical seats for backward classes nationwide every year', ta: 'ஆண்டுதோறும் ஆயிரக்கணக்கான பிற்படுத்தப்பட்ட மாணவர்கள் மருத்துவம் பயிலும் உரிமையை உறுதி செய்த தீர்ப்பு' }
+  },
+  {
+    year: '2024-2026',
+    title: { en: 'Governor Inaction Precedent & NEET Legal Challenges', ta: 'மாநில உரிமைகள், ஆளுநர் அதிகார வரம்பு & நீட் தேர்வு சட்டப் போராட்டம்' },
     description: { 
       en: 'Under Chief Minister M.K. Stalin and Senior Advocate P. Wilson MP, DMK Legal Wing achieved landmark Supreme Court rulings mandating that Governors cannot pocket-veto state legislation, and continues the legal struggle against NEET.', 
       ta: 'முதலமைச்சர் மு.க. ஸ்டாலின் வழிகாட்டுதலில், மூத்த வழக்கறிஞர் பி. வில்சன் எம்பி உள்ளிட்டோர் முன்னெடுப்பில் ஆளுநர்கள் மசோதாக்களைக் காலவரையின்றி முடக்க முடியாது என்ற உச்சநீதிமன்ற வரலாற்றுத் தீர்ப்பு பெறப்பட்டது.' 

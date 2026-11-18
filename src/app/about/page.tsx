@@ -10,18 +10,19 @@ import {
   CheckCircle2, 
   Gavel, 
   History, 
-  Filter 
+  Filter,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Calendar
 } from 'lucide-react';
 
 export default function AboutPage() {
   const { language } = useLanguage();
-  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [selectedMilestoneIndex, setSelectedMilestoneIndex] = useState<number>(0);
+  const [showFullIndex, setShowFullIndex] = useState<boolean>(false);
 
-  const categories = ['All', 'Constitutional', 'Reservation', 'Legislation', 'Movement'];
-
-  const filteredMilestones = HISTORICAL_MILESTONES.filter(
-    (m) => activeCategory === 'All' || m.category === activeCategory
-  );
+  const currentMilestone = HISTORICAL_MILESTONES[selectedMilestoneIndex] || HISTORICAL_MILESTONES[0];
 
   return (
     <div className="w-full flex flex-col space-y-12 py-10 font-dmk-body bg-[#FAF7F2]">
@@ -221,79 +222,210 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 5. Historical Milestones Timeline (Archival Gazette Chronicle) */}
+      {/* 5. Historical Milestones Timeline (Our Journey - Star Timeline) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-white border border-neutral-300 p-8 sm:p-10">
+        <div className="bg-white border border-neutral-300 p-6 sm:p-10 relative overflow-hidden">
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-neutral-300 mb-8">
+          {/* Section Header Matching Reference Image */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-neutral-300 mb-8">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-[#E31E24] uppercase tracking-widest mb-1 font-english">
-                <History className="w-4 h-4" />
-                <span>{language === 'ta' ? 'வரலாற்று மைல்கற்கள்' : 'VERIFIED HISTORICAL TIMELINE'}</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline">
-                {language === 'ta' ? 'நூற்றாண்டு கால சட்டப் போராட்ட வரலாறு' : 'Over a Century of Legal Milestones'}
+              <h2 className="text-3xl sm:text-5xl font-black text-[#8B0000] font-dmk-headline tracking-tight leading-none">
+                {language === 'ta' ? 'நமது வரலாற்றுப் பயணம்' : 'Our Journey'}
               </h2>
+              <p className="text-xs sm:text-sm text-neutral-600 font-dmk-headline mt-2">
+                {language === 'ta'
+                  ? 'நூற்றாண்டு கால சட்டப் போராட்ட வரலாறு • 1921 முதல் 2026 வரை'
+                  : 'Over a Century of Legal Milestones • From 1921 to 2026'}
+              </p>
             </div>
 
-            {/* Timeline Category Filters */}
-            <div className="flex items-center gap-2 overflow-x-auto">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-3 py-1.5 text-xs font-bold uppercase font-english tracking-wider transition-all border ${
-                    activeCategory === cat
-                      ? 'bg-neutral-900 text-white border-neutral-900'
-                      : 'bg-white text-neutral-700 hover:text-black border-neutral-300'
-                  }`}
-                >
-                  {cat === 'All' ? (language === 'ta' ? 'அனைத்தும்' : 'All') : cat}
-                </button>
-              ))}
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono text-neutral-500 font-semibold">
+                {language === 'ta'
+                  ? `மைல்கல் ${selectedMilestoneIndex + 1} / ${HISTORICAL_MILESTONES.length}`
+                  : `Milestone ${selectedMilestoneIndex + 1} of ${HISTORICAL_MILESTONES.length}`}
+              </span>
+
+              <button
+                onClick={() => setShowFullIndex(!showFullIndex)}
+                className="px-3 py-1.5 text-xs font-english font-bold uppercase tracking-wider border border-neutral-300 hover:border-black text-neutral-700 hover:text-black transition-colors"
+              >
+                {showFullIndex
+                  ? (language === 'ta' ? 'சுருக்கப் பார்வை' : 'Interactive View')
+                  : (language === 'ta' ? 'அனைத்து மைல்கற்கள்' : 'View Full Index')}
+              </button>
             </div>
           </div>
 
-          {/* Timeline Sequence with authentic broadsheet rules */}
-          <div className="relative border-l-2 border-neutral-900 pl-6 sm:pl-10 space-y-8 ml-3 sm:ml-6">
-            {filteredMilestones.map((m, idx) => (
-              <div key={idx} className="relative group">
-                
-                {/* Year Marker Pin */}
-                <div className="absolute -left-[30px] sm:-left-[46px] top-1 w-5 h-5 bg-white border border-neutral-900 flex items-center justify-center">
-                  <div className="w-2 h-2 bg-[#E31E24]" />
-                </div>
+          {/* Interactive Star Timeline Track (Exact Replica of Reference Design) */}
+          <div className="relative py-10 my-4 overflow-x-auto scrollbar-none">
+            <div className="min-w-[700px] relative px-6">
+              
+              {/* Background Grey Track Line */}
+              <div className="absolute top-[18px] left-8 right-8 h-[2px] bg-neutral-300 z-0" />
 
-                {/* Milestone Entry in Broadsheet Layout */}
-                <div className="bg-[#FAF7F2] border border-neutral-300 p-6 transition-all">
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-300 pb-2 mb-3">
-                    <span className="text-2xl sm:text-3xl font-black text-[#E31E24] font-english">
-                      {m.year}
-                    </span>
-                    <span className="text-[11px] font-english px-2.5 py-0.5 bg-white text-neutral-800 border border-neutral-300 uppercase font-bold">
-                      {m.category}
-                    </span>
-                  </div>
+              {/* Active Crimson Progress Track Line */}
+              <div 
+                className="absolute top-[18px] left-8 h-[2px] bg-[#8B0000] z-0 transition-all duration-500" 
+                style={{ 
+                  width: `calc(${(selectedMilestoneIndex / (HISTORICAL_MILESTONES.length - 1)) * 100}% * ((100% - 64px) / 100))` 
+                }} 
+              />
 
-                  <h3 className="text-lg sm:text-xl font-bold text-neutral-900 font-dmk-headline mb-2 leading-snug">
-                    {m.title[language]}
-                  </h3>
+              {/* Star Nodes along the Track */}
+              <div className="flex items-center justify-between relative z-10">
+                {HISTORICAL_MILESTONES.map((m, idx) => {
+                  const isSelected = selectedMilestoneIndex === idx;
+                  return (
+                    <button
+                      key={m.year + idx}
+                      onClick={() => setSelectedMilestoneIndex(idx)}
+                      className="group flex flex-col items-center focus:outline-none cursor-pointer transition-transform"
+                      title={`${m.year}: ${m.title[language]}`}
+                    >
+                      {/* 5-Pointed Star Icon */}
+                      <div className={`p-1 bg-white rounded-full transition-transform duration-300 ${
+                        isSelected ? 'scale-125' : 'group-hover:scale-115'
+                      }`}>
+                        <Star 
+                          className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-300 ${
+                            isSelected
+                              ? 'text-[#8B0000] fill-[#8B0000]'
+                              : 'text-neutral-400 fill-neutral-300 group-hover:text-[#8B0000] group-hover:fill-[#8B0000]'
+                          }`} 
+                        />
+                      </div>
 
-                  <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed mb-4 font-dmk-body">
-                    {m.description[language]}
-                  </p>
-
-                  <div className="pt-3 border-t border-neutral-300 text-xs flex items-start gap-2 text-neutral-800">
-                    <strong className="text-[#B81318] font-bold shrink-0 font-english">
-                      {language === 'ta' ? 'அரசமைப்பு முக்கியத்துவம்:' : 'Constitutional Impact:'}
-                    </strong>
-                    <span className="font-english italic">{m.significance[language]}</span>
-                  </div>
-                </div>
-
+                      {/* Year Label */}
+                      <span className={`text-xs sm:text-sm font-english mt-2.5 transition-colors duration-200 select-none ${
+                        isSelected
+                          ? 'text-[#8B0000] font-black'
+                          : 'text-neutral-400 group-hover:text-neutral-800 font-semibold'
+                      }`}>
+                        {m.year}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
-            ))}
+
+            </div>
           </div>
+
+          {/* Detailed Selected Milestone Card */}
+          <div className="mt-8 bg-[#FAF7F2] border border-neutral-300 p-6 sm:p-10 relative overflow-hidden transition-all duration-300">
+            {/* Subtle Watermark Year in Background */}
+            <div className="absolute -right-4 -bottom-6 opacity-5 pointer-events-none select-none text-[120px] sm:text-[180px] font-black font-english text-neutral-900 leading-none">
+              {currentMilestone.year}
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-300 pb-4 mb-4">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl sm:text-5xl font-black text-[#8B0000] font-english tracking-tight">
+                    {currentMilestone.year}
+                  </span>
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 bg-white text-neutral-800 border border-neutral-300">
+                    {currentMilestone.category}
+                  </span>
+                </div>
+
+                <div className="text-xs font-mono text-neutral-500 font-semibold">
+                  {language === 'ta'
+                    ? `காலவரிசை பதிவு • ${currentMilestone.year}`
+                    : `Chronicle Entry • ${currentMilestone.year}`}
+                </div>
+              </div>
+
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-neutral-900 font-dmk-headline mb-3 leading-snug">
+                {currentMilestone.title[language]}
+              </h3>
+
+              <p className="text-sm sm:text-base text-neutral-700 leading-relaxed font-dmk-body mb-6 max-w-4xl">
+                {currentMilestone.description[language]}
+              </p>
+
+              <div className="p-4 bg-white border-l-4 border-[#8B0000] border-y border-r border-neutral-200 flex flex-col sm:flex-row sm:items-baseline gap-2 text-xs sm:text-sm text-neutral-800 mb-6">
+                <span className="font-bold uppercase tracking-wider text-[#8B0000] font-english shrink-0">
+                  {language === 'ta' ? 'அரசமைப்பு முக்கியத்துவம்:' : 'Constitutional Significance:'}
+                </span>
+                <span className="font-dmk-body italic">
+                  {currentMilestone.significance[language]}
+                </span>
+              </div>
+
+              {/* Step Navigation Controls */}
+              <div className="flex items-center justify-between pt-4 border-t border-neutral-300 text-xs font-english font-bold uppercase tracking-wider">
+                <button
+                  onClick={() => setSelectedMilestoneIndex(prev => Math.max(0, prev - 1))}
+                  disabled={selectedMilestoneIndex === 0}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-white border border-neutral-300 hover:border-black text-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronLeft className="w-4 h-4 text-[#8B0000]" />
+                  <span>{language === 'ta' ? 'முந்தைய மைல்கல்' : 'Previous Milestone'}</span>
+                </button>
+
+                <span className="text-neutral-500 font-mono text-[11px] hidden sm:inline">
+                  {language === 'ta'
+                    ? 'நட்சத்திரத்தைக் கிளிக் செய்து வரலாற்றை அறிக'
+                    : 'Click any star above or use navigation buttons'}
+                </span>
+
+                <button
+                  onClick={() => setSelectedMilestoneIndex(prev => Math.min(HISTORICAL_MILESTONES.length - 1, prev + 1))}
+                  disabled={selectedMilestoneIndex === HISTORICAL_MILESTONES.length - 1}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-white border border-neutral-300 hover:border-black text-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  <span>{language === 'ta' ? 'அடுத்த மைல்கல்' : 'Next Milestone'}</span>
+                  <ChevronRight className="w-4 h-4 text-[#8B0000]" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Full Chronological Gazette Index (Collapsible / Expandable) */}
+          {showFullIndex && (
+            <div className="mt-12 pt-8 border-t-2 border-neutral-900 space-y-6 animate-in fade-in duration-300">
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-300">
+                <h4 className="text-lg font-black text-neutral-900 font-dmk-headline">
+                  {language === 'ta' ? 'முழு காலவரிசைப் பட்டியல்' : 'Complete Chronological Archive'}
+                </h4>
+                <span className="text-xs font-mono text-neutral-500">
+                  10 {language === 'ta' ? 'வரலாற்று மைல்கற்கள்' : 'Key Milestones'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {HISTORICAL_MILESTONES.map((m, idx) => (
+                  <div 
+                    key={m.year + idx}
+                    onClick={() => {
+                      setSelectedMilestoneIndex(idx);
+                      setShowFullIndex(false);
+                    }}
+                    className={`p-5 border transition-all cursor-pointer ${
+                      selectedMilestoneIndex === idx
+                        ? 'bg-white border-[#8B0000] shadow-sm'
+                        : 'bg-[#FAF7F2] border-neutral-300 hover:border-neutral-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-2">
+                      <span className="text-xl font-black text-[#8B0000] font-english">{m.year}</span>
+                      <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 bg-white border border-neutral-200">
+                        {m.category}
+                      </span>
+                    </div>
+                    <h5 className="font-bold text-neutral-900 font-dmk-headline text-sm mb-1 leading-snug">
+                      {m.title[language]}
+                    </h5>
+                    <p className="text-xs text-neutral-600 font-dmk-body line-clamp-2">
+                      {m.description[language]}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
         </div>
       </section>
