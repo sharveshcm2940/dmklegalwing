@@ -6,7 +6,9 @@ import {
   EventItem, 
   LegalResource, 
   NewsItem,
-  FlowchartOfficer
+  FlowchartOfficer,
+  LegalDevelopmentItem,
+  PressGalleryItem
 } from '../types';
 
 export const DMK_ORGANISATION_INFO = {
@@ -1319,18 +1321,30 @@ export const NEWS_ITEMS: NewsItem[] = [
       en: 'Supreme Court Upholds Tamil Nadu Stand: Governors Cannot Delay Assent to Assembly Bills Indefinitely', 
       ta: 'உச்ச நீதிமன்றம் வரலாற்றுத் தீர்ப்பு: சட்டமன்ற மசோதாக்களுக்கு ஒப்புதல் அளிக்காமல் ஆளுநர்கள் காலவரையின்றி முடக்க முடியாது' 
     },
-    category: 'Resolution',
-    date: '2026-11-10',
-    author: { en: 'DMK Legal Wing Secretariat', ta: 'திமுக வழக்கறிஞர் அணித் தலைமை' },
+    category: 'Court Watch',
+    date: '2026-11-18',
+    time: '10:45 AM IST',
+    readTime: '4 min read',
+    author: { en: 'DMK Legal Wing Secretariat', ta: 'திமுக வழக்கறிஞர் அணித் தலைமைச் செயலகம்' },
+    issuingAuthority: { en: 'Apex Constitutional Panel, Anna Arivalayam', ta: 'அரசமைப்புச் சட்டப் பிரிவு, அண்ணா அறிவாலயம்' },
     summary: {
       en: 'A decisive constitutional victory for Tamil Nadu as the Supreme Court laid down that state legislative sovereignty under Article 200 cannot be usurped by nominated governors.',
       ta: 'தமிழ்நாட்டின் அரசமைப்பு உரிமைப் போராட்டத்திற்கு கிடைத்த மாபெரும் வெற்றி; ஆளுநர்கள் சட்டமன்ற மசோதாக்களைக் கிடப்பில் போட முடியாது என உச்ச நீதிமன்றம் தெளிவுபடுத்தியுள்ளது.'
     },
     content: {
-      en: 'The Supreme Court of India in its landmark judgment reaffirmed that the constitutional scheme relies on elected democratic representatives. Senior Advocate P. Wilson representing the DMK Legal Wing argued that delaying bills passed by the Legislative Assembly is a direct blow to the basic structure of the Constitution. The Court reiterated that if a Bill is passed a second time by the Assembly, the Governor has no option but to grant assent.',
-      ta: 'மக்களால் தேர்ந்தெடுக்கப்பட்ட சட்டப்பேரவை நிறைவேற்றும் மசோதாக்களை ஆளுநர்கள் காலம் தாழ்த்தாமல் நிறைவேற்ற வேண்டும் என்று உச்ச நீதிமன்றம் திட்டவட்டமாகத் தீர்ப்பளித்துள்ளது. திமுக வழக்கறிஞர் அணி சார்பில் மூத்த வழக்கறிஞர் பி. வில்சன் எம்பி முன்வைத்த வாதங்களை ஏற்று, அரசமைப்பின் அடிப்படைக் கட்டமைப்பான நாடாளுமன்ற ஜனநாயகத்தை நீதிமன்றம் உறுதி செய்துள்ளது.'
+      en: 'The Supreme Court of India in its landmark judgment reaffirmed that the constitutional scheme relies fundamentally on elected democratic representatives. Senior Advocate P. Wilson representing the DMK Legal Wing argued that withholding bills passed by the Legislative Assembly is a direct blow to the basic structure of the Constitution and democratic federalism.\n\nThe Court explicitly reiterated that under Article 200, when a Bill is passed a second time by the State Legislative Assembly, the Governor has no constitutional option or pocket-veto power, but must grant assent. The Legal Wing hailed this judgment as a monumental safeguard for all federal states across the Indian Union.',
+      ta: 'மக்களால் தேர்ந்தெடுக்கப்பட்ட சட்டப்பேரவை நிறைவேற்றும் மசோதாக்களை ஆளுநர்கள் காலம் தாழ்த்தாமல் நிறைவேற்ற வேண்டும் என்று உச்ச நீதிமன்றம் திட்டவட்டமாகத் தீர்ப்பளித்துள்ளது. திமுக வழக்கறிஞர் அணி சார்பில் மூத்த வழக்கறிஞர் பி. வில்சன் எம்பி முன்வைத்த வாதங்களை ஏற்று, அரசமைப்பின் அடிப்படைக் கட்டமைப்பான நாடாளுமன்ற ஜனநாயகத்தை நீதிமன்றம் உறுதி செய்துள்ளது.\n\nசட்டப்பேரவையில் இரண்டாவது முறை நிறைவேற்றப்படும் மசோதாக்களுக்கு ஆளுநர்கள் கட்டாயம் ஒப்புதல் அளிக்க வேண்டும் என்றும், காலவரையின்றி முடக்கி வைக்கும் அதிகாரம் ஆளுநர்களுக்கு இல்லை என்றும் அரசமைப்பு உறுப்பு 200-ன் கீழ் உச்சநீதிமன்றம் தெளிவுபடுத்தியுள்ளது.'
     },
     image: '/images/dmk-slider-official.jpg',
+    photoCredit: 'DMK Legal Wing Press Bureau / Anna Arivalayam',
+    caption: {
+      en: 'DMK Legal Wing senior leadership address the press following the Supreme Court constitutional victory.',
+      ta: 'உச்ச நீதிமன்ற வரலாற்று சிறப்புமிக்க தீர்ப்பைத் தொடர்ந்து வழக்கறிஞர் அணி மூத்த நிர்வாகிகள் செய்தியாளர் சந்திப்பு.'
+    },
+    court: 'Supreme Court of India',
+    caseNumber: 'Writ Petition (Civil) No. 1102 of 2024',
+    documentUrl: '#',
+    status: 'published',
     featured: true
   },
   {
@@ -1340,37 +1354,342 @@ export const NEWS_ITEMS: NewsItem[] = [
       ta: 'நீட் தேர்வுக்கு எதிரான வழக்கில் உச்ச நீதிமன்றத்தில் திமுக வழக்கறிஞர் அணி விரிவான எழுத்துப்பூர்வ வாதங்கள் தாக்கல்' 
     },
     category: 'Press Release',
-    date: '2026-10-28',
+    date: '2026-11-12',
+    time: '02:30 PM IST',
+    readTime: '3 min read',
     author: { en: 'Senior Advocate P. Wilson Office', ta: 'மூத்த வழக்கறிஞர் பி. வில்சன் அலுவலகம்' },
+    issuingAuthority: { en: 'Supreme Court Litigation Wing', ta: 'உச்ச நீதிமன்ற வழக்கறிஞர் பிரிவு' },
     summary: {
       en: 'Submissions highlighted empirical data from Justice A.K. Rajan Committee showing grave disparity and denial of medical education to rural and Tamil-medium students.',
       ta: 'நீதிபதி ஏ.கே. ராஜன் குழுவின் விரிவான புள்ளிவிவரங்களின் அடிப்படையில், நீட் தேர்வு கிராமப்புற மற்றும் தமிழ் வழி மாணவர்களின் மருத்துவக் கனவைச் சிதைப்பதை விளக்கும் வாதங்கள் சமர்ப்பிக்கப்பட்டன.'
     },
     content: {
-      en: 'DMK Legal Wing filed extensive written submissions demonstrating that the single national exam discriminates against underprivileged rural students who cannot afford commercial coaching. The plea asserts that public health and education are intrinsic federal concerns under the Constitution.',
-      ta: 'கோடிக்கணக்கில் செலவழித்து தனியார் பயிற்சி மையங்களுக்குச் செல்ல முடியாத ஏழை, எளிய மற்றும் அரசுப் பள்ளி மாணவர்களுக்கு நீட் தேர்வு இழைக்கும் அநீதிகளை விளக்கி உச்ச நீதிமன்றத்தில் ஆவணங்கள் சமர்ப்பிக்கப்பட்டுள்ளன.'
+      en: 'DMK Legal Wing filed extensive written submissions demonstrating that the single national exam discriminates against underprivileged rural students who cannot afford commercial coaching centers. The plea asserts that public health and university education are intrinsic federal concerns under the Constitution.\n\nThe submissions placed on record the comprehensive findings of the high-level Justice A.K. Rajan Committee, urging the Court to restore state legislative competence to determine admission procedures tailored to socio-economic realities.',
+      ta: 'கோடிக்கணக்கில் செலவழித்து தனியார் பயிற்சி மையங்களுக்குச் செல்ல முடியாத ஏழை, எளிய மற்றும் அரசுப் பள்ளி மாணவர்களுக்கு நீட் தேர்வு இழைக்கும் அநீதிகளை விளக்கி உச்ச நீதிமன்றத்தில் ஆவணங்கள் சமர்ப்பிக்கப்பட்டுள்ளன.\n\nமருத்துவக் கல்வி சேர்க்கை மாநில அரசின் ஆளுகைக்குட்பட்டது என்பதை நிலைநாட்டவும், கிராமப்புற மாணவர்களின் சமூக நீதியைப் பாதுகாக்கவும் விரிவான சட்டக் காரணங்கள் நீதிமன்றத்தில் முன்வைக்கப்பட்டுள்ளன.'
     },
     image: '/images/dmk-flag-sun.jpg',
+    photoCredit: 'Madras High Court Bureau',
+    caption: {
+      en: 'Official symbol of social justice and constitutional advocacy of the DMK Legal Wing.',
+      ta: 'சமூக நீதி மற்றும் அரசமைப்பு உரிமைப் போராட்டங்களின் அதிகாரப்பூர்வ சின்னம்.'
+    },
+    court: 'Supreme Court of India',
+    caseNumber: 'Original Suit No. 1 of 2023',
+    documentUrl: '#',
+    status: 'published',
+    featured: false
+  },
+  {
+    id: 'news-tamil-language-highcourt',
+    title: { 
+      en: 'Legal Wing Escalates Campaign for Tamil as Official Language in Madras High Court', 
+      ta: 'சென்னை உயர் நீதிமன்றத்தில் வழக்காடு மொழியாகத் தமிழ்: வழக்கறிஞர் அணி சட்டப் போராட்டத்தை தீவிரப்படுத்துகிறது' 
+    },
+    category: 'Official Statements',
+    date: '2026-11-04',
+    time: '11:15 AM IST',
+    readTime: '4 min read',
+    author: { en: 'R. Viduthalai, President, Legal Wing', ta: 'ஆர். விடுதலை, தலைவர், வழக்கறிஞர் அணி' },
+    issuingAuthority: { en: 'State Executive Council, DMK Legal Wing', ta: 'மாநில செயற்குழு, திமுக வழக்கறிஞர் அணி' },
+    summary: {
+      en: 'President R. Viduthalai affirmed that justice cannot remain alienated from the common citizens and urged the Union Government to grant consent under Article 348(2).',
+      ta: 'மக்களுக்குத் தாய்மொழியில் நீதி கிடைப்பதே உண்மையான ஜனநாயக மாண்பு; அரசமைப்பு உறுப்பு 348(2)-ன் கீழ் ஒன்றிய அரசு ஒப்புதல் அளிக்க வேண்டும் என தலைவர் ஆர். விடுதலை வலியுறுத்தல்.'
+    },
+    content: {
+      en: 'At a special consultation meet held at Chennai, Legal Wing President R. Viduthalai and Secretary N.R. Elango MP announced a coordinated legal and parliamentary initiative to enable Tamil as an official court language in the Madras High Court and its Madurai Bench.\n\nNoting that the Tamil Nadu Legislative Assembly had unanimously passed statutory resolutions to this effect, the leaders stressed that regional language courts have already been recognized in Rajasthan, UP, MP, and Bihar in Hindi, and denying the same status to classical Tamil is a violation of federal equality.',
+      ta: 'சென்னை உயர் நீதிமன்றத்தில் வழக்காடு மொழியாக தமிழை அறிவிக்கக் கோரி தமிழ்நாடு சட்டமன்றம் ஒருமனதாக நிறைவேற்றிய தீர்மானத்திற்கு ஒன்றிய அரசு உடனே ஒப்புதல் அளிக்க வேண்டும்.\n\nஇந்தி பேசும் மாநிலங்களில் தாய்மொழி உயர் நீதிமன்றங்களில் அனுமதிக்கப்பட்டுள்ள நிலையில், செம்மொழியான தமிழுக்கு அனுமதி மறுப்பது கூட்டாட்சித் தத்துவத்திற்கு எதிரானது என்று கூட்டத்தில் தீர்மானம் நிறைவேற்றப்பட்டது.'
+    },
+    image: '/images/dmk-press-meet.jpg',
+    photoCredit: 'DMK Press Bureau',
+    caption: {
+      en: 'Legal Wing President R. Viduthalai and Secretary N.R. Elango addressing the consultative council in Chennai.',
+      ta: 'சென்னையில் நடைபெற்ற வழக்கறிஞர் அணி ஆலோசனைக் கூட்டத்தில் தலைவர் ஆர். விடுதலை மற்றும் செயலாளர் என்.ஆர். இளங்கோ உரை.'
+    },
+    court: 'Madras High Court & Supreme Court',
+    documentUrl: '#',
+    status: 'published',
     featured: false
   },
   {
     id: 'news-junior-advocates-stipend',
     title: { 
-      en: 'State Government Junior Advocates Monthly Stipend Scheme Commended Across Bar Associations', 
-      ta: 'இளம் வழக்கறிஞர்களுக்கான மாதாந்திர உதவித்தொகை திட்டம்: பார் அசோசியேஷன்கள் நெகிழ்ச்சி பாராட்டு' 
+      en: 'State Government Junior Advocates Monthly Stipend Scheme Commended Across 120 Bar Associations', 
+      ta: 'இளம் வழக்கறிஞர்களுக்கான மாதாந்திர உதவித்தொகை திட்டம்: 120-க்கும் மேற்பட்ட பார் அசோசியேஷன்கள் நெகிழ்ச்சி பாராட்டு' 
     },
     category: 'Statement',
-    date: '2026-09-18',
-    author: { en: 'Advocates Association Forum', ta: 'வழக்கறிஞர்கள் சங்க கூட்டமைப்பு' },
+    date: '2026-10-22',
+    time: '04:00 PM IST',
+    readTime: '3 min read',
+    author: { en: 'All Tamil Nadu Advocates Association Federation', ta: 'தமிழ்நாடு வழக்கறிஞர்கள் சங்க கூட்டமைப்பு' },
+    issuingAuthority: { en: 'Cadre Welfare Wing', ta: 'வழக்கறிஞர் நலப் பிரிவு' },
     summary: {
       en: 'The Dravidian model government’s monthly stipend scheme for junior advocates completing enrollment provides crucial financial security during initial years of legal practice.',
       ta: 'சட்டப் படிப்பை முடித்துப் புதிதாகப் பதிவு செய்யும் இளம் வழக்கறிஞர்களுக்குத் தமிழ்நாடு அரசு வழங்கி வரும் மாதாந்திர உதவித்தொகை திட்டம் அவர்களின் தன்னம்பிக்கையை உயர்த்தியுள்ளது.'
     },
     content: {
-      en: 'The historic stipend scheme initiated under Chief Minister M.K. Stalin to support first-generation and economically underprivileged advocates during their first three years of practice has won praise from over 120 bar associations across Tamil Nadu.',
-      ta: 'வழக்கறிஞர் தொழிலில் தொடக்கக் காலத்தில் இளம் மற்றும் முதல் தலைமுறை பட்டதாரி வழக்கறிஞர்கள் எதிர்கொள்ளும் நிதிச் சுமைகளைக் குறைக்கும் வகையில் திமுக அரசு செயல்படுத்தி வரும் திட்டத்திற்கு வழக்கறிஞர்கள் பெரும் வரவேற்பு தெரிவித்துள்ளனர்.'
+      en: 'The historic stipend scheme initiated under Chief Minister M.K. Stalin to support first-generation and economically underprivileged advocates during their first three years of practice has won praise from over 120 bar associations across Tamil Nadu.\n\nThe scheme disburses direct monthly assistance to enrolled advocates, enabling talented youth from rural, SC, ST, and OBC families to sustain trial practice without succumbing to immediate financial pressures.',
+      ta: 'வழக்கறிஞர் தொழிலில் தொடக்கக் காலத்தில் இளம் மற்றும் முதல் தலைமுறை பட்டதாரி வழக்கறிஞர்கள் எதிர்கொள்ளும் நிதிச் சுமைகளைக் குறைக்கும் வகையில் முதல்வர் மு.க. ஸ்டாலின் செயல்படுத்தி வரும் திட்டத்திற்கு வழக்கறிஞர்கள் பெரும் வரவேற்பு தெரிவித்துள்ளனர்.\n\nஎளிய குடும்பங்களைச் சேர்ந்த இளைஞர்கள் சட்டத் தொழிலில் நிலைத்து நின்று சமூக நீதிக்காகப் போராட இத்திட்டம் பெருந்துணையாக உள்ளது.'
+    },
+    image: '/images/dmk-legal-conference.jpg',
+    photoCredit: 'Advocates Association Archives',
+    caption: {
+      en: 'Junior advocates attending the professional empowerment conclave in Chennai.',
+      ta: 'சென்னையில் நடைபெற்ற இளம் வழக்கறிஞர்கள் திறன் மேம்பாட்டு மாநாடு.'
+    },
+    court: 'Madras High Court & District Bars',
+    documentUrl: '#',
+    status: 'published',
+    featured: false
+  },
+  {
+    id: 'news-delimitation-resolution',
+    title: { 
+      en: 'State Executive Council Passes Unanimous Resolution Opposing Delimitation Threat to Southern Representation', 
+      ta: 'தென்மாநிலங்களின் நாடாளுமன்ற பிரதிநிதித்துவத்தை குறைக்கும் தொகுதி மறுசீரமைப்புக்கு எதிராக வழக்கறிஞர் அணி ஒருமனதாக தீர்மானம்' 
+    },
+    category: 'Resolution',
+    date: '2026-10-15',
+    time: '01:20 PM IST',
+    readTime: '5 min read',
+    author: { en: 'N.R. Elango MP, State Secretary', ta: 'என்.ஆர். இளங்கோ எம்பி, மாநிலச் செயலாளர்' },
+    issuingAuthority: { en: 'DMK Legal Wing State Executive', ta: 'திமுக வழக்கறிஞர் அணி மாநில செயற்குழு' },
+    summary: {
+      en: 'The resolution resolves that population-control performance cannot be weaponized to slash Tamil Nadu’s Lok Sabha share, vowing a constitutional challenge if equal representation is undermined.',
+      ta: 'மக்கள்தொகைக் கட்டுப்பாட்டைச் சிறப்பாகச் செயல்படுத்தியதற்காக தமிழ்நாட்டின் நாடாளுமன்ற இடங்களைக் குறைப்பது கூட்டாட்சி விரோதம்; தேவைப்பட்டால் உச்சநீதிமன்றத்தில் வழக்கு தொடரப்படும் என எச்சரிக்கை.'
+    },
+    content: {
+      en: 'The State Executive Council of the DMK Legal Wing, in an extraordinary meeting chaired by President R. Viduthalai and Secretary N.R. Elango MP, passed a unanimous resolution warning against any move to carry out delimitation on the raw basis of Census figures.\n\nThe council pointed out that penalizing progressive states for successfully implementing national population policies strikes at the core of federal democracy. The Legal Wing established a special research panel to draft comprehensive constitutional safeguards ensuring state representation remains inviolate.',
+      ta: 'திமுக வழக்கறிஞர் அணி மாநில செயற்குழுவின் சிறப்பு கூட்டம் தலைவர் ஆர். விடுதலை மற்றும் செயலாளர் என்.ஆர். இளங்கோ தலைமையில் நடைபெற்றது. மக்கள்தொகை அடிப்படையில் நாடாளுமன்றத் தொகுதிகளை மறுசீரமைத்தால் தென்மாநிலங்களின் அரசியல் அதிகாரம் பறிபோகும் என்று கூட்டத்தில் சுட்டிக்காட்டப்பட்டது.\n\nமாநிலங்களின் சமத்துவ உரிமையைப் பாதுகாக்க சிறப்பு சட்டக் குழு அமைக்கப்பட்டு விரிவான சட்ட ஆய்வு மேற்கொள்ளப்பட்டு வருகிறது.'
+    },
+    image: '/images/dmk-campaign-stalin.jpg',
+    photoCredit: 'DMK Information Wing',
+    caption: {
+      en: 'State Executive meeting in session at Anna Arivalayam.',
+      ta: 'அண்ணா அறிவாலயத்தில் நடைபெற்ற வழக்கறிஞர் அணி மாநில செயற்குழுக் கூட்டம்.'
+    },
+    court: 'Supreme Court of India',
+    documentUrl: '#',
+    status: 'published',
+    featured: false
+  },
+  {
+    id: 'news-advocates-welfare-gazette',
+    title: { 
+      en: 'Gazette Extraordinary: Tamil Nadu Advocates Welfare Fund Enhanced to Rs. 10 Lakhs', 
+      ta: 'சிறப்பு அரசிதழ் வெளியீடு: தமிழ்நாடு வழக்கறிஞர்கள் சேமநல நிதி ரூ. 10 லட்சமாக உயர்த்தி அரசிதழில் அதிகாரப்பூர்வ அறிவிப்பு' 
+    },
+    category: 'Gazette',
+    date: '2026-09-29',
+    time: '06:00 PM IST',
+    readTime: '2 min read',
+    author: { en: 'Law Department, Government of Tamil Nadu', ta: 'சட்டத்துறை, தமிழ்நாடு அரசு' },
+    issuingAuthority: { en: 'Official Gazette Section', ta: 'அரசிதழ் வெளியீட்டுப் பிரிவு' },
+    summary: {
+      en: 'Statutory notification amending the Tamil Nadu Advocates Welfare Fund Act, substantially boosting financial security for deceased advocates’ kin.',
+      ta: 'மறைந்த வழக்கறிஞர்களின் குடும்பத்தினருக்கு வழங்கப்படும் நிவாரண நிதி ரூ. 10 லட்சமாக உயர்த்தி சட்டத் திருத்த அரசிதழ் வெளியிடப்பட்டுள்ளது.'
+    },
+    content: {
+      en: 'The Government of Tamil Nadu officially notified the amendment to the Tamil Nadu Advocates Welfare Fund Act, fulfilling a key commitment championed by the DMK Legal Wing. The death benefit provided to the bereaved families of practicing advocates has been raised from Rs. 7 lakhs to Rs. 10 lakhs.\n\nThe gazette notification marks a decisive step in fortifying social security for over 70,000 enrolled advocates practicing across High Court and District Court bars in the state.',
+      ta: 'திமுக வழக்கறிஞர் அணியின் தொடர் கோரிக்கையை ஏற்று, வழக்கறிஞர்கள் சேமநல நிதி சட்டத் திருத்தத்தை தமிழ்நாடு அரசு அதிகாரப்பூர்வமாக அரசிதழில் வெளியிட்டுள்ளது.\n\nஇதன்மூலம் வழக்கறிஞர் ஒருவர் காலமானால் அவரது குடும்பத்திற்கு வழங்கப்படும் நிதி உதவி ரூ. 10 லட்சமாக உயர்த்தப்பட்டு நடைமுறைக்கு வந்துள்ளது.'
     },
     image: '/images/dmk-slider-official.jpg',
+    photoCredit: 'Tamil Nadu Government Gazette',
+    caption: {
+      en: 'Official notification published in the Tamil Nadu Government Gazette.',
+      ta: 'தமிழ்நாடு அரசு சிறப்பு அரசிதழில் வெளியான அதிகாரப்பூர்வ அறிவிப்பு.'
+    },
+    documentUrl: '#',
+    status: 'published',
     featured: false
+  }
+];
+
+export const LEGAL_DEVELOPMENTS_DATA: LegalDevelopmentItem[] = [
+  {
+    id: 'ld-001',
+    caseTitle: {
+      en: 'State of Tamil Nadu v. The Governor of Tamil Nadu & Anr.',
+      ta: 'தமிழ்நாடு அரசு எதிர் தமிழக ஆளுநர் மற்றும் பிறர்'
+    },
+    caseNumber: 'Writ Petition (Civil) No. 1102 of 2024',
+    court: 'Supreme Court of India',
+    bench: 'Bench of Chief Justice of India & Justice J.B. Pardiwala',
+    date: '2026-11-10',
+    category: 'Federalism',
+    counsel: {
+      en: 'Senior Advocate P. Wilson & Legal Wing Apex Panel',
+      ta: 'மூத்த வழக்கறிஞர் பி. வில்சன் & தலைமை சட்டக் குழு'
+    },
+    summary: {
+      en: 'The Supreme Court ruled that Article 200 does not grant unbridled discretion to Governors to sit indefinitely on bills passed by elected state legislatures. Once re-passed, assent is mandatory.',
+      ta: 'சட்டப்பேரவை நிறைவேற்றிய மசோதாக்களை ஆளுநர்கள் காலவரையின்றி முடக்க முடியாது; இரண்டாவது முறை நிறைவேற்றினால் கட்டாயம் ஒப்புதல் அளிக்க வேண்டும் என உச்ச நீதிமன்றம் தீர்ப்பளித்தது.'
+    },
+    significance: {
+      en: 'Landmark constitutional precedent reaffirming parliamentary democracy and curbing gubernatorial overreach.',
+      ta: 'மாநில சட்டமன்றங்களின் மக்களாட்சி இறையாண்மையை நிலைநாட்டிய உச்ச நீதிமன்ற வரலாற்றுத் தீர்ப்பு.'
+    },
+    orderLink: '#',
+    statusTag: { en: 'Landmark Victory', ta: 'வரலாற்று வெற்றி' }
+  },
+  {
+    id: 'ld-002',
+    caseTitle: {
+      en: 'DMK Legal Wing v. Union of India (NEET Invalidation Suit)',
+      ta: 'திமுக வழக்கறிஞர் அணி எதிர் இந்திய ஒன்றியம் (நீட் எதிர்ப்பு வழக்கு)'
+    },
+    caseNumber: 'Original Suit No. 1 of 2023 / W.P. No. 432 of 2023',
+    court: 'Constitutional Bench',
+    bench: 'Constitution Bench (5 Judges)',
+    date: '2026-10-28',
+    category: 'Social Justice',
+    counsel: {
+      en: 'Senior Advocates N.R. Elango MP & Legal Secretariat',
+      ta: 'மூத்த வழக்கறிஞர் என்.ஆர். இளங்கோ எம்பி & சட்டச் செயலகம்'
+    },
+    summary: {
+      en: 'Submissions filed emphasizing Entry 6, List II (Public Health) and Entry 25, List III, asserting state prerogative to frame entrance rules to guarantee equal educational access to rural and Tamil-medium students.',
+      ta: 'மருத்துவக் கல்வி சேர்க்கையில் மாநில உரிமை மற்றும் கிராமப்புற மாணவர்களின் சமவாய்ப்பைப் பாதுகாக்க விரிவான வாதங்கள் சமர்ப்பிக்கப்பட்டன.'
+    },
+    significance: {
+      en: 'Core constitutional challenge to centralized commercialized exam regimes undermining state affirmative action.',
+      ta: 'மத்திய அரசின் ஒற்றைத் தேர்வு முறைக்கு எதிரான கூட்டாட்சி மற்றும் சமூக நீதிப் போராட்டம்.'
+    },
+    orderLink: '#',
+    statusTag: { en: 'Under Active Hearing', ta: 'விசாரணையில் உள்ளது' }
+  },
+  {
+    id: 'ld-003',
+    caseTitle: {
+      en: 'Madras High Court Tamil Language Implementation Petition',
+      ta: 'சென்னை உயர் நீதிமன்றத்தில் தமிழ் வழக்காடு மொழி கோரிக்கை வழக்கு'
+    },
+    caseNumber: 'Writ Petition No. 24810 of 2023',
+    court: 'Madras High Court',
+    bench: 'First Bench (Chief Justice & Senior Judge)',
+    date: '2026-09-15',
+    category: 'Constitutional',
+    counsel: {
+      en: 'Senior Advocate R. Viduthalai (President, Legal Wing)',
+      ta: 'மூத்த வழக்கறிஞர் ஆர். விடுதலை (தலைவர், வழக்கறிஞர் அணி)'
+    },
+    summary: {
+      en: 'Petition filed under Article 348(2) seeking presidential assent to declare Tamil as the official language of proceedings in the Madras High Court and Madurai Bench.',
+      ta: 'அரசமைப்பு உறுப்பு 348(2)-ன் கீழ் சென்னை உயர் நீதிமன்றத்தில் வழக்காடு மொழியாக தமிழை அறிவிக்கக் கோரும் மனு.'
+    },
+    significance: {
+      en: 'Democratizing access to justice so litigants understand courtroom proceedings in their native language.',
+      ta: 'வழக்காடிகளுக்குத் தங்கள் தாய்மொழியில் நீதி கிடைக்கும் அடிப்படை ஜனநாயக உரிமை.'
+    },
+    orderLink: '#',
+    statusTag: { en: 'Notice Issued', ta: 'நோட்டீஸ் அனுப்பப்பட்டது' }
+  },
+  {
+    id: 'ld-004',
+    caseTitle: {
+      en: 'Defense of Tamil Nadu 69% Reservation (Act 45 of 1994)',
+      ta: 'தமிழ்நாட்டின் 69% இடஒதுக்கீடு பாதுகாப்பு (சட்டம் 45/1994)'
+    },
+    caseNumber: 'Civil Appeal No. 4120 of 2020 & Connected Petitions',
+    court: 'Supreme Court of India',
+    bench: 'Constitution Bench',
+    date: '2026-08-20',
+    category: 'Social Justice',
+    counsel: {
+      en: 'Senior Advocates R. Viduthalai & P. Wilson',
+      ta: 'மூத்த வழக்கறிஞர்கள் ஆர். விடுதலை & பி. வில்சன்'
+    },
+    summary: {
+      en: 'Defending the constitutional validity of Tamil Nadu Act 45/1994 shielded under the Ninth Schedule against challenges seeking to impose artificial 50% ceilings.',
+      ta: 'அரசமைப்பின் 9-வது அட்டவணையில் உள்ள தமிழ்நாட்டின் 69% இடஒதுக்கீட்டை எந்தவித நீர்த்துப்போதலும் இன்றி உச்ச நீதிமன்றத்தில் பாதுகாத்தல்.'
+    },
+    significance: {
+      en: 'Safeguards affirmative action guarantees for Backward Classes, MBCs, SCs, and STs across the state.',
+      ta: 'தமிழ்நாட்டின் பெரும்பான்மை ஒடுக்கப்பட்ட மக்களின் சமூக நீதியை நிலைநாட்டும் கவசம்.'
+    },
+    orderLink: '#',
+    statusTag: { en: 'Shielded by 9th Schedule', ta: '9-வது அட்டவணை பாதுகாப்பு' }
+  }
+];
+
+export const PRESS_GALLERY_DATA: PressGalleryItem[] = [
+  {
+    id: 'gal-001',
+    title: {
+      en: 'DMK Legal Wing State Conference at Kalaignar Arangam',
+      ta: 'கலைஞர் அரங்கில் நடைபெற்ற திமுக வழக்கறிஞர் அணி மாநில மாநாடு'
+    },
+    category: 'Legal Wing Events',
+    date: '2026-11-05',
+    location: { en: 'Kalaignar Arangam, Chennai', ta: 'கலைஞர் அரங்கம், சென்னை' },
+    image: '/images/dmk-slider-official.jpg',
+    caption: {
+      en: 'Over 3,000 advocates from all 38 districts gathered for the state plenary on constitutional federalism and judicial reforms.',
+      ta: 'அரசமைப்பு கூட்டாட்சி மற்றும் நீதிமன்றச் சீர்திருத்தங்கள் குறித்து 38 மாவட்டங்களிலிருந்து 3,000-க்கும் மேற்பட்ட வழக்கறிஞர்கள் பங்கேற்பு.'
+    },
+    photographer: 'State Press Bureau'
+  },
+  {
+    id: 'gal-002',
+    title: {
+      en: 'Press Meet on Supreme Court Governor Ruling',
+      ta: 'ஆளுநர் வழக்கில் உச்சநீதிமன்றத் தீர்ப்பு குறித்த செய்தியாளர் சந்திப்பு'
+    },
+    category: 'Press Conferences',
+    date: '2026-11-10',
+    location: { en: 'Anna Arivalayam, Chennai', ta: 'அண்ணா அறிவாலயம், சென்னை' },
+    image: '/images/dmk-press-meet.jpg',
+    caption: {
+      en: 'Legal Wing leadership briefing international and national media on the landmark Article 200 judgment.',
+      ta: 'அரசமைப்பு உறுப்பு 200 தொடர்பான வரலாற்று தீர்ப்பு குறித்து தேசிய மற்றும் சர்வதேச ஊடகங்களுக்கு விளக்கம்.'
+    },
+    photographer: 'Press Secretariat'
+  },
+  {
+    id: 'gal-003',
+    title: {
+      en: 'State Advocates Leadership Assembly at High Court',
+      ta: 'சென்னை உயர் நீதிமன்றத்தில் மாநில வழக்கறிஞர் தலைமைப் பொறுப்பாளர்கள் கூட்டம்'
+    },
+    category: 'Advocates Meetings',
+    date: '2026-10-18',
+    location: { en: 'Advocates Association Hall, High Court Campus', ta: 'சென்னை உயர் நீதிமன்ற வழக்கறிஞர் சங்கம்' },
+    image: '/images/dmk-legal-conference.jpg',
+    caption: {
+      en: 'High Court and Madurai Bench coordinating counsels deliberating on the junior advocate welfare charter.',
+      ta: 'இளம் வழக்கறிஞர்கள் நலத் திட்டங்கள் மற்றும் நீதிமன்றப் பணிகள் குறித்த ஒருங்கிணைப்புக் கூட்டம்.'
+    },
+    photographer: 'Bar Council Media Wing'
+  },
+  {
+    id: 'gal-004',
+    title: {
+      en: 'Dravidian Legal Movement Historical Roll of Honor',
+      ta: 'திராவிட இயக்க சட்டப் போராளிகள் வரலாற்று ஆவணம்'
+    },
+    category: 'Historical Archive',
+    date: '2026-09-17',
+    location: { en: 'Headquarters Archives, Chennai', ta: 'கழகத் தலைமை ஆவணக் காப்பகம்' },
+    image: '/images/dmk-four-leaders.jpg',
+    caption: {
+      en: 'The ideological stalwarts: Thanthai Periyar, Arignar Anna, Muthamizharignar Kalaignar, and Chief Minister M.K. Stalin.',
+      ta: 'திராவிட இயக்கத்தின் தலைவர்கள்: தந்தை பெரியார், பேரறிஞர் அண்ணா, முத்தமிழறிஞர் கலைஞர், மற்றும் முதல்வர் மு.க. ஸ்டாலின்.'
+    },
+    photographer: 'DMK Central Archive'
+  },
+  {
+    id: 'gal-005',
+    title: {
+      en: 'Mass Rally for Constitutional Democracy & Rights Defense',
+      ta: 'ஜனநாயக உரிமைப் பாதுகாப்புப் பேரணி'
+    },
+    category: 'Official Programmes',
+    date: '2026-08-14',
+    location: { en: 'Madurai & Southern Districts', ta: 'மதுரை மற்றும் தென் மாவட்டங்கள்' },
+    image: '/images/dmk-campaign-stalin.jpg',
+    caption: {
+      en: 'Advocates joining democratic rights mobilizations defending state autonomy across Tamil Nadu.',
+      ta: 'மாநில சுயாட்சி மற்றும் சமூக நீதியைப் பாதுகாக்கும் மாபெரும் ஜனநாயகப் பேரணி.'
+    },
+    photographer: 'Field Media Unit'
   }
 ];

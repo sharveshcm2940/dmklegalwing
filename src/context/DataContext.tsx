@@ -8,14 +8,18 @@ import {
   LegalResource, 
   NewsItem, 
   AdvocateRegistration, 
-  PublicEnquiry 
+  PublicEnquiry,
+  LegalDevelopmentItem,
+  PressGalleryItem
 } from '../types';
 import { 
   LEADERSHIP_PROFILES, 
   TAMIL_NADU_DISTRICTS, 
   LEGAL_RESOURCES, 
   EVENTS_DATA, 
-  NEWS_ITEMS 
+  NEWS_ITEMS,
+  LEGAL_DEVELOPMENTS_DATA,
+  PRESS_GALLERY_DATA
 } from '../data/content';
 
 interface DataContextType {
@@ -24,10 +28,15 @@ interface DataContextType {
   resources: LegalResource[];
   events: EventItem[];
   news: NewsItem[];
+  legalDevelopments: LegalDevelopmentItem[];
+  gallery: PressGalleryItem[];
   registrations: AdvocateRegistration[];
   enquiries: PublicEnquiry[];
   addNews: (item: Omit<NewsItem, 'id'>) => void;
   deleteNews: (id: string) => void;
+  setLeadStory: (id: string) => void;
+  addGalleryItem: (item: Omit<PressGalleryItem, 'id'>) => void;
+  deleteGalleryItem: (id: string) => void;
   addEvent: (item: Omit<EventItem, 'id'>) => void;
   deleteEvent: (id: string) => void;
   addResource: (item: Omit<LegalResource, 'id'>) => void;
@@ -120,6 +129,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [resources, setResources] = useState<LegalResource[]>(LEGAL_RESOURCES);
   const [events, setEvents] = useState<EventItem[]>(EVENTS_DATA);
   const [news, setNews] = useState<NewsItem[]>(NEWS_ITEMS);
+  const [legalDevelopments] = useState<LegalDevelopmentItem[]>(LEGAL_DEVELOPMENTS_DATA);
+  const [gallery, setGallery] = useState<PressGalleryItem[]>(PRESS_GALLERY_DATA);
   const [registrations, setRegistrations] = useState<AdvocateRegistration[]>(SEED_REGISTRATIONS);
   const [enquiries, setEnquiries] = useState<PublicEnquiry[]>(SEED_ENQUIRIES);
 
@@ -128,6 +139,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const savedNews = localStorage.getItem('dmk_news');
       if (savedNews) setNews(JSON.parse(savedNews));
+
+      const savedGallery = localStorage.getItem('dmk_gallery');
+      if (savedGallery) setGallery(JSON.parse(savedGallery));
 
       const savedEvents = localStorage.getItem('dmk_events');
       if (savedEvents) setEvents(JSON.parse(savedEvents));
@@ -159,6 +173,28 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updated = news.filter((n) => n.id !== id);
     setNews(updated);
     localStorage.setItem('dmk_news', JSON.stringify(updated));
+  };
+
+  const setLeadStory = (id: string) => {
+    const updated = news.map((item) => ({
+      ...item,
+      featured: item.id === id
+    }));
+    setNews(updated);
+    localStorage.setItem('dmk_news', JSON.stringify(updated));
+  };
+
+  const addGalleryItem = (item: Omit<PressGalleryItem, 'id'>) => {
+    const newItem: PressGalleryItem = { ...item, id: `gal-${Date.now()}` };
+    const updated = [newItem, ...gallery];
+    setGallery(updated);
+    localStorage.setItem('dmk_gallery', JSON.stringify(updated));
+  };
+
+  const deleteGalleryItem = (id: string) => {
+    const updated = gallery.filter((g) => g.id !== id);
+    setGallery(updated);
+    localStorage.setItem('dmk_gallery', JSON.stringify(updated));
   };
 
   const addEvent = (item: Omit<EventItem, 'id'>) => {
@@ -244,10 +280,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resources,
         events,
         news,
+        legalDevelopments,
+        gallery,
         registrations,
         enquiries,
         addNews,
         deleteNews,
+        setLeadStory,
+        addGalleryItem,
+        deleteGalleryItem,
         addEvent,
         deleteEvent,
         addResource,

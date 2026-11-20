@@ -90,13 +90,48 @@ export interface LegalResource {
 export interface NewsItem {
   id: string;
   title: { en: string; ta: string };
-  category: 'Press Release' | 'Statement' | 'Resolution' | 'Media' | 'Gazette';
+  category: 'Press Release' | 'Statement' | 'Official Statements' | 'Court Watch' | 'Resolution' | 'Gazette' | 'Media' | 'Legal Developments';
   date: string;
+  time?: string;
+  readTime?: string;
   author: { en: string; ta: string };
+  issuingAuthority?: { en: string; ta: string };
   summary: { en: string; ta: string };
   content: { en: string; ta: string };
   image: string;
+  photoCredit?: string;
+  caption?: { en: string; ta: string };
   featured?: boolean;
+  court?: string;
+  caseNumber?: string;
+  documentUrl?: string;
+  status?: 'published' | 'draft' | 'scheduled';
+}
+
+export interface LegalDevelopmentItem {
+  id: string;
+  caseTitle: { en: string; ta: string };
+  caseNumber: string;
+  court: 'Supreme Court of India' | 'Madras High Court' | 'Madras High Court (Madurai Bench)' | 'Constitutional Bench';
+  bench: string;
+  date: string;
+  category: 'Constitutional' | 'Federalism' | 'Social Justice' | 'Civil Rights' | 'Service Law';
+  counsel: { en: string; ta: string };
+  summary: { en: string; ta: string };
+  significance: { en: string; ta: string };
+  orderLink?: string;
+  statusTag: { en: string; ta: string };
+}
+
+export interface PressGalleryItem {
+  id: string;
+  title: { en: string; ta: string };
+  category: 'Press Conferences' | 'Legal Wing Events' | 'Advocates Meetings' | 'Official Programmes' | 'Historical Archive';
+  date: string;
+  location: { en: string; ta: string };
+  image: string;
+  caption: { en: string; ta: string };
+  photographer?: string;
 }
 
 export interface AdvocateRegistration {

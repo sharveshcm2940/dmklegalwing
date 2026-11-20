@@ -10,7 +10,13 @@ import {
   Plus, 
   Calendar, 
   BookOpen, 
-  LogOut 
+  LogOut,
+  Star,
+  Camera,
+  ExternalLink,
+  Eye,
+  CheckCircle,
+  MapPin
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -19,6 +25,10 @@ export default function AdminPage() {
     news, 
     addNews, 
     deleteNews, 
+    setLeadStory,
+    gallery,
+    addGalleryItem,
+    deleteGalleryItem,
     events, 
     addEvent, 
     deleteEvent, 
@@ -38,17 +48,32 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState('');
 
   // Active admin tab
-  const [activeTab, setActiveTab] = useState<'overview' | 'registrations' | 'enquiries' | 'news' | 'events' | 'resources'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'registrations' | 'enquiries' | 'news' | 'gallery' | 'events' | 'resources'>('overview');
 
   // Modal / Form states for adding items
   const [showAddNewsModal, setShowAddNewsModal] = useState(false);
   const [newNewsTitleEn, setNewNewsTitleEn] = useState('');
   const [newNewsTitleTa, setNewNewsTitleTa] = useState('');
-  const [newNewsCategory, setNewNewsCategory] = useState<'Press Release' | 'Statement' | 'Resolution' | 'Media'>('Press Release');
+  const [newNewsCategory, setNewNewsCategory] = useState<'Press Release' | 'Statement' | 'Court Watch' | 'Resolution' | 'Gazette' | 'Media'>('Press Release');
   const [newNewsSummaryEn, setNewNewsSummaryEn] = useState('');
   const [newNewsSummaryTa, setNewNewsSummaryTa] = useState('');
   const [newNewsContentEn, setNewNewsContentEn] = useState('');
   const [newNewsContentTa, setNewNewsContentTa] = useState('');
+  const [newNewsCourt, setNewNewsCourt] = useState('');
+  const [newNewsCaseNo, setNewNewsCaseNo] = useState('');
+  const [newNewsIsLead, setNewNewsIsLead] = useState(false);
+  const [newNewsImage, setNewNewsImage] = useState('/images/dmk-slider-official.jpg');
+
+  // Gallery modal state
+  const [showAddGalleryModal, setShowAddGalleryModal] = useState(false);
+  const [newGalTitleEn, setNewGalTitleEn] = useState('');
+  const [newGalTitleTa, setNewGalTitleTa] = useState('');
+  const [newGalCategory, setNewGalCategory] = useState<'Press Conferences' | 'Legal Wing Events' | 'Advocates Meetings' | 'Official Programmes' | 'Historical Archive'>('Press Conferences');
+  const [newGalLocationEn, setNewGalLocationEn] = useState('');
+  const [newGalLocationTa, setNewGalLocationTa] = useState('');
+  const [newGalCaptionEn, setNewGalCaptionEn] = useState('');
+  const [newGalCaptionTa, setNewGalCaptionTa] = useState('');
+  const [newGalImage, setNewGalImage] = useState('/images/dmk-press-meet.jpg');
 
   const [showAddEventModal, setShowAddEventModal] = useState(false);
   const [newEventTitleEn, setNewEventTitleEn] = useState('');
@@ -86,11 +111,17 @@ export default function AdminPage() {
       title: { en: newNewsTitleEn, ta: newNewsTitleTa || newNewsTitleEn },
       category: newNewsCategory,
       date: new Date().toISOString().split('T')[0],
+      time: '11:00 AM IST',
+      readTime: '3 min read',
       author: { en: 'DMK Legal Wing Secretariat', ta: 'திமுக வழக்கறிஞர் அணித் தலைமை' },
+      issuingAuthority: { en: 'Apex Constitutional Panel, Anna Arivalayam', ta: 'அரசமைப்புச் சட்டப் பிரிவு, அண்ணா அறிவாலயம்' },
       summary: { en: newNewsSummaryEn, ta: newNewsSummaryTa || newNewsSummaryEn },
       content: { en: newNewsContentEn || newNewsSummaryEn, ta: newNewsContentTa || newNewsSummaryTa || newNewsSummaryEn },
-      image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=1000',
-      featured: false
+      image: newNewsImage,
+      court: newNewsCourt || undefined,
+      caseNumber: newNewsCaseNo || undefined,
+      featured: newNewsIsLead,
+      status: 'published'
     });
 
     setShowAddNewsModal(false);
@@ -98,6 +129,34 @@ export default function AdminPage() {
     setNewNewsTitleTa('');
     setNewNewsSummaryEn('');
     setNewNewsSummaryTa('');
+    setNewNewsContentEn('');
+    setNewNewsContentTa('');
+    setNewNewsCourt('');
+    setNewNewsCaseNo('');
+    setNewNewsIsLead(false);
+  };
+
+  const handleCreateGallery = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newGalTitleEn.trim()) return;
+
+    addGalleryItem({
+      title: { en: newGalTitleEn, ta: newGalTitleTa || newGalTitleEn },
+      category: newGalCategory,
+      date: new Date().toISOString().split('T')[0],
+      location: { en: newGalLocationEn || 'Chennai, Tamil Nadu', ta: newGalLocationTa || 'சென்னை, தமிழ்நாடு' },
+      image: newGalImage,
+      caption: { en: newGalCaptionEn || newGalTitleEn, ta: newGalCaptionTa || newGalTitleTa || newGalTitleEn },
+      photographer: 'State Press Bureau'
+    });
+
+    setShowAddGalleryModal(false);
+    setNewGalTitleEn('');
+    setNewGalTitleTa('');
+    setNewGalLocationEn('');
+    setNewGalLocationTa('');
+    setNewGalCaptionEn('');
+    setNewGalCaptionTa('');
   };
 
   const handleCreateEvent = (e: React.FormEvent) => {
@@ -254,6 +313,7 @@ export default function AdminPage() {
           { id: 'registrations', label: 'Advocate Registrations', count: registrations.length },
           { id: 'enquiries', label: 'Citizen Inquiries', count: enquiries.length },
           { id: 'news', label: 'Press Releases & News', count: news.length },
+          { id: 'gallery', label: 'Press Photo Gallery', count: gallery.length },
           { id: 'events', label: 'Events & Conferences', count: events.length },
           { id: 'resources', label: 'Legal Resources', count: resources.length }
         ].map((tab) => (
@@ -481,47 +541,157 @@ export default function AdminPage() {
       {/* TAB 4: NEWS & PRESS RELEASES MANAGER */}
       {activeTab === 'news' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-              Published Press Releases ({news.length})
-            </h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
+                Newsroom & Press Releases ({news.length})
+              </h3>
+              <p className="text-xs text-neutral-500">
+                Manage official press releases, statements, court watch dockets, and designate the front-page lead feature.
+              </p>
+            </div>
             <button
               onClick={() => setShowAddNewsModal(true)}
-              className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
+              className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Press Release</span>
+              <span>Publish Dispatch</span>
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {news.map((item) => (
+            {news.map((item) => {
+              const isLead = !!item.featured;
+              return (
+                <div
+                  key={item.id}
+                  className={`p-5 bg-white border rounded-xl flex flex-col justify-between shadow-2xs transition-all ${
+                    isLead ? 'border-[#E31E24] ring-2 ring-[#E31E24]/20' : 'border-[#E2DDD5]'
+                  }`}
+                >
+                  <div>
+                    {isLead && (
+                      <div className="mb-2 bg-[#FFF5F5] border border-[#E31E24] text-[#B81318] text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-[#E31E24]" />
+                        <span>ACTIVE FRONT-PAGE LEAD STORY</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between text-xs text-[#666666] font-mono mb-2">
+                      <span className="text-[#E31E24] font-bold">{item.category}</span>
+                      <span>{item.date}</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-[#111111] font-tamil-serif line-clamp-2 mb-2">
+                      {item.title[language]}
+                    </h4>
+                    <p className="text-xs text-[#555555] line-clamp-3">
+                      {item.summary[language]}
+                    </p>
+                    {item.court && (
+                      <span className="inline-block mt-2 text-[10px] bg-[#FAF8F5] text-neutral-700 px-2 py-0.5 border border-[#E2DDD5] rounded font-mono">
+                        {item.court}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="pt-3 mt-4 border-t border-[#EAE6DF] flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      {!isLead && (
+                        <button
+                          onClick={() => setLeadStory(item.id)}
+                          className="px-2 py-1 bg-[#FAF8F5] hover:bg-[#E31E24] hover:text-white text-neutral-800 text-[11px] font-bold rounded border border-[#D5CEC4] transition-colors"
+                          title="Set as front-page lead feature"
+                        >
+                          Make Lead
+                        </button>
+                      )}
+                      <a
+                        href={`/news/${item.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-1.5 text-neutral-500 hover:text-neutral-900"
+                        title="View Live Dispatch"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </a>
+                    </div>
+                    
+                    <button
+                      onClick={() => deleteNews(item.id)}
+                      className="p-1.5 rounded hover:bg-red-50 text-red-600 hover:text-red-800 transition-colors"
+                      title="Delete Dispatch"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4.5: PRESS GALLERY MANAGER */}
+      {activeTab === 'gallery' && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
+                Archival Press Photo Gallery ({gallery.length})
+              </h3>
+              <p className="text-xs text-neutral-500">
+                Documentary photographs from legal conferences, press briefings, and historical Dravidian movement archives.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowAddGalleryModal(true)}
+              className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Photograph</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {gallery.map((item) => (
               <div
                 key={item.id}
-                className="p-5 bg-white border border-[#E2DDD5] rounded-xl flex flex-col justify-between shadow-2xs"
+                className="bg-white border border-[#E2DDD5] rounded-xl overflow-hidden flex flex-col justify-between shadow-2xs"
               >
-                <div>
-                  <div className="flex items-center justify-between text-xs text-[#666666] font-mono mb-2">
-                    <span className="text-[#E31E24] font-bold">{item.category}</span>
-                    <span>{item.date}</span>
+                <div className="aspect-[16/10] bg-neutral-900 relative">
+                  <img
+                    src={item.image}
+                    alt={item.title[language]}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 left-2 bg-[#E31E24] text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase">
+                    {item.category}
                   </div>
-                  <h4 className="text-sm font-bold text-[#111111] font-tamil-serif line-clamp-2 mb-2">
-                    {item.title[language]}
-                  </h4>
-                  <p className="text-xs text-[#555555] line-clamp-3">
-                    {item.summary[language]}
-                  </p>
                 </div>
 
-                <div className="pt-3 mt-4 border-t border-[#EAE6DF] flex items-center justify-between text-xs">
-                  <span className="text-[#777777] text-[11px]">Authorised</span>
-                  <button
-                    onClick={() => deleteNews(item.id)}
-                    className="p-1.5 rounded hover:bg-red-50 text-red-600 hover:text-red-800 transition-colors"
-                    title="Delete News"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div className="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] text-neutral-500 mb-1">
+                      <span>{item.location[language]}</span>
+                      <span>{item.date}</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-neutral-900 font-tamil-serif line-clamp-2">
+                      {item.title[language]}
+                    </h4>
+                    <p className="text-xs text-neutral-600 line-clamp-2 mt-1">
+                      {item.caption[language]}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 mt-3 border-t border-[#EAE6DF] flex items-center justify-between text-xs">
+                    <span className="text-neutral-400 text-[10px]">Archived</span>
+                    <button
+                      onClick={() => deleteGalleryItem(item.id)}
+                      className="p-1 rounded hover:bg-red-50 text-red-600 transition-colors"
+                      title="Delete photograph"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -625,13 +795,19 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* MODAL: ADD NEWS */}
+      {/* MODAL: ADD NEWS / DISPATCH */}
       {showAddNewsModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#C5BEB3] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
-            <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-              Publish New Press Release
-            </h3>
+          <div className="bg-white border border-[#C5BEB3] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div className="border-b border-[#E2DDD5] pb-2">
+              <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
+                Publish Official Press Release / Dispatch
+              </h3>
+              <p className="text-xs text-neutral-500">
+                Official releases will immediately appear on the Legal Wing Editorial Newsroom.
+              </p>
+            </div>
+
             <form onSubmit={handleCreateNews} className="space-y-3 text-xs">
               <div>
                 <label className="text-[#333333] block mb-1 font-semibold">Headline (English) *</label>
@@ -656,18 +832,61 @@ export default function AdminPage() {
                 />
               </div>
 
-              <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Category</label>
-                <select
-                  value={newNewsCategory}
-                  onChange={(e) => setNewNewsCategory(e.target.value as any)}
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                >
-                  <option value="Press Release">Press Release</option>
-                  <option value="Statement">Official Statement</option>
-                  <option value="Resolution">Assembly Resolution</option>
-                  <option value="Media">Media Coverage</option>
-                </select>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[#333333] block mb-1 font-semibold">Category</label>
+                  <select
+                    value={newNewsCategory}
+                    onChange={(e) => setNewNewsCategory(e.target.value as any)}
+                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  >
+                    <option value="Press Release">Press Release</option>
+                    <option value="Statement">Official Statement</option>
+                    <option value="Court Watch">Court Watch / Legal Developments</option>
+                    <option value="Resolution">Assembly Resolution</option>
+                    <option value="Gazette">Gazette Notification</option>
+                    <option value="Media">Media Coverage</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[#333333] block mb-1 font-semibold">Document / Image</label>
+                  <select
+                    value={newNewsImage}
+                    onChange={(e) => setNewNewsImage(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  >
+                    <option value="/images/dmk-slider-official.jpg">Official Press Conclave</option>
+                    <option value="/images/dmk-press-meet.jpg">Anna Arivalayam Briefing</option>
+                    <option value="/images/dmk-legal-conference.jpg">Advocates Assembly Hall</option>
+                    <option value="/images/dmk-campaign-stalin.jpg">Democratic Rally Photo</option>
+                    <option value="/images/dmk-flag-sun.jpg">DMK Legal Wing Emblem</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[#333333] block mb-1 font-semibold">Court (Optional)</label>
+                  <input
+                    type="text"
+                    value={newNewsCourt}
+                    onChange={(e) => setNewNewsCourt(e.target.value)}
+                    placeholder="Supreme Court of India"
+                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[#333333] block mb-1 font-semibold">Case Docket No. (Optional)</label>
+                  <input
+                    type="text"
+                    value={newNewsCaseNo}
+                    onChange={(e) => setNewNewsCaseNo(e.target.value)}
+                    placeholder="W.P. (C) No. 1102 of 2024"
+                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  />
+                </div>
               </div>
 
               <div>
@@ -681,7 +900,31 @@ export default function AdminPage() {
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div>
+                <label className="text-[#333333] block mb-1 font-semibold">Full Article Content (English)</label>
+                <textarea
+                  rows={4}
+                  value={newNewsContentEn}
+                  onChange={(e) => setNewNewsContentEn(e.target.value)}
+                  placeholder="Full text of the statement or court argument..."
+                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 p-2.5 bg-[#FFF5F5] border border-[#E31E24]/30 rounded">
+                <input
+                  type="checkbox"
+                  id="leadStoryCheck"
+                  checked={newNewsIsLead}
+                  onChange={(e) => setNewNewsIsLead(e.target.checked)}
+                  className="w-4 h-4 text-[#E31E24] rounded"
+                />
+                <label htmlFor="leadStoryCheck" className="text-xs font-bold text-neutral-900 cursor-pointer">
+                  Feature as Front-Page Lead Story on Editorial Newsroom
+                </label>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-[#E2DDD5]">
                 <button
                   type="button"
                   onClick={() => setShowAddNewsModal(false)}
@@ -694,6 +937,106 @@ export default function AdminPage() {
                   className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded font-bold uppercase"
                 >
                   Publish Now
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD GALLERY PHOTOGRAPH */}
+      {showAddGalleryModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-[#C5BEB3] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
+            <div className="border-b border-[#E2DDD5] pb-2">
+              <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
+                Add Photo to Press Gallery
+              </h3>
+              <p className="text-xs text-neutral-500">
+                Upload or select an approved authentic documentary photo.
+              </p>
+            </div>
+
+            <form onSubmit={handleCreateGallery} className="space-y-3 text-xs">
+              <div>
+                <label className="text-[#333333] block mb-1 font-semibold">Photo Title (English) *</label>
+                <input
+                  type="text"
+                  required
+                  value={newGalTitleEn}
+                  onChange={(e) => setNewGalTitleEn(e.target.value)}
+                  placeholder="State Advocates Summit 2026..."
+                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[#333333] block mb-1 font-semibold">Gallery Category</label>
+                  <select
+                    value={newGalCategory}
+                    onChange={(e) => setNewGalCategory(e.target.value as any)}
+                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  >
+                    <option value="Press Conferences">Press Conferences</option>
+                    <option value="Legal Wing Events">Legal Wing Events</option>
+                    <option value="Advocates Meetings">Advocates Meetings</option>
+                    <option value="Official Programmes">Official Programmes</option>
+                    <option value="Historical Archive">Historical Archive</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[#333333] block mb-1 font-semibold">Photo Asset</label>
+                  <select
+                    value={newGalImage}
+                    onChange={(e) => setNewGalImage(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  >
+                    <option value="/images/dmk-press-meet.jpg">Press Briefing</option>
+                    <option value="/images/dmk-slider-official.jpg">State Conference Hall</option>
+                    <option value="/images/dmk-legal-conference.jpg">Madras High Court Session</option>
+                    <option value="/images/dmk-campaign-stalin.jpg">Public Rally & Conclave</option>
+                    <option value="/images/dmk-four-leaders.jpg">Historical Leaders Roll</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[#333333] block mb-1 font-semibold">Location (English)</label>
+                <input
+                  type="text"
+                  value={newGalLocationEn}
+                  onChange={(e) => setNewGalLocationEn(e.target.value)}
+                  placeholder="Kalaignar Arangam, Chennai"
+                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[#333333] block mb-1 font-semibold">Caption / Description</label>
+                <textarea
+                  rows={2}
+                  value={newGalCaptionEn}
+                  onChange={(e) => setNewGalCaptionEn(e.target.value)}
+                  placeholder="Documentary caption describing the assembly..."
+                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-[#E2DDD5]">
+                <button
+                  type="button"
+                  onClick={() => setShowAddGalleryModal(false)}
+                  className="px-4 py-2 bg-[#FAF8F5] border border-[#E2DDD5] text-[#555555] rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded font-bold uppercase"
+                >
+                  Add Photo
                 </button>
               </div>
             </form>
