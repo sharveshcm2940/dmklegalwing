@@ -5,7 +5,8 @@ import {
   IdeologyPillar, 
   EventItem, 
   LegalResource, 
-  NewsItem 
+  NewsItem,
+  FlowchartOfficer
 } from '../types';
 
 export const DMK_ORGANISATION_INFO = {
@@ -305,13 +306,395 @@ export const HISTORICAL_MILESTONES: HistoricalMilestone[] = [
   }
 ];
 
+export const OFFICIAL_HIERARCHY_CHART: {
+  president: FlowchartOfficer;
+  secretary: FlowchartOfficer;
+  jointSecretaries: FlowchartOfficer[];
+  deputySecretaries: FlowchartOfficer[];
+  headOfficeAdvocates: FlowchartOfficer[];
+} = {
+  president: {
+    id: 'r-viduthalai',
+    name: { en: 'R. Viduthalai', ta: 'ஆர். விடுதலை' },
+    role: { en: 'Senior Advocate & Former Advocate General', ta: 'மூத்த வழக்கறிஞர் & முன்னாள் தலைமை வழக்கறிஞர்' },
+    designation: { en: 'President', ta: 'தலைவர்' },
+    district: { en: 'Chennai', ta: 'சென்னை' },
+    branch: 'president',
+    honorific: { en: 'Senior Advocate', ta: 'மூத்த வழக்கறிஞர்' },
+    court: 'Supreme Court of India & Madras High Court',
+    barCouncilNo: 'MS/318/1979',
+    bio: {
+      en: 'Distinguished Senior Advocate and former Advocate General of Tamil Nadu. Widely regarded for masterminding monumental social justice, 69% reservation protection, and federal autonomy jurisprudence before constitutional benches.',
+      ta: 'தமிழ்நாட்டின் முன்னாள் தலைமை வழக்கறிஞர் (Advocate General) மற்றும் புகழ்பெற்ற மூத்த வழக்கறிஞர். அரசமைப்பு அமர்வுகளில் சமூக நீதி, 69% இடஒதுக்கீடு பாதுகாப்பு மற்றும் மாநில சுயாட்சிக்கான வழக்குகளை முன்நின்று நடத்திய பெருமைக்குரியவர்.'
+    },
+    isSenior: true
+  },
+  secretary: {
+    id: 'n-r-elango',
+    name: { en: 'N.R. Elango', ta: 'என்.ஆர். இளங்கோ' },
+    role: { en: 'Senior Advocate & Member of Parliament (Rajya Sabha)', ta: 'மூத்த வழக்கறிஞர் & நாடாளுமன்ற உறுப்பினர் (மாநிலங்களவை)' },
+    designation: { en: 'Secretary', ta: 'செயலாளர்' },
+    district: { en: 'Chennai', ta: 'சென்னை' },
+    branch: 'secretary',
+    honorific: { en: 'Senior Advocate & M.P.', ta: 'மூத்த வழக்கறிஞர் & எம்.பி.' },
+    court: 'Supreme Court of India & Madras High Court',
+    barCouncilNo: 'MS/651/1985',
+    bio: {
+      en: 'Senior Advocate of four decades standing and Member of Parliament (Rajya Sabha). Stalwart voice defending constitutional democracy, civil liberties, and criminal justice reforms both on the floor of Parliament and in the highest courts.',
+      ta: 'நாடாளுமன்ற மாநிலங்களவை உறுப்பினர் மற்றும் நான்கு தசாப்தங்களுக்கும் மேலான அனுபவம் கொண்ட மூத்த வழக்கறிஞர். மனித உரிமைப் பாதுகாப்பு, குற்றவியல் சட்டவியல் மற்றும் ஜனநாயக விழுமியங்களை நிலைநிறுத்துவதில் முன்னணிப் பங்காற்றுபவர்.'
+    },
+    isSenior: true
+  },
+  jointSecretaries: [
+    {
+      id: 'i-paranthaman',
+      name: { en: 'I. Paranthaman', ta: 'ஐ. பரந்தாமன்' },
+      role: { en: 'Member of Legislative Assembly (Egmore) & Advocate', ta: 'சட்டமன்ற உறுப்பினர் (எழும்பூர்) & வழக்கறிஞர்' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'joint_secretaries',
+      court: 'Madras High Court & City Civil Courts',
+      bio: {
+        en: 'Member of the Tamil Nadu Legislative Assembly representing Egmore constituency. Seasoned trial advocate active in constitutional debate and cadre legal mobilization across the state.',
+        ta: 'எழும்பூர் தொகுதி சட்டமன்ற உறுப்பினர் மற்றும் வழக்கறிஞர். சட்டமன்றத்திலும் நீதிமன்றங்களிலும் மக்கள் உரிமைகளுக்காகவும் திராவிடக் கொள்கைகளுக்காகவும் குரலெழுப்பும் களப்பணியாளர்.'
+      }
+    },
+    {
+      id: 'k-s-ravichandran',
+      name: { en: 'K.S. Ravichandran', ta: 'கே.எஸ். ரவிச்சந்திரன்' },
+      role: { en: 'Advocate, Madras High Court', ta: 'சென்னை உயர் நீதிமன்ற வழக்கறிஞர்' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'joint_secretaries',
+      court: 'Madras High Court',
+      bio: {
+        en: 'Advocate of the Madras High Court with deep experience in civil, criminal, and service jurisprudence, coordinating state-level legal support for party cadres.',
+        ta: 'சென்னை உயர் நீதிமன்ற வழக்கறிஞர். உரிமையியல், குற்றவியல் மற்றும் பணித்துறை வழக்குகளில் அனுபவம் வாய்ந்தவர்; கழகத் தோழர்களுக்கான சட்டப்பணிகளை முன்னெடுப்பவர்.'
+      }
+    },
+    {
+      id: 'n-maniraj',
+      name: { en: 'N. Maniraj', ta: 'என். மணிராஜ்' },
+      role: { en: 'Advocate & District Bar Leader', ta: 'வழக்கறிஞர் & மாவட்ட வழக்கறிஞர் சங்கத் தலைவர்' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Karur', ta: 'கரூர்' },
+      branch: 'joint_secretaries',
+      court: 'Karur District & Sessions Court',
+      bio: {
+        en: 'Leading counsel at Karur District Court, spearheading party legal wings across the Cauvery delta region and providing prompt legal aid to cadres.',
+        ta: 'கரூர் மாவட்ட வழக்கறிஞர்; காவேரி டெல்டா மண்டல வழக்கறிஞர்களை ஒருங்கிணைத்து, கழகத் தோழர்களுக்கு உடனடி சட்டப் பாதுகாப்பு வழங்கி வருபவர்.'
+      }
+    },
+    {
+      id: 'k-m-dhandapani',
+      name: { en: 'K.M. Dhandapani', ta: 'கே.எம். தண்டபாணி' },
+      role: { en: 'Advocate, Coimbatore District Bar', ta: 'வழக்கறிஞர், கோவை மாவட்ட வழக்கறிஞர் சங்கம்' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Coimbatore', ta: 'கோயம்புத்தூர்' },
+      branch: 'joint_secretaries',
+      court: 'Coimbatore District Courts',
+      bio: {
+        en: 'Prominent advocate from Coimbatore leading Western Zone legal operations, labor court representations, and grassroots bar coordination.',
+        ta: 'மேற்கு மண்டல வழக்கறிஞர்களை வழிநடத்தும் கோவை மாவட்ட வழக்கறிஞர்; தொழிலாளர் நல தீர்ப்பாயங்கள் மற்றும் உரிமையியல் வழக்குகளில் நீண்ட அனுபவம் கொண்டவர்.'
+      }
+    },
+    {
+      id: 'radhakrishnan',
+      name: { en: 'Radhakrishnan', ta: 'இராதாகிருஷ்ணன்' },
+      role: { en: 'Advocate, Erode District Bar', ta: 'வழக்கறிஞர், ஈரோடு மாவட்ட வழக்கறிஞர் சங்கம்' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Erode', ta: 'ஈரோடு' },
+      branch: 'joint_secretaries',
+      court: 'Erode District & Sessions Court',
+      bio: {
+        en: 'Senior advocate of the Erode Bar coordinating Legal Wing wings across Erode, Tiruppur, and Namakkal districts.',
+        ta: 'ஈரோடு, திருப்பூர், நாமக்கல் மாவட்ட வழக்கறிஞர்களை ஒருங்கிணைத்து, கீழமை நீதிமன்றங்களில் சமூக நீதிக்கான பணிகளை முன்னெடுத்து வருபவர்.'
+      }
+    },
+    {
+      id: 'arul-mozhi',
+      name: { en: 'Arul Mozhi', ta: 'அருள்மொழி' },
+      role: { en: 'Advocate & Social Reform Jurist', ta: 'வழக்கறிஞர் & சமூக சீர்திருத்த சட்டவியலாளர்' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Coimbatore', ta: 'கோயம்புத்தூர்' },
+      branch: 'joint_secretaries',
+      court: 'Madras High Court & Coimbatore Courts',
+      bio: {
+        en: 'Champion of gender equality, self-respect principles, and civil liberties, representing key public interest litigation across Tamil Nadu.',
+        ta: 'பெண்கள் உரிமை, சுயமரியாதைத் திருமண சட்டப் பாதுகாப்பு மற்றும் சமூக சமத்துவத்திற்கான வழக்குகளில் தீவிரமாக இயங்கும் மூத்த சட்டப் போராளி.'
+      }
+    },
+    {
+      id: 'r-thamaraiselvan',
+      name: { en: 'R. Thamaraiselvan', ta: 'ஆர். தாமரைச்செல்வன்' },
+      role: { en: 'Advocate & Former Member of Parliament (Dharmapuri)', ta: 'வழக்கறிஞர் & முன்னாள் நாடாளுமன்ற உறுப்பினர் (தர்மபுரி)' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Dharmapuri', ta: 'தர்மபுரி' },
+      branch: 'joint_secretaries',
+      court: 'Madras High Court & Dharmapuri Courts',
+      bio: {
+        en: 'Former Member of Parliament from Dharmapuri and senior trial advocate, coordinating legal defense networks across North-Western Tamil Nadu.',
+        ta: 'தர்மபுரி முன்னாள் நாடாளுமன்ற உறுப்பினர் மற்றும் மூத்த வழக்கறிஞர்; வடக்கு-மேற்கு மாவட்டங்களில் கழக வழக்கறிஞர் அணியின் தூணாக விளங்குபவர்.'
+      }
+    },
+    {
+      id: 'j-pachaiyappan',
+      name: { en: 'J. Pachaiyappan', ta: 'ஜெ. பச்சையப்பன்' },
+      role: { en: 'Advocate, Madras High Court', ta: 'சென்னை உயர் நீதிமன்ற வழக்கறிஞர்' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'joint_secretaries',
+      court: 'Madras High Court',
+      bio: {
+        en: 'Experienced appellate lawyer at the Madras High Court, actively monitoring election law compliance and writ proceedings.',
+        ta: 'சென்னை உயர் நீதிமன்றத்தில் மேல்முறையீடு மற்றும் தேர்தல் வழக்குகளைக் கையாளும் திறமையான வழக்கறிஞர்.'
+      }
+    },
+    {
+      id: 'surya-vetrikondan',
+      name: { en: 'Surya Vetrikondan', ta: 'சூர்யா வெற்றிகொண்டான்' },
+      role: { en: 'Advocate, Madras High Court & Ideology Wing', ta: 'சென்னை உயர் நீதிமன்ற வழக்கறிஞர் & கொள்கை விளக்கப் பிரிவு' },
+      designation: { en: 'Joint Secretary', ta: 'இணைச் செயலாளர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'joint_secretaries',
+      court: 'Madras High Court',
+      bio: {
+        en: 'Young and dynamic constitutional counsel carrying forward the ideological legacy of the Dravidian movement in judicial forums.',
+        ta: 'திராவிட இயக்கத்தின் கொள்கை வழித்தோன்றலாக நீதிமன்றங்களிலும் மக்கள் மன்றங்களிலும் அரசமைப்பு விழுமியங்களை நிலைநாட்டும் இளம் வழக்கறிஞர்.'
+      }
+    }
+  ],
+  deputySecretaries: [
+    {
+      id: 'k-chandru',
+      name: { en: 'K. Chandru', ta: 'கே. சந்துரு' },
+      role: { en: 'Advocate, Madras High Court', ta: 'சென்னை உயர் நீதிமன்ற வழக்கறிஞர்' },
+      designation: { en: 'Deputy Secretary', ta: 'துணைச் செயலாளர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'deputy_secretaries',
+      court: 'Madras High Court',
+      bio: {
+        en: 'Active legal practitioner at Madras High Court focusing on administrative jurisprudence, fundamental rights, and cadre bail protections.',
+        ta: 'சென்னை உயர் நீதிமன்ற வழக்கறிஞர்; நிர்வாகச் சட்டம், அடிப்படை உரிமைகள் மற்றும் கழகத் தோழர்களுக்கான பிணைப் பணிகளை விரைவுபடுத்துபவர்.'
+      }
+    },
+    {
+      id: 'ragu',
+      name: { en: 'Ragu', ta: 'ரகு' },
+      role: { en: 'Advocate, High Court Bar Association', ta: 'உயர் நீதிமன்ற வழக்கறிஞர்' },
+      designation: { en: 'Deputy Secretary', ta: 'துணைச் செயலாளர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'deputy_secretaries',
+      court: 'Madras High Court',
+      bio: {
+        en: 'Trusted litigation counsel handling metropolitan court operations and assisting state executive secretariat coordination.',
+        ta: 'தலைநகர் சென்னை நீதிமன்றங்களில் கழகப் பணிகளையும் தலைமைச் செயலக நிர்வாகத் தொடர்புகளையும் கவனிக்கும் வழக்கறிஞர்.'
+      }
+    },
+    {
+      id: 'dr-g-chandrabose',
+      name: { en: 'Dr. G. Chandrabose', ta: 'டாக்டர் ஜி. சந்திரபோஸ்' },
+      role: { en: 'Advocate & Legal Academician', ta: 'வழக்கறிஞர் & சட்டத்துறை அறிஞர்' },
+      designation: { en: 'Deputy Secretary', ta: 'துணைச் செயலாளர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'deputy_secretaries',
+      court: 'Madras High Court',
+      bio: {
+        en: 'Doctorate in Law and practicing advocate, spearheading legal seminars, research journals, and policy briefs for the Legal Wing.',
+        ta: 'சட்டத்துறையில் முனைவர் பட்டம் பெற்ற வழக்கறிஞர்; சட்ட கருத்தரங்குகள், ஆய்வுக் கட்டுரைகள் மற்றும் பயிற்சி வகுப்புகளை ஒருங்கிணைப்பவர்.'
+      }
+    },
+    {
+      id: 'marudhu-ganesh',
+      name: { en: 'Marudhu Ganesh', ta: 'மருது கணேஷ்' },
+      role: { en: 'Advocate & Dedicated Cadre Leader', ta: 'வழக்கறிஞர் & கழக களப் போராளி' },
+      designation: { en: 'Deputy Secretary', ta: 'துணைச் செயலாளர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'deputy_secretaries',
+      court: 'Madras High Court & George Town Bar',
+      bio: {
+        en: 'Popular grassroots advocate and seasoned campaigner known for fearless legal defenses during mass democratic demonstrations.',
+        ta: 'மக்களோடு மக்களாக நின்று ஜனநாயகப் போராட்டங்களில் சட்டப் பாதுகாப்பு வழங்கும் கள வழக்கறிஞர்.'
+      }
+    },
+    {
+      id: 'raja-mohamed',
+      name: { en: 'Raja Mohamed', ta: 'ராஜா முகமது' },
+      role: { en: 'Advocate, Tirunelveli District Bar', ta: 'வழக்கறிஞர், திருநெல்வேலி மாவட்ட நீதிமன்றம்' },
+      designation: { en: 'Deputy Secretary', ta: 'துணைச் செயலாளர்' },
+      district: { en: 'Tirunelveli', ta: 'திருநெல்வேலி' },
+      branch: 'deputy_secretaries',
+      court: 'Tirunelveli District Courts & Madurai Bench',
+      bio: {
+        en: 'Leading advocate from Tirunelveli bridging the Southern District Bars and strengthening minority and human rights litigation.',
+        ta: 'தென்மாவட்ட வழக்கறிஞர்களை ஒருங்கிணைக்கும் நெல்லை வழக்கறிஞர்; சிறுபான்மையினர் மற்றும் விளிம்புநிலை மக்களின் சட்ட உரிமைகளுக்காகப் பாடுபடுபவர்.'
+      }
+    }
+  ],
+  headOfficeAdvocates: [
+    {
+      id: 'k-j-saravanan',
+      name: { en: 'K.J. Saravanan', ta: 'கே.ஜே. சரவணன்' },
+      role: { en: 'Head Office Advocate, Anna Arivalayam', ta: 'தலைமையக வழக்கறிஞர், அண்ணா அறிவாலயம்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'headoffice_advocates',
+      court: 'Anna Arivalayam Secretariat & High Court',
+      bio: {
+        en: 'Head office counsel based at Anna Arivalayam, managing central documentation, statutory filings, and headquarters legal protocols.',
+        ta: 'அண்ணா அறிவாலயத்தில் அமைந்த தலைமையகத்தில் தலைமைச் செயலக ஆவணங்கள் மற்றும் சட்டப் பணிகளைக் கவனிக்கும் வழக்கறிஞர்.'
+      }
+    },
+    {
+      id: 'v-kavi-ganesan',
+      name: { en: 'V. Kavi Ganesan', ta: 'வி. கவி கணேசன்' },
+      role: { en: 'Head Office Advocate, Anna Arivalayam', ta: 'தலைமையக வழக்கறிஞர், அண்ணா அறிவாலயம்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'headoffice_advocates',
+      court: 'Madras High Court',
+      bio: {
+        en: 'Head office coordinator facilitating liaison between district legal units and the state high command.',
+        ta: 'மாவட்ட அமைப்புகளுக்கும் கழகத் தலைமைக்கும் இடையிலான சட்டத் தொடர்புகளை ஒருங்கிணைக்கும் தலைமையக வழக்கறிஞர்.'
+      }
+    },
+    {
+      id: 'k-maraimalai',
+      name: { en: 'K. Maraimalai', ta: 'கே. மறைமலை' },
+      role: { en: 'Head Office Advocate & Delta Bar Liaison', ta: 'தலைமையக வழக்கறிஞர் & டெல்டா மண்டல பொறுப்பாளர்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Nagapattinam', ta: 'நாகப்பட்டினம்' },
+      branch: 'headoffice_advocates',
+      court: 'Nagapattinam District Courts',
+      bio: {
+        en: 'Nagapattinam advocate serving on the central state panel, overseeing agrarian and coastal fishermen legal rights.',
+        ta: 'நாகப்பட்டினம் மாவட்ட வழக்கறிஞர்; டெல்டா விவசாயிகள் மற்றும் மீனவ மக்களின் சட்டப் பாதுகாப்பில் முன்னிற்பவர்.'
+      }
+    },
+    {
+      id: 'suvai-suresh',
+      name: { en: 'Suvai Suresh', ta: 'சுவை சுரேஷ்' },
+      role: { en: 'Head Office Advocate & Northern Zone In-Charge', ta: 'தலைமையக வழக்கறிஞர் & வடக்கு மண்டல பொறுப்பாளர்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Villupuram', ta: 'விழுப்புரம்' },
+      branch: 'headoffice_advocates',
+      court: 'Villupuram District Courts',
+      bio: {
+        en: 'Villupuram advocate liaising northern district bars with the party headquarters, actively assisting rural legal aid camps.',
+        ta: 'விழுப்புரம் மாவட்ட வழக்கறிஞர்; வடக்கு மண்டல கீழமை நீதிமன்ற வழக்குகளையும் தலைமையகப் பணிகளையும் இணைப்பவர்.'
+      }
+    },
+    {
+      id: 'manoj',
+      name: { en: 'Manoj', ta: 'மனோஜ்' },
+      role: { en: 'Head Office Advocate & Southern Coastal Bar Liaison', ta: 'தலைமையக வழக்கறிஞர் & தென் கடலோர மண்டல பொறுப்பாளர்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Thoothukudi', ta: 'தூத்துக்குடி' },
+      branch: 'headoffice_advocates',
+      court: 'Thoothukudi District Courts & Madurai Bench',
+      bio: {
+        en: 'Advocate from Thoothukudi coordinating maritime and environmental legal aid, providing active legal coverage in southern coastal bars.',
+        ta: 'தூத்துக்குடி மாவட்ட வழக்கறிஞர்; தென் கடலோர மாவட்டங்களின் வழக்கறிஞர் பணிகளைத் தலைமையகத்துடன் ஒருங்கிணைப்பவர்.'
+      }
+    },
+    {
+      id: 'dinesh',
+      name: { en: 'Dinesh', ta: 'தினேஷ்' },
+      role: { en: 'Head Office Advocate & Coastal Delta Bar Liaison', ta: 'தலைமையக வழக்கறிஞர் & கடலோர டெல்டா பொறுப்பாளர்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Nagapattinam', ta: 'நாகப்பட்டினம்' },
+      branch: 'headoffice_advocates',
+      court: 'Nagapattinam District Courts',
+      bio: {
+        en: 'Dedicated counsel from Nagapattinam coordinating grassroots dispute resolutions and defending worker grievances in district courts.',
+        ta: 'நாகப்பட்டினம் வழக்கறிஞர்; கீழமை நீதிமன்றங்களில் எளிய மக்களுக்கான சட்ட உதவிகளையும் தலைமையக ஒருங்கிணைப்பையும் மேற்கொள்பவர்.'
+      }
+    },
+    {
+      id: 'm-s-p-veeramani',
+      name: { en: 'M.S.P. Veeramani', ta: 'எம்.எஸ்.பி. வீரமணி' },
+      role: { en: 'Head Office Advocate & Central Zone Coordinator', ta: 'தலைமையக வழக்கறிஞர் & மத்திய மண்டல ஒருங்கிணைப்பாளர்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Tiruchi', ta: 'திருச்சி' },
+      branch: 'headoffice_advocates',
+      court: 'Tiruchi District & Sessions Court',
+      bio: {
+        en: 'Senior practitioner at Tiruchirappalli District Court coordinating Central Tamil Nadu advocates and student bar forums.',
+        ta: 'திருச்சி மாவட்ட வழக்கறிஞர்; மத்திய மண்டல வழக்கறிஞர்கள் மற்றும் சட்டக் கல்லூரி மாணவர் மன்றங்களை வழிநடத்துபவர்.'
+      }
+    },
+    {
+      id: 'minjur-suresh',
+      name: { en: 'Minjur Suresh', ta: 'மீஞ்சூர் சுரேஷ்' },
+      role: { en: 'Head Office Advocate & Northern Suburban Bar Liaison', ta: 'தலைமையக வழக்கறிஞர் & திருவள்ளூர் புறநகர் பொறுப்பாளர்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Chennai', ta: 'சென்னை' },
+      branch: 'headoffice_advocates',
+      court: 'Madras High Court & Ponneri Courts',
+      bio: {
+        en: 'Advocate representing Minjur and northern suburban courts, ensuring rapid legal aid intervention for public interest causes.',
+        ta: 'மீஞ்சூர், பொன்னேரி மற்றும் திருவள்ளூர் பகுதிகளை உள்ளடக்கிய வடசென்னை புறநகர் நீதிமன்றப் பணிகளை ஒருங்கிணைக்கும் வழக்கறிஞர்.'
+      }
+    },
+    {
+      id: 'kalanidhi',
+      name: { en: 'Kalanidhi', ta: 'கலாநிதி' },
+      role: { en: 'Head Office Advocate & Madurai Bench Coordinator', ta: 'தலைமையக வழக்கறிஞர் & மதுரை கிளை ஒருங்கிணைப்பாளர்' },
+      designation: { en: 'Head Office Advocate', ta: 'தலைமையக வழக்கறிஞர்' },
+      district: { en: 'Madurai North', ta: 'மதுரை வடக்கு' },
+      branch: 'headoffice_advocates',
+      court: 'Madras High Court (Madurai Bench)',
+      bio: {
+        en: 'Madurai North counsel coordinating Madurai Bench legal interventions and public interest cases for the 13 southern districts.',
+        ta: 'மதுரை வடக்கு வழக்கறிஞர்; சென்னை உயர் நீதிமன்ற மதுரை கிளையில் 13 தென்மாவட்டங்களுக்கான பொதுநல மற்றும் கட்சி வழக்குகளை ஒருங்கிணைப்பவர்.'
+      }
+    }
+  ]
+};
+
 export const LEADERSHIP_PROFILES: Leader[] = [
+  {
+    id: 'r-viduthalai',
+    name: { en: 'R. Viduthalai', ta: 'ஆர். விடுதலை' },
+    role: { en: 'Senior Advocate & Former Advocate General of Tamil Nadu', ta: 'மூத்த வழக்கறிஞர் & முன்னாள் தலைமை வழக்கறிஞர்' },
+    designation: { en: 'President, DMK Legal Wing', ta: 'தலைவர், திமுக வழக்கறிஞர் அணி' },
+    level: 'state',
+    barCouncilNo: 'MS/318/1979',
+    practiceArea: { en: 'Constitutional Benches, Social Justice, Reservation Defense & Writs', ta: 'அரசமைப்பு அமர்வுகள், சமூக நீதி, இடஒதுக்கீட்டுப் பாதுகாப்பு & நீதிப்பேராணைகள்' },
+    bio: {
+      en: 'Senior Advocate and former Advocate General of Tamil Nadu. Foremost constitutional authority who has represented the state government and the Dravidian movement in epochal Supreme Court and High Court litigations protecting 69% reservation and state rights.',
+      ta: 'தமிழ்நாட்டின் முன்னாள் அட்வகேட் ஜெனரல் மற்றும் மூத்த வழக்கறிஞர். சமூக நீதி, 69% இடஒதுக்கீடு பாதுகாப்பு மற்றும் மாநில சுயாட்சி தொடர்பான வரலாற்று சிறப்புமிக்க வழக்குகளை உச்ச நீதிமன்றத்தில் வாதாடிய பெருமைக்குரியவர்.'
+    },
+    image: '/images/dmk-flag-sun.jpg',
+    email: 'viduthalai.office@dmk.org.in',
+    phone: '+91 44 2434 4455',
+    court: 'Supreme Court of India & Madras High Court',
+    featured: true
+  },
+  {
+    id: 'n-r-elango',
+    name: { en: 'N.R. Elango', ta: 'என்.ஆர். இளங்கோ' },
+    role: { en: 'Senior Advocate & Member of Parliament (Rajya Sabha)', ta: 'மூத்த வழக்கறிஞர் & நாடாளுமன்ற உறுப்பினர் (மாநிலங்களவை)' },
+    designation: { en: 'Secretary, DMK Legal Wing', ta: 'செயலாளர், திமுக வழக்கறிஞர் அணி' },
+    level: 'state',
+    barCouncilNo: 'MS/651/1985',
+    practiceArea: { en: 'Criminal Jurisprudence, Constitutional Writs & Corporate Governance', ta: 'குற்றவியல் சட்டவியல், அரசமைப்பு நீதிப்பேராணைகள் & நிறுவனச் சட்டம்' },
+    bio: {
+      en: 'Senior Advocate with four decades of trial and appellate experience, and Member of Parliament (Rajya Sabha). Stalwart voice defending civil liberties, criminal justice reforms, and federalism.',
+      ta: 'நாடாளுமன்ற மாநிலங்களவை உறுப்பினர் மற்றும் நான்கு தசாப்தங்களுக்கும் மேலான அனுபவம் கொண்ட மூத்த வழக்கறிஞர். மனித உரிமைப் பாதுகாப்பு, குற்றவியல் சட்டவியல் மற்றும் ஜனநாயக விழுமியங்களை நிலைநிறுத்துவதில் முன்னணிப் பங்காற்றுபவர்.'
+    },
+    image: '/images/dmk-flag-sun.jpg',
+    email: 'nrelango.office@dmk.org.in',
+    phone: '+91 44 2811 3322',
+    court: 'Supreme Court of India & Madras High Court',
+    featured: true
+  },
   {
     id: 'p-wilson',
     name: { en: 'P. Wilson', ta: 'பி. வில்சன்' },
     role: { en: 'Senior Advocate & Member of Parliament (Rajya Sabha)', ta: 'மூத்த வழக்கறிஞர் & நாடாளுமன்ற உறுப்பினர் (மாநிலங்களவை)' },
-    designation: { en: 'State Secretary, DMK Legal Wing', ta: 'மாநிலச் செயலாளர், திமுக வழக்கறிஞர் அணி' },
-    level: 'state',
+    designation: { en: 'Senior Advisory Counsel & MP', ta: 'மூத்த சட்ட ஆலோசகர் & நாடாளுமன்ற உறுப்பினர்' },
+    level: 'advisory',
     barCouncilNo: 'MS/482/1989',
     practiceArea: { en: 'Constitutional, Administrative, Election & Appellate Law', ta: 'அரசமைப்புச் சட்டம், நிர்வாகவியல், தேர்தல் & மேல்முறையீட்டுச் சட்டம்' },
     bio: {
@@ -322,24 +705,6 @@ export const LEADERSHIP_PROFILES: Leader[] = [
     email: 'pwilson.office@dmk.org.in',
     phone: '+91 44 2434 4455',
     court: 'Supreme Court of India & Madras High Court',
-    featured: true
-  },
-  {
-    id: 'n-r-elan-go',
-    name: { en: 'N.R. Elango', ta: 'என்.ஆர். இளங்கோ' },
-    role: { en: 'Senior Advocate & Member of Parliament (Rajya Sabha)', ta: 'மூத்த வழக்கறிஞர் & நாடாளுமன்ற உறுப்பினர் (மாநிலங்களவை)' },
-    designation: { en: 'State Legal Advisory Board Member', ta: 'மாநில சட்ட ஆலோசனைக் குழு உறுப்பினர்' },
-    level: 'advisory',
-    barCouncilNo: 'MS/651/1985',
-    practiceArea: { en: 'Criminal Jurisprudence, Constitutional Writs & Corporate Governance', ta: 'குற்றவியல் சட்டவியல், அரசமைப்பு நீதிப்பேராணைகள் & நிறுவனச் சட்டம்' },
-    bio: {
-      en: 'Distinguished Senior Advocate with four decades of trial and appellate practice. Known for spearheading civil liberty protections and criminal justice reform in Parliament.',
-      ta: 'நான்கு தசாப்தங்களுக்கும் மேலான உயர் நீதிமன்ற மற்றும் கீழ் நீதிமன்ற அனுபவம் கொண்ட மூத்த வழக்கறிஞர். மனித உரிமைப் பாதுகாப்பு மற்றும் குற்றவியல் சட்டச் சீர்திருத்தங்களை நாடாளுமன்றத்தில் தொடர்ந்து குரலெழுப்பி வருபவர்.'
-    },
-    image: '/images/dmk-flag-sun.jpg',
-    email: 'nrelango.office@dmk.org.in',
-    phone: '+91 44 2811 3322',
-    court: 'Madras High Court & Supreme Court',
     featured: true
   },
   {

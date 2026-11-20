@@ -1,391 +1,590 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { useData } from '../context/DataContext';
-import { Leader } from '../types';
+import { OFFICIAL_HIERARCHY_CHART } from '../data/content';
+import { FlowchartOfficer } from '../types';
 import { 
-  Users, 
-  ChevronRight, 
-  Mail, 
-  Phone, 
   Search, 
-  Shield, 
+  MapPin, 
+  Scale, 
   Award, 
-  Layers, 
-  MapPin,
-  X 
+  ChevronRight, 
+  X, 
+  Shield, 
+  Building,
+  Mail,
+  Phone,
+  CheckCircle2,
+  Share2
 } from 'lucide-react';
 
 export const OrgChart: React.FC = () => {
   const { language } = useLanguage();
-  const { leaders } = useData();
-  const [selectedLeader, setSelectedLeader] = useState<Leader | null>(null);
+  const [selectedOfficer, setSelectedOfficer] = useState<FlowchartOfficer | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTier, setActiveTier] = useState<'all' | 'state' | 'high_court' | 'advisory'>('all');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [activeBranchFilter, setActiveBranchFilter] = useState<'all' | 'joint' | 'deputy' | 'headoffice'>('all');
 
-  const filteredLeaders = leaders.filter((l) => {
-    const matchesTier = activeTier === 'all' || l.level === activeTier;
+  const { president, secretary, jointSecretaries, deputySecretaries, headOfficeAdvocates } = OFFICIAL_HIERARCHY_CHART;
+
+  // Aggregate all 25 officers into a single flat array for search and filter calculations
+  const allOfficers: FlowchartOfficer[] = useMemo(() => [
+    president,
+    secretary,
+    ...jointSecretaries,
+    ...deputySecretaries,
+    ...headOfficeAdvocates
+  ], [president, secretary, jointSecretaries, deputySecretaries, headOfficeAdvocates]);
+
+  // List of unique districts with counts
+  const districtCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allOfficers.forEach((o) => {
+      const dist = o.district[language];
+      counts[dist] = (counts[dist] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [allOfficers, language]);
+
+  // Check if an officer matches current search and district filters
+  const isMatch = (officer: FlowchartOfficer): boolean => {
+    const q = searchQuery.trim().toLowerCase();
     const matchesSearch =
-      l.name[language].toLowerCase().includes(searchQuery.toLowerCase()) ||
-      l.designation[language].toLowerCase().includes(searchQuery.toLowerCase()) ||
-      l.role[language].toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesTier && matchesSearch;
-  });
+      !q ||
+      officer.name[language].toLowerCase().includes(q) ||
+      officer.district[language].toLowerCase().includes(q) ||
+      officer.designation[language].toLowerCase().includes(q) ||
+      officer.role[language].toLowerCase().includes(q);
 
-  const stateSecretary = leaders.find((l) => l.id === 'p-wilson') || leaders[0];
-  const advisoryLeaders = leaders.filter((l) => l.level === 'advisory');
-  const stateDeputies = leaders.filter((l) => l.level === 'state' && l.id !== 'p-wilson');
-  const highCourtLeaders = leaders.filter((l) => l.level === 'high_court');
+    const matchesDistrict =
+      selectedDistrict === 'all' ||
+      officer.district[language].toLowerCase() === selectedDistrict.toLowerCase();
+
+    return matchesSearch && matchesDistrict;
+  };
+
+  // Check if any filter is active
+  const hasActiveFilter = searchQuery.trim() !== '' || selectedDistrict !== 'all';
 
   return (
-    <div className="w-full space-y-8 font-dmk-body">
-      
-      {/* 1. Broadsheet Filter & Directory Search Bar */}
-      <div className="bg-white border border-neutral-300 p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
-          <Layers className="w-4 h-4 text-[#E31E24] shrink-0" />
-          <span className="text-xs font-english font-bold uppercase text-neutral-800 shrink-0">
-            {language === 'ta' ? 'அடுக்குகள்:' : 'Tiers:'}
-          </span>
-          {[
-            { id: 'all', label: language === 'ta' ? 'அனைத்து நிலைகளும்' : 'All Tiers' },
-            { id: 'state', label: language === 'ta' ? 'மாநில தலைமை' : 'State Executive' },
-            { id: 'high_court', label: language === 'ta' ? 'உயர்நீதிமன்றக் கிளை' : 'High Court Wing' },
-            { id: 'advisory', label: language === 'ta' ? 'ஆலோசனைக் குழு' : 'Advisory Board' }
-          ].map((tier) => (
-            <button
-              key={tier.id}
-              onClick={() => setActiveTier(tier.id as any)}
-              className={`px-3 py-1.5 text-xs font-english font-bold uppercase tracking-wider transition-all border ${
-                activeTier === tier.id
-                  ? 'bg-neutral-900 text-white border-neutral-900'
-                  : 'bg-[#FAF7F2] text-neutral-700 hover:text-black border-neutral-300'
-              }`}
-            >
-              {tier.label}
-            </button>
-          ))}
-        </div>
+    <div className="w-full space-y-8 font-dmk-body text-[#111111]">
 
-        {/* Search */}
-        <div className="relative w-full md:w-72">
-          <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={language === 'ta' ? 'பொறுப்பாளர் தேடுக...' : 'Search officer...'}
-            className="w-full bg-[#FAF7F2] border border-neutral-300 pl-8 pr-3 py-1.5 text-xs text-neutral-900 placeholder-neutral-500 focus:outline-none focus:border-[#E31E24] font-dmk-body"
-          />
-        </div>
-      </div>
-
-      {/* 2. Structured Broadsheet Organisational Flow Chart */}
-      <div className="bg-white border border-neutral-300 p-6 sm:p-10 relative overflow-hidden">
-        
-        {/* LEVEL 0: PARTY HIGH COMMAND */}
-        <div className="flex flex-col items-center text-center mb-8">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#FAF7F2] border border-neutral-300 text-[10px] font-english text-neutral-800 uppercase tracking-wider mb-2 font-bold">
-            <Shield className="w-3.5 h-3.5 text-[#E31E24]" />
-            <span>{language === 'ta' ? 'கழகத் தலைமை வழிகாட்டுதல்' : 'DMK High Command Guidance'}</span>
-          </div>
-
-          <div className="p-4 bg-[#FAF7F2] border border-neutral-300 max-w-md w-full">
-            <h4 className="text-base font-black text-neutral-900 uppercase tracking-wider font-dmk-headline">
-              {language === 'ta' ? 'கழகத் தலைவர் & பொதுச்செயலாளர்' : 'Party President & General Secretary'}
-            </h4>
-            <p className="text-xs text-neutral-600 font-english mt-0.5">
-              {language === 'ta' ? 'அண்ணா அறிவாலயம், சென்னை' : 'Anna Arivalayam, Chennai'}
+      {/* Top Editorial Bar: Status, District Filter & Search */}
+      <div className="bg-white border-2 border-neutral-900 p-5 sm:p-7 shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-5 border-b border-neutral-200">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="w-2.5 h-2.5 bg-[#E31E24] inline-block animate-pulse" />
+              <span className="text-[11px] font-english font-bold uppercase tracking-[0.2em] text-[#E31E24]">
+                {language === 'ta' ? 'அதிகாரப்பூர்வ தலைமைப் படிநிலை' : 'OFFICIAL STATE LEADERSHIP FLOWCHART'}
+              </span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-neutral-900 font-dmk-headline tracking-tight">
+              {language === 'ta' ? 'திமுக வழக்கறிஞர் அணி - மாநிலக் கட்டமைப்பு' : 'DMK Legal Wing — Executive Hierarchy Tree'}
+            </h3>
+            <p className="text-xs sm:text-sm text-neutral-600 mt-1 max-w-2xl font-dmk-body">
+              {language === 'ta'
+                ? 'தலைவர், செயலாளர் வழிகாட்டலில் இயங்கும் 25 மாநில தலைமைப் பொறுப்பாளர்கள் மற்றும் 3 செயல் பிரிவுகள்.'
+                : 'A structured 3-tier constitutional hierarchy connecting the President, Secretary, and three executive wings across Tamil Nadu.'}
             </p>
           </div>
 
-          {/* Vertical Connecting Line */}
-          <div className="w-[2px] h-8 bg-neutral-900 my-1" />
+          {/* Search bar */}
+          <div className="relative w-full lg:w-80 shrink-0">
+            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={language === 'ta' ? 'பெயர் அல்லது ஊர் தேடுக...' : 'Search officer or district...'}
+              className="w-full bg-[#FAF7F2] border border-neutral-300 pl-10 pr-9 py-2.5 text-xs text-neutral-900 placeholder-neutral-500 focus:outline-none focus:border-neutral-900 focus:bg-white transition-all font-dmk-body"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-900"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* LEVEL 1: STATE SECRETARY */}
-        <div className="flex flex-col items-center text-center mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#FFF5F5] border border-[#E31E24] text-[10px] font-english text-[#B81318] uppercase tracking-wider mb-2 font-bold">
-            <Award className="w-3.5 h-3.5 text-[#E31E24]" />
-            <span>{language === 'ta' ? 'மாநிலத் தலைமைச் செயலாளர்' : 'State Legal Secretary'}</span>
+        {/* District Filter Chips */}
+        <div className="pt-4 flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-english font-bold uppercase tracking-wider text-neutral-500 mr-1 flex items-center gap-1">
+            <MapPin className="w-3 h-3 text-[#E31E24]" />
+            {language === 'ta' ? 'மாவட்டம்:' : 'Filter Station:'}
+          </span>
+
+          <button
+            onClick={() => setSelectedDistrict('all')}
+            className={`px-3 py-1 text-xs font-english font-bold uppercase tracking-wider transition-all border ${
+              selectedDistrict === 'all'
+                ? 'bg-neutral-900 text-white border-neutral-900'
+                : 'bg-[#FAF7F2] text-neutral-700 hover:text-black hover:bg-neutral-200 border-neutral-300'
+            }`}
+          >
+            {language === 'ta' ? 'அனைத்தும் (25)' : 'All Stations (25)'}
+          </button>
+
+          {districtCounts.map(([district, count]) => {
+            const isSelected = selectedDistrict.toLowerCase() === district.toLowerCase();
+            return (
+              <button
+                key={district}
+                onClick={() => setSelectedDistrict(isSelected ? 'all' : district)}
+                className={`px-2.5 py-1 text-xs font-english transition-all border flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-[#E31E24] text-white border-[#E31E24] font-bold shadow-xs'
+                    : 'bg-white text-neutral-700 hover:border-neutral-900 border-neutral-300'
+                }`}
+              >
+                <span>{district}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white text-[#E31E24] font-bold' : 'bg-neutral-100 text-neutral-600'}`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Main Flowchart Tree Canvas */}
+      <div className="bg-[#FAF7F2] border-2 border-neutral-900 p-6 sm:p-10 relative overflow-hidden">
+        
+        {/* Subtle decorative background watermark badge */}
+        <div className="absolute right-6 top-6 opacity-5 pointer-events-none select-none">
+          <Scale className="w-64 h-64 text-neutral-900" />
+        </div>
+
+        {/* ============================================================== */}
+        {/* TIER 1: PRESIDENT (APEX)                                       */}
+        {/* ============================================================== */}
+        <div className="flex flex-col items-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-neutral-300 shadow-2xs text-[11px] font-english font-bold uppercase tracking-widest text-[#E31E24] mb-3">
+            <Shield className="w-3.5 h-3.5 text-[#E31E24]" />
+            <span>{language === 'ta' ? 'மாநிலத் தலைமை • தலைவர்' : 'APEX LEADERSHIP • PRESIDENT'}</span>
           </div>
 
           <div
-            onClick={() => setSelectedLeader(stateSecretary)}
-            className="group cursor-pointer bg-[#FAF7F2] hover:bg-white border border-neutral-300 hover:border-neutral-900 p-5 max-w-lg w-full transition-all flex items-center gap-4 text-left"
+            onClick={() => setSelectedOfficer(president)}
+            className={`group cursor-pointer bg-white border-2 transition-all p-6 max-w-xl w-full text-center relative shadow-sm hover:shadow-md ${
+              isMatch(president)
+                ? 'border-neutral-900 ring-2 ring-[#E31E24]'
+                : hasActiveFilter
+                ? 'border-neutral-200 opacity-40'
+                : 'border-neutral-900 hover:border-[#E31E24]'
+            }`}
           >
-            <div className="w-16 h-16 rounded-full bg-white border border-neutral-300 p-1 overflow-hidden shrink-0 flex items-center justify-center">
-              <img
-                src="/images/dmk-flag-sun.jpg"
-                alt={stateSecretary.name[language]}
-                className="w-full h-full object-contain rounded-full"
-              />
-            </div>
-            <div className="flex-1">
-              <span className="text-[10px] font-bold text-[#E31E24] uppercase tracking-wider block font-english">
-                {stateSecretary.designation[language]}
+            {/* Top red header hairline */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#E31E24]" />
+
+            <div className="flex flex-col items-center">
+              <span className="text-[11px] font-english font-bold uppercase tracking-[0.2em] text-[#E31E24] mb-1">
+                {president.designation[language]}
               </span>
-              <h3 className="text-lg font-bold text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors leading-tight">
-                {stateSecretary.name[language]}
-              </h3>
-              <p className="text-xs text-neutral-700 line-clamp-1 font-dmk-body">
-                {stateSecretary.role[language]}
+              <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors">
+                {president.name[language]}
+              </h2>
+              <p className="text-xs sm:text-sm font-semibold text-neutral-700 mt-1 font-dmk-body">
+                {president.role[language]}
               </p>
-              <div className="flex items-center gap-3 mt-1.5 text-[11px]">
-                <span className="font-english text-[#B81318] font-bold">{stateSecretary.barCouncilNo}</span>
-                <span>•</span>
-                <span className="text-neutral-900 font-bold font-dmk-headline">{language === 'ta' ? 'முழு விவரம்' : 'View Profile'} &rarr;</span>
+              
+              <div className="mt-3 flex items-center gap-3 text-xs">
+                <span className="inline-flex items-center gap-1 font-english font-bold text-neutral-800 bg-[#FAF7F2] px-2.5 py-0.5 border border-neutral-300">
+                  <MapPin className="w-3 h-3 text-[#E31E24]" />
+                  {president.district[language]}
+                </span>
+                <span className="text-neutral-400">•</span>
+                <span className="font-english text-[11px] text-[#B81318] font-bold">
+                  {president.court}
+                </span>
               </div>
             </div>
-          </div>
 
-          {/* Branching Tree Line */}
-          <div className="w-[2px] h-8 bg-neutral-900 my-1" />
-          <div className="w-3/4 max-w-2xl h-[2px] bg-neutral-900 relative">
-            <div className="absolute left-0 top-0 w-2 h-2 bg-[#E31E24] -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute left-1/2 top-0 w-2 h-2 bg-[#E31E24] -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute right-0 top-0 w-2 h-2 bg-[#E31E24] translate-x-1/2 -translate-y-1/2" />
-          </div>
-        </div>
-
-        {/* LEVEL 2: THREE EXECUTIVE PILLARS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          
-          {/* Pillar 1: Legal Advisory Board */}
-          <div className="bg-[#FAF7F2] border border-neutral-300 p-5 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-300 mb-3">
-                <span className="text-xs font-black text-neutral-900 uppercase tracking-wider font-dmk-headline">
-                  {language === 'ta' ? 'மாநில சட்ட ஆலோசனைக் குழு' : 'Legal Advisory Board'}
-                </span>
-                <span className="text-[10px] bg-white text-neutral-900 px-2 py-0.5 border border-neutral-300 font-english font-bold">
-                  {advisoryLeaders.length}
-                </span>
-              </div>
-
-              <div className="space-y-2.5">
-                {advisoryLeaders.map((leader) => (
-                  <div
-                    key={leader.id}
-                    onClick={() => setSelectedLeader(leader)}
-                    className="p-3 bg-white hover:bg-[#FFF8F8] border border-neutral-200 hover:border-neutral-900 cursor-pointer transition-colors"
-                  >
-                    <h5 className="text-xs font-bold text-neutral-900 font-dmk-headline">
-                      {leader.name[language]}
-                    </h5>
-                    <p className="text-[11px] text-[#E31E24] font-medium font-english">
-                      {leader.designation[language]}
-                    </p>
-                    <p className="text-[10px] text-neutral-600 line-clamp-1 mt-0.5 font-dmk-body">
-                      {leader.role[language]}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Pillar 2: Additional & Joint Secretaries */}
-          <div className="bg-[#FAF7F2] border border-neutral-300 p-5 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-300 mb-3">
-                <span className="text-xs font-black text-neutral-900 uppercase tracking-wider font-dmk-headline">
-                  {language === 'ta' ? 'மாநில கூடுதல் / துணைச் செயலாளர்கள்' : 'State Executive Secretariat'}
-                </span>
-                <span className="text-[10px] bg-white text-neutral-900 px-2 py-0.5 border border-neutral-300 font-english font-bold">
-                  {stateDeputies.length}
-                </span>
-              </div>
-
-              <div className="space-y-2.5">
-                {stateDeputies.map((leader) => (
-                  <div
-                    key={leader.id}
-                    onClick={() => setSelectedLeader(leader)}
-                    className="p-3 bg-white hover:bg-[#FFF8F8] border border-neutral-200 hover:border-neutral-900 cursor-pointer transition-colors"
-                  >
-                    <h5 className="text-xs font-bold text-neutral-900 font-dmk-headline">
-                      {leader.name[language]}
-                    </h5>
-                    <p className="text-[11px] text-[#E31E24] font-medium font-english">
-                      {leader.designation[language]}
-                    </p>
-                    <p className="text-[10px] text-neutral-600 line-clamp-1 mt-0.5 font-dmk-body">
-                      {leader.role[language]}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Pillar 3: High Court Wing */}
-          <div className="bg-[#FAF7F2] border border-neutral-300 p-5 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-300 mb-3">
-                <span className="text-xs font-black text-neutral-900 uppercase tracking-wider font-dmk-headline">
-                  {language === 'ta' ? 'சென்னை உயர் நீதிமன்றம் & மதுரை கிளை' : 'High Court & Madurai Bench'}
-                </span>
-                <span className="text-[10px] bg-white text-neutral-900 px-2 py-0.5 border border-neutral-300 font-english font-bold">
-                  {highCourtLeaders.length}
-                </span>
-              </div>
-
-              <div className="space-y-2.5">
-                {highCourtLeaders.map((leader) => (
-                  <div
-                    key={leader.id}
-                    onClick={() => setSelectedLeader(leader)}
-                    className="p-3 bg-white hover:bg-[#FFF8F8] border border-neutral-200 hover:border-neutral-900 cursor-pointer transition-colors"
-                  >
-                    <h5 className="text-xs font-bold text-neutral-900 font-dmk-headline">
-                      {leader.name[language]}
-                    </h5>
-                    <p className="text-[11px] text-[#E31E24] font-medium font-english">
-                      {leader.designation[language]}
-                    </p>
-                    <p className="text-[10px] text-neutral-600 line-clamp-1 mt-0.5 font-dmk-body">
-                      {leader.court}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* LEVEL 3: DISTRICT CADRE DIRECTORY */}
-        <div className="bg-[#FAF7F2] border border-neutral-300 p-6">
-          <div className="flex items-center justify-between border-b-2 border-neutral-900 pb-3 mb-4">
-            <div>
-              <span className="text-[10px] font-mono font-bold text-[#E31E24] uppercase tracking-wider block">
-                {language === 'ta' ? 'களக் கட்டமைப்பு' : 'GRASSROOTS CADRE'}
+            <div className="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between text-[11px] text-neutral-500 font-english">
+              <span>{language === 'ta' ? 'முன்னாள் தலைமை வழக்கறிஞர்' : 'Former Advocate General, TN'}</span>
+              <span className="text-neutral-900 font-bold group-hover:text-[#E31E24] flex items-center gap-0.5 font-dmk-headline">
+                {language === 'ta' ? 'முழு விவரம்' : 'View Profile'} &rarr;
               </span>
-              <h4 className="text-base font-black text-neutral-900 font-dmk-headline">
-                {language === 'ta' ? '38 மாவட்ட வழக்கறிஞர் அமைப்புகள்' : '38 District Legal Wing Secretariats'}
-              </h4>
+            </div>
+          </div>
+
+          {/* Vertical Connecting Line with Flow Arrow */}
+          <div className="flex flex-col items-center my-1 select-none">
+            <div className="w-[3px] h-8 bg-neutral-900" />
+            <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-neutral-900" />
+          </div>
+        </div>
+
+        {/* ============================================================== */}
+        {/* TIER 2: SECRETARY (EXECUTIVE)                                  */}
+        {/* ============================================================== */}
+        <div className="flex flex-col items-center relative z-10 mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-neutral-300 shadow-2xs text-[11px] font-english font-bold uppercase tracking-widest text-neutral-800 mb-3">
+            <Award className="w-3.5 h-3.5 text-[#E31E24]" />
+            <span>{language === 'ta' ? 'மாநிலச் செயலகம் • செயலாளர்' : 'EXECUTIVE SECRETARIAT • SECRETARY'}</span>
+          </div>
+
+          <div
+            onClick={() => setSelectedOfficer(secretary)}
+            className={`group cursor-pointer bg-white border-2 transition-all p-6 max-w-xl w-full text-center relative shadow-sm hover:shadow-md ${
+              isMatch(secretary)
+                ? 'border-neutral-900 ring-2 ring-[#E31E24]'
+                : hasActiveFilter
+                ? 'border-neutral-200 opacity-40'
+                : 'border-neutral-900 hover:border-[#E31E24]'
+            }`}
+          >
+            {/* Top black/red split bar */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 flex">
+              <div className="w-1/2 bg-neutral-900" />
+              <div className="w-1/2 bg-[#E31E24]" />
             </div>
 
-            <a
-              href="/districts"
-              className="inline-flex items-center gap-1 text-xs text-[#E31E24] hover:text-black font-bold uppercase font-dmk-headline"
-            >
-              <span>{language === 'ta' ? 'அனைத்து மாவட்டங்களையும் பார்க்க' : 'View District Units'}</span>
-              <ChevronRight className="w-4 h-4" />
-            </a>
+            <div className="flex flex-col items-center">
+              <span className="text-[11px] font-english font-bold uppercase tracking-[0.2em] text-[#E31E24] mb-1">
+                {secretary.designation[language]}
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors">
+                {secretary.name[language]}
+              </h2>
+              <p className="text-xs sm:text-sm font-semibold text-neutral-700 mt-1 font-dmk-body">
+                {secretary.role[language]}
+              </p>
+              
+              <div className="mt-3 flex items-center gap-3 text-xs">
+                <span className="inline-flex items-center gap-1 font-english font-bold text-neutral-800 bg-[#FAF7F2] px-2.5 py-0.5 border border-neutral-300">
+                  <MapPin className="w-3 h-3 text-[#E31E24]" />
+                  {secretary.district[language]}
+                </span>
+                <span className="text-neutral-400">•</span>
+                <span className="font-english text-[11px] text-[#B81318] font-bold">
+                  {secretary.court}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between text-[11px] text-neutral-500 font-english">
+              <span>{language === 'ta' ? 'மாநிலங்களவை உறுப்பினர்' : 'Member of Parliament (Rajya Sabha)'}</span>
+              <span className="text-neutral-900 font-bold group-hover:text-[#E31E24] flex items-center gap-0.5 font-dmk-headline">
+                {language === 'ta' ? 'முழு விவரம்' : 'View Profile'} &rarr;
+              </span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5 text-xs">
-            {['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Vellore', 'Thanjavur', 'Kanchipuram', 'Cuddalore', 'Erode', 'Kanniyakumari'].map((dist) => (
-              <div
-                key={dist}
-                className="p-2.5 bg-white border border-neutral-400 text-center hover:border-neutral-900 transition-colors shadow-2xs"
-              >
-                <MapPin className="w-3.5 h-3.5 text-[#E31E24] mx-auto mb-1" />
-                <span className="text-neutral-900 font-bold block truncate font-dmk-headline">{dist}</span>
-                <span className="text-[10px] text-neutral-500 font-mono">District Bar</span>
+          {/* Flowchart Branching Connector (Stem -> Horizontal Bar -> 3 Drops) */}
+          <div className="w-full max-w-5xl flex flex-col items-center mt-1">
+            {/* Center stem down */}
+            <div className="w-[3px] h-8 bg-neutral-900" />
+
+            {/* Horizontal Busbar spanning across the 3 columns (hidden on mobile, displayed on md+) */}
+            <div className="hidden md:block w-full h-[3px] bg-neutral-900 relative">
+              {/* Left drop anchor dot */}
+              <div className="absolute left-[16.6%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#E31E24] rounded-full border-2 border-white" />
+              {/* Center drop anchor dot */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#E31E24] rounded-full border-2 border-white" />
+              {/* Right drop anchor dot */}
+              <div className="absolute left-[83.3%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#E31E24] rounded-full border-2 border-white" />
+            </div>
+
+            {/* Three Downward Arrow Drops */}
+            <div className="hidden md:grid grid-cols-3 w-full">
+              <div className="flex flex-col items-center">
+                <div className="w-[3px] h-8 bg-neutral-900" />
+                <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-neutral-900" />
               </div>
-            ))}
+              <div className="flex flex-col items-center">
+                <div className="w-[3px] h-8 bg-neutral-900" />
+                <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-neutral-900" />
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-[3px] h-8 bg-neutral-900" />
+                <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-neutral-900" />
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* ============================================================== */}
+        {/* TIER 3: THREE PARALLEL COLUMNS                                  */}
+        {/* ============================================================== */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 items-start">
+          
+          {/* ========================================== */}
+          {/* COLUMN 1: JOINT SECRETARIES (9)            */}
+          {/* ========================================== */}
+          <div className="bg-white border-2 border-neutral-900 shadow-sm flex flex-col h-full">
+            <div className="p-4 sm:p-5 bg-white border-b-2 border-neutral-900 relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-[#E31E24]" />
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-english font-bold uppercase tracking-wider text-neutral-500">
+                  {language === 'ta' ? 'படிநிலை 3.1' : 'TIER 3.1 • EXECUTIVE'}
+                </span>
+                <span className="bg-[#E31E24] text-white text-xs font-english font-bold px-2 py-0.5">
+                  9 {language === 'ta' ? 'பொறுப்பாளர்கள்' : 'OFFICERS'}
+                </span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-neutral-900 font-dmk-headline">
+                {language === 'ta' ? 'இணைச் செயலாளர்கள் (9)' : 'Joint Secretaries (9)'}
+              </h3>
+              <p className="text-xs text-neutral-600 mt-1 font-dmk-body">
+                {language === 'ta'
+                  ? 'மண்டல ஒருங்கிணைப்பு & உயர்நீதிமன்ற வழக்கறிஞர் வழிகாட்டுதல்'
+                  : 'Zonal Administration & Regional Bar Coordination'}
+              </p>
+            </div>
+
+            <div className="p-3 sm:p-4 space-y-2.5 flex-1 bg-[#FDFBF7]">
+              {jointSecretaries.map((officer, index) => {
+                const matched = isMatch(officer);
+                return (
+                  <div
+                    key={officer.id}
+                    onClick={() => setSelectedOfficer(officer)}
+                    className={`p-3 bg-white border transition-all cursor-pointer relative group flex items-start justify-between gap-3 ${
+                      matched
+                        ? 'border-neutral-900 hover:border-[#E31E24] shadow-2xs hover:shadow-xs'
+                        : hasActiveFilter
+                        ? 'border-neutral-200 opacity-30'
+                        : 'border-neutral-300 hover:border-neutral-900'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                      <span className="text-[11px] font-english font-black text-[#E31E24] shrink-0 pt-0.5">
+                        {String(index + 1).padStart(2, '0')}.
+                      </span>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-bold text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors truncate">
+                          {officer.name[language]}
+                        </h4>
+                        <p className="text-[11px] text-neutral-600 truncate font-dmk-body">
+                          {officer.role[language]}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className="inline-flex items-center gap-1 text-[11px] font-english font-bold text-neutral-800 bg-[#FAF7F2] px-2 py-0.5 border border-neutral-300 shrink-0">
+                      <MapPin className="w-2.5 h-2.5 text-[#E31E24]" />
+                      {officer.district[language]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ========================================== */}
+          {/* COLUMN 2: DEPUTY SECRETARIES (5)           */}
+          {/* ========================================== */}
+          <div className="bg-white border-2 border-neutral-900 shadow-sm flex flex-col h-full">
+            <div className="p-4 sm:p-5 bg-white border-b-2 border-neutral-900 relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-neutral-900" />
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-english font-bold uppercase tracking-wider text-neutral-500">
+                  {language === 'ta' ? 'படிநிலை 3.2' : 'TIER 3.2 • EXECUTIVE'}
+                </span>
+                <span className="bg-neutral-900 text-white text-xs font-english font-bold px-2 py-0.5">
+                  5 {language === 'ta' ? 'பொறுப்பாளர்கள்' : 'OFFICERS'}
+                </span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-neutral-900 font-dmk-headline">
+                {language === 'ta' ? 'துணைச் செயலாளர்கள் (5)' : 'Deputy Secretaries (5)'}
+              </h3>
+              <p className="text-xs text-neutral-600 mt-1 font-dmk-body">
+                {language === 'ta'
+                  ? 'தலைமைச் செயலகப் பணிகள் & இளைஞர் வழக்கறிஞர் பாசறை'
+                  : 'Operations, Cadre Liaison & Training Portfolios'}
+              </p>
+            </div>
+
+            <div className="p-3 sm:p-4 space-y-2.5 flex-1 bg-[#FDFBF7]">
+              {deputySecretaries.map((officer, index) => {
+                const matched = isMatch(officer);
+                return (
+                  <div
+                    key={officer.id}
+                    onClick={() => setSelectedOfficer(officer)}
+                    className={`p-3 bg-white border transition-all cursor-pointer relative group flex items-start justify-between gap-3 ${
+                      matched
+                        ? 'border-neutral-900 hover:border-[#E31E24] shadow-2xs hover:shadow-xs'
+                        : hasActiveFilter
+                        ? 'border-neutral-200 opacity-30'
+                        : 'border-neutral-300 hover:border-neutral-900'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                      <span className="text-[11px] font-english font-black text-[#E31E24] shrink-0 pt-0.5">
+                        {String(index + 1).padStart(2, '0')}.
+                      </span>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-bold text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors truncate">
+                          {officer.name[language]}
+                        </h4>
+                        <p className="text-[11px] text-neutral-600 truncate font-dmk-body">
+                          {officer.role[language]}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className="inline-flex items-center gap-1 text-[11px] font-english font-bold text-neutral-800 bg-[#FAF7F2] px-2 py-0.5 border border-neutral-300 shrink-0">
+                      <MapPin className="w-2.5 h-2.5 text-[#E31E24]" />
+                      {officer.district[language]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ========================================== */}
+          {/* COLUMN 3: HEAD OFFICE ADVOCATES (9)        */}
+          {/* ========================================== */}
+          <div className="bg-white border-2 border-neutral-900 shadow-sm flex flex-col h-full">
+            <div className="p-4 sm:p-5 bg-white border-b-2 border-neutral-900 relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-[#E31E24]" />
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-english font-bold uppercase tracking-wider text-neutral-500">
+                  {language === 'ta' ? 'படிநிலை 3.3' : 'TIER 3.3 • HEADQUARTERS'}
+                </span>
+                <span className="bg-[#E31E24] text-white text-xs font-english font-bold px-2 py-0.5">
+                  9 {language === 'ta' ? 'வழக்கறிஞர்கள்' : 'ADVOCATES'}
+                </span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-neutral-900 font-dmk-headline">
+                {language === 'ta' ? 'தலைமையக வழக்கறிஞர்கள் (9)' : 'Head Office Advocates (9)'}
+              </h3>
+              <p className="text-xs text-neutral-600 mt-1 font-dmk-body">
+                {language === 'ta'
+                  ? 'அண்ணா அறிவாலயம் & கடலோர டெல்டா வழக்கறிஞர் ஒருங்கிணைப்பு'
+                  : 'Anna Arivalayam Secretariat & Regional Bench Liaisons'}
+              </p>
+            </div>
+
+            <div className="p-3 sm:p-4 space-y-2.5 flex-1 bg-[#FDFBF7]">
+              {headOfficeAdvocates.map((officer, index) => {
+                const matched = isMatch(officer);
+                return (
+                  <div
+                    key={officer.id}
+                    onClick={() => setSelectedOfficer(officer)}
+                    className={`p-3 bg-white border transition-all cursor-pointer relative group flex items-start justify-between gap-3 ${
+                      matched
+                        ? 'border-neutral-900 hover:border-[#E31E24] shadow-2xs hover:shadow-xs'
+                        : hasActiveFilter
+                        ? 'border-neutral-200 opacity-30'
+                        : 'border-neutral-300 hover:border-neutral-900'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                      <span className="text-[11px] font-english font-black text-[#E31E24] shrink-0 pt-0.5">
+                        {String(index + 1).padStart(2, '0')}.
+                      </span>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-bold text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors truncate">
+                          {officer.name[language]}
+                        </h4>
+                        <p className="text-[11px] text-neutral-600 truncate font-dmk-body">
+                          {officer.role[language]}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className="inline-flex items-center gap-1 text-[11px] font-english font-bold text-neutral-800 bg-[#FAF7F2] px-2 py-0.5 border border-neutral-300 shrink-0">
+                      <MapPin className="w-2.5 h-2.5 text-[#E31E24]" />
+                      {officer.district[language]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
 
       </div>
 
-      {/* Leader Profile Modal (Broadsheet Official Dossier Format) */}
-      {selectedLeader && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border-2 border-neutral-900 max-w-2xl w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto font-dmk-body">
-            
-            {/* Top Modal Flag Bar */}
-            <div className="w-full h-1 flex absolute top-0 left-0">
+      {/* Interactive Dossier Modal */}
+      {selectedOfficer && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={() => setSelectedOfficer(null)}
+        >
+          <div 
+            className="bg-white border-2 border-neutral-900 max-w-xl w-full p-6 sm:p-8 relative shadow-2xl overflow-y-auto max-h-[90vh] font-dmk-body"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top party red/black hairline banner */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 flex">
               <div className="w-1/2 bg-black" />
               <div className="w-1/2 bg-[#E31E24]" />
             </div>
 
             <button
-              onClick={() => setSelectedLeader(null)}
-              className="absolute top-5 right-5 w-8 h-8 bg-[#FAF7F2] hover:bg-neutral-900 hover:text-white text-neutral-800 flex items-center justify-center font-bold text-sm transition-colors border border-neutral-300"
+              onClick={() => setSelectedOfficer(null)}
+              className="absolute top-4 right-4 w-8 h-8 bg-[#FAF7F2] hover:bg-neutral-900 hover:text-white text-neutral-800 flex items-center justify-center font-bold text-sm transition-colors border border-neutral-300"
+              aria-label="Close dossier"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="flex flex-col sm:flex-row gap-6 items-start mt-2 border-b border-neutral-300 pb-4">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white p-1 border border-neutral-300 shrink-0 flex items-center justify-center">
-                <img
-                  src="/images/dmk-flag-sun.jpg"
-                  alt={selectedLeader.name[language]}
-                  className="w-full h-full object-contain rounded-full"
-                />
+            <div className="mt-2 space-y-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-english font-bold uppercase tracking-[0.2em] text-[#E31E24] bg-[#FFF5F5] px-2 py-0.5 border border-[#E31E24]">
+                    {selectedOfficer.designation[language]}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-english font-bold text-neutral-700 bg-[#FAF7F2] px-2 py-0.5 border border-neutral-300">
+                    <MapPin className="w-3 h-3 text-[#E31E24]" />
+                    {selectedOfficer.district[language]}
+                  </span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline">
+                  {selectedOfficer.name[language]}
+                </h3>
+                <p className="text-sm font-semibold text-neutral-700 mt-0.5 font-dmk-body">
+                  {selectedOfficer.role[language]}
+                </p>
               </div>
 
-              <div className="flex-1 space-y-1">
-                <span className="text-xs font-mono font-bold text-[#E31E24] uppercase tracking-wider block">
-                  {selectedLeader.designation[language]}
-                </span>
-                <h3 className="text-2xl font-black text-neutral-900 font-dmk-headline">
-                  {selectedLeader.name[language]}
-                </h3>
-                <p className="text-xs text-neutral-700 font-semibold font-serif italic">
-                  {selectedLeader.role[language]}
-                </p>
-
-                <div className="pt-2 flex flex-wrap gap-2 text-xs">
-                  {selectedLeader.barCouncilNo && (
-                    <span className="bg-[#FAF7F2] text-neutral-900 px-2.5 py-0.5 border border-neutral-900 font-mono font-bold">
-                      Bar No: {selectedLeader.barCouncilNo}
-                    </span>
-                  )}
-                  {selectedLeader.court && (
-                    <span className="bg-[#FAF7F2] text-neutral-700 px-2.5 py-0.5 border border-neutral-400 font-mono">
-                      {selectedLeader.court}
+              {selectedOfficer.court && (
+                <div className="bg-[#FAF7F2] border border-neutral-300 p-3 text-xs">
+                  <span className="text-[10px] font-english font-bold text-neutral-500 uppercase tracking-wider block mb-0.5">
+                    {language === 'ta' ? 'நீதிமன்ற ஆளுகை / பணித்துறை' : 'COURT JURISDICTION & BAR'}
+                  </span>
+                  <span className="font-english font-bold text-neutral-900">
+                    {selectedOfficer.court}
+                  </span>
+                  {selectedOfficer.barCouncilNo && (
+                    <span className="block text-neutral-600 font-english mt-0.5">
+                      Bar Council Reg: {selectedOfficer.barCouncilNo}
                     </span>
                   )}
                 </div>
-              </div>
-            </div>
+              )}
 
-            <div className="mt-5 space-y-4 text-xs">
-              <div>
-                <h5 className="font-mono font-bold text-neutral-800 uppercase tracking-wider text-[11px] mb-1">
-                  {language === 'ta' ? 'அறிமுகம் & வாதாடிய வழக்குகள்' : 'BIOGRAPHY & JURISPRUDENCE'}
-                </h5>
-                <p className="text-neutral-800 leading-relaxed text-sm font-dmk-body">
-                  {selectedLeader.bio[language]}
-                </p>
-              </div>
-
-              {selectedLeader.practiceArea && (
+              {selectedOfficer.bio && (
                 <div>
-                  <h5 className="font-mono font-bold text-neutral-800 uppercase tracking-wider text-[11px] mb-1">
-                    {language === 'ta' ? 'வழக்காடும் சிறப்புத் துறைகள்' : 'PRACTICE SPECIALIZATION'}
-                  </h5>
-                  <p className="text-neutral-900 font-medium">
-                    {selectedLeader.practiceArea[language]}
+                  <span className="text-[10px] font-english font-bold text-neutral-500 uppercase tracking-wider block mb-1">
+                    {language === 'ta' ? 'பொறுப்பாளர் அறிமுகம் & களப்பணிகள்' : 'OFFICER PROFILE & CADRE PORTFOLIO'}
+                  </span>
+                  <p className="text-xs sm:text-sm text-neutral-800 leading-relaxed font-dmk-body">
+                    {selectedOfficer.bio[language]}
                   </p>
                 </div>
               )}
 
-              <div className="pt-3 border-t border-neutral-300 flex flex-wrap gap-4 text-neutral-700">
-                {selectedLeader.email && (
-                  <a
-                    href={`mailto:${selectedLeader.email}`}
-                    className="flex items-center gap-1.5 hover:text-[#E31E24]"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-[#E31E24]" />
-                    <span className="font-mono">{selectedLeader.email}</span>
-                  </a>
-                )}
-                {selectedLeader.phone && (
-                  <a
-                    href={`tel:${selectedLeader.phone}`}
-                    className="flex items-center gap-1.5 hover:text-[#E31E24]"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-[#E31E24]" />
-                    <span className="font-mono">{selectedLeader.phone}</span>
-                  </a>
-                )}
+              <div className="pt-4 border-t border-neutral-200 flex items-center justify-between text-xs font-english text-neutral-600">
+                <span className="flex items-center gap-1.5 font-bold text-neutral-900">
+                  <CheckCircle2 className="w-4 h-4 text-[#E31E24]" />
+                  DMK Legal Wing State Executive
+                </span>
+                <span className="text-neutral-500">
+                  Anna Arivalayam, Chennai
+                </span>
               </div>
             </div>
 

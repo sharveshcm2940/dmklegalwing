@@ -126,3 +126,17 @@ export interface PublicEnquiry {
   submittedAt: string;
   status: 'new' | 'reviewed' | 'resolved';
 }
+
+export interface FlowchartOfficer {
+  id: string;
+  name: { en: string; ta: string };
+  role: { en: string; ta: string };
+  designation: { en: string; ta: string };
+  district: { en: string; ta: string };
+  branch: 'president' | 'secretary' | 'joint_secretaries' | 'deputy_secretaries' | 'headoffice_advocates';
+  honorific?: { en: string; ta: string };
+  bio?: { en: string; ta: string };
+  court?: string;
+  barCouncilNo?: string;
+  isSenior?: boolean;
+}
