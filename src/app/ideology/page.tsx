@@ -131,82 +131,15 @@ export default function IdeologyPage() {
         onMouseLeave={() => setIsPaused(false)}
       >
         
-        {/* Human-Designed Story-Style Progress Bar Header */}
-        <div className="bg-white border-y-2 border-neutral-900 p-4 sm:p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-neutral-200 mb-4">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 bg-[#E31E24]" />
-              <span className="text-xs font-english font-bold uppercase tracking-widest text-neutral-900">
-                {language === 'ta' ? 'அரசமைப்பு அடிப்படைக் கொள்கைகள்' : 'SIX FOUNDATIONAL DOCTRINES'}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4 text-xs font-english font-bold text-neutral-600">
-              <button
-                onClick={() => setIsPaused(!isPaused)}
-                className="flex items-center gap-1.5 text-neutral-700 hover:text-[#E31E24] transition-colors cursor-pointer"
-                title={isPaused ? 'Resume auto-play' : 'Pause auto-play'}
-              >
-                {isPaused ? <Play className="w-3.5 h-3.5 text-[#E31E24]" /> : <Pause className="w-3.5 h-3.5 text-[#E31E24]" />}
-                <span className="uppercase tracking-wider text-[11px]">
-                  {isPaused ? (language === 'ta' ? 'தொடர்க' : 'Auto-Play Paused') : (language === 'ta' ? 'நிறுத்துக' : 'Auto-Advancing')}
-                </span>
-              </button>
-
-              <span className="text-neutral-300">•</span>
-
-              <span className="text-[#E31E24] tracking-wider">
-                {language === 'ta' ? `தூண் 0${activeIndex + 1} / 06` : `DOCTRINE 0${activeIndex + 1} OF 06`}
-              </span>
-            </div>
-          </div>
-
-          {/* Clean Stepper Columns with Live Animated Red Fill Lines */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {IDEOLOGY_PILLARS.map((p, idx) => {
-              const isSelected = activeIndex === idx;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => selectPillar(idx)}
-                  className="group flex flex-col text-left focus:outline-none cursor-pointer py-1"
-                >
-                  {/* Real-time Progress Bar */}
-                  <div className="w-full h-1 bg-neutral-200 overflow-hidden mb-2.5">
-                    <div
-                      className="h-full bg-[#E31E24] transition-all duration-75"
-                      style={{
-                        width: isSelected ? `${progress}%` : idx < activeIndex ? '100%' : '0%'
-                      }}
-                    />
-                  </div>
-
-                  {/* Numeral and Title */}
-                  <div className="flex items-baseline gap-1.5">
-                    <span className={`text-xs font-black font-english transition-colors ${
-                      isSelected ? 'text-[#E31E24]' : 'text-neutral-400 group-hover:text-neutral-800'
-                    }`}>
-                      0{idx + 1}
-                    </span>
-                    <span className={`text-xs font-dmk-headline font-bold truncate transition-colors ${
-                      isSelected ? 'text-neutral-900 font-black' : 'text-neutral-600 group-hover:text-neutral-900'
-                    }`}>
-                      {p.title[language]}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
         {/* The Human-Designed Carousel Slide Canvas */}
-        <div className="relative bg-white border border-neutral-300 p-6 sm:p-12 shadow-sm">
+        <div className="relative bg-white border border-neutral-300 p-6 sm:p-12 shadow-sm overflow-hidden">
           
-          {/* Subtle Top Decorative Movement Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-1 flex">
-            <div className="w-1/2 bg-black" />
-            <div className="w-1/2 bg-[#E31E24]" />
+          {/* Subtle Top Movement Stripe with Live Auto-Advance Progress */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-neutral-200">
+            <div 
+              className="h-full bg-[#E31E24] transition-all duration-75"
+              style={{ width: `${progress}%` }}
+            />
           </div>
 
           {/* Desktop Left / Right Hover Floating Buttons */}
@@ -347,20 +280,35 @@ export default function IdeologyPage() {
               <span>{language === 'ta' ? 'முந்தைய கொள்கை' : 'Previous Doctrine'}</span>
             </button>
 
-            {/* Slide Dot Indicators */}
-            <div className="flex items-center gap-2">
-              {IDEOLOGY_PILLARS.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => selectPillar(idx)}
-                  aria-label={`Go to pillar ${idx + 1}`}
-                  className={`h-2 transition-all cursor-pointer ${
-                    activeIndex === idx
-                      ? 'w-8 bg-[#E31E24]'
-                      : 'w-2 bg-neutral-300 hover:bg-neutral-700'
-                  }`}
-                />
-              ))}
+            {/* Slide Indicators & Auto-Play Control */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsPaused(!isPaused)}
+                className="flex items-center gap-1.5 px-3 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-english font-bold uppercase tracking-wider border border-neutral-300 transition-colors cursor-pointer"
+                title={isPaused ? 'Resume auto-play' : 'Pause auto-play'}
+              >
+                {isPaused ? <Play className="w-3.5 h-3.5 text-[#E31E24]" /> : <Pause className="w-3.5 h-3.5 text-[#E31E24]" />}
+                <span className="text-[11px] hidden sm:inline">{isPaused ? 'Play' : 'Pause'}</span>
+              </button>
+
+              <div className="flex items-center gap-1.5">
+                {IDEOLOGY_PILLARS.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => selectPillar(idx)}
+                    aria-label={`Go to pillar ${idx + 1}`}
+                    className={`h-2 transition-all cursor-pointer ${
+                      activeIndex === idx
+                        ? 'w-8 bg-[#E31E24]'
+                        : 'w-2 bg-neutral-300 hover:bg-neutral-700'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <span className="text-xs font-english font-bold text-[#E31E24] ml-1">
+                0{activeIndex + 1} / 06
+              </span>
             </div>
 
             {/* Step Next Button */}
