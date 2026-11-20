@@ -6,17 +6,23 @@ import { useLanguage } from '@/context/LanguageContext';
 import { IDEOLOGY_PILLARS } from '@/data/content';
 import { 
   Quote, 
-  CheckCircle2, 
   ArrowRight, 
   ChevronLeft, 
   ChevronRight,
   ShieldCheck,
-  Scale
+  Scale,
+  Play,
+  Pause
 } from 'lucide-react';
 
 export default function IdeologyPage() {
   const { language } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const SLIDE_DURATION = 6500; // 6.5 seconds per slide
+  const PROGRESS_INTERVAL = 50; // update progress every 50ms
 
   // Sync with URL hash if present (e.g. #federalism)
   useEffect(() => {
@@ -29,20 +35,44 @@ export default function IdeologyPage() {
     }
   }, []);
 
-  const currentPillar = IDEOLOGY_PILLARS[activeIndex] || IDEOLOGY_PILLARS[0];
+  // Automatic animation timer
+  useEffect(() => {
+    if (isPaused) return;
+
+    const step = (PROGRESS_INTERVAL / SLIDE_DURATION) * 100;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          setActiveIndex((curr) => (curr + 1) % IDEOLOGY_PILLARS.length);
+          return 0;
+        }
+        return prev + step;
+      });
+    }, PROGRESS_INTERVAL);
+
+    return () => clearInterval(timer);
+  }, [isPaused, activeIndex]);
+
+  const selectPillar = (idx: number) => {
+    setActiveIndex(idx);
+    setProgress(0);
+  };
 
   const nextSlide = () => {
-    setActiveIndex((prev) => (prev + 1) % IDEOLOGY_PILLARS.length);
+    selectPillar((activeIndex + 1) % IDEOLOGY_PILLARS.length);
   };
 
   const prevSlide = () => {
-    setActiveIndex((prev) => (prev - 1 + IDEOLOGY_PILLARS.length) % IDEOLOGY_PILLARS.length);
+    selectPillar((activeIndex - 1 + IDEOLOGY_PILLARS.length) % IDEOLOGY_PILLARS.length);
   };
+
+  const currentPillar = IDEOLOGY_PILLARS[activeIndex] || IDEOLOGY_PILLARS[0];
 
   return (
     <div className="w-full flex flex-col space-y-12 py-8 font-dmk-body bg-[#FAF7F2]">
       
-      {/* 1. Manifesto Editorial Header (Clean Border, No Shadow Box) */}
+      {/* 1. Manifesto Editorial Header */}
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
         <div className="border-b-2 border-neutral-900 pb-6 pt-2">
           <div className="flex items-center gap-2 mb-2">
@@ -94,56 +124,92 @@ export default function IdeologyPage() {
         </div>
       </section>
 
-      {/* 3. INTERACTIVE DOCTRINE CAROUSEL (Carousel Edition) */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full space-y-6">
+      {/* 3. AUTOMATICALLY ANIMATING HUMAN-DESIGNED DOCTRINE CAROUSEL */}
+      <section 
+        className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full space-y-6"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         
-        {/* Carousel Navigation Bar (Selector Tabs across all 6 Pillars) */}
-        <div className="bg-white border-y-2 border-neutral-900 p-3 sm:p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-200 mb-3">
+        {/* Human-Designed Story-Style Progress Bar Header */}
+        <div className="bg-white border-y-2 border-neutral-900 p-4 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-neutral-200 mb-4">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 bg-[#E31E24]" />
-              <span className="text-xs font-english font-bold uppercase tracking-wider text-neutral-800">
-                {language === 'ta' ? 'கொள்கைக் கோட்பாடுகள் தெரிவு' : 'SELECT DOCTRINAL PILLAR'}
+              <span className="text-xs font-english font-bold uppercase tracking-widest text-neutral-900">
+                {language === 'ta' ? 'அரசமைப்பு அடிப்படைக் கொள்கைகள்' : 'SIX FOUNDATIONAL DOCTRINES'}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-english font-bold text-neutral-600">
-              <span className="text-[#E31E24]">
-                {language === 'ta' ? `தூண் 0${activeIndex + 1} / 06` : `PILLAR 0${activeIndex + 1} OF 06`}
+            <div className="flex items-center gap-4 text-xs font-english font-bold text-neutral-600">
+              <button
+                onClick={() => setIsPaused(!isPaused)}
+                className="flex items-center gap-1.5 text-neutral-700 hover:text-[#E31E24] transition-colors cursor-pointer"
+                title={isPaused ? 'Resume auto-play' : 'Pause auto-play'}
+              >
+                {isPaused ? <Play className="w-3.5 h-3.5 text-[#E31E24]" /> : <Pause className="w-3.5 h-3.5 text-[#E31E24]" />}
+                <span className="uppercase tracking-wider text-[11px]">
+                  {isPaused ? (language === 'ta' ? 'தொடர்க' : 'Auto-Play Paused') : (language === 'ta' ? 'நிறுத்துக' : 'Auto-Advancing')}
+                </span>
+              </button>
+
+              <span className="text-neutral-300">•</span>
+
+              <span className="text-[#E31E24] tracking-wider">
+                {language === 'ta' ? `தூண் 0${activeIndex + 1} / 06` : `DOCTRINE 0${activeIndex + 1} OF 06`}
               </span>
             </div>
           </div>
 
-          {/* Quick-Jump Tabs for all 6 Pillars */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+          {/* Clean Stepper Columns with Live Animated Red Fill Lines */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {IDEOLOGY_PILLARS.map((p, idx) => {
               const isSelected = activeIndex === idx;
               return (
                 <button
                   key={p.id}
-                  onClick={() => setActiveIndex(idx)}
-                  className={`px-3 py-2 text-xs font-english font-bold uppercase tracking-wider transition-all border text-left flex flex-col justify-between cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#E31E24] text-white border-[#E31E24] shadow-sm'
-                      : 'bg-[#FAF7F2] text-neutral-700 hover:text-black hover:bg-white border-neutral-300'
-                  }`}
+                  onClick={() => selectPillar(idx)}
+                  className="group flex flex-col text-left focus:outline-none cursor-pointer py-1"
                 >
-                  <span className={`text-[11px] block font-black ${isSelected ? 'text-white/80' : 'text-[#E31E24]'}`}>
-                    § {p.number}
-                  </span>
-                  <span className="truncate block font-dmk-headline font-bold text-xs mt-0.5">
-                    {p.title[language]}
-                  </span>
+                  {/* Real-time Progress Bar */}
+                  <div className="w-full h-1 bg-neutral-200 overflow-hidden mb-2.5">
+                    <div
+                      className="h-full bg-[#E31E24] transition-all duration-75"
+                      style={{
+                        width: isSelected ? `${progress}%` : idx < activeIndex ? '100%' : '0%'
+                      }}
+                    />
+                  </div>
+
+                  {/* Numeral and Title */}
+                  <div className="flex items-baseline gap-1.5">
+                    <span className={`text-xs font-black font-english transition-colors ${
+                      isSelected ? 'text-[#E31E24]' : 'text-neutral-400 group-hover:text-neutral-800'
+                    }`}>
+                      0{idx + 1}
+                    </span>
+                    <span className={`text-xs font-dmk-headline font-bold truncate transition-colors ${
+                      isSelected ? 'text-neutral-900 font-black' : 'text-neutral-600 group-hover:text-neutral-900'
+                    }`}>
+                      {p.title[language]}
+                    </span>
+                  </div>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* The Active Carousel Article Card */}
-        <div className="relative bg-white border border-neutral-300 p-6 sm:p-10 shadow-sm transition-all duration-300">
+        {/* The Human-Designed Carousel Slide Canvas */}
+        <div className="relative bg-white border border-neutral-300 p-6 sm:p-12 shadow-sm">
           
-          {/* Previous / Next Desktop Floating Buttons */}
+          {/* Subtle Top Decorative Movement Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-1 flex">
+            <div className="w-1/2 bg-black" />
+            <div className="w-1/2 bg-[#E31E24]" />
+          </div>
+
+          {/* Desktop Left / Right Hover Floating Buttons */}
           <button
             onClick={prevSlide}
             aria-label="Previous Doctrine"
@@ -160,24 +226,30 @@ export default function IdeologyPage() {
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          {/* Top Identifier Bar */}
-          <div className="flex flex-wrap items-center gap-3 border-b-2 border-neutral-900 pb-4 mb-6">
-            <span className="text-3xl sm:text-4xl font-black text-[#E31E24] font-english">
-              § {currentPillar.number}
-            </span>
-            <div className="h-6 w-[2px] bg-neutral-900 hidden sm:block" />
-            <span className="text-xs sm:text-sm font-english font-bold text-neutral-600 uppercase tracking-wider">
-              {currentPillar.subtitle[language]}
-            </span>
+          {/* Key Identifiers: Kicker & Subtitle */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-neutral-900 pb-5 mb-8">
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 bg-[#E31E24] text-white text-xs font-english font-bold uppercase tracking-widest">
+                {language === 'ta' ? `கோட்பாடு 0${activeIndex + 1}` : `DOCTRINE 0${activeIndex + 1}`}
+              </span>
+              <span className="text-xs sm:text-sm font-english font-bold text-neutral-800 uppercase tracking-wider">
+                {currentPillar.subtitle[language]}
+              </span>
+            </div>
+
+            <div className="text-xs font-english text-neutral-500 font-semibold hidden sm:block">
+              {language === 'ta' ? 'திமுக வழக்கறிஞர் அணி கொள்கைப் பிரகடனம்' : 'DMK Legal Wing Doctrinal Charter'}
+            </div>
           </div>
 
-          {/* Two-Column Broadsheet Presentation (Matching Reference Design) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Editorial Double-Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             
-            {/* Left Column: Title, Overview, Tenets, & Benchmark */}
-            <div className="lg:col-span-7 space-y-5">
+            {/* Left Column: Title, Narrative, Numbered Tenets, & Precedent Benchmark */}
+            <div className="lg:col-span-7 space-y-6">
+              
               <div>
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 font-dmk-headline tracking-tight leading-snug">
+                <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 font-dmk-headline tracking-tight leading-tight">
                   {currentPillar.title[language]}
                 </h2>
                 <p className="text-sm sm:text-base text-neutral-700 leading-relaxed font-dmk-body mt-3">
@@ -185,42 +257,48 @@ export default function IdeologyPage() {
                 </p>
               </div>
 
-              {/* Core Constitutional Tenets Checklist */}
-              <div className="space-y-2 pt-2">
-                <h4 className="text-xs font-english font-bold text-neutral-700 uppercase tracking-wider border-b border-neutral-300 pb-1.5 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#E31E24] rounded-full inline-block" />
-                  <span>{language === 'ta' ? 'அடிப்படை சட்டக் கோட்பாடுகள்:' : 'CORE CONSTITUTIONAL TENETS:'}</span>
-                </h4>
-                <div className="space-y-2">
+              {/* Core Constitutional Tenets (Dignified Editorial Numbering, No Checklist Boxes) */}
+              <div className="space-y-3 pt-3 border-t border-neutral-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 bg-[#E31E24]" />
+                  <h3 className="text-xs font-english font-bold uppercase tracking-widest text-neutral-800">
+                    {language === 'ta' ? 'அடிப்படை அரசமைப்புக் கோட்பாடுகள்' : 'CORE CONSTITUTIONAL TENETS'}
+                  </h3>
+                </div>
+
+                <div className="space-y-3">
                   {currentPillar.keyPrinciples.map((kp, kIdx) => (
-                    <div 
-                      key={kIdx} 
-                      className="flex items-start gap-3 p-3 bg-[#FAF7F2] border-l-2 border-[#E31E24] text-xs sm:text-sm text-neutral-800"
-                    >
-                      <CheckCircle2 className="w-4 h-4 text-[#E31E24] shrink-0 mt-0.5" />
-                      <span className="font-dmk-body font-medium leading-relaxed">{kp[language]}</span>
+                    <div key={kIdx} className="flex items-start gap-3">
+                      <span className="text-xs font-black font-english text-[#E31E24] mt-0.5 shrink-0">
+                        0{kIdx + 1}.
+                      </span>
+                      <p className="text-xs sm:text-sm text-neutral-800 font-dmk-body leading-relaxed font-medium">
+                        {kp[language]}
+                      </p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Constitutional Benchmark Box */}
-              <div className="p-4 bg-[#FAF7F2] border-l-4 border-neutral-900 text-xs sm:text-sm text-neutral-900 space-y-1">
+              {/* Constitutional Benchmark & Landmark Precedent Callout */}
+              <div className="p-4 bg-[#FAF7F2] border-l-4 border-[#E31E24] border-y border-r border-neutral-200 space-y-1">
                 <span className="font-english font-bold text-[#E31E24] uppercase tracking-wider block text-xs">
-                  {language === 'ta' ? 'அரசமைப்பு & தீர்ப்பு முக்கியத்துவம்:' : 'CONSTITUTIONAL BENCHMARK:'}
+                  {language === 'ta' ? 'அரசமைப்பு & தீர்ப்பு முக்கியத்துவம்:' : 'CONSTITUTIONAL BENCHMARK & PRECEDENT:'}
                 </span>
-                <p className="leading-relaxed font-serif italic text-neutral-800">
+                <p className="text-xs sm:text-sm font-serif italic text-neutral-800 leading-relaxed">
                   {currentPillar.legalRelevance[language]}
                 </p>
               </div>
+
             </div>
 
-            {/* Right Column: Historical Decree Quote Banner */}
-            <div className="lg:col-span-5">
-              <div className="p-6 sm:p-8 bg-[#FAF7F2] border-t-2 border-b-2 border-neutral-900 space-y-4">
+            {/* Right Column: Historical Decree Pull-Quote */}
+            <div className="lg:col-span-5 flex flex-col justify-between h-full">
+              <div className="p-6 sm:p-8 bg-[#FAF7F2] border-2 border-neutral-900 shadow-sm relative space-y-5">
+                
                 <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
                   <span className="text-xs font-english font-bold uppercase tracking-wider text-[#E31E24]">
-                    HISTORICAL DECREE
+                    {language === 'ta' ? 'வரலாற்றுப் பிரகடனம்' : 'HISTORICAL DECREE'}
                   </span>
                   <Quote className="w-6 h-6 text-[#E31E24]" />
                 </div>
@@ -230,25 +308,40 @@ export default function IdeologyPage() {
                 </blockquote>
 
                 <div className="pt-4 border-t border-neutral-300 space-y-1">
-                  <span className="text-base font-bold text-neutral-900 block font-dmk-headline">
+                  <p className="text-base font-black text-neutral-900 font-dmk-headline">
                     {currentPillar.quote.author[language]}
-                  </span>
-                  <span className="text-xs text-neutral-600 font-english block">
+                  </p>
+                  <p className="text-xs text-neutral-600 font-english leading-relaxed">
                     {currentPillar.quote.context[language]}
-                  </span>
+                  </p>
                 </div>
+
+              </div>
+
+              {/* Bottom Quick Reference Link */}
+              <div className="mt-6 flex items-center justify-between text-xs font-english">
+                <span className="text-neutral-500 font-medium">
+                  {language === 'ta' ? 'ஆவணக் களஞ்சியத்தில் முழு தீர்ப்புகள் உள்ளன' : 'Complete case briefs available in archive'}
+                </span>
+                <Link
+                  href="/resources"
+                  className="text-[#E31E24] hover:text-black font-bold uppercase tracking-wider flex items-center gap-1"
+                >
+                  <span>{language === 'ta' ? 'ஆவணங்கள்' : 'Case Briefs'}</span>
+                  <span>&rarr;</span>
+                </Link>
               </div>
             </div>
 
           </div>
 
-          {/* Bottom Carousel Controls Bar */}
-          <div className="mt-8 pt-6 border-t border-neutral-300 flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* Bottom Carousel Navigation Bar */}
+          <div className="mt-10 pt-6 border-t border-neutral-300 flex flex-col sm:flex-row items-center justify-between gap-4">
             
             {/* Step Previous Button */}
             <button
               onClick={prevSlide}
-              className="w-full sm:w-auto px-5 py-2.5 bg-white hover:bg-neutral-900 hover:text-white text-neutral-900 border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-6 py-2.5 bg-white hover:bg-neutral-900 hover:text-white text-neutral-900 border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4 text-[#E31E24]" />
               <span>{language === 'ta' ? 'முந்தைய கொள்கை' : 'Previous Doctrine'}</span>
@@ -259,12 +352,12 @@ export default function IdeologyPage() {
               {IDEOLOGY_PILLARS.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setActiveIndex(idx)}
+                  onClick={() => selectPillar(idx)}
                   aria-label={`Go to pillar ${idx + 1}`}
                   className={`h-2 transition-all cursor-pointer ${
                     activeIndex === idx
                       ? 'w-8 bg-[#E31E24]'
-                      : 'w-2 bg-neutral-300 hover:bg-neutral-600'
+                      : 'w-2 bg-neutral-300 hover:bg-neutral-700'
                   }`}
                 />
               ))}
@@ -273,7 +366,7 @@ export default function IdeologyPage() {
             {/* Step Next Button */}
             <button
               onClick={nextSlide}
-              className="w-full sm:w-auto px-5 py-2.5 bg-[#E31E24] hover:bg-neutral-900 text-white border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
+              className="w-full sm:w-auto px-6 py-2.5 bg-[#E31E24] hover:bg-black text-white border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
             >
               <span>{language === 'ta' ? 'அடுத்த கொள்கை' : 'Next Doctrine'}</span>
               <ChevronRight className="w-4 h-4 text-white" />
