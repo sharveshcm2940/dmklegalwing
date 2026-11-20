@@ -32,11 +32,11 @@ export default function LeadershipPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-[#111111] text-white text-[10px] font-mono uppercase px-2 py-0.5 tracking-widest font-bold">
-                  {language === 'ta' ? 'அதிகாரப்பூர்வ அரசிதழ் பதிவேடு' : 'OFFICIAL GAZETTE REGISTER'}
+                <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
+                  {language === 'ta' ? 'மாநிலத் தலைமைப் பொறுப்பாளர்கள்' : 'LEADERSHIP COUNCIL'}
                 </span>
-                <span className="text-[11px] font-mono text-[#E31E24] font-bold">
-                  VOL. LIV • SEC. IV (LEADERSHIP)
+                <span className="text-xs font-english text-[#E31E24] font-bold">
+                  ESTD. 1971 • CHENNAI
                 </span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-[#111111] font-dmk-headline tracking-tight uppercase leading-none">
@@ -45,7 +45,7 @@ export default function LeadershipPage() {
                   : 'Roll of Senior Counsel & Leadership'}
               </h1>
             </div>
-            <div className="text-left md:text-right font-mono text-[11px] text-neutral-600">
+            <div className="text-left md:text-right font-english text-xs text-neutral-600">
               <p className="font-bold text-[#111111]">STATE COUNCIL SECRETARIAT</p>
               <p>Anna Arivalayam, Chennai — 600 018</p>
             </div>
@@ -64,7 +64,7 @@ export default function LeadershipPage() {
         <div className="bg-white border-y border-neutral-300 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           
           <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1 shrink-0">
+            <span className="font-english text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1 shrink-0">
               <Filter className="w-3.5 h-3.5 text-[#E31E24]" />
               {language === 'ta' ? 'வடிகட்டுக:' : 'FILTER:'}
             </span>
@@ -77,7 +77,7 @@ export default function LeadershipPage() {
               <button
                 key={f.id}
                 onClick={() => setActiveFilter(f.id as any)}
-                className={`px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider transition-all border ${
+                className={`px-3 py-1.5 text-xs font-english font-bold uppercase tracking-wider transition-all border ${
                   activeFilter === f.id
                     ? 'bg-[#E31E24] text-white border-neutral-900 font-bold'
                     : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-900'
@@ -95,7 +95,7 @@ export default function LeadershipPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={language === 'ta' ? 'பெயர் அல்லது பார் எண் தேடுக...' : 'Search by name or bar enrollment...'}
-              className="w-full bg-[#FAF7F2] border border-neutral-300 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-mono placeholder-neutral-500 focus:outline-none focus:bg-white focus:border-[#E31E24]"
+              className="w-full bg-[#FAF7F2] border border-neutral-300 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-english placeholder-neutral-500 focus:outline-none focus:bg-white focus:border-[#E31E24]"
             />
           </div>
 
@@ -118,7 +118,7 @@ export default function LeadershipPage() {
             return (
               <article
                 key={leader.id}
-                className="bg-white border border-neutral-300 hover:border-neutral-900 transition-colors flex flex-col justify-between group"
+                className="bg-white border border-neutral-300 hover:border-neutral-900 transition-colors flex flex-col justify-between group shadow-xs hover:shadow-md"
               >
                 <div>
                   {/* Top DMK Dual-Color Ribbon */}
@@ -139,10 +139,10 @@ export default function LeadershipPage() {
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5 mb-0.5">
-                          <span className="w-4 h-4 bg-[#111111] text-white font-mono text-[8px] font-bold flex items-center justify-center">
+                          <span className="w-5 h-5 bg-[#111111] text-white font-english text-[9px] font-bold flex items-center justify-center">
                             {initials}
                           </span>
-                          <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-[#111111] text-white">
+                          <span className="text-[10px] font-english font-bold uppercase tracking-wider px-2 py-0.5 bg-[#E31E24] text-white">
                             {leader.level === 'state'
                               ? language === 'ta' ? 'மாநிலத் தலைமை' : 'STATE SECRETARY'
                               : leader.level === 'advisory'
@@ -151,7 +151,7 @@ export default function LeadershipPage() {
                           </span>
                         </div>
                         {leader.barCouncilNo && (
-                          <div className="font-mono text-[10px] font-bold text-[#E31E24] inline-block">
+                          <div className="font-english text-[11px] font-bold text-neutral-700 inline-block">
                             BAR: {leader.barCouncilNo}
                           </div>
                         )}
@@ -159,43 +159,43 @@ export default function LeadershipPage() {
                     </div>
 
                     <div className="text-right">
-                      <span className="font-mono text-[10px] text-neutral-400 font-bold block">
+                      <span className="font-english text-xs text-neutral-400 font-bold block">
                         #{index + 1 < 10 ? `0${index + 1}` : index + 1}
                       </span>
                     </div>
                   </div>
 
                   {/* Editorial Body */}
-                  <div className="p-4 space-y-2">
-                    <span className="text-[10px] font-mono font-bold text-[#E31E24] uppercase tracking-wider block">
+                  <div className="p-5 space-y-2">
+                    <span className="text-xs font-english font-bold text-[#E31E24] uppercase tracking-wider block">
                       {leader.designation[language]}
                     </span>
 
-                    <h2 className="text-lg sm:text-xl font-black text-[#111111] font-dmk-headline group-hover:text-[#E31E24] transition-colors leading-tight">
+                    <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline group-hover:text-[#E31E24] transition-colors leading-tight">
                       {leader.name[language]}
                     </h2>
 
-                    <p className="text-xs text-neutral-700 font-bold font-dmk-body border-l-2 border-[#E31E24] pl-2 py-0.5">
+                    <p className="text-xs text-neutral-800 font-bold font-dmk-body border-l-2 border-[#E31E24] pl-2.5 py-0.5">
                       {leader.role[language]}
                     </p>
 
-                    <p className="text-xs text-neutral-600 leading-relaxed line-clamp-3 font-dmk-body pt-1">
+                    <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed line-clamp-3 font-dmk-body pt-1">
                       {leader.bio[language]}
                     </p>
                   </div>
                 </div>
 
                 {/* Footer Strip */}
-                <div className="px-4 py-2.5 bg-[#FAF7F2] border-t border-neutral-200 flex items-center justify-between text-xs">
-                  <span className="font-mono text-[11px] text-neutral-700 font-semibold truncate max-w-[160px]">
+                <div className="px-5 py-3 bg-[#FAF7F2] border-t border-neutral-200 flex items-center justify-between text-xs">
+                  <span className="font-english text-xs text-neutral-700 font-bold truncate max-w-[170px]">
                     {leader.court || 'Madras High Court'}
                   </span>
 
                   <button
                     onClick={() => setSelectedLeader(leader)}
-                    className="font-mono text-[11px] font-bold text-[#111111] hover:text-[#E31E24] flex items-center gap-1 uppercase tracking-wider"
+                    className="font-english text-xs font-bold text-[#E31E24] hover:text-black flex items-center gap-1 uppercase tracking-wider"
                   >
-                    <span>{language === 'ta' ? 'முழு விவரம்' : 'Read Dossier'}</span>
+                    <span>{language === 'ta' ? 'முழு விவரம்' : 'View Profile'}</span>
                     <span>&rarr;</span>
                   </button>
                 </div>

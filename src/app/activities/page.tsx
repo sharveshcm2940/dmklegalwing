@@ -51,11 +51,11 @@ export default function ActivitiesPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-neutral-300 pb-5 mb-6 pt-2">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-[#111111] text-white text-[10px] font-english uppercase px-2 py-0.5 tracking-widest font-bold">
-                  {language === 'ta' ? 'செய்திப் பதிவேடு & களப் புகைப்படங்கள்' : 'PHOTOJOURNALISM & SPECIAL DISPATCHES'}
+                <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
+                  {language === 'ta' ? 'களப்பணிகள் & மாநாடுகள்' : 'CAMPAIGNS & LEGAL CONFERENCES'}
                 </span>
-                <span className="text-[11px] font-english text-[#E31E24] font-bold">
-                  VOL. LIV • SEC. VII (ACTIVITIES)
+                <span className="text-xs font-english text-[#E31E24] font-bold">
+                  CITIZEN DEFENSE INITIATIVES
                 </span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-[#111111] font-dmk-headline tracking-tight uppercase leading-none">

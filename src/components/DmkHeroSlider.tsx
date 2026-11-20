@@ -275,23 +275,23 @@ export const DmkHeroSlider: React.FC = () => {
               <img
                 src={slide.bannerImage}
                 alt={slide.titlePrimary[language]}
-                className="w-full h-full object-cover md:object-contain object-center filter saturate-105 transition-all duration-700 hover:scale-[1.01]"
+                className="w-full h-full object-cover object-center filter saturate-105 transition-all duration-700 hover:scale-[1.01]"
               />
             </div>
 
             {/* Gradient shadow for text contrast */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
 
-            {/* Interactive Quick Action Button at Bottom Right */}
-            <div className="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex flex-col items-end gap-2 animate-in fade-in duration-500">
+            {/* Interactive Quick Action Button at Bottom Left (leaving right slogan clear) */}
+            <div className="absolute bottom-5 left-5 sm:bottom-8 sm:left-8 z-20 flex flex-wrap items-center gap-3 animate-in fade-in duration-500">
               <Link
                 href={slide.ctaLink}
-                className="px-6 py-3 bg-[#E31E24] hover:bg-neutral-900 text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white transition-colors"
+                className="px-6 py-2.5 bg-[#E31E24] hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white shadow-xl transition-all"
               >
                 <UserPlus className="w-4 h-4" />
                 <span className="font-dmk-headline font-bold">{slide.ctaText[language]}</span>
               </Link>
-              <span className="text-[11px] font-english text-white font-semibold bg-black/80 px-3 py-1 border border-white/20">
+              <span className="text-[11px] font-english text-white font-semibold bg-black/85 px-3 py-1.5 border border-white/20 backdrop-blur-xs">
                 {language === 'ta' ? 'திமுக வழக்கறிஞர் அணித் தலைமை' : 'DMK Legal Wing Secretariat'}
               </span>
             </div>
@@ -306,54 +306,44 @@ export const DmkHeroSlider: React.FC = () => {
 
             <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10 py-12">
               
-              {/* Left Column: Trio of Dravidian Ideological Mentors + DMK Flag Crest */}
-              <div className="lg:col-span-4 flex items-center gap-6">
+              {/* Left Column: Prestigious Emblem & Movement Seal */}
+              <div className="lg:col-span-5 flex flex-col items-center justify-center gap-6">
                 
-                {/* Vertical Stack of Mentors: Periyar, Anna, Kalaignar */}
-                <div className="flex flex-col gap-3 shrink-0">
-                  <div className="flex flex-col items-center group/p">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white p-1 border border-white/40 overflow-hidden flex items-center justify-center transition-transform group-hover/p:scale-105">
-                      <span className="text-xs font-bold text-black font-dmk-headline">பெரியார்</span>
-                    </div>
-                    <span className="text-[10px] text-white font-english mt-0.5 font-bold">Periyar</span>
+                {/* Central High-Impact Shield */}
+                <div className="relative group">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 bg-white p-3 border-2 border-white/80 shadow-2xl flex items-center justify-center relative z-10 transition-transform duration-500 group-hover:scale-105">
+                    <img
+                      src="/images/dmk-flag-sun.jpg"
+                      alt="DMK Flag & Rising Sun"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-
-                  <div className="flex flex-col items-center group/a">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white p-1 border border-white/40 overflow-hidden flex items-center justify-center transition-transform group-hover/a:scale-105">
-                      <span className="text-xs font-bold text-black font-dmk-headline">அண்ணா</span>
-                    </div>
-                    <span className="text-[10px] text-white font-english mt-0.5 font-bold">Anna</span>
-                  </div>
-
-                  <div className="flex flex-col items-center group/k">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white p-1 border border-white/40 overflow-hidden flex items-center justify-center transition-transform group-hover/k:scale-105">
-                      <span className="text-xs font-bold text-black font-dmk-headline">கலைஞர்</span>
-                    </div>
-                    <span className="text-[10px] text-white font-english mt-0.5 font-bold">Kalaignar</span>
-                  </div>
+                  {/* Glowing background aura */}
+                  <div className="absolute -inset-2 bg-gradient-to-r from-[#E31E24] to-[#FFB703] opacity-40 blur-lg rounded-full pointer-events-none" />
                 </div>
 
-                {/* Central Emblem Frame */}
-                <div className="w-40 h-40 sm:w-48 sm:h-48 bg-white p-2 border-2 border-white flex items-center justify-center shrink-0">
-                  <img
-                    src="/images/dmk-flag-sun.jpg"
-                    alt="DMK Flag & Rising Sun"
-                    className="w-full h-full object-contain"
-                  />
+                {/* Slogan Banner */}
+                <div className="text-center space-y-1">
+                  <span className="px-3 py-1 bg-black/60 border border-white/20 text-[11px] font-english font-bold uppercase tracking-widest text-[#FFD166] inline-block">
+                    {language === 'ta' ? 'அரசமைப்புச் சட்ட அரண்' : 'CONSTITUTIONAL CITADEL'}
+                  </span>
+                  <p className="text-xs text-white/80 font-english">
+                    {language === 'ta' ? 'சென்னை உயர்நீதிமன்றம் & இந்திய உச்சநீதிமன்றம்' : 'Madras High Court & Supreme Court of India'}
+                  </p>
                 </div>
 
               </div>
 
               {/* Right Column: Hero Bold Typography in exact Anek Tamil / Mukta Malar font */}
-              <div className="lg:col-span-8 space-y-4 text-left">
+              <div className="lg:col-span-7 space-y-5 text-left">
                 
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/40 border border-white/20 text-xs font-english font-bold tracking-widest uppercase">
-                  <span className="w-2 h-2 bg-[#E31E24]" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/50 border border-white/30 text-xs font-english font-bold tracking-widest uppercase">
+                  <span className="w-2.5 h-2.5 bg-[#E31E24] rounded-full inline-block animate-pulse" />
                   <span>{slide.tagline[language]}</span>
                 </div>
 
-                <div className="space-y-1">
-                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black font-dmk-headline tracking-tight leading-[1.1] text-white">
+                <div className="space-y-2">
+                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black font-dmk-headline tracking-tight leading-[1.08] text-white">
                     {slide.titlePrimary[language]}
                   </h2>
                   <h3 className="text-xl sm:text-3xl lg:text-4xl font-extrabold font-dmk-headline text-[#FFD166]">
@@ -361,14 +351,14 @@ export const DmkHeroSlider: React.FC = () => {
                   </h3>
                 </div>
 
-                <p className="text-sm sm:text-base text-white/95 max-w-2xl leading-relaxed font-dmk-body pt-1">
+                <p className="text-sm sm:text-base text-white/90 max-w-2xl leading-relaxed font-dmk-body pt-1">
                   {slide.subtitle[language]}
                 </p>
 
-                <div className="pt-3 flex flex-wrap items-center gap-4">
+                <div className="pt-2 flex flex-wrap items-center gap-4">
                   <Link
                     href={slide.ctaLink}
-                    className="px-6 py-3 bg-[#E31E24] hover:bg-neutral-900 text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white/40 transition-colors"
+                    className="px-7 py-3.5 bg-[#E31E24] hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white/40 shadow-lg transition-all duration-200"
                   >
                     <span>{slide.ctaText[language]}</span>
                     <ChevronRight className="w-4 h-4" />
@@ -376,7 +366,7 @@ export const DmkHeroSlider: React.FC = () => {
 
                   <Link
                     href="/structure"
-                    className="px-6 py-3 bg-black/60 hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider border border-white/30 transition-colors"
+                    className="px-7 py-3.5 bg-black/70 hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider border border-white/30 transition-all duration-200"
                   >
                     {language === 'ta' ? 'அமைப்பு விவரம்' : 'Organisation Chart'}
                   </Link>

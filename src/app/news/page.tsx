@@ -52,11 +52,11 @@ export default function NewsPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-[#111111] text-white text-[10px] font-mono uppercase px-2 py-0.5 tracking-widest font-bold">
-                  {language === 'ta' ? 'அதிகாரப்பூர்வ செய்தி & அறிக்கை இதழ்' : 'THE DRAVIDIAN LEGAL HERALD'}
+                <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
+                  {language === 'ta' ? 'அதிகாரப்பூர்வ செய்திப் பிரிவு' : 'NEWS & MEDIA WIRE'}
                 </span>
-                <span className="text-[11px] font-mono text-[#E31E24] font-bold">
-                  DAILY DISPATCH & PRESS COMMUNIQUÉ
+                <span className="text-xs font-english text-[#E31E24] font-bold">
+                  OFFICIAL PRESS BUREAU
                 </span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-[#111111] font-dmk-headline tracking-tight uppercase leading-none">

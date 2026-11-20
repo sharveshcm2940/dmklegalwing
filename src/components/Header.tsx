@@ -39,6 +39,12 @@ export const Header: React.FC = () => {
   return (
     <header className="w-full bg-white z-50 sticky top-0 transition-all duration-300 shadow-xs font-dmk-body">
       
+      {/* Top Movement Stripe */}
+      <div className="w-full h-1 flex">
+        <div className="w-1/2 bg-black" />
+        <div className="w-1/2 bg-[#E31E24]" />
+      </div>
+
       {/* 1. EDITORIAL MASTHEAD ROW */}
       <div className="border-b border-neutral-300 bg-white py-4 px-4 sm:px-6">
         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">

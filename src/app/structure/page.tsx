@@ -20,7 +20,7 @@ export default function StructurePage() {
                 {language === 'ta' ? 'அமைப்பு கட்டமைப்பு & பொறுப்பாளர்கள்' : 'ORGANISATIONAL DIRECTORY & CADRE'}
               </span>
               <span className="text-neutral-300">•</span>
-              <span className="text-xs font-english text-neutral-500">OFFICIAL GAZETTE ROLL</span>
+              <span className="text-xs font-english text-neutral-500">ESTD. 1971 • CHENNAI</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black text-neutral-900 font-dmk-headline tracking-tight leading-tight">

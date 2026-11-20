@@ -94,11 +94,11 @@ export default function ResourcesPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-[#111111] text-white text-[10px] font-mono uppercase px-2 py-0.5 tracking-widest font-bold">
-                  {language === 'ta' ? 'அரசமைப்பு & சட்ட ஆவணக் களஞ்சியம்' : 'MADRAS LAW & CONSTITUTIONAL JOURNAL'}
+                <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
+                  {language === 'ta' ? 'அரசமைப்பு & சட்ட ஆவணக் களஞ்சியம்' : 'CONSTITUTIONAL LAW REPOSITORY'}
                 </span>
-                <span className="text-[11px] font-mono text-[#E31E24] font-bold">
-                  REPORTS & DIGEST • SERIES VIII
+                <span className="text-xs font-english text-[#E31E24] font-bold">
+                  50+ YEARS LEGAL ARCHIVE
                 </span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-[#111111] font-dmk-headline tracking-tight uppercase leading-none">

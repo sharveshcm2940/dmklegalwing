@@ -16,11 +16,11 @@ export default function IdeologyPage() {
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
         <div className="border-b-2 border-neutral-900 pb-6 pt-2">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-mono font-bold text-[#E31E24] tracking-[0.2em] uppercase">
+            <span className="text-xs font-english font-bold text-[#E31E24] tracking-[0.2em] uppercase">
               {language === 'ta' ? 'திராவிட இயக்கக் கொள்கைப் பிரகடனம்' : 'DRAVIDIAN JURISPRUDENCE & FOUNDING DOCTRINE'}
             </span>
             <span className="text-neutral-400">•</span>
-            <span className="text-xs font-mono text-neutral-500">MANIFESTO OF EGALITARIAN JUSTICE</span>
+            <span className="text-xs font-english text-neutral-500 font-bold">MANIFESTO OF EGALITARIAN JUSTICE</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-neutral-900 font-dmk-headline tracking-tight leading-tight mb-4">
