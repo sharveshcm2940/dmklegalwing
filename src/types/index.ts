@@ -32,18 +32,6 @@ export interface DistrictInfo {
   activeCasesAssisted: number;
 }
 
-export interface DistrictSubUnit {
-  id: string;
-  number: number;
-  name: { en: string; ta: string };
-  organizer: { en: string; ta: string };
-  court: { en: string; ta: string };
-  memberCount: number;
-  activeCases: number;
-  phone: string;
-  email: string;
-}
-
 export interface HistoricalMilestone {
   year: string;
   title: { en: string; ta: string };

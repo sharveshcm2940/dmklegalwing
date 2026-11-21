@@ -6,7 +6,6 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { IDEOLOGY_PILLARS, DMK_ORGANISATION_INFO } from '@/data/content';
 import { DmkHeroSlider } from '@/components/DmkHeroSlider';
-import { DistrictStructure } from '@/components/DistrictStructure';
 import { 
   Calendar, 
   ArrowRight, 
@@ -389,11 +388,6 @@ export default function HomePage() {
           </Link>
         </div>
 
-      </section>
-
-      {/* 4.5 DISTRICT STRUCTURE / CADRE NETWORK (Interactive Tamil Nadu Map & Grassroots Sub-Units) */}
-      <section className="border-b border-neutral-300">
-        <DistrictStructure viewMoreLink="/districts" />
       </section>
 
       {/* 5. PHOTOJOURNALISM & FIELD DISPATCHES (Editorial Press Layout, No Bulky Cards) */}
