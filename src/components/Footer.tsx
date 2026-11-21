@@ -103,10 +103,9 @@ export const Footer: React.FC = () => {
                 { href: '/', label: t.nav.home },
                 { href: '/about', label: t.nav.about },
                 { href: '/structure', label: t.nav.structure },
-                { href: '/leadership', label: t.nav.leadership },
                 { href: '/districts', label: t.nav.districts },
                 { href: '/activities', label: t.nav.activities },
-                { href: '/news', label: t.nav.news },
+                { href: '/resources', label: language === 'ta' ? 'சட்ட ஆவணங்கள்' : 'Legal Resources' },
                 { href: '/contact', label: t.nav.contact }
               ].map((item) => (
                 <li key={item.href}>

@@ -28,11 +28,9 @@ export const Header: React.FC = () => {
     { href: '/about', label: language === 'ta' ? 'அறிமுகம்' : 'ABOUT US' },
     { href: '/ideology', label: language === 'ta' ? 'கொள்கைகள்' : 'OUR IDEOLOGY' },
     { href: '/structure', label: language === 'ta' ? 'கட்டமைப்பு' : 'ORGANISATION' },
-    { href: '/leadership', label: language === 'ta' ? 'தலைமை' : 'LEADERSHIP' },
     { href: '/districts', label: language === 'ta' ? 'மாவட்டங்கள்' : 'DISTRICTS' },
     { href: '/activities', label: language === 'ta' ? 'செயல்பாடுகள்' : 'ACTIVITIES' },
     { href: '/resources', label: language === 'ta' ? 'சட்ட ஆவணங்கள்' : 'LEGAL RESOURCES' },
-    { href: '/news', label: language === 'ta' ? 'செய்திகள்' : 'NEWS & MEDIA' },
     { href: '/contact', label: language === 'ta' ? 'தொடர்பு' : 'CONTACT' }
   ];
 

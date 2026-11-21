@@ -21,10 +21,9 @@ import {
 
 export default function HomePage() {
   const { language, t } = useLanguage();
-  const { events, news } = useData();
+  const { events } = useData();
   const [activePillarIndex, setActivePillarIndex] = useState(0);
 
-  const latestNews = news.slice(0, 3);
   const upcomingEvents = events.slice(0, 2);
   const activePillar = IDEOLOGY_PILLARS[activePillarIndex] || IDEOLOGY_PILLARS[0];
 
@@ -470,69 +469,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. TELEGRAPHIC BULLETINS & PRESS ARCHIVE (Seamless 3-Column Newsprint) */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12 border-b border-neutral-300">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-3 border-b-2 border-neutral-900 mb-8">
-          <div>
-            <span className="text-xs font-english font-bold text-[#E31E24] tracking-[0.2em] uppercase block mb-1">
-              {t.newsPreview.tag}
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline">
-              {t.newsPreview.title}
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 font-serif italic mt-0.5">
-              {t.newsPreview.subtitle}
-            </p>
-          </div>
-
-          <Link
-            href="/news"
-            className="text-xs font-english font-bold text-[#E31E24] hover:underline uppercase tracking-wider flex items-center gap-1"
-          >
-            <span>{t.newsPreview.viewArchive}</span>
-            <span>&rarr;</span>
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-neutral-300">
-          {latestNews.map((item, idx) => (
-            <article
-              key={item.id}
-              className={`flex flex-col justify-between pt-6 md:pt-0 ${idx > 0 ? 'md:pl-8' : ''} group`}
-            >
-              <div>
-                <div className="flex items-center justify-between text-xs text-neutral-600 font-english mb-2 border-b border-neutral-200 pb-1">
-                  <span className="text-[#E31E24] font-bold uppercase tracking-wider">{item.category}</span>
-                  <span className="font-semibold">{item.date}</span>
-                </div>
-
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors leading-snug mb-2">
-                  {item.title[language]}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-dmk-body mb-3">
-                  {item.summary[language]}
-                </p>
-              </div>
-
-              <div className="pt-2 border-t border-neutral-200 flex items-center justify-between text-xs">
-                <span className="text-neutral-600 font-english text-[11px] font-bold truncate max-w-[160px]">
-                  {item.author[language]}
-                </span>
-                <Link
-                  href="/news"
-                  className="text-neutral-900 hover:text-[#E31E24] font-bold flex items-center gap-1 font-dmk-headline"
-                >
-                  <span>{language === 'ta' ? 'வாசிக்க' : 'Read'}</span>
-                  <ExternalLink className="w-3 h-3 text-[#E31E24]" />
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* 7. OFFICIAL ENROLLMENT NOTICE / ADVOCATE MEMBERSHIP PROCLAMATION (Mass & Stylish) */}
+      {/* 6. OFFICIAL ENROLLMENT NOTICE / ADVOCATE MEMBERSHIP PROCLAMATION (Mass & Stylish) */}
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12">
         <div className="bg-[#111111] text-white p-8 sm:p-14 border-t-4 border-[#E31E24] relative overflow-hidden shadow-2xl">
           

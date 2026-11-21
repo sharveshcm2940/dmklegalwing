@@ -167,17 +167,17 @@ export const DmkHeroSlider: React.FC = () => {
         ta: 'சட்டப்பேரவை நிறைவேற்றும் மசோதாக்களை ஆளுநர்கள் காலவரையின்றி முடக்க முடியாது என உச்சநீதிமன்றத்தில் பெறப்பட்ட வரலாற்றுத் தீர்ப்பு.'
       },
       ctaText: {
-        en: 'Explore Ruling',
-        ta: 'தீர்ப்பு விவரம்'
+        en: 'Explore Resources',
+        ta: 'ஆவண விவரம்'
       },
-      ctaLink: '/news',
+      ctaLink: '/resources',
       tickerText: {
         en: 'Supreme Court bench rules in favour of Tamil Nadu Legislature: Pocket vetoes declared unconstitutional.',
         ta: 'சட்டப்பேரவை நிறைவேற்றிய மசோதாக்களைக் கிடப்பில் போடும் ஆளுநரின் மறைமுக வீட்டோ அதிகாரம் ரத்து!'
       },
       tickerButton: {
-        en: 'Read Report',
-        ta: 'முழு செய்தி'
+        en: 'Legal Docket',
+        ta: 'சட்ட ஆவணம்'
       }
     },
     {
