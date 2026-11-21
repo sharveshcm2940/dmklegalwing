@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import { TamilNaduMap } from '@/components/TamilNaduMap';
+import { DistrictStructure } from '@/components/DistrictStructure';
 import { Phone, Mail, Search, Filter, MapPin, Building2, Scale } from 'lucide-react';
 
 export default function DistrictsPage() {
@@ -79,8 +79,8 @@ export default function DistrictsPage() {
       </section>
 
       {/* Cartographic Interactive Map Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <TamilNaduMap />
+      <section className="w-full">
+        <DistrictStructure isStandalonePage={true} />
       </section>
 
       {/* Complete District Classified Directory */}
