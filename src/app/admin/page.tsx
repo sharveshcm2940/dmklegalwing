@@ -343,7 +343,7 @@ export default function AdminPage() {
             <div className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-1 shadow-2xs">
               <span className="text-xs text-[#666666] uppercase font-mono font-bold">Enrolled Advocates</span>
               <span className="text-2xl font-bold text-[#111111] font-mono block">28,500+</span>
-              <span className="text-[11px] text-emerald-600 font-medium">● 38 Districts Covered</span>
+              <span className="text-[11px] text-emerald-600 font-medium">● 74 Districts Covered</span>
             </div>
 
             <div className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-1 shadow-2xs">
@@ -423,66 +423,74 @@ export default function AdminPage() {
             </span>
           </div>
 
-          <div className="bg-white border border-[#E2DDD5] rounded-xl overflow-hidden shadow-2xs">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#333333]">
-                <thead className="bg-[#FAF8F5] text-[#555555] uppercase font-mono border-b border-[#E2DDD5] text-[11px]">
-                  <tr>
-                    <th className="p-3.5">Name</th>
-                    <th className="p-3.5">Bar Council No.</th>
-                    <th className="p-3.5">District</th>
-                    <th className="p-3.5">Court</th>
-                    <th className="p-3.5">Contact</th>
-                    <th className="p-3.5">Status</th>
-                    <th className="p-3.5 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#EAE6DF]">
-                  {registrations.map((reg) => (
-                    <tr key={reg.id} className="hover:bg-[#FAF8F5]">
-                      <td className="p-3.5 font-bold text-[#111111]">{reg.fullName}</td>
-                      <td className="p-3.5 font-mono text-[#B81318] font-bold">{reg.barCouncilNumber}</td>
-                      <td className="p-3.5">{reg.district}</td>
-                      <td className="p-3.5">{reg.courtOfPractice}</td>
-                      <td className="p-3.5">
-                        <div className="font-mono text-[11px] font-bold">{reg.mobileNumber}</div>
-                        <div className="text-[#777777] text-[10px]">{reg.emailAddress}</div>
-                      </td>
-                      <td className="p-3.5">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                          reg.status === 'approved'
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                            : reg.status === 'verified'
-                            ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                            : 'bg-amber-100 text-amber-800 border border-amber-300'
-                        }`}>
-                          {reg.status}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-right space-x-2">
-                        {reg.status !== 'approved' && (
-                          <button
-                            onClick={() => updateRegistrationStatus(reg.id, 'approved')}
-                            className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold"
-                          >
-                            Approve
-                          </button>
-                        )}
-                        {reg.status === 'pending' && (
-                          <button
-                            onClick={() => updateRegistrationStatus(reg.id, 'verified')}
-                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold"
-                          >
-                            Verify Bar
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {registrations.length === 0 ? (
+            <div className="p-12 text-center text-neutral-500 bg-white border border-[#E2DDD5] rounded-xl shadow-2xs">
+              <CheckCircle className="w-8 h-8 mx-auto mb-2 text-neutral-400" />
+              <p className="font-bold text-sm text-[#111111]">No pending advocate registrations</p>
+              <p className="text-xs text-neutral-500 mt-1">Live applications submitted via the Join/Enroll portal will appear here in real-time.</p>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white border border-[#E2DDD5] rounded-xl overflow-hidden shadow-2xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-[#333333]">
+                  <thead className="bg-[#FAF8F5] text-[#555555] uppercase font-mono border-b border-[#E2DDD5] text-[11px]">
+                    <tr>
+                      <th className="p-3.5">Name</th>
+                      <th className="p-3.5">Bar Council No.</th>
+                      <th className="p-3.5">District</th>
+                      <th className="p-3.5">Court</th>
+                      <th className="p-3.5">Contact</th>
+                      <th className="p-3.5">Status</th>
+                      <th className="p-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#EAE6DF]">
+                    {registrations.map((reg) => (
+                      <tr key={reg.id} className="hover:bg-[#FAF8F5]">
+                        <td className="p-3.5 font-bold text-[#111111]">{reg.fullName}</td>
+                        <td className="p-3.5 font-mono text-[#B81318] font-bold">{reg.barCouncilNumber}</td>
+                        <td className="p-3.5">{reg.district}</td>
+                        <td className="p-3.5">{reg.courtOfPractice}</td>
+                        <td className="p-3.5">
+                          <div className="font-mono text-[11px] font-bold">{reg.mobileNumber}</div>
+                          <div className="text-[#777777] text-[10px]">{reg.emailAddress}</div>
+                        </td>
+                        <td className="p-3.5">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            reg.status === 'approved'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                              : reg.status === 'verified'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                              : 'bg-amber-100 text-amber-800 border border-amber-300'
+                          }`}>
+                            {reg.status}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-right space-x-2">
+                          {reg.status !== 'approved' && (
+                            <button
+                              onClick={() => updateRegistrationStatus(reg.id, 'approved')}
+                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold cursor-pointer"
+                            >
+                              Approve
+                            </button>
+                          )}
+                          {reg.status === 'pending' && (
+                            <button
+                              onClick={() => updateRegistrationStatus(reg.id, 'verified')}
+                              className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold cursor-pointer"
+                            >
+                              Verify Bar
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -495,46 +503,54 @@ export default function AdminPage() {
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {enquiries.map((enq) => (
-              <div
-                key={enq.id}
-                className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-3 flex flex-col justify-between shadow-2xs"
-              >
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="font-bold text-[#E31E24]">{enq.category}</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                      enq.status === 'resolved'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-amber-100 text-amber-800'
-                    }`}>
-                      {enq.status}
-                    </span>
-                  </div>
-
-                  <h4 className="text-base font-bold text-[#111111] font-tamil-serif">{enq.subject}</h4>
-                  <p className="text-xs text-[#444444] mt-1.5 leading-relaxed">{enq.message}</p>
-                </div>
-
-                <div className="pt-3 border-t border-[#EAE6DF] text-xs text-[#555555] flex items-center justify-between">
+          {enquiries.length === 0 ? (
+            <div className="p-12 text-center text-neutral-500 bg-white border border-[#E2DDD5] rounded-xl shadow-2xs">
+              <Eye className="w-8 h-8 mx-auto mb-2 text-neutral-400" />
+              <p className="font-bold text-sm text-[#111111]">No pending citizen enquiries</p>
+              <p className="text-xs text-neutral-500 mt-1">Grievances and legal aid inquiries submitted through the contact desk will appear here.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {enquiries.map((enq) => (
+                <div
+                  key={enq.id}
+                  className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-3 flex flex-col justify-between shadow-2xs"
+                >
                   <div>
-                    <span className="text-[#111111] font-bold block">{enq.name} ({enq.district})</span>
-                    <span className="font-mono text-[11px]">{enq.phone}</span>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="font-bold text-[#E31E24]">{enq.category}</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                        enq.status === 'resolved'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {enq.status}
+                      </span>
+                    </div>
+
+                    <h4 className="text-base font-bold text-[#111111] font-tamil-serif">{enq.subject}</h4>
+                    <p className="text-xs text-[#444444] mt-1.5 leading-relaxed">{enq.message}</p>
                   </div>
 
-                  {enq.status !== 'resolved' && (
-                    <button
-                      onClick={() => updateEnquiryStatus(enq.id, 'resolved')}
-                      className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold"
-                    >
-                      Mark Resolved
-                    </button>
-                  )}
+                  <div className="pt-3 border-t border-[#EAE6DF] text-xs text-[#555555] flex items-center justify-between">
+                    <div>
+                      <span className="text-[#111111] font-bold block">{enq.name} ({enq.district})</span>
+                      <span className="font-mono text-[11px]">{enq.phone}</span>
+                    </div>
+
+                    {enq.status !== 'resolved' && (
+                      <button
+                        onClick={() => updateEnquiryStatus(enq.id, 'resolved')}
+                        className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold cursor-pointer"
+                      >
+                        Mark Resolved
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

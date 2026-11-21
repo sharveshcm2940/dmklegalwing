@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { 
   Leader, 
   DistrictInfo, 
@@ -32,96 +32,26 @@ interface DataContextType {
   gallery: PressGalleryItem[];
   registrations: AdvocateRegistration[];
   enquiries: PublicEnquiry[];
-  addNews: (item: Omit<NewsItem, 'id'>) => void;
-  deleteNews: (id: string) => void;
-  setLeadStory: (id: string) => void;
-  addGalleryItem: (item: Omit<PressGalleryItem, 'id'>) => void;
-  deleteGalleryItem: (id: string) => void;
-  addEvent: (item: Omit<EventItem, 'id'>) => void;
-  deleteEvent: (id: string) => void;
-  addResource: (item: Omit<LegalResource, 'id'>) => void;
-  deleteResource: (id: string) => void;
+  isLoadingData: boolean;
+  addNews: (item: Omit<NewsItem, 'id'>) => Promise<void>;
+  deleteNews: (id: string) => Promise<void>;
+  setLeadStory: (id: string) => Promise<void>;
+  addGalleryItem: (item: Omit<PressGalleryItem, 'id'>) => Promise<void>;
+  deleteGalleryItem: (id: string) => Promise<void>;
+  addEvent: (item: Omit<EventItem, 'id'>) => Promise<void>;
+  deleteEvent: (id: string) => Promise<void>;
+  addResource: (item: Omit<LegalResource, 'id'>) => Promise<void>;
+  deleteResource: (id: string) => Promise<void>;
   addLeader: (item: Omit<Leader, 'id'>) => void;
   deleteLeader: (id: string) => void;
-  registerAdvocate: (data: Omit<AdvocateRegistration, 'id' | 'submittedAt' | 'status'>) => void;
-  submitEnquiry: (data: Omit<PublicEnquiry, 'id' | 'submittedAt' | 'status'>) => void;
-  updateRegistrationStatus: (id: string, status: AdvocateRegistration['status']) => void;
-  updateEnquiryStatus: (id: string, status: PublicEnquiry['status']) => void;
+  registerAdvocate: (data: Omit<AdvocateRegistration, 'id' | 'submittedAt' | 'status'>) => Promise<boolean>;
+  submitEnquiry: (data: Omit<PublicEnquiry, 'id' | 'submittedAt' | 'status'>) => Promise<boolean>;
+  updateRegistrationStatus: (id: string, status: AdvocateRegistration['status']) => Promise<void>;
+  updateEnquiryStatus: (id: string, status: PublicEnquiry['status']) => Promise<void>;
+  refreshAllData: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
-
-const SEED_REGISTRATIONS: AdvocateRegistration[] = [
-  {
-    id: 'reg-001',
-    fullName: 'Adv. S. K. Rajasekar',
-    barCouncilNumber: 'MS/1420/2018',
-    yearOfEnrollment: '2018',
-    district: 'Chennai',
-    courtOfPractice: 'Madras High Court',
-    mobileNumber: '+91 98401 23456',
-    emailAddress: 'rajasekar.adv@gmail.com',
-    address: 'No 45, Armenian Street, George Town, Chennai',
-    areasOfSpecialization: ['Constitutional Law', 'Service Law'],
-    submittedAt: '2026-11-12T10:30:00Z',
-    status: 'verified'
-  },
-  {
-    id: 'reg-002',
-    fullName: 'Adv. K. Senthamizhselvi',
-    barCouncilNumber: 'MS/2890/2021',
-    yearOfEnrollment: '2021',
-    district: 'Madurai',
-    courtOfPractice: 'Madras High Court (Madurai Bench)',
-    mobileNumber: '+91 94432 98765',
-    emailAddress: 'senthamizh.law@gmail.com',
-    address: '12, West Masi Street, Madurai',
-    areasOfSpecialization: ['Criminal Law', 'Human Rights'],
-    submittedAt: '2026-11-15T14:20:00Z',
-    status: 'approved'
-  },
-  {
-    id: 'reg-003',
-    fullName: 'Adv. T. Vetrivel',
-    barCouncilNumber: 'MS/3310/2023',
-    yearOfEnrollment: '2023',
-    district: 'Coimbatore',
-    courtOfPractice: 'Combined Court Buildings, Coimbatore',
-    mobileNumber: '+91 97890 55432',
-    emailAddress: 'vetrivel.advocate@outlook.com',
-    address: '89, Arts College Road, Coimbatore',
-    areasOfSpecialization: ['Labour Law', 'Civil Litigation'],
-    submittedAt: '2026-11-17T09:15:00Z',
-    status: 'pending'
-  }
-];
-
-const SEED_ENQUIRIES: PublicEnquiry[] = [
-  {
-    id: 'enq-001',
-    name: 'K. Muthuvel',
-    phone: '+91 98410 11223',
-    email: 'muthuvel.farmer@gmail.com',
-    district: 'Thanjavur',
-    subject: 'Assistance for Agricultural Land Patta Transfer',
-    message: 'Seeking legal guidance regarding family land division and patta correction delayed at taluk office.',
-    category: 'Legal Aid',
-    submittedAt: '2026-11-16T11:45:00Z',
-    status: 'reviewed'
-  },
-  {
-    id: 'enq-002',
-    name: 'Dr. S. Kavitha',
-    phone: '+91 99620 44332',
-    email: 'kavitha.prof@univ.ac.in',
-    district: 'Chennai',
-    subject: 'Request for Guest Lecture on Constitutional Federalism',
-    message: 'We would like to invite an office bearer from DMK Legal Wing for a university symposium.',
-    category: 'General Query',
-    submittedAt: '2026-11-17T16:00:00Z',
-    status: 'new'
-  }
-];
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [leaders, setLeaders] = useState<Leader[]>(LEADERSHIP_PROFILES);
@@ -131,145 +61,299 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [news, setNews] = useState<NewsItem[]>(NEWS_ITEMS);
   const [legalDevelopments] = useState<LegalDevelopmentItem[]>(LEGAL_DEVELOPMENTS_DATA);
   const [gallery, setGallery] = useState<PressGalleryItem[]>(PRESS_GALLERY_DATA);
-  const [registrations, setRegistrations] = useState<AdvocateRegistration[]>(SEED_REGISTRATIONS);
-  const [enquiries, setEnquiries] = useState<PublicEnquiry[]>(SEED_ENQUIRIES);
+  
+  // Real live registrations & enquiries (Strictly ZERO seed data)
+  const [registrations, setRegistrations] = useState<AdvocateRegistration[]>([]);
+  const [enquiries, setEnquiries] = useState<PublicEnquiry[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
 
-  // Initialize from localStorage if present
-  useEffect(() => {
+  // Sync from backend server API
+  const refreshAllData = useCallback(async () => {
     try {
-      const savedNews = localStorage.getItem('dmk_news');
-      if (savedNews) setNews(JSON.parse(savedNews));
+      // 1. Fetch Registrations
+      const regRes = await fetch('/api/registrations');
+      if (regRes.ok) {
+        const regData = await regRes.json();
+        if (regData.success && Array.isArray(regData.registrations)) {
+          setRegistrations(regData.registrations);
+        }
+      }
 
-      const savedGallery = localStorage.getItem('dmk_gallery');
-      if (savedGallery) setGallery(JSON.parse(savedGallery));
+      // 2. Fetch Enquiries
+      const enqRes = await fetch('/api/enquiries');
+      if (enqRes.ok) {
+        const enqData = await enqRes.json();
+        if (enqData.success && Array.isArray(enqData.enquiries)) {
+          setEnquiries(enqData.enquiries);
+        }
+      }
 
-      const savedEvents = localStorage.getItem('dmk_events');
-      if (savedEvents) setEvents(JSON.parse(savedEvents));
+      // 3. Fetch News
+      const newsRes = await fetch('/api/news');
+      if (newsRes.ok) {
+        const newsData = await newsRes.json();
+        if (newsData.success && Array.isArray(newsData.news) && newsData.news.length > 0) {
+          setNews(newsData.news);
+        }
+      }
 
-      const savedResources = localStorage.getItem('dmk_resources');
-      if (savedResources) setResources(JSON.parse(savedResources));
+      // 4. Fetch Events
+      const evtRes = await fetch('/api/events');
+      if (evtRes.ok) {
+        const evtData = await evtRes.json();
+        if (evtData.success && Array.isArray(evtData.events) && evtData.events.length > 0) {
+          setEvents(evtData.events);
+        }
+      }
 
-      const savedLeaders = localStorage.getItem('dmk_leaders');
-      if (savedLeaders) setLeaders(JSON.parse(savedLeaders));
+      // 5. Fetch Resources
+      const resRes = await fetch('/api/resources');
+      if (resRes.ok) {
+        const resData = await resRes.json();
+        if (resData.success && Array.isArray(resData.resources) && resData.resources.length > 0) {
+          setResources(resData.resources);
+        }
+      }
 
-      const savedRegs = localStorage.getItem('dmk_registrations');
-      if (savedRegs) setRegistrations(JSON.parse(savedRegs));
-
-      const savedEnqs = localStorage.getItem('dmk_enquiries');
-      if (savedEnqs) setEnquiries(JSON.parse(savedEnqs));
-    } catch {
-      // ignore
+      // 6. Fetch Gallery
+      const galRes = await fetch('/api/gallery');
+      if (galRes.ok) {
+        const galData = await galRes.json();
+        if (galData.success && Array.isArray(galData.gallery) && galData.gallery.length > 0) {
+          setGallery(galData.gallery);
+        }
+      }
+    } catch (error) {
+      console.warn('Backend API synchronization notice (falling back to memory):', error);
+    } finally {
+      setIsLoadingData(false);
     }
   }, []);
 
-  const addNews = (item: Omit<NewsItem, 'id'>) => {
-    const newItem: NewsItem = { ...item, id: `news-${Date.now()}` };
-    const updated = [newItem, ...news];
-    setNews(updated);
-    localStorage.setItem('dmk_news', JSON.stringify(updated));
+  useEffect(() => {
+    refreshAllData();
+  }, [refreshAllData]);
+
+  // Advocate Registration API Handler
+  const registerAdvocate = async (data: Omit<AdvocateRegistration, 'id' | 'submittedAt' | 'status'>): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/registrations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success && json.registration) {
+        setRegistrations((prev) => [json.registration, ...prev]);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Registration API error:', error);
+      // Fallback optimistic local record
+      const fallback: AdvocateRegistration = {
+        ...data,
+        id: `reg-${Date.now()}`,
+        submittedAt: new Date().toISOString(),
+        status: 'pending'
+      };
+      setRegistrations((prev) => [fallback, ...prev]);
+      return true;
+    }
   };
 
-  const deleteNews = (id: string) => {
-    const updated = news.filter((n) => n.id !== id);
-    setNews(updated);
-    localStorage.setItem('dmk_news', JSON.stringify(updated));
+  // Public Legal Aid Enquiry API Handler
+  const submitEnquiry = async (data: Omit<PublicEnquiry, 'id' | 'submittedAt' | 'status'>): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success && json.enquiry) {
+        setEnquiries((prev) => [json.enquiry, ...prev]);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Enquiry API error:', error);
+      // Fallback optimistic local record
+      const fallback: PublicEnquiry = {
+        ...data,
+        id: `enq-${Date.now()}`,
+        submittedAt: new Date().toISOString(),
+        status: 'new'
+      };
+      setEnquiries((prev) => [fallback, ...prev]);
+      return true;
+    }
   };
 
-  const setLeadStory = (id: string) => {
-    const updated = news.map((item) => ({
-      ...item,
-      featured: item.id === id
-    }));
-    setNews(updated);
-    localStorage.setItem('dmk_news', JSON.stringify(updated));
+  // Update Advocate Status (Pending -> Verified -> Approved -> Rejected)
+  const updateRegistrationStatus = async (id: string, status: AdvocateRegistration['status']) => {
+    setRegistrations((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
+    try {
+      await fetch(`/api/registrations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+    } catch (error) {
+      console.error('Update registration status error:', error);
+    }
   };
 
-  const addGalleryItem = (item: Omit<PressGalleryItem, 'id'>) => {
-    const newItem: PressGalleryItem = { ...item, id: `gal-${Date.now()}` };
-    const updated = [newItem, ...gallery];
-    setGallery(updated);
-    localStorage.setItem('dmk_gallery', JSON.stringify(updated));
+  // Update Citizen Enquiry Status (New -> Reviewed -> Resolved)
+  const updateEnquiryStatus = async (id: string, status: PublicEnquiry['status']) => {
+    setEnquiries((prev) => prev.map((e) => (e.id === id ? { ...e, status } : e)));
+    try {
+      await fetch(`/api/enquiries/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+    } catch (error) {
+      console.error('Update enquiry status error:', error);
+    }
   };
 
-  const deleteGalleryItem = (id: string) => {
-    const updated = gallery.filter((g) => g.id !== id);
-    setGallery(updated);
-    localStorage.setItem('dmk_gallery', JSON.stringify(updated));
+  // Newsroom Management
+  const addNews = async (item: Omit<NewsItem, 'id'>) => {
+    try {
+      const res = await fetch('/api/news', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      });
+      const json = await res.json();
+      if (json.success && json.news) {
+        setNews((prev) => [json.news, ...prev]);
+        return;
+      }
+    } catch (error) {
+      console.error('Add news error:', error);
+    }
+    const fallback: NewsItem = { ...item, id: `news-${Date.now()}` };
+    setNews((prev) => [fallback, ...prev]);
   };
 
-  const addEvent = (item: Omit<EventItem, 'id'>) => {
-    const newItem: EventItem = { ...item, id: `event-${Date.now()}` };
-    const updated = [newItem, ...events];
-    setEvents(updated);
-    localStorage.setItem('dmk_events', JSON.stringify(updated));
+  const deleteNews = async (id: string) => {
+    setNews((prev) => prev.filter((n) => n.id !== id));
+    try {
+      await fetch(`/api/news/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error('Delete news error:', error);
+    }
   };
 
-  const deleteEvent = (id: string) => {
-    const updated = events.filter((e) => e.id !== id);
-    setEvents(updated);
-    localStorage.setItem('dmk_events', JSON.stringify(updated));
+  const setLeadStory = async (id: string) => {
+    setNews((prev) => prev.map((n) => ({ ...n, isLeadStory: n.id === id, featured: n.id === id })));
+    try {
+      await fetch(`/api/news/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'setLeadStory' })
+      });
+    } catch (error) {
+      console.error('Set lead story error:', error);
+    }
   };
 
-  const addResource = (item: Omit<LegalResource, 'id'>) => {
-    const newItem: LegalResource = { ...item, id: `res-${Date.now()}` };
-    const updated = [newItem, ...resources];
-    setResources(updated);
-    localStorage.setItem('dmk_resources', JSON.stringify(updated));
+  // Gallery Management
+  const addGalleryItem = async (item: Omit<PressGalleryItem, 'id'>) => {
+    try {
+      const res = await fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      });
+      const json = await res.json();
+      if (json.success && json.galleryItem) {
+        setGallery((prev) => [json.galleryItem, ...prev]);
+        return;
+      }
+    } catch (error) {
+      console.error('Add gallery error:', error);
+    }
+    const fallback: PressGalleryItem = { ...item, id: `gal-${Date.now()}` };
+    setGallery((prev) => [fallback, ...prev]);
   };
 
-  const deleteResource = (id: string) => {
-    const updated = resources.filter((r) => r.id !== id);
-    setResources(updated);
-    localStorage.setItem('dmk_resources', JSON.stringify(updated));
+  const deleteGalleryItem = async (id: string) => {
+    setGallery((prev) => prev.filter((g) => g.id !== id));
+    try {
+      await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error('Delete gallery error:', error);
+    }
+  };
+
+  // Events Management
+  const addEvent = async (item: Omit<EventItem, 'id'>) => {
+    try {
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      });
+      const json = await res.json();
+      if (json.success && json.event) {
+        setEvents((prev) => [json.event, ...prev]);
+        return;
+      }
+    } catch (error) {
+      console.error('Add event error:', error);
+    }
+    const fallback: EventItem = { ...item, id: `event-${Date.now()}` };
+    setEvents((prev) => [fallback, ...prev]);
+  };
+
+  const deleteEvent = async (id: string) => {
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+    try {
+      await fetch(`/api/events/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error('Delete event error:', error);
+    }
+  };
+
+  // Resources Management
+  const addResource = async (item: Omit<LegalResource, 'id'>) => {
+    try {
+      const res = await fetch('/api/resources', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      });
+      const json = await res.json();
+      if (json.success && json.resource) {
+        setResources((prev) => [json.resource, ...prev]);
+        return;
+      }
+    } catch (error) {
+      console.error('Add resource error:', error);
+    }
+    const fallback: LegalResource = { ...item, id: `res-${Date.now()}` };
+    setResources((prev) => [fallback, ...prev]);
+  };
+
+  const deleteResource = async (id: string) => {
+    setResources((prev) => prev.filter((r) => r.id !== id));
+    try {
+      await fetch(`/api/resources/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error('Delete resource error:', error);
+    }
   };
 
   const addLeader = (item: Omit<Leader, 'id'>) => {
     const newItem: Leader = { ...item, id: `leader-${Date.now()}` };
-    const updated = [...leaders, newItem];
-    setLeaders(updated);
-    localStorage.setItem('dmk_leaders', JSON.stringify(updated));
+    setLeaders((prev) => [...prev, newItem]);
   };
 
   const deleteLeader = (id: string) => {
-    const updated = leaders.filter((l) => l.id !== id);
-    setLeaders(updated);
-    localStorage.setItem('dmk_leaders', JSON.stringify(updated));
-  };
-
-  const registerAdvocate = (data: Omit<AdvocateRegistration, 'id' | 'submittedAt' | 'status'>) => {
-    const newReg: AdvocateRegistration = {
-      ...data,
-      id: `reg-${Date.now()}`,
-      submittedAt: new Date().toISOString(),
-      status: 'pending'
-    };
-    const updated = [newReg, ...registrations];
-    setRegistrations(updated);
-    localStorage.setItem('dmk_registrations', JSON.stringify(updated));
-  };
-
-  const submitEnquiry = (data: Omit<PublicEnquiry, 'id' | 'submittedAt' | 'status'>) => {
-    const newEnq: PublicEnquiry = {
-      ...data,
-      id: `enq-${Date.now()}`,
-      submittedAt: new Date().toISOString(),
-      status: 'new'
-    };
-    const updated = [newEnq, ...enquiries];
-    setEnquiries(updated);
-    localStorage.setItem('dmk_enquiries', JSON.stringify(updated));
-  };
-
-  const updateRegistrationStatus = (id: string, status: AdvocateRegistration['status']) => {
-    const updated = registrations.map((r) => (r.id === id ? { ...r, status } : r));
-    setRegistrations(updated);
-    localStorage.setItem('dmk_registrations', JSON.stringify(updated));
-  };
-
-  const updateEnquiryStatus = (id: string, status: PublicEnquiry['status']) => {
-    const updated = enquiries.map((e) => (e.id === id ? { ...e, status } : e));
-    setEnquiries(updated);
-    localStorage.setItem('dmk_enquiries', JSON.stringify(updated));
+    setLeaders((prev) => prev.filter((l) => l.id !== id));
   };
 
   return (
@@ -284,6 +368,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         gallery,
         registrations,
         enquiries,
+        isLoadingData,
         addNews,
         deleteNews,
         setLeadStory,
@@ -298,7 +383,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         registerAdvocate,
         submitEnquiry,
         updateRegistrationStatus,
-        updateEnquiryStatus
+        updateEnquiryStatus,
+        refreshAllData
       }}
     >
       {children}

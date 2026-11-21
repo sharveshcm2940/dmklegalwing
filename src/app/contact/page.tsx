@@ -19,7 +19,7 @@ import {
 
 export default function ContactPage() {
   const { language, t } = useLanguage();
-  const { registerAdvocate, submitEnquiry } = useData();
+  const { registerAdvocate, submitEnquiry, districts } = useData();
 
   // Active form tab
   const [activeFormTab, setActiveFormTab] = useState<'register' | 'inquiry'>('register');
@@ -28,7 +28,7 @@ export default function ContactPage() {
   const [advFullName, setAdvFullName] = useState('');
   const [advBarNo, setAdvBarNo] = useState('');
   const [advEnrollYear, setAdvEnrollYear] = useState('');
-  const [advDistrict, setAdvDistrict] = useState('Chennai');
+  const [advDistrict, setAdvDistrict] = useState('Ariyalur');
   const [advCourt, setAdvCourt] = useState('');
   const [advMobile, setAdvMobile] = useState('');
   const [advEmail, setAdvEmail] = useState('');
@@ -36,17 +36,19 @@ export default function ContactPage() {
   const [advSpecializations, setAdvSpecializations] = useState<string[]>(['Constitutional Law']);
   const [advFormSuccess, setAdvFormSuccess] = useState(false);
   const [advFormError, setAdvFormError] = useState('');
+  const [advIsSubmitting, setAdvIsSubmitting] = useState(false);
 
   // Public Legal Aid Inquiry Form State
   const [inqName, setInqName] = useState('');
   const [inqPhone, setInqPhone] = useState('');
   const [inqEmail, setInqEmail] = useState('');
-  const [inqDistrict, setInqDistrict] = useState('Chennai');
+  const [inqDistrict, setInqDistrict] = useState('Ariyalur');
   const [inqCategory, setInqCategory] = useState<'Legal Aid' | 'General Query' | 'High Court Wing' | 'Press / Media'>('Legal Aid');
   const [inqSubject, setInqSubject] = useState('');
   const [inqMessage, setInqMessage] = useState('');
   const [inqFormSuccess, setInqFormSuccess] = useState(false);
   const [inqFormError, setInqFormError] = useState('');
+  const [inqIsSubmitting, setInqIsSubmitting] = useState(false);
 
   const specializationOptions = [
     'Constitutional Law',
@@ -66,7 +68,7 @@ export default function ContactPage() {
     }
   };
 
-  const handleAdvocateSubmit = (e: React.FormEvent) => {
+  const handleAdvocateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAdvFormError('');
 
@@ -75,22 +77,31 @@ export default function ContactPage() {
       return;
     }
 
-    registerAdvocate({
-      fullName: advFullName,
-      barCouncilNumber: advBarNo,
-      yearOfEnrollment: advEnrollYear || '2024',
-      district: advDistrict,
-      courtOfPractice: advCourt || 'District & Sessions Court',
-      mobileNumber: advMobile,
-      emailAddress: advEmail,
-      address: advAddress,
-      areasOfSpecialization: advSpecializations
-    });
+    setAdvIsSubmitting(true);
+    try {
+      const ok = await registerAdvocate({
+        fullName: advFullName,
+        barCouncilNumber: advBarNo,
+        yearOfEnrollment: advEnrollYear || '2024',
+        district: advDistrict,
+        courtOfPractice: advCourt || 'District & Sessions Court',
+        mobileNumber: advMobile,
+        emailAddress: advEmail,
+        address: advAddress,
+        areasOfSpecialization: advSpecializations
+      });
 
-    setAdvFormSuccess(true);
+      if (ok) {
+        setAdvFormSuccess(true);
+      } else {
+        setAdvFormError(language === 'ta' ? 'விண்ணப்பத்தைப் பதிவு செய்வதில் பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.' : 'Failed to submit registration. Please try again.');
+      }
+    } finally {
+      setAdvIsSubmitting(false);
+    }
   };
 
-  const handleInquirySubmit = (e: React.FormEvent) => {
+  const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setInqFormError('');
 
@@ -99,17 +110,26 @@ export default function ContactPage() {
       return;
     }
 
-    submitEnquiry({
-      name: inqName,
-      phone: inqPhone,
-      email: inqEmail || 'citizen@portal.dmk',
-      district: inqDistrict,
-      category: inqCategory,
-      subject: inqSubject || 'Citizen Legal Assistance',
-      message: inqMessage
-    });
+    setInqIsSubmitting(true);
+    try {
+      const ok = await submitEnquiry({
+        name: inqName,
+        phone: inqPhone,
+        email: inqEmail || 'citizen@portal.dmk',
+        district: inqDistrict,
+        category: inqCategory,
+        subject: inqSubject || 'Citizen Legal Assistance',
+        message: inqMessage
+      });
 
-    setInqFormSuccess(true);
+      if (ok) {
+        setInqFormSuccess(true);
+      } else {
+        setInqFormError(language === 'ta' ? 'கோரிக்கையை அனுப்புவதில் பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.' : 'Failed to send inquiry. Please try again.');
+      }
+    } finally {
+      setInqIsSubmitting(false);
+    }
   };
 
   return (
@@ -384,8 +404,10 @@ export default function ContactPage() {
                             onChange={(e) => setAdvDistrict(e.target.value)}
                             className="w-full bg-[#FAF7F2] border border-neutral-300 p-2 text-xs text-[#111111] font-english focus:outline-none focus:bg-white focus:border-[#E31E24]"
                           >
-                            {['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Vellore', 'Thanjavur', 'Kanchipuram', 'Cuddalore', 'Erode', 'Dharmapuri', 'Pudukkottai', 'Ramanathapuram', 'Thoothukudi', 'Kanniyakumari'].map((d) => (
-                              <option key={d} value={d}>{d}</option>
+                            {districts.map((d) => (
+                              <option key={d.id} value={d.name.en}>
+                                {d.number ? `#${d.number} ` : ''}{d.name[language]} ({d.name.en})
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -473,10 +495,11 @@ export default function ContactPage() {
                       <div className="pt-2">
                         <button
                           type="submit"
-                          className="w-full py-3 bg-[#E31E24] hover:bg-neutral-900 text-white border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                          disabled={advIsSubmitting}
+                          className="w-full py-3 bg-[#E31E24] hover:bg-neutral-900 disabled:bg-neutral-600 text-white border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                         >
                           <FileCheck2 className="w-4 h-4" />
-                          <span>{t.forms.submit}</span>
+                          <span>{advIsSubmitting ? (language === 'ta' ? 'பதிவு செய்யப்படுகிறது...' : 'Registering...') : t.forms.submit}</span>
                         </button>
                       </div>
                     </form>
@@ -561,8 +584,10 @@ export default function ContactPage() {
                             onChange={(e) => setInqDistrict(e.target.value)}
                             className="w-full bg-[#FAF7F2] border border-neutral-300 p-2 text-xs text-[#111111] font-english focus:outline-none focus:bg-white focus:border-[#E31E24]"
                           >
-                            {['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Thanjavur', 'Vellore', 'Cuddalore', 'Erode'].map((d) => (
-                              <option key={d} value={d}>{d}</option>
+                            {districts.map((d) => (
+                              <option key={d.id} value={d.name.en}>
+                                {d.number ? `#${d.number} ` : ''}{d.name[language]} ({d.name.en})
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -614,10 +639,11 @@ export default function ContactPage() {
                       <div className="pt-2">
                         <button
                           type="submit"
-                          className="w-full py-3 bg-[#E31E24] hover:bg-neutral-900 text-white border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                          disabled={inqIsSubmitting}
+                          className="w-full py-3 bg-[#E31E24] hover:bg-neutral-900 disabled:bg-neutral-600 text-white border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                         >
                           <Send className="w-4 h-4" />
-                          <span>{t.forms.submitInquiry}</span>
+                          <span>{inqIsSubmitting ? (language === 'ta' ? 'அனுப்பப்படுகிறது...' : 'Sending...') : t.forms.submitInquiry}</span>
                         </button>
                       </div>
                     </form>

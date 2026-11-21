@@ -103,6 +103,7 @@ export interface NewsItem {
   photoCredit?: string;
   caption?: { en: string; ta: string };
   featured?: boolean;
+  isLeadStory?: boolean;
   court?: string;
   caseNumber?: string;
   documentUrl?: string;

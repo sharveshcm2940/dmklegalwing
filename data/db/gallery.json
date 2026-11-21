@@ -1,0 +1,97 @@
+[
+  {
+    "id": "gal-001",
+    "title": {
+      "en": "DMK Legal Wing State Conference at Kalaignar Arangam",
+      "ta": "கலைஞர் அரங்கில் நடைபெற்ற திமுக வழக்கறிஞர் அணி மாநில மாநாடு"
+    },
+    "category": "Legal Wing Events",
+    "date": "2026-11-05",
+    "location": {
+      "en": "Kalaignar Arangam, Chennai",
+      "ta": "கலைஞர் அரங்கம், சென்னை"
+    },
+    "image": "/images/dmk-slider-official.jpg",
+    "caption": {
+      "en": "Over 3,000 advocates from all 38 districts gathered for the state plenary on constitutional federalism and judicial reforms.",
+      "ta": "அரசமைப்பு கூட்டாட்சி மற்றும் நீதிமன்றச் சீர்திருத்தங்கள் குறித்து 38 மாவட்டங்களிலிருந்து 3,000-க்கும் மேற்பட்ட வழக்கறிஞர்கள் பங்கேற்பு."
+    },
+    "photographer": "State Press Bureau"
+  },
+  {
+    "id": "gal-002",
+    "title": {
+      "en": "Press Meet on Supreme Court Governor Ruling",
+      "ta": "ஆளுநர் வழக்கில் உச்சநீதிமன்றத் தீர்ப்பு குறித்த செய்தியாளர் சந்திப்பு"
+    },
+    "category": "Press Conferences",
+    "date": "2026-11-10",
+    "location": {
+      "en": "Anna Arivalayam, Chennai",
+      "ta": "அண்ணா அறிவாலயம், சென்னை"
+    },
+    "image": "/images/dmk-press-meet.jpg",
+    "caption": {
+      "en": "Legal Wing leadership briefing international and national media on the landmark Article 200 judgment.",
+      "ta": "அரசமைப்பு உறுப்பு 200 தொடர்பான வரலாற்று தீர்ப்பு குறித்து தேசிய மற்றும் சர்வதேச ஊடகங்களுக்கு விளக்கம்."
+    },
+    "photographer": "Press Secretariat"
+  },
+  {
+    "id": "gal-003",
+    "title": {
+      "en": "State Advocates Leadership Assembly at High Court",
+      "ta": "சென்னை உயர் நீதிமன்றத்தில் மாநில வழக்கறிஞர் தலைமைப் பொறுப்பாளர்கள் கூட்டம்"
+    },
+    "category": "Advocates Meetings",
+    "date": "2026-10-18",
+    "location": {
+      "en": "Advocates Association Hall, High Court Campus",
+      "ta": "சென்னை உயர் நீதிமன்ற வழக்கறிஞர் சங்கம்"
+    },
+    "image": "/images/dmk-legal-conference.jpg",
+    "caption": {
+      "en": "High Court and Madurai Bench coordinating counsels deliberating on the junior advocate welfare charter.",
+      "ta": "இளம் வழக்கறிஞர்கள் நலத் திட்டங்கள் மற்றும் நீதிமன்றப் பணிகள் குறித்த ஒருங்கிணைப்புக் கூட்டம்."
+    },
+    "photographer": "Bar Council Media Wing"
+  },
+  {
+    "id": "gal-004",
+    "title": {
+      "en": "Dravidian Legal Movement Historical Roll of Honor",
+      "ta": "திராவிட இயக்க சட்டப் போராளிகள் வரலாற்று ஆவணம்"
+    },
+    "category": "Historical Archive",
+    "date": "2026-09-17",
+    "location": {
+      "en": "Headquarters Archives, Chennai",
+      "ta": "கழகத் தலைமை ஆவணக் காப்பகம்"
+    },
+    "image": "/images/dmk-four-leaders.jpg",
+    "caption": {
+      "en": "The ideological stalwarts: Thanthai Periyar, Arignar Anna, Muthamizharignar Kalaignar, and Chief Minister M.K. Stalin.",
+      "ta": "திராவிட இயக்கத்தின் தலைவர்கள்: தந்தை பெரியார், பேரறிஞர் அண்ணா, முத்தமிழறிஞர் கலைஞர், மற்றும் முதல்வர் மு.க. ஸ்டாலின்."
+    },
+    "photographer": "DMK Central Archive"
+  },
+  {
+    "id": "gal-005",
+    "title": {
+      "en": "Mass Rally for Constitutional Democracy & Rights Defense",
+      "ta": "ஜனநாயக உரிமைப் பாதுகாப்புப் பேரணி"
+    },
+    "category": "Official Programmes",
+    "date": "2026-08-14",
+    "location": {
+      "en": "Madurai & Southern Districts",
+      "ta": "மதுரை மற்றும் தென் மாவட்டங்கள்"
+    },
+    "image": "/images/dmk-campaign-stalin.jpg",
+    "caption": {
+      "en": "Advocates joining democratic rights mobilizations defending state autonomy across Tamil Nadu.",
+      "ta": "மாநில சுயாட்சி மற்றும் சமூக நீதியைப் பாதுகாக்கும் மாபெரும் ஜனநாயகப் பேரணி."
+    },
+    "photographer": "Field Media Unit"
+  }
+]
