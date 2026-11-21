@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
+import { AdvocateRegistration, PublicEnquiry, NewsItem, PressGalleryItem, EventItem, LegalResource, DistrictInfo } from '@/types';
 import { 
   Shield, 
   Lock, 
@@ -16,7 +18,21 @@ import {
   ExternalLink,
   Eye,
   CheckCircle,
-  MapPin
+  MapPin,
+  Search,
+  Filter,
+  Download,
+  Building2,
+  Phone,
+  Mail,
+  AlertCircle,
+  Scale,
+  RefreshCw,
+  Clock,
+  Database,
+  ArrowUpRight,
+  X,
+  FileText
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -38,19 +54,39 @@ export default function AdminPage() {
     registrations, 
     updateRegistrationStatus, 
     enquiries, 
-    updateEnquiryStatus 
+    updateEnquiryStatus,
+    districts,
+    refreshAllData,
+    isLoadingData
   } = useData();
 
-  // Authentication simulation
+  // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [adminRole, setAdminRole] = useState<'super_admin' | 'content_admin' | 'legal_officer'>('super_admin');
   const [adminPassword, setAdminPassword] = useState('');
   const [authError, setAuthError] = useState('');
 
-  // Active admin tab
-  const [activeTab, setActiveTab] = useState<'overview' | 'registrations' | 'enquiries' | 'news' | 'gallery' | 'events' | 'resources'>('overview');
+  // Active Admin Tab
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'registrations' | 'enquiries' | 'news' | 'districts' | 'gallery' | 'events' | 'resources'
+  >('overview');
 
-  // Modal / Form states for adding items
+  // Filter & Search States
+  const [regStatusFilter, setRegStatusFilter] = useState<'all' | 'pending' | 'verified' | 'approved' | 'rejected'>('all');
+  const [regSearchQuery, setRegSearchQuery] = useState('');
+  const [selectedRegDossier, setSelectedRegDossier] = useState<AdvocateRegistration | null>(null);
+
+  const [enqCategoryFilter, setEnqCategoryFilter] = useState<string>('all');
+  const [enqStatusFilter, setEnqStatusFilter] = useState<string>('all');
+  const [enqSearchQuery, setEnqSearchQuery] = useState('');
+
+  const [newsSearchQuery, setNewsSearchQuery] = useState('');
+  const [newsCategoryFilter, setNewsCategoryFilter] = useState<string>('all');
+
+  const [districtSearchQuery, setDistrictSearchQuery] = useState('');
+  const [districtZoneFilter, setDistrictZoneFilter] = useState('All');
+
+  // Modals
   const [showAddNewsModal, setShowAddNewsModal] = useState(false);
   const [newNewsTitleEn, setNewNewsTitleEn] = useState('');
   const [newNewsTitleTa, setNewNewsTitleTa] = useState('');
@@ -64,7 +100,6 @@ export default function AdminPage() {
   const [newNewsIsLead, setNewNewsIsLead] = useState(false);
   const [newNewsImage, setNewNewsImage] = useState('/images/dmk-slider-official.jpg');
 
-  // Gallery modal state
   const [showAddGalleryModal, setShowAddGalleryModal] = useState(false);
   const [newGalTitleEn, setNewGalTitleEn] = useState('');
   const [newGalTitleTa, setNewGalTitleTa] = useState('');
@@ -93,6 +128,7 @@ export default function AdminPage() {
   const [newResSummaryEn, setNewResSummaryEn] = useState('');
   const [newResSummaryTa, setNewResSummaryTa] = useState('');
 
+  // Authentication Handlers
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (adminPassword === 'dmk1971' || adminPassword === 'admin') {
@@ -103,11 +139,12 @@ export default function AdminPage() {
     }
   };
 
-  const handleCreateNews = (e: React.FormEvent) => {
+  // Form Submission Handlers
+  const handleCreateNews = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNewsTitleEn.trim()) return;
 
-    addNews({
+    await addNews({
       title: { en: newNewsTitleEn, ta: newNewsTitleTa || newNewsTitleEn },
       category: newNewsCategory,
       date: new Date().toISOString().split('T')[0],
@@ -121,6 +158,7 @@ export default function AdminPage() {
       court: newNewsCourt || undefined,
       caseNumber: newNewsCaseNo || undefined,
       featured: newNewsIsLead,
+      isLeadStory: newNewsIsLead,
       status: 'published'
     });
 
@@ -136,11 +174,11 @@ export default function AdminPage() {
     setNewNewsIsLead(false);
   };
 
-  const handleCreateGallery = (e: React.FormEvent) => {
+  const handleCreateGallery = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGalTitleEn.trim()) return;
 
-    addGalleryItem({
+    await addGalleryItem({
       title: { en: newGalTitleEn, ta: newGalTitleTa || newGalTitleEn },
       category: newGalCategory,
       date: new Date().toISOString().split('T')[0],
@@ -159,11 +197,11 @@ export default function AdminPage() {
     setNewGalCaptionTa('');
   };
 
-  const handleCreateEvent = (e: React.FormEvent) => {
+  const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEventTitleEn.trim()) return;
 
-    addEvent({
+    await addEvent({
       title: { en: newEventTitleEn, ta: newEventTitleTa || newEventTitleEn },
       category: newEventCategory,
       date: newEventDate,
@@ -182,11 +220,11 @@ export default function AdminPage() {
     setNewEventDescEn('');
   };
 
-  const handleCreateResource = (e: React.FormEvent) => {
+  const handleCreateResource = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newResTitleEn.trim()) return;
 
-    addResource({
+    await addResource({
       title: { en: newResTitleEn, ta: newResTitleTa || newResTitleEn },
       category: newResCategory,
       citation: newResCitation,
@@ -207,282 +245,989 @@ export default function AdminPage() {
     setNewResSummaryEn('');
   };
 
+  // Filtered Lists
+  const filteredRegistrations = registrations.filter((reg) => {
+    const matchesStatus = regStatusFilter === 'all' || reg.status === regStatusFilter;
+    const query = regSearchQuery.toLowerCase();
+    const matchesQuery = 
+      !query ||
+      reg.fullName.toLowerCase().includes(query) ||
+      reg.barCouncilNumber.toLowerCase().includes(query) ||
+      reg.district.toLowerCase().includes(query) ||
+      reg.mobileNumber.toLowerCase().includes(query) ||
+      reg.emailAddress.toLowerCase().includes(query);
+    return matchesStatus && matchesQuery;
+  });
+
+  const filteredEnquiries = enquiries.filter((enq) => {
+    const matchesCategory = enqCategoryFilter === 'all' || enq.category === enqCategoryFilter;
+    const matchesStatus = enqStatusFilter === 'all' || enq.status === enqStatusFilter;
+    const query = enqSearchQuery.toLowerCase();
+    const matchesQuery = 
+      !query ||
+      enq.name.toLowerCase().includes(query) ||
+      enq.district.toLowerCase().includes(query) ||
+      enq.subject.toLowerCase().includes(query) ||
+      enq.phone.toLowerCase().includes(query);
+    return matchesCategory && matchesStatus && matchesQuery;
+  });
+
+  const filteredNews = news.filter((item) => {
+    const matchesCategory = newsCategoryFilter === 'all' || item.category === newsCategoryFilter;
+    const query = newsSearchQuery.toLowerCase();
+    const matchesQuery =
+      !query ||
+      item.title.en.toLowerCase().includes(query) ||
+      item.title.ta.toLowerCase().includes(query) ||
+      item.summary.en.toLowerCase().includes(query);
+    return matchesCategory && matchesQuery;
+  });
+
+  const filteredDistricts = districts.filter((d) => {
+    const matchesZone = districtZoneFilter === 'All' || d.zone === districtZoneFilter;
+    const query = districtSearchQuery.toLowerCase();
+    const matchesQuery =
+      !query ||
+      d.name.en.toLowerCase().includes(query) ||
+      d.name.ta.toLowerCase().includes(query) ||
+      d.organizer.en.toLowerCase().includes(query) ||
+      d.contactPhone.toLowerCase().includes(query);
+    return matchesZone && matchesQuery;
+  });
+
+  // Export Data Dump
+  const handleExportJson = () => {
+    const dataDump = {
+      exportTimestamp: new Date().toISOString(),
+      counts: {
+        registrations: registrations.length,
+        enquiries: enquiries.length,
+        news: news.length,
+        events: events.length,
+        resources: resources.length,
+        districts: districts.length
+      },
+      registrations,
+      enquiries,
+      news,
+      events,
+      resources
+    };
+    const blob = new Blob([JSON.stringify(dataDump, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `dmk-legal-wing-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // -------------------------------------------------------------
+  // AUTHENTICATION LOGIN LOCK SCREEN (INSTITUTIONAL PARCHMENT)
+  // -------------------------------------------------------------
   if (!isAuthenticated) {
     return (
-      <div className="min-h-[75vh] flex items-center justify-center p-4 font-tamil-sans">
-        <div className="bg-white border-2 border-[#E2DDD5] rounded-2xl max-w-md w-full p-8 shadow-sm">
-          <div className="text-center space-y-2 mb-6">
-            <div className="w-12 h-12 bg-[#FFF5F5] border border-[#E31E24] text-[#E31E24] rounded-xl flex items-center justify-center mx-auto">
-              <Lock className="w-6 h-6" />
+      <div className="min-h-[85vh] bg-[#FAF8F5] flex items-center justify-center p-4 font-dmk-body">
+        <div className="bg-white border-2 border-neutral-900 max-w-md w-full p-8 sm:p-10 relative shadow-2xl">
+          {/* Dual Party Stripe */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 flex">
+            <div className="w-1/2 bg-black" />
+            <div className="w-1/2 bg-[#E31E24]" />
+          </div>
+
+          <div className="text-center space-y-3 mb-8 pt-2">
+            <div className="w-14 h-14 bg-black text-[#E31E24] border-2 border-neutral-900 flex items-center justify-center mx-auto">
+              <Scale className="w-7 h-7" />
             </div>
-            <h2 className="text-xl font-bold text-[#111111] font-tamil-serif">
-              DMK Legal Wing Admin Access
-            </h2>
-            <p className="text-xs text-[#666666]">
-              Authorized legal wing officers, secretariat administrators & editors only.
+            <div>
+              <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#E31E24] block">
+                STATE LEGAL SECRETARIAT
+              </span>
+              <h2 className="text-2xl font-black text-neutral-950 font-dmk-headline tracking-tight uppercase mt-1">
+                Command Access
+              </h2>
+            </div>
+            <p className="text-xs text-neutral-600 font-dmk-body leading-relaxed">
+              Authorized legal wing officers, secretariat controllers & bar registrars only.
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             {authError && (
-              <div className="p-3 bg-[#FFF5F5] border border-[#F5C2C4] text-[#B81318] text-xs rounded">
-                {authError}
+              <div className="p-3 bg-red-50 border border-[#E31E24] text-[#E31E24] text-xs font-bold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{authError}</span>
               </div>
             )}
             <div>
-              <label className="text-xs font-semibold text-[#333333] block mb-1">
-                Security Password
+              <label className="text-[11px] font-english font-bold text-neutral-900 uppercase tracking-wider block mb-1">
+                Security Passcode
               </label>
               <input
                 type="password"
                 required
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
-                placeholder="Enter password (hint: dmk1971)"
-                className="w-full bg-white border border-[#D5CEC4] rounded-md p-2 text-xs text-[#111111] placeholder-neutral-400 focus:outline-none focus:border-[#E31E24]"
+                placeholder="Enter passcode (hint: dmk1971)"
+                className="w-full bg-[#FAF8F5] border border-neutral-400 p-2.5 text-xs text-neutral-950 font-english placeholder-neutral-500 focus:outline-none focus:border-black focus:bg-white"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-2.5 bg-[#E31E24] hover:bg-[#B81318] text-white rounded text-xs font-bold uppercase tracking-wider transition-colors"
+              className="w-full py-3 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-black uppercase tracking-widest transition-colors border border-black shadow-md cursor-pointer"
             >
-              Sign In to Secretariat
+              Sign In to Command Console
             </button>
           </form>
+
+          <div className="mt-6 pt-4 border-t border-neutral-300 text-center text-[10px] text-neutral-500 font-mono">
+            HEADQUARTERS: ANNA ARIVALAYAM • CHENNAI 600018
+          </div>
         </div>
       </div>
     );
   }
 
+  // -------------------------------------------------------------
+  // MAIN INSTITUTIONAL COMMAND CONSOLE
+  // -------------------------------------------------------------
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-tamil-sans">
+    <div className="w-full min-h-screen bg-[#FAF8F5] text-neutral-950 font-dmk-body">
       
-      {/* Top Admin Bar with Role Switcher */}
-      <div className="bg-white border border-[#E2DDD5] rounded-xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#FAF8F5] border border-[#E2DDD5] flex items-center justify-center text-[#E31E24]">
-            <Shield className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold text-[#111111] font-tamil-serif">
-                Legal Wing Management Portal
+      {/* 1. HIGH COMMAND APEX STRIP */}
+      <header className="bg-[#111111] text-white border-b-2 border-[#E31E24]">
+        {/* Dual Party Stripe */}
+        <div className="h-1 flex">
+          <div className="w-1/2 bg-black" />
+          <div className="w-1/2 bg-[#E31E24]" />
+        </div>
+
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-4 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          
+          {/* Identity & Seal */}
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 bg-neutral-900 border border-neutral-700 text-[#E31E24] flex items-center justify-center shrink-0">
+              <Scale className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#E31E24]">
+                  STATE LEGAL SECRETARIAT
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.2 bg-neutral-800 text-neutral-300 border border-neutral-700 uppercase font-bold">
+                  {adminRole.replace('_', ' ')}
+                </span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black font-dmk-headline uppercase tracking-tight text-white leading-tight">
+                Control Console & Database Hub
               </h1>
-              <span className="text-[10px] font-mono bg-[#FFF5F5] text-[#B81318] px-2 py-0.5 rounded border border-[#F5C2C4] uppercase font-bold">
-                {adminRole.replace('_', ' ')}
+            </div>
+          </div>
+
+          {/* Telemetry & Action Strip */}
+          <div className="flex flex-wrap items-center gap-2.5 text-xs font-english">
+            
+            {/* Live Backend Connection Indicator */}
+            <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-1.5 text-neutral-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] font-mono">
+                {isLoadingData ? 'SYNCING API...' : 'LIVE BACKEND: CONNECTED'}
               </span>
             </div>
-            <p className="text-xs text-[#666666]">
-              Live State Secretariat Control System • Anna Arivalayam
-            </p>
+
+            {/* Role Switcher */}
+            <div className="flex items-center border border-neutral-700 bg-neutral-900 p-0.5">
+              {(['super_admin', 'content_admin', 'legal_officer'] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setAdminRole(r)}
+                  className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                    adminRole === r ? 'bg-[#E31E24] text-white' : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  {r === 'super_admin' ? 'Super Admin' : r === 'content_admin' ? 'Editorial' : 'Legal Desk'}
+                </button>
+              ))}
+            </div>
+
+            {/* Manual Sync */}
+            <button
+              onClick={() => refreshAllData()}
+              title="Refresh all records from backend"
+              className="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 hover:text-white transition-colors cursor-pointer"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoadingData ? 'animate-spin text-[#E31E24]' : ''}`} />
+            </button>
+
+            {/* Export JSON Backup */}
+            <button
+              onClick={handleExportJson}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white font-bold text-[11px] uppercase tracking-wider transition-colors cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-[#E31E24]" />
+              <span>Export DB</span>
+            </button>
+
+            {/* Lock Console */}
+            <button
+              onClick={() => setIsAuthenticated(false)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E31E24] hover:bg-red-700 text-white font-bold text-[11px] uppercase tracking-wider transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Lock</span>
+            </button>
+
           </div>
+
         </div>
+      </header>
 
-        {/* Role Switcher & Actions */}
-        <div className="flex flex-wrap items-center gap-3 text-xs">
-          <div className="flex items-center gap-1.5 bg-[#FAF8F5] p-1 rounded-lg border border-[#E2DDD5]">
-            <span className="text-[#666666] px-2 font-medium">Role:</span>
-            {(['super_admin', 'content_admin', 'legal_officer'] as const).map((r) => (
-              <button
-                key={r}
-                onClick={() => setAdminRole(r)}
-                className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
-                  adminRole === r ? 'bg-[#E31E24] text-white' : 'text-[#555555] hover:text-black'
-                }`}
-              >
-                {r === 'super_admin' ? 'Super Admin' : r === 'content_admin' ? 'Content Admin' : 'Legal Desk'}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={() => setIsAuthenticated(false)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#EAE6DF] text-[#444444] border border-[#E2DDD5]"
-          >
-            <LogOut className="w-3.5 h-3.5 text-[#E31E24]" />
-            <span>Lock Portal</span>
-          </button>
+      {/* 2. INSTITUTIONAL HORIZONTAL COMMAND TABS */}
+      <nav className="bg-white border-b border-neutral-300 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto scrollbar-none py-1">
+          {[
+            { id: 'overview', label: '01. Telemetry & Overview', count: null },
+            { id: 'registrations', label: '02. Advocate Cadre Applications', count: registrations.length },
+            { id: 'enquiries', label: '03. Citizen Legal Desk', count: enquiries.length },
+            { id: 'news', label: '04. Editorial Newsroom', count: news.length },
+            { id: 'districts', label: '05. 74 District Cadre Directory', count: 74 },
+            { id: 'resources', label: '06. Legal Dossiers & Archive', count: resources.length },
+            { id: 'gallery', label: '07. Press Photojournalism', count: gallery.length },
+            { id: 'events', label: '08. State Conferences', count: events.length }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-3.5 py-2.5 text-xs font-english font-bold uppercase tracking-wider whitespace-nowrap transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
+                activeTab === tab.id
+                  ? 'border-[#E31E24] text-[#E31E24] bg-[#FAF8F5]'
+                  : 'border-transparent text-neutral-600 hover:text-black hover:bg-neutral-50'
+              }`}
+            >
+              <span>{tab.label}</span>
+              {tab.count !== null && (
+                <span className={`px-1.5 py-0.2 text-[10px] font-mono font-bold ${
+                  activeTab === tab.id
+                    ? 'bg-[#E31E24] text-white'
+                    : 'bg-neutral-200 text-neutral-800'
+                }`}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
-      </div>
+      </nav>
 
-      {/* Tabs navigation */}
-      <div className="flex items-center gap-2 border-b border-[#E2DDD5] pb-2 overflow-x-auto text-xs">
-        {[
-          { id: 'overview', label: 'Overview & Analytics', count: null },
-          { id: 'registrations', label: 'Advocate Registrations', count: registrations.length },
-          { id: 'enquiries', label: 'Citizen Inquiries', count: enquiries.length },
-          { id: 'news', label: 'Press Releases & News', count: news.length },
-          { id: 'gallery', label: 'Press Photo Gallery', count: gallery.length },
-          { id: 'events', label: 'Events & Conferences', count: events.length },
-          { id: 'resources', label: 'Legal Resources', count: resources.length }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`px-3.5 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-[#E31E24] text-white shadow-2xs'
-                : 'bg-white text-[#555555] hover:text-black border border-[#E2DDD5]'
-            }`}
-          >
-            <span>{tab.label}</span>
-            {tab.count !== null && (
-              <span className="text-[10px] bg-black/10 px-1.5 py-0.2 rounded font-mono">
-                {tab.count}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+      {/* 3. MAIN WORKSPACE AREA */}
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 py-8 space-y-8">
 
-      {/* TAB 1: OVERVIEW & ANALYTICS */}
-      {activeTab === 'overview' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-1 shadow-2xs">
-              <span className="text-xs text-[#666666] uppercase font-mono font-bold">Enrolled Advocates</span>
-              <span className="text-2xl font-bold text-[#111111] font-mono block">28,500+</span>
-              <span className="text-[11px] text-emerald-600 font-medium">● 74 Districts Covered</span>
-            </div>
-
-            <div className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-1 shadow-2xs">
-              <span className="text-xs text-[#666666] uppercase font-mono font-bold">Pending Registrations</span>
-              <span className="text-2xl font-bold text-[#E31E24] font-mono block">
-                {registrations.filter((r) => r.status === 'pending').length}
-              </span>
-              <span className="text-[11px] text-[#666666]">Awaiting Bar Verification</span>
-            </div>
-
-            <div className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-1 shadow-2xs">
-              <span className="text-xs text-[#666666] uppercase font-mono font-bold">Active Inquiries</span>
-              <span className="text-2xl font-bold text-[#111111] font-mono block">
-                {enquiries.filter((e) => e.status === 'new').length}
-              </span>
-              <span className="text-[11px] text-[#666666]">Pro-Bono Legal Desks</span>
-            </div>
-
-            <div className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-1 shadow-2xs">
-              <span className="text-xs text-[#666666] uppercase font-mono font-bold">Published Resources</span>
-              <span className="text-2xl font-bold text-[#111111] font-mono block">{resources.length}</span>
-              <span className="text-[11px] text-[#666666]">Supreme Court & HC Dossiers</span>
-            </div>
-          </div>
-
-          <div className="p-6 bg-white border border-[#E2DDD5] rounded-xl shadow-2xs">
-            <h3 className="text-base font-bold text-[#111111] font-tamil-serif mb-4">
-              Quick Administrative Actions
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <button
-                onClick={() => setShowAddNewsModal(true)}
-                className="p-4 bg-[#FAF8F5] border border-[#E2DDD5] hover:border-[#E31E24] rounded-lg text-left transition-all group"
-              >
-                <Plus className="w-5 h-5 text-[#E31E24] mb-2" />
-                <span className="text-xs font-bold text-[#111111] block group-hover:text-[#E31E24]">Publish New Press Release</span>
-                <span className="text-[11px] text-[#666666] mt-0.5 block">
-                  Add official statement or court resolution
+        {/* ============================================================== */}
+        {/* TAB 1: TELEMETRY & OVERVIEW                                    */}
+        {/* ============================================================== */}
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            
+            {/* Top Stat Ledger Strip */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden">
+                <span className="w-1.5 h-full bg-[#E31E24] absolute top-0 left-0" />
+                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
+                  REGISTERED ADVOCATES CADRE
                 </span>
-              </button>
-
-              <button
-                onClick={() => setShowAddEventModal(true)}
-                className="p-4 bg-[#FAF8F5] border border-[#E2DDD5] hover:border-[#E31E24] rounded-lg text-left transition-all group"
-              >
-                <Calendar className="w-5 h-5 text-[#E31E24] mb-2" />
-                <span className="text-xs font-bold text-[#111111] block group-hover:text-[#E31E24]">Schedule Legal Conference</span>
-                <span className="text-[11px] text-[#666666] mt-0.5 block">
-                  Create upcoming seminar or legal clinic
+                <span className="text-3xl font-black text-neutral-900 font-english block my-1">
+                  28,500+
                 </span>
-              </button>
-
-              <button
-                onClick={() => setShowAddResourceModal(true)}
-                className="p-4 bg-[#FAF8F5] border border-[#E2DDD5] hover:border-[#E31E24] rounded-lg text-left transition-all group"
-              >
-                <BookOpen className="w-5 h-5 text-[#E31E24] mb-2" />
-                <span className="text-xs font-bold text-[#111111] block group-hover:text-[#E31E24]">Upload Legal Judgment</span>
-                <span className="text-[11px] text-[#666666] mt-0.5 block">
-                  Add Supreme Court or Madras HC dossier
+                <span className="text-[11px] text-emerald-700 font-bold font-english flex items-center gap-1">
+                  <span>●</span> 74 Party Districts Mobilized
                 </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              </div>
 
-      {/* TAB 2: ADVOCATE REGISTRATIONS REVIEW */}
-      {activeTab === 'registrations' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-              Advocate Membership Applications ({registrations.length})
-            </h3>
-            <span className="text-xs text-[#666666]">
-              Bar Council verification & admission
-            </span>
-          </div>
+              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden">
+                <span className="w-1.5 h-full bg-amber-500 absolute top-0 left-0" />
+                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
+                  PENDING CADRE VERIFICATIONS
+                </span>
+                <span className="text-3xl font-black text-[#E31E24] font-english block my-1">
+                  {registrations.filter((r) => r.status === 'pending').length}
+                </span>
+                <span className="text-[11px] text-neutral-600 font-english">
+                  Awaiting Bar Council Review
+                </span>
+              </div>
 
-          {registrations.length === 0 ? (
-            <div className="p-12 text-center text-neutral-500 bg-white border border-[#E2DDD5] rounded-xl shadow-2xs">
-              <CheckCircle className="w-8 h-8 mx-auto mb-2 text-neutral-400" />
-              <p className="font-bold text-sm text-[#111111]">No pending advocate registrations</p>
-              <p className="text-xs text-neutral-500 mt-1">Live applications submitted via the Join/Enroll portal will appear here in real-time.</p>
+              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden">
+                <span className="w-1.5 h-full bg-neutral-900 absolute top-0 left-0" />
+                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
+                  CITIZEN GRIEVANCES INTAKE
+                </span>
+                <span className="text-3xl font-black text-neutral-900 font-english block my-1">
+                  {enquiries.filter((e) => e.status === 'new').length}
+                </span>
+                <span className="text-[11px] text-neutral-600 font-english">
+                  Active Legal Aid Dispatches
+                </span>
+              </div>
+
+              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden">
+                <span className="w-1.5 h-full bg-[#E31E24] absolute top-0 left-0" />
+                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
+                  PUBLISHED LEGAL DOSSIERS
+                </span>
+                <span className="text-3xl font-black text-neutral-900 font-english block my-1">
+                  {resources.length}
+                </span>
+                <span className="text-[11px] text-neutral-600 font-english">
+                  Supreme Court & Madras HC Judgments
+                </span>
+              </div>
             </div>
-          ) : (
-            <div className="bg-white border border-[#E2DDD5] rounded-xl overflow-hidden shadow-2xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-[#333333]">
-                  <thead className="bg-[#FAF8F5] text-[#555555] uppercase font-mono border-b border-[#E2DDD5] text-[11px]">
-                    <tr>
-                      <th className="p-3.5">Name</th>
-                      <th className="p-3.5">Bar Council No.</th>
-                      <th className="p-3.5">District</th>
-                      <th className="p-3.5">Court</th>
-                      <th className="p-3.5">Contact</th>
-                      <th className="p-3.5">Status</th>
-                      <th className="p-3.5 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#EAE6DF]">
-                    {registrations.map((reg) => (
-                      <tr key={reg.id} className="hover:bg-[#FAF8F5]">
-                        <td className="p-3.5 font-bold text-[#111111]">{reg.fullName}</td>
-                        <td className="p-3.5 font-mono text-[#B81318] font-bold">{reg.barCouncilNumber}</td>
-                        <td className="p-3.5">{reg.district}</td>
-                        <td className="p-3.5">{reg.courtOfPractice}</td>
-                        <td className="p-3.5">
-                          <div className="font-mono text-[11px] font-bold">{reg.mobileNumber}</div>
-                          <div className="text-[#777777] text-[10px]">{reg.emailAddress}</div>
-                        </td>
-                        <td className="p-3.5">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                            reg.status === 'approved'
-                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                              : reg.status === 'verified'
-                              ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                              : 'bg-amber-100 text-amber-800 border border-amber-300'
+
+            {/* Split Screen: Quick Dispatches & Actions */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Left Column: Fast Secretariat Actions */}
+              <div className="lg:col-span-4 bg-white border border-neutral-300 p-6 space-y-4">
+                <div className="border-b border-neutral-200 pb-3">
+                  <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#E31E24] block">
+                    FAST ACTIONS
+                  </span>
+                  <h3 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
+                    Publish & Dispatch
+                  </h3>
+                </div>
+
+                <div className="space-y-2.5">
+                  <button
+                    onClick={() => { setShowAddNewsModal(true); }}
+                    className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
+                  >
+                    <Plus className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <span className="text-xs font-bold font-english uppercase tracking-wider block">
+                        Publish Press Statement
+                      </span>
+                      <span className="text-[11px] text-neutral-600 group-hover:text-neutral-300 block mt-0.5">
+                        Add official press release, resolution, or court update
+                      </span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => { setShowAddResourceModal(true); }}
+                    className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
+                  >
+                    <BookOpen className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <span className="text-xs font-bold font-english uppercase tracking-wider block">
+                        Upload Constitutional Judgment
+                      </span>
+                      <span className="text-[11px] text-neutral-600 group-hover:text-neutral-300 block mt-0.5">
+                        Record Supreme Court or Madras High Court filing
+                      </span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => { setShowAddEventModal(true); }}
+                    className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
+                  >
+                    <Calendar className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <span className="text-xs font-bold font-english uppercase tracking-wider block">
+                        Schedule State Conference
+                      </span>
+                      <span className="text-[11px] text-neutral-600 group-hover:text-neutral-300 block mt-0.5">
+                        Announce advocate legal workshop or seminar
+                      </span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => { setShowAddGalleryModal(true); }}
+                    className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
+                  >
+                    <Camera className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <span className="text-xs font-bold font-english uppercase tracking-wider block">
+                        Archive Press Photography
+                      </span>
+                      <span className="text-[11px] text-neutral-600 group-hover:text-neutral-300 block mt-0.5">
+                        Upload high-resolution event documentation
+                      </span>
+                    </div>
+                  </button>
+                </div>
+
+                <div className="pt-3 border-t border-neutral-200">
+                  <Link
+                    href="/"
+                    target="_blank"
+                    className="w-full py-2.5 bg-neutral-900 hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-1.5"
+                  >
+                    <span>View Live Public Portal</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-[#E31E24]" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Right Column: Database Health & Recent Feed */}
+              <div className="lg:col-span-8 space-y-6">
+                
+                {/* Database Telemetry Table */}
+                <div className="bg-white border border-neutral-300 p-6">
+                  <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-4">
+                    <div>
+                      <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#E31E24] block">
+                        INFRASTRUCTURE
+                      </span>
+                      <h3 className="text-base font-black text-neutral-950 font-dmk-headline uppercase">
+                        Server File Database Health
+                      </h3>
+                    </div>
+                    <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                      STORAGE: ATOMIC JSON
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
+                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">registrations.json</span>
+                      <span className="text-base font-bold text-neutral-900 font-mono">{registrations.length} live records</span>
+                    </div>
+                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
+                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">enquiries.json</span>
+                      <span className="text-base font-bold text-neutral-900 font-mono">{enquiries.length} live records</span>
+                    </div>
+                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
+                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">districts.json</span>
+                      <span className="text-base font-bold text-[#E31E24] font-mono">74 party units</span>
+                    </div>
+                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
+                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">news.json</span>
+                      <span className="text-base font-bold text-neutral-900 font-mono">{news.length} items</span>
+                    </div>
+                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
+                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">events.json</span>
+                      <span className="text-base font-bold text-neutral-900 font-mono">{events.length} events</span>
+                    </div>
+                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
+                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">resources.json</span>
+                      <span className="text-base font-bold text-neutral-900 font-mono">{resources.length} filings</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Unverified Registrations Alert */}
+                <div className="bg-white border border-neutral-300 p-6">
+                  <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-4">
+                    <h3 className="text-base font-black text-neutral-950 font-dmk-headline uppercase">
+                      Recent Advocate Applications Queue
+                    </h3>
+                    <button
+                      onClick={() => setActiveTab('registrations')}
+                      className="text-xs font-english font-bold text-[#E31E24] hover:underline"
+                    >
+                      View All ({registrations.length}) &rarr;
+                    </button>
+                  </div>
+
+                  {registrations.length === 0 ? (
+                    <div className="py-8 text-center bg-[#FAF8F5] border border-dashed border-neutral-300">
+                      <CheckCircle className="w-6 h-6 text-neutral-400 mx-auto mb-1" />
+                      <p className="text-xs font-bold text-neutral-700">No pending advocate registrations</p>
+                      <p className="text-[11px] text-neutral-500">Live submissions through `/contact#register` appear here instantly.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {registrations.slice(0, 3).map((reg) => (
+                        <div
+                          key={reg.id}
+                          className="p-3 bg-[#FAF8F5] border border-neutral-200 flex items-center justify-between text-xs"
+                        >
+                          <div>
+                            <span className="font-bold text-neutral-900 block">{reg.fullName}</span>
+                            <span className="text-neutral-500 font-mono text-[11px]">
+                              {reg.barCouncilNumber} • {reg.district}
+                            </span>
+                          </div>
+                          <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase ${
+                            reg.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                           }`}>
                             {reg.status}
                           </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 2: ADVOCATE CADRE APPLICATIONS                             */}
+        {/* ============================================================== */}
+        {activeTab === 'registrations' && (
+          <div className="space-y-6">
+            
+            {/* Header and Filter Controls */}
+            <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                  LEGAL CADRE DIRECTORY
+                </span>
+                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
+                  Advocate Membership Applications ({filteredRegistrations.length})
+                </h3>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                {/* Search */}
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={regSearchQuery}
+                    onChange={(e) => setRegSearchQuery(e.target.value)}
+                    placeholder="Search name, bar no, district..."
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 pl-8 pr-3 py-1.5 text-xs text-neutral-900 font-english placeholder-neutral-500 focus:outline-none focus:border-black focus:bg-white"
+                  />
+                </div>
+
+                {/* Status Filter Buttons */}
+                <div className="flex items-center border border-neutral-300 bg-[#FAF8F5] p-0.5 text-xs font-english">
+                  {(['all', 'pending', 'verified', 'approved', 'rejected'] as const).map((st) => (
+                    <button
+                      key={st}
+                      onClick={() => setRegStatusFilter(st)}
+                      className={`px-2.5 py-1 text-[11px] font-bold uppercase transition-colors cursor-pointer ${
+                        regStatusFilter === st
+                          ? 'bg-[#E31E24] text-white'
+                          : 'text-neutral-700 hover:text-black'
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Applications Table */}
+            {filteredRegistrations.length === 0 ? (
+              <div className="p-16 text-center bg-white border border-neutral-300 space-y-2">
+                <FileText className="w-10 h-10 text-neutral-400 mx-auto" />
+                <h4 className="text-base font-bold text-neutral-900 font-dmk-headline uppercase">
+                  No Advocate Applications Found
+                </h4>
+                <p className="text-xs text-neutral-600 max-w-md mx-auto font-dmk-body">
+                  {regSearchQuery || regStatusFilter !== 'all'
+                    ? 'No applications match your active search filter. Clear the search or status filter to see all records.'
+                    : 'Applications submitted by advocates via the website enrollment form will appear in this verified queue.'}
+                </p>
+              </div>
+            ) : (
+              <div className="bg-white border border-neutral-300 overflow-hidden shadow-xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-neutral-800 font-dmk-body">
+                    <thead className="bg-[#FAF8F5] text-neutral-700 uppercase font-english text-[11px] font-bold border-b border-neutral-300 tracking-wider">
+                      <tr>
+                        <th className="p-3.5">Ref / Date</th>
+                        <th className="p-3.5">Advocate Name</th>
+                        <th className="p-3.5">Bar Council Reg.</th>
+                        <th className="p-3.5">District / Practice</th>
+                        <th className="p-3.5">Contact Despatch</th>
+                        <th className="p-3.5">Specializations</th>
+                        <th className="p-3.5">Status</th>
+                        <th className="p-3.5 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-200">
+                      {filteredRegistrations.map((reg) => (
+                        <tr key={reg.id} className="hover:bg-[#FAF8F5] transition-colors">
+                          <td className="p-3.5 font-mono text-[11px] text-neutral-600">
+                            <span className="block font-bold text-neutral-900">{reg.id.slice(0, 10)}</span>
+                            <span>{new Date(reg.submittedAt).toLocaleDateString()}</span>
+                          </td>
+                          <td className="p-3.5">
+                            <strong className="text-sm text-neutral-950 font-bold block">{reg.fullName}</strong>
+                            <span className="text-[11px] text-neutral-500">Enrolled: {reg.yearOfEnrollment}</span>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="font-mono text-xs font-bold text-[#E31E24] bg-red-50 px-2 py-0.5 border border-red-200">
+                              {reg.barCouncilNumber}
+                            </span>
+                          </td>
+                          <td className="p-3.5">
+                            <strong className="block text-neutral-900 font-bold">{reg.district}</strong>
+                            <span className="text-[11px] text-neutral-600">{reg.courtOfPractice}</span>
+                          </td>
+                          <td className="p-3.5 font-english">
+                            <a href={`tel:${reg.mobileNumber}`} className="text-xs font-bold text-neutral-900 hover:text-[#E31E24] block">
+                              {reg.mobileNumber}
+                            </a>
+                            <a href={`mailto:${reg.emailAddress}`} className="text-[11px] text-neutral-600 hover:underline block truncate max-w-[160px]">
+                              {reg.emailAddress}
+                            </a>
+                          </td>
+                          <td className="p-3.5">
+                            <div className="flex flex-wrap gap-1 max-w-[180px]">
+                              {reg.areasOfSpecialization?.map((spec, i) => (
+                                <span key={i} className="text-[10px] bg-neutral-100 text-neutral-800 px-1.5 py-0.2 border border-neutral-300">
+                                  {spec}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="p-3.5">
+                            <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider border ${
+                              reg.status === 'approved'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                : reg.status === 'verified'
+                                ? 'bg-blue-50 text-blue-800 border-blue-300'
+                                : reg.status === 'rejected'
+                                ? 'bg-red-50 text-red-800 border-red-300'
+                                : 'bg-amber-50 text-amber-800 border-amber-300'
+                            }`}>
+                              {reg.status}
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-right space-x-1.5">
+                            <button
+                              onClick={() => setSelectedRegDossier(reg)}
+                              className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                            >
+                              Inspect
+                            </button>
+                            {reg.status !== 'approved' && (
+                              <button
+                                onClick={() => updateRegistrationStatus(reg.id, 'approved')}
+                                className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                              >
+                                Approve
+                              </button>
+                            )}
+                            {reg.status === 'pending' && (
+                              <button
+                                onClick={() => updateRegistrationStatus(reg.id, 'verified')}
+                                className="px-2.5 py-1 bg-blue-700 hover:bg-blue-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                              >
+                                Verify Bar
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Dossier Detail Inspection Modal */}
+            {selectedRegDossier && (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+                <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 relative shadow-2xl space-y-4">
+                  <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
+                    <div>
+                      <span className="text-[10px] font-english font-bold uppercase text-[#E31E24] tracking-widest block">
+                        ADVOCATE DOSSIER
+                      </span>
+                      <h4 className="text-xl font-black text-neutral-950 font-dmk-headline">
+                        {selectedRegDossier.fullName}
+                      </h4>
+                    </div>
+                    <button
+                      onClick={() => setSelectedRegDossier(null)}
+                      className="p-1 hover:bg-neutral-100 text-neutral-600 cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="grid grid-cols-2 gap-3 p-3 bg-[#FAF8F5] border border-neutral-200">
+                      <div>
+                        <span className="text-[10px] text-neutral-500 uppercase block font-bold">Bar Council No.</span>
+                        <strong className="text-sm font-mono text-[#E31E24]">{selectedRegDossier.barCouncilNumber}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-neutral-500 uppercase block font-bold">Enrollment Year</span>
+                        <strong className="text-sm font-english">{selectedRegDossier.yearOfEnrollment}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-neutral-500 uppercase block font-bold">District</span>
+                        <strong className="text-sm">{selectedRegDossier.district}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-neutral-500 uppercase block font-bold">Court Complex</span>
+                        <strong className="text-sm">{selectedRegDossier.courtOfPractice}</strong>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200 space-y-1">
+                      <span className="text-[10px] text-neutral-500 uppercase block font-bold">Direct Contact</span>
+                      <div className="flex items-center justify-between text-xs font-mono font-bold">
+                        <span>Phone: {selectedRegDossier.mobileNumber}</span>
+                        <span>Email: {selectedRegDossier.emailAddress}</span>
+                      </div>
+                      {selectedRegDossier.address && (
+                        <p className="text-[11px] text-neutral-600 pt-1">
+                          Chambers: {selectedRegDossier.address}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] text-neutral-500 uppercase block font-bold mb-1">Areas of Practice</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedRegDossier.areasOfSpecialization?.map((s, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-neutral-100 border border-neutral-300 text-xs">
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-neutral-200">
+                    <span className="text-xs font-mono">Status: <strong>{selectedRegDossier.status}</strong></span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          updateRegistrationStatus(selectedRegDossier.id, 'verified');
+                          setSelectedRegDossier(null);
+                        }}
+                        className="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider"
+                      >
+                        Verify Bar
+                      </button>
+                      <button
+                        onClick={() => {
+                          updateRegistrationStatus(selectedRegDossier.id, 'approved');
+                          setSelectedRegDossier(null);
+                        }}
+                        className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase tracking-wider"
+                      >
+                        Approve Cadre
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 3: CITIZEN LEGAL AID INQUIRIES                             */}
+        {/* ============================================================== */}
+        {activeTab === 'enquiries' && (
+          <div className="space-y-6">
+            
+            <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                  PUBLIC DEFENSE DESK
+                </span>
+                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
+                  Citizen Legal Grievance Inquiries ({filteredEnquiries.length})
+                </h3>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={enqSearchQuery}
+                    onChange={(e) => setEnqSearchQuery(e.target.value)}
+                    placeholder="Search citizen, district, subject..."
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 pl-8 pr-3 py-1.5 text-xs text-neutral-900 font-english placeholder-neutral-500 focus:outline-none focus:border-black focus:bg-white"
+                  />
+                </div>
+
+                <select
+                  value={enqCategoryFilter}
+                  onChange={(e) => setEnqCategoryFilter(e.target.value)}
+                  className="bg-[#FAF8F5] border border-neutral-300 px-3 py-1.5 text-xs font-english focus:outline-none"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="Legal Aid">Free Legal Aid</option>
+                  <option value="General Query">General Inquiry</option>
+                  <option value="High Court Wing">High Court Wing</option>
+                  <option value="Press / Media">Press / Media</option>
+                </select>
+              </div>
+            </div>
+
+            {filteredEnquiries.length === 0 ? (
+              <div className="p-16 text-center bg-white border border-neutral-300 space-y-2">
+                <Eye className="w-10 h-10 text-neutral-400 mx-auto" />
+                <h4 className="text-base font-bold text-neutral-900 font-dmk-headline uppercase">
+                  No Citizen Inquiries Recorded
+                </h4>
+                <p className="text-xs text-neutral-600 max-w-md mx-auto font-dmk-body">
+                  Public grievance requests submitted via the `/contact#inquiry` pro-bono assistance desk will arrive here.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredEnquiries.map((enq) => (
+                  <article
+                    key={enq.id}
+                    className="bg-white border border-neutral-300 p-5 flex flex-col justify-between space-y-4 shadow-2xs hover:border-black transition-colors"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-xs pb-2 border-b border-neutral-200 mb-2.5">
+                        <span className="font-english font-bold uppercase tracking-wider text-[#E31E24]">
+                          {enq.category}
+                        </span>
+                        <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase border ${
+                          enq.status === 'resolved'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                            : 'bg-amber-50 text-amber-800 border-amber-300'
+                        }`}>
+                          {enq.status}
+                        </span>
+                      </div>
+
+                      <h4 className="text-base font-black text-neutral-950 font-dmk-headline">
+                        {enq.subject}
+                      </h4>
+                      <p className="text-xs text-neutral-700 leading-relaxed font-dmk-body mt-2">
+                        {enq.message}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                      <div>
+                        <strong className="block text-neutral-900">{enq.name} ({enq.district})</strong>
+                        <a href={`tel:${enq.phone}`} className="font-mono text-neutral-600 hover:text-[#E31E24] font-bold">
+                          {enq.phone}
+                        </a>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {enq.status !== 'resolved' && (
+                          <button
+                            onClick={() => updateEnquiryStatus(enq.id, 'resolved')}
+                            className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                          >
+                            Mark Resolved
+                          </button>
+                        )}
+                        {enq.status === 'new' && (
+                          <button
+                            onClick={() => updateEnquiryStatus(enq.id, 'reviewed')}
+                            className="px-3 py-1 bg-blue-700 hover:bg-blue-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                          >
+                            Mark Reviewed
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 4: EDITORIAL NEWSROOM MANAGER                              */}
+        {/* ============================================================== */}
+        {activeTab === 'news' && (
+          <div className="space-y-6">
+            
+            <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                  OFFICIAL PRESS BUREAU
+                </span>
+                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
+                  Editorial Newsroom & Statements ({filteredNews.length})
+                </h3>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  onClick={() => setShowAddNewsModal(true)}
+                  className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Publish New Story</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Articles Table */}
+            <div className="bg-white border border-neutral-300 overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-neutral-800 font-dmk-body">
+                  <thead className="bg-[#FAF8F5] text-neutral-700 uppercase font-english text-[11px] font-bold border-b border-neutral-300 tracking-wider">
+                    <tr>
+                      <th className="p-3.5">Headline & Summary</th>
+                      <th className="p-3.5">Category</th>
+                      <th className="p-3.5">Date Stamp</th>
+                      <th className="p-3.5">Lead Story Status</th>
+                      <th className="p-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-200">
+                    {filteredNews.map((item) => (
+                      <tr key={item.id} className="hover:bg-[#FAF8F5] transition-colors">
+                        <td className="p-3.5 max-w-md">
+                          <div className="flex items-center gap-2">
+                            {(item.isLeadStory || item.featured) && (
+                              <span className="px-2 py-0.2 bg-[#E31E24] text-white text-[9px] font-bold uppercase font-english">
+                                LEAD
+                              </span>
+                            )}
+                            <strong className="text-sm text-neutral-950 font-bold block">{item.title[language]}</strong>
+                          </div>
+                          <p className="text-[11px] text-neutral-600 line-clamp-2 mt-1">{item.summary[language]}</p>
+                        </td>
+                        <td className="p-3.5">
+                          <span className="font-mono text-xs font-bold text-neutral-700 bg-neutral-100 px-2 py-0.5 border border-neutral-200">
+                            {item.category}
+                          </span>
+                        </td>
+                        <td className="p-3.5 font-mono text-[11px] text-neutral-600">
+                          {item.date}
+                        </td>
+                        <td className="p-3.5">
+                          {item.isLeadStory || item.featured ? (
+                            <span className="text-xs font-bold text-[#E31E24] flex items-center gap-1">
+                              <Star className="w-3.5 h-3.5 fill-current" />
+                              <span>Active Front-Page Lead</span>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setLeadStory(item.id)}
+                              className="text-[11px] font-english font-bold uppercase tracking-wider text-neutral-600 hover:text-[#E31E24] hover:underline cursor-pointer"
+                            >
+                              Set as Front-Page Lead &rarr;
+                            </button>
+                          )}
                         </td>
                         <td className="p-3.5 text-right space-x-2">
-                          {reg.status !== 'approved' && (
-                            <button
-                              onClick={() => updateRegistrationStatus(reg.id, 'approved')}
-                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold cursor-pointer"
-                            >
-                              Approve
-                            </button>
-                          )}
-                          {reg.status === 'pending' && (
-                            <button
-                              onClick={() => updateRegistrationStatus(reg.id, 'verified')}
-                              className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold cursor-pointer"
-                            >
-                              Verify Bar
-                            </button>
-                          )}
+                          <button
+                            onClick={() => deleteNews(item.id)}
+                            className="p-1.5 text-neutral-500 hover:text-[#E31E24] hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors cursor-pointer"
+                            title="Delete article"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -490,469 +1235,428 @@ export default function AdminPage() {
                 </table>
               </div>
             </div>
-          )}
-        </div>
-      )}
 
-      {/* TAB 3: CITIZEN LEGAL AID INQUIRIES */}
-      {activeTab === 'enquiries' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-              Citizen Legal Aid Inquiries ({enquiries.length})
-            </h3>
           </div>
+        )}
 
-          {enquiries.length === 0 ? (
-            <div className="p-12 text-center text-neutral-500 bg-white border border-[#E2DDD5] rounded-xl shadow-2xs">
-              <Eye className="w-8 h-8 mx-auto mb-2 text-neutral-400" />
-              <p className="font-bold text-sm text-[#111111]">No pending citizen enquiries</p>
-              <p className="text-xs text-neutral-500 mt-1">Grievances and legal aid inquiries submitted through the contact desk will appear here.</p>
+        {/* ============================================================== */}
+        {/* TAB 5: 74 DISTRICT CADRE DIRECTORY                            */}
+        {/* ============================================================== */}
+        {activeTab === 'districts' && (
+          <div className="space-y-6">
+            
+            <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                  GRASSROOTS UNITS
+                </span>
+                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
+                  Official 74 District Legal Secretariats
+                </h3>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={districtSearchQuery}
+                    onChange={(e) => setDistrictSearchQuery(e.target.value)}
+                    placeholder="Search district, organizer, phone..."
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 pl-8 pr-3 py-1.5 text-xs text-neutral-900 font-english placeholder-neutral-500 focus:outline-none focus:border-black focus:bg-white"
+                  />
+                </div>
+
+                <div className="flex items-center border border-neutral-300 bg-[#FAF8F5] p-0.5 text-xs font-english">
+                  {['All', 'Chennai', 'North', 'West', 'Central', 'South'].map((z) => (
+                    <button
+                      key={z}
+                      onClick={() => setDistrictZoneFilter(z)}
+                      className={`px-2.5 py-1 text-[11px] font-bold uppercase transition-colors cursor-pointer ${
+                        districtZoneFilter === z ? 'bg-[#E31E24] text-white' : 'text-neutral-700 hover:text-black'
+                      }`}
+                    >
+                      {z}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {enquiries.map((enq) => (
-                <div
-                  key={enq.id}
-                  className="p-5 bg-white border border-[#E2DDD5] rounded-xl space-y-3 flex flex-col justify-between shadow-2xs"
-                >
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-1.5">
-                      <span className="font-bold text-[#E31E24]">{enq.category}</span>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                        enq.status === 'resolved'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        {enq.status}
-                      </span>
-                    </div>
 
-                    <h4 className="text-base font-bold text-[#111111] font-tamil-serif">{enq.subject}</h4>
-                    <p className="text-xs text-[#444444] mt-1.5 leading-relaxed">{enq.message}</p>
+            <div className="bg-white border border-neutral-300 overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-neutral-800 font-dmk-body">
+                  <thead className="bg-[#FAF8F5] text-neutral-700 uppercase font-english text-[11px] font-bold border-b border-neutral-300 tracking-wider">
+                    <tr>
+                      <th className="p-3.5">No.</th>
+                      <th className="p-3.5">District Unit</th>
+                      <th className="p-3.5">Zone</th>
+                      <th className="p-3.5">District Organizer</th>
+                      <th className="p-3.5">Direct Contact</th>
+                      <th className="p-3.5">Court Complex</th>
+                      <th className="p-3.5 text-right">Cadre Strength</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-200">
+                    {filteredDistricts.map((d) => (
+                      <tr key={d.id} className="hover:bg-[#FAF8F5] transition-colors">
+                        <td className="p-3.5 font-mono font-bold text-[#E31E24]">
+                          #{d.number || '-'}
+                        </td>
+                        <td className="p-3.5">
+                          <strong className="text-sm font-bold text-neutral-950 block">{d.name[language]}</strong>
+                          <span className="text-[11px] text-neutral-500">{d.headquarters[language]}</span>
+                        </td>
+                        <td className="p-3.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider bg-neutral-100 text-neutral-800 px-2 py-0.5 border border-neutral-200">
+                            {d.zone}
+                          </span>
+                        </td>
+                        <td className="p-3.5">
+                          <strong className="text-xs font-bold text-neutral-900 block">{d.organizer[language]}</strong>
+                          <span className="text-[10px] text-neutral-500">DMK Legal Wing In-Charge</span>
+                        </td>
+                        <td className="p-3.5 font-english">
+                          <a href={`tel:${d.contactPhone}`} className="text-xs font-bold text-neutral-900 hover:text-[#E31E24] block">
+                            {d.contactPhone}
+                          </a>
+                          <span className="text-[10px] text-neutral-500 block truncate max-w-[150px]">{d.contactEmail}</span>
+                        </td>
+                        <td className="p-3.5 text-neutral-700 text-[11px] max-w-xs">
+                          {d.courtComplex[language]}
+                        </td>
+                        <td className="p-3.5 text-right font-mono font-bold text-neutral-900">
+                          {d.memberCount}+
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 6: LEGAL RESOURCES & ARCHIVE                               */}
+        {/* ============================================================== */}
+        {activeTab === 'resources' && (
+          <div className="space-y-6">
+            <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                  CONSTITUTIONAL JURISPRUDENCE
+                </span>
+                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
+                  Published Legal Resources ({resources.length})
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowAddResourceModal(true)}
+                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Upload Legal Resource</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {resources.map((res) => (
+                <div key={res.id} className="bg-white border border-neutral-300 p-5 flex flex-col justify-between space-y-3">
+                  <div>
+                    <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-wider block">
+                      {res.category} • {res.citation || 'Official Filing'}
+                    </span>
+                    <h4 className="text-base font-black text-neutral-950 font-dmk-headline mt-1">
+                      {res.title[language]}
+                    </h4>
+                    <p className="text-xs text-neutral-700 mt-2 leading-relaxed font-dmk-body">
+                      {res.summary[language]}
+                    </p>
                   </div>
 
-                  <div className="pt-3 border-t border-[#EAE6DF] text-xs text-[#555555] flex items-center justify-between">
-                    <div>
-                      <span className="text-[#111111] font-bold block">{enq.name} ({enq.district})</span>
-                      <span className="font-mono text-[11px]">{enq.phone}</span>
-                    </div>
-
-                    {enq.status !== 'resolved' && (
-                      <button
-                        onClick={() => updateEnquiryStatus(enq.id, 'resolved')}
-                        className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold cursor-pointer"
-                      >
-                        Mark Resolved
-                      </button>
-                    )}
+                  <div className="pt-3 border-t border-neutral-200 flex items-center justify-between text-xs">
+                    <span className="font-mono text-neutral-500">{res.date} • {res.fileSize}</span>
+                    <button
+                      onClick={() => deleteResource(res.id)}
+                      className="text-neutral-500 hover:text-[#E31E24] text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB 4: NEWS & PRESS RELEASES MANAGER */}
-      {activeTab === 'news' && (
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-                Newsroom & Press Releases ({news.length})
-              </h3>
-              <p className="text-xs text-neutral-500">
-                Manage official press releases, statements, court watch dockets, and designate the front-page lead feature.
-              </p>
-            </div>
-            <button
-              onClick={() => setShowAddNewsModal(true)}
-              className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Publish Dispatch</span>
-            </button>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {news.map((item) => {
-              const isLead = !!item.featured;
-              return (
-                <div
-                  key={item.id}
-                  className={`p-5 bg-white border rounded-xl flex flex-col justify-between shadow-2xs transition-all ${
-                    isLead ? 'border-[#E31E24] ring-2 ring-[#E31E24]/20' : 'border-[#E2DDD5]'
-                  }`}
-                >
-                  <div>
-                    {isLead && (
-                      <div className="mb-2 bg-[#FFF5F5] border border-[#E31E24] text-[#B81318] text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-[#E31E24]" />
-                        <span>ACTIVE FRONT-PAGE LEAD STORY</span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between text-xs text-[#666666] font-mono mb-2">
-                      <span className="text-[#E31E24] font-bold">{item.category}</span>
-                      <span>{item.date}</span>
-                    </div>
-                    <h4 className="text-sm font-bold text-[#111111] font-tamil-serif line-clamp-2 mb-2">
-                      {item.title[language]}
-                    </h4>
-                    <p className="text-xs text-[#555555] line-clamp-3">
-                      {item.summary[language]}
-                    </p>
-                    {item.court && (
-                      <span className="inline-block mt-2 text-[10px] bg-[#FAF8F5] text-neutral-700 px-2 py-0.5 border border-[#E2DDD5] rounded font-mono">
-                        {item.court}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="pt-3 mt-4 border-t border-[#EAE6DF] flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      {!isLead && (
-                        <button
-                          onClick={() => setLeadStory(item.id)}
-                          className="px-2 py-1 bg-[#FAF8F5] hover:bg-[#E31E24] hover:text-white text-neutral-800 text-[11px] font-bold rounded border border-[#D5CEC4] transition-colors"
-                          title="Set as front-page lead feature"
-                        >
-                          Make Lead
-                        </button>
-                      )}
-                      <a
-                        href={`/news/${item.id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-1.5 text-neutral-500 hover:text-neutral-900"
-                        title="View Live Dispatch"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </a>
-                    </div>
-                    
-                    <button
-                      onClick={() => deleteNews(item.id)}
-                      className="p-1.5 rounded hover:bg-red-50 text-red-600 hover:text-red-800 transition-colors"
-                      title="Delete Dispatch"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4.5: PRESS GALLERY MANAGER */}
-      {activeTab === 'gallery' && (
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-                Archival Press Photo Gallery ({gallery.length})
-              </h3>
-              <p className="text-xs text-neutral-500">
-                Documentary photographs from legal conferences, press briefings, and historical Dravidian movement archives.
-              </p>
-            </div>
-            <button
-              onClick={() => setShowAddGalleryModal(true)}
-              className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Photograph</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {gallery.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white border border-[#E2DDD5] rounded-xl overflow-hidden flex flex-col justify-between shadow-2xs"
-              >
-                <div className="aspect-[16/10] bg-neutral-900 relative">
-                  <img
-                    src={item.image}
-                    alt={item.title[language]}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-2 left-2 bg-[#E31E24] text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase">
-                    {item.category}
-                  </div>
-                </div>
-
-                <div className="p-4 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between text-[11px] text-neutral-500 mb-1">
-                      <span>{item.location[language]}</span>
-                      <span>{item.date}</span>
-                    </div>
-                    <h4 className="text-sm font-bold text-neutral-900 font-tamil-serif line-clamp-2">
-                      {item.title[language]}
-                    </h4>
-                    <p className="text-xs text-neutral-600 line-clamp-2 mt-1">
-                      {item.caption[language]}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-[#EAE6DF] flex items-center justify-between text-xs">
-                    <span className="text-neutral-400 text-[10px]">Archived</span>
-                    <button
-                      onClick={() => deleteGalleryItem(item.id)}
-                      className="p-1 rounded hover:bg-red-50 text-red-600 transition-colors"
-                      title="Delete photograph"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+        {/* ============================================================== */}
+        {/* TAB 7: PRESS PHOTOJOURNALISM GALLERY                           */}
+        {/* ============================================================== */}
+        {activeTab === 'gallery' && (
+          <div className="space-y-6">
+            <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                  PRESS ARCHIVE
+                </span>
+                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
+                  Press Photography Gallery ({gallery.length})
+                </h3>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 5: EVENTS MANAGER */}
-      {activeTab === 'events' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-              Conferences & Events ({events.length})
-            </h3>
-            <button
-              onClick={() => setShowAddEventModal(true)}
-              className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Schedule Event</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {events.map((evt) => (
-              <div
-                key={evt.id}
-                className="p-5 bg-white border border-[#E2DDD5] rounded-xl flex items-start justify-between gap-4 shadow-2xs"
+              <button
+                onClick={() => setShowAddGalleryModal(true)}
+                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-mono text-[#666666]">
-                    <span className="text-[#E31E24] font-bold">{evt.category}</span>
-                    <span>•</span>
-                    <span>{evt.date}</span>
-                  </div>
-                  <h4 className="text-base font-bold text-[#111111] font-tamil-serif">
-                    {evt.title[language]}
-                  </h4>
-                  <p className="text-xs text-[#555555]">
-                    {evt.venue[language]}
-                  </p>
-                </div>
+                <Plus className="w-4 h-4" />
+                <span>Upload Photograph</span>
+              </button>
+            </div>
 
-                <button
-                  onClick={() => deleteEvent(evt.id)}
-                  className="p-1.5 rounded hover:bg-red-50 text-red-600"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 6: RESOURCES MANAGER */}
-      {activeTab === 'resources' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-              Constitutional & Legal Dossiers ({resources.length})
-            </h3>
-            <button
-              onClick={() => setShowAddResourceModal(true)}
-              className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Resource Dossier</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {resources.map((res) => (
-              <div
-                key={res.id}
-                className="p-5 bg-white border border-[#E2DDD5] rounded-xl flex items-start justify-between gap-4 shadow-2xs"
-              >
-                <div className="space-y-1">
-                  <span className="text-xs font-mono text-[#E31E24] font-bold">
-                    {res.category}
-                  </span>
-                  <h4 className="text-sm font-bold text-[#111111] font-tamil-serif">
-                    {res.title[language]}
-                  </h4>
-                  {res.citation && (
-                    <span className="text-[11px] font-mono text-[#666666] block">
-                      {res.citation}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {gallery.map((img) => (
+                <div key={img.id} className="bg-white border border-neutral-300 overflow-hidden group">
+                  <div className="h-48 overflow-hidden bg-neutral-900 relative">
+                    <img src={img.image} alt={img.title.en} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <span className="absolute top-2 left-2 bg-black/80 text-white text-[10px] font-english uppercase px-2 py-0.5">
+                      {img.category}
                     </span>
-                  )}
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <h4 className="text-sm font-black text-neutral-900 font-dmk-headline">
+                      {img.title[language]}
+                    </h4>
+                    <p className="text-xs text-neutral-600 line-clamp-2">
+                      {img.caption[language]}
+                    </p>
+                    <div className="pt-2 border-t border-neutral-200 flex items-center justify-between text-xs">
+                      <span className="text-neutral-500 font-mono text-[10px]">{img.date}</span>
+                      <button
+                        onClick={() => deleteGalleryItem(img.id)}
+                        className="text-neutral-500 hover:text-[#E31E24] text-[11px] font-bold uppercase cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                <button
-                  onClick={() => deleteResource(res.id)}
-                  className="p-1.5 rounded hover:bg-red-50 text-red-600"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* MODAL: ADD NEWS / DISPATCH */}
-      {showAddNewsModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#C5BEB3] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="border-b border-[#E2DDD5] pb-2">
-              <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-                Publish Official Press Release / Dispatch
-              </h3>
-              <p className="text-xs text-neutral-500">
-                Official releases will immediately appear on the Legal Wing Editorial Newsroom.
-              </p>
+        {/* ============================================================== */}
+        {/* TAB 8: EVENTS & CONFERENCES                                    */}
+        {/* ============================================================== */}
+        {activeTab === 'events' && (
+          <div className="space-y-6">
+            <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                  ADVOCATE ADVANCEMENT
+                </span>
+                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
+                  State Conferences & Seminars ({events.length})
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowAddEventModal(true)}
+                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Schedule Conference</span>
+              </button>
             </div>
 
-            <form onSubmit={handleCreateNews} className="space-y-3 text-xs">
-              <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Headline (English) *</label>
-                <input
-                  type="text"
-                  required
-                  value={newNewsTitleEn}
-                  onChange={(e) => setNewNewsTitleEn(e.target.value)}
-                  placeholder="Supreme Court affirms State legislative supremacy..."
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                />
-              </div>
+            <div className="space-y-3">
+              {events.map((evt) => (
+                <div key={evt.id} className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-english font-bold uppercase text-[#E31E24] bg-red-50 px-2 py-0.5 border border-red-200">
+                        {evt.category}
+                      </span>
+                      <span className="text-xs font-mono text-neutral-500">{evt.date} • {evt.time}</span>
+                    </div>
+                    <h4 className="text-base font-black text-neutral-900 font-dmk-headline">
+                      {evt.title[language]}
+                    </h4>
+                    <p className="text-xs text-neutral-600 font-dmk-body">
+                      {evt.venue[language]}
+                    </p>
+                  </div>
 
-              <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Headline (Tamil)</label>
-                <input
-                  type="text"
-                  value={newNewsTitleTa}
-                  onChange={(e) => setNewNewsTitleTa(e.target.value)}
-                  placeholder="உச்ச நீதிமன்றம் வரலாற்றுத் தீர்ப்பு..."
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                />
-              </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <button
+                      onClick={() => deleteEvent(evt.id)}
+                      className="px-3 py-1.5 bg-neutral-100 hover:bg-red-50 text-neutral-700 hover:text-[#E31E24] border border-neutral-300 text-xs font-bold uppercase cursor-pointer"
+                    >
+                      Delete Event
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-              <div className="grid grid-cols-2 gap-3">
+      </main>
+
+      {/* ============================================================== */}
+      {/* MODAL: PUBLISH EDITORIAL STORY                                 */}
+      {/* ============================================================== */}
+      {showAddNewsModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white border-2 border-neutral-900 max-w-2xl w-full p-6 sm:p-8 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
+              <div>
+                <span className="text-[10px] font-english font-bold uppercase text-[#E31E24] tracking-widest block">
+                  EDITORIAL DESK
+                </span>
+                <h4 className="text-xl font-black text-neutral-950 font-dmk-headline uppercase">
+                  Publish Press Release / Statement
+                </h4>
+              </div>
+              <button onClick={() => setShowAddNewsModal(false)} className="p-1 hover:bg-neutral-100 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateNews} className="space-y-4 text-xs font-english">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Category</label>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Headline (English) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newNewsTitleEn}
+                    onChange={(e) => setNewNewsTitleEn(e.target.value)}
+                    placeholder="Enter prominent headline..."
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Headline (Tamil)</label>
+                  <input
+                    type="text"
+                    value={newNewsTitleTa}
+                    onChange={(e) => setNewNewsTitleTa(e.target.value)}
+                    placeholder="தமிழில் தலைப்பு..."
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white font-tamil-sans"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Category</label>
                   <select
                     value={newNewsCategory}
                     onChange={(e) => setNewNewsCategory(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
                   >
                     <option value="Press Release">Press Release</option>
                     <option value="Statement">Official Statement</option>
-                    <option value="Court Watch">Court Watch / Legal Developments</option>
-                    <option value="Resolution">Assembly Resolution</option>
-                    <option value="Gazette">Gazette Notification</option>
-                    <option value="Media">Media Coverage</option>
+                    <option value="Court Watch">Court Watch</option>
+                    <option value="Resolution">Resolution</option>
+                    <option value="Gazette">Gazette</option>
+                    <option value="Media">Media Report</option>
                   </select>
                 </div>
-
                 <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Document / Image</label>
-                  <select
-                    value={newNewsImage}
-                    onChange={(e) => setNewNewsImage(e.target.value)}
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                  >
-                    <option value="/images/dmk-slider-official.jpg">Official Press Conclave</option>
-                    <option value="/images/dmk-press-meet.jpg">Anna Arivalayam Briefing</option>
-                    <option value="/images/dmk-legal-conference.jpg">Advocates Assembly Hall</option>
-                    <option value="/images/dmk-campaign-stalin.jpg">Democratic Rally Photo</option>
-                    <option value="/images/dmk-flag-sun.jpg">DMK Legal Wing Emblem</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Court (Optional)</label>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Court Name (Optional)</label>
                   <input
                     type="text"
                     value={newNewsCourt}
                     onChange={(e) => setNewNewsCourt(e.target.value)}
-                    placeholder="Supreme Court of India"
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                    placeholder="e.g. Supreme Court of India"
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
                   />
                 </div>
-
                 <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Case Docket No. (Optional)</label>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Case Number (Optional)</label>
                   <input
                     type="text"
                     value={newNewsCaseNo}
                     onChange={(e) => setNewNewsCaseNo(e.target.value)}
-                    placeholder="W.P. (C) No. 1102 of 2024"
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                    placeholder="e.g. WP (C) No. 1245/2026"
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Summary (English) *</label>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Summary (English) *</label>
                 <textarea
                   rows={2}
                   required
                   value={newNewsSummaryEn}
                   onChange={(e) => setNewNewsSummaryEn(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  placeholder="Concise editorial summary..."
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Full Article Content (English)</label>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Summary (Tamil)</label>
+                <textarea
+                  rows={2}
+                  value={newNewsSummaryTa}
+                  onChange={(e) => setNewNewsSummaryTa(e.target.value)}
+                  placeholder="தமிழில் சுருக்கம்..."
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white font-tamil-sans"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Full Statement Content (English)</label>
                 <textarea
                   rows={4}
                   value={newNewsContentEn}
                   onChange={(e) => setNewNewsContentEn(e.target.value)}
-                  placeholder="Full text of the statement or court argument..."
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  placeholder="Complete text of statement / resolution..."
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
                 />
               </div>
 
-              <div className="flex items-center gap-2 p-2.5 bg-[#FFF5F5] border border-[#E31E24]/30 rounded">
+              <div>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Image URL / Asset</label>
+                <input
+                  type="text"
+                  value={newNewsImage}
+                  onChange={(e) => setNewNewsImage(e.target.value)}
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none font-mono"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200">
                 <input
                   type="checkbox"
                   id="leadStoryCheck"
                   checked={newNewsIsLead}
                   onChange={(e) => setNewNewsIsLead(e.target.checked)}
-                  className="w-4 h-4 text-[#E31E24] rounded"
+                  className="w-4 h-4 text-[#E31E24]"
                 />
                 <label htmlFor="leadStoryCheck" className="text-xs font-bold text-neutral-900 cursor-pointer">
-                  Feature as Front-Page Lead Story on Editorial Newsroom
+                  Feature this story as the Front-Page Lead Story on the Newsroom
                 </label>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2 border-t border-[#E2DDD5]">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
                 <button
                   type="button"
                   onClick={() => setShowAddNewsModal(false)}
-                  className="px-4 py-2 bg-[#FAF8F5] border border-[#E2DDD5] text-[#555555] rounded"
+                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold uppercase tracking-wider cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded font-bold uppercase"
+                  className="px-6 py-2 bg-[#E31E24] hover:bg-black text-white font-bold uppercase tracking-wider cursor-pointer transition-colors"
                 >
-                  Publish Now
+                  Publish Statement
                 </button>
               </div>
             </form>
@@ -960,39 +1664,222 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* MODAL: ADD GALLERY PHOTOGRAPH */}
-      {showAddGalleryModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#C5BEB3] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
-            <div className="border-b border-[#E2DDD5] pb-2">
-              <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-                Add Photo to Press Gallery
-              </h3>
-              <p className="text-xs text-neutral-500">
-                Upload or select an approved authentic documentary photo.
-              </p>
+      {/* ============================================================== */}
+      {/* MODAL: UPLOAD LEGAL RESOURCE                                   */}
+      {/* ============================================================== */}
+      {showAddResourceModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 sm:p-8 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
+              <h4 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
+                Upload Constitutional Judgment / Dossier
+              </h4>
+              <button onClick={() => setShowAddResourceModal(false)} className="p-1 hover:bg-neutral-100 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <form onSubmit={handleCreateGallery} className="space-y-3 text-xs">
+            <form onSubmit={handleCreateResource} className="space-y-3.5 text-xs font-english">
               <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Photo Title (English) *</label>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Document Title (English) *</label>
                 <input
                   type="text"
                   required
-                  value={newGalTitleEn}
-                  onChange={(e) => setNewGalTitleEn(e.target.value)}
-                  placeholder="State Advocates Summit 2026..."
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  value={newResTitleEn}
+                  onChange={(e) => setNewResTitleEn(e.target.value)}
+                  placeholder="e.g. 69% Reservation Ninth Schedule Compendium"
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Gallery Category</label>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Forum / Category</label>
+                  <select
+                    value={newResCategory}
+                    onChange={(e) => setNewResCategory(e.target.value as any)}
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
+                  >
+                    <option value="Supreme Court">Supreme Court</option>
+                    <option value="High Court">High Court</option>
+                    <option value="Constitution">Constitution</option>
+                    <option value="Statute">Statute</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Official Citation</label>
+                  <input
+                    type="text"
+                    value={newResCitation}
+                    onChange={(e) => setNewResCitation(e.target.value)}
+                    placeholder="e.g. 1994 SCC (Cri) 45"
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Executive Summary *</label>
+                <textarea
+                  rows={3}
+                  required
+                  value={newResSummaryEn}
+                  onChange={(e) => setNewResSummaryEn(e.target.value)}
+                  placeholder="Summary of constitutional significance..."
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
+                <button
+                  type="button"
+                  onClick={() => setShowAddResourceModal(false)}
+                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-[#E31E24] hover:bg-black text-white font-bold uppercase tracking-wider"
+                >
+                  Upload Filing
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MODAL: SCHEDULE STATE CONFERENCE                               */}
+      {/* ============================================================== */}
+      {showAddEventModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 sm:p-8 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
+              <h4 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
+                Schedule State Legal Conference
+              </h4>
+              <button onClick={() => setShowAddEventModal(false)} className="p-1 hover:bg-neutral-100 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateEvent} className="space-y-3.5 text-xs font-english">
+              <div>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Conference Title *</label>
+                <input
+                  type="text"
+                  required
+                  value={newEventTitleEn}
+                  onChange={(e) => setNewEventTitleEn(e.target.value)}
+                  placeholder="e.g. State Plenary on Federalism & Judicial Autonomy"
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Category</label>
+                  <select
+                    value={newEventCategory}
+                    onChange={(e) => setNewEventCategory(e.target.value as any)}
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
+                  >
+                    <option value="Conference">State Conference</option>
+                    <option value="Seminar">Constitutional Seminar</option>
+                    <option value="Legal Awareness">Advocate Workshop</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={newEventDate}
+                    onChange={(e) => setNewEventDate(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Venue / Complex</label>
+                <input
+                  type="text"
+                  value={newEventVenueEn}
+                  onChange={(e) => setNewEventVenueEn(e.target.value)}
+                  placeholder="e.g. Kalaignar Arangam, Anna Arivalayam, Chennai"
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Agenda / Description</label>
+                <textarea
+                  rows={3}
+                  value={newEventDescEn}
+                  onChange={(e) => setNewEventDescEn(e.target.value)}
+                  placeholder="Conference proceedings and legal discussion topics..."
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
+                <button
+                  type="button"
+                  onClick={() => setShowAddEventModal(false)}
+                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-[#E31E24] hover:bg-black text-white font-bold uppercase tracking-wider"
+                >
+                  Schedule Event
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MODAL: ARCHIVE PRESS PHOTOGRAPH                                */}
+      {/* ============================================================== */}
+      {showAddGalleryModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 sm:p-8 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
+              <h4 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
+                Archive Press Documentation Photo
+              </h4>
+              <button onClick={() => setShowAddGalleryModal(false)} className="p-1 hover:bg-neutral-100 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateGallery} className="space-y-3.5 text-xs font-english">
+              <div>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Photograph Event Title *</label>
+                <input
+                  type="text"
+                  required
+                  value={newGalTitleEn}
+                  onChange={(e) => setNewGalTitleEn(e.target.value)}
+                  placeholder="e.g. Legal Wing State Executive Briefing"
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Archive Album</label>
                   <select
                     value={newGalCategory}
                     onChange={(e) => setNewGalCategory(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
                   >
                     <option value="Press Conferences">Press Conferences</option>
                     <option value="Legal Wing Events">Legal Wing Events</option>
@@ -1001,210 +1888,52 @@ export default function AdminPage() {
                     <option value="Historical Archive">Historical Archive</option>
                   </select>
                 </div>
-
                 <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Photo Asset</label>
-                  <select
-                    value={newGalImage}
-                    onChange={(e) => setNewGalImage(e.target.value)}
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                  >
-                    <option value="/images/dmk-press-meet.jpg">Press Briefing</option>
-                    <option value="/images/dmk-slider-official.jpg">State Conference Hall</option>
-                    <option value="/images/dmk-legal-conference.jpg">Madras High Court Session</option>
-                    <option value="/images/dmk-campaign-stalin.jpg">Public Rally & Conclave</option>
-                    <option value="/images/dmk-four-leaders.jpg">Historical Leaders Roll</option>
-                  </select>
+                  <label className="font-bold text-neutral-800 uppercase block mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={newGalLocationEn}
+                    onChange={(e) => setNewGalLocationEn(e.target.value)}
+                    placeholder="e.g. High Court Campus, Chennai"
+                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
+                  />
                 </div>
               </div>
 
               <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Location (English)</label>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Image URL / Path</label>
                 <input
                   type="text"
-                  value={newGalLocationEn}
-                  onChange={(e) => setNewGalLocationEn(e.target.value)}
-                  placeholder="Kalaignar Arangam, Chennai"
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  value={newGalImage}
+                  onChange={(e) => setNewGalImage(e.target.value)}
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none font-mono"
                 />
               </div>
 
               <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Caption / Description</label>
+                <label className="font-bold text-neutral-800 uppercase block mb-1">Documentary Caption</label>
                 <textarea
                   rows={2}
                   value={newGalCaptionEn}
                   onChange={(e) => setNewGalCaptionEn(e.target.value)}
-                  placeholder="Documentary caption describing the assembly..."
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
+                  placeholder="Official archival event description..."
+                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-2 border-t border-[#E2DDD5]">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
                 <button
                   type="button"
                   onClick={() => setShowAddGalleryModal(false)}
-                  className="px-4 py-2 bg-[#FAF8F5] border border-[#E2DDD5] text-[#555555] rounded"
+                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold uppercase tracking-wider"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded font-bold uppercase"
+                  className="px-6 py-2 bg-[#E31E24] hover:bg-black text-white font-bold uppercase tracking-wider"
                 >
-                  Add Photo
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: ADD EVENT */}
-      {showAddEventModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#C5BEB3] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
-            <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-              Schedule New Conference / Event
-            </h3>
-            <form onSubmit={handleCreateEvent} className="space-y-3 text-xs">
-              <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Event Title (English) *</label>
-                <input
-                  type="text"
-                  required
-                  value={newEventTitleEn}
-                  onChange={(e) => setNewEventTitleEn(e.target.value)}
-                  placeholder="State Advocates Summit 2026..."
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Category</label>
-                  <select
-                    value={newEventCategory}
-                    onChange={(e) => setNewEventCategory(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                  >
-                    <option value="Conference">State Conference</option>
-                    <option value="Seminar">Constitutional Seminar</option>
-                    <option value="Legal Awareness">Pro-Bono Legal Clinic</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Date</label>
-                  <input
-                    type="date"
-                    value={newEventDate}
-                    onChange={(e) => setNewEventDate(e.target.value)}
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Venue</label>
-                <input
-                  type="text"
-                  value={newEventVenueEn}
-                  onChange={(e) => setNewEventVenueEn(e.target.value)}
-                  placeholder="Kalaignar Arangam, Anna Arivalayam, Chennai"
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                />
-              </div>
-
-              <div className="pt-2 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddEventModal(false)}
-                  className="px-4 py-2 bg-[#FAF8F5] border border-[#E2DDD5] text-[#555555] rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded font-bold uppercase"
-                >
-                  Save Event
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: ADD RESOURCE */}
-      {showAddResourceModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#C5BEB3] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
-            <h3 className="text-lg font-bold text-[#111111] font-tamil-serif">
-              Upload Legal Resource / Judgment
-            </h3>
-            <form onSubmit={handleCreateResource} className="space-y-3 text-xs">
-              <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Title (English) *</label>
-                <input
-                  type="text"
-                  required
-                  value={newResTitleEn}
-                  onChange={(e) => setNewResTitleEn(e.target.value)}
-                  placeholder="Supreme Court Ruling on Federal Quotas..."
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Category</label>
-                  <select
-                    value={newResCategory}
-                    onChange={(e) => setNewResCategory(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                  >
-                    <option value="Supreme Court">Supreme Court of India</option>
-                    <option value="High Court">Madras High Court</option>
-                    <option value="Constitution">Constitutional Report</option>
-                    <option value="Statute">State Statute</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[#333333] block mb-1 font-semibold">Citation (Optional)</label>
-                  <input
-                    type="text"
-                    value={newResCitation}
-                    onChange={(e) => setNewResCitation(e.target.value)}
-                    placeholder="AIR 2024 SC 1120"
-                    className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111] font-mono"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[#333333] block mb-1 font-semibold">Executive Summary *</label>
-                <textarea
-                  rows={3}
-                  required
-                  value={newResSummaryEn}
-                  onChange={(e) => setNewResSummaryEn(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-[#D5CEC4] rounded p-2 text-[#111111]"
-                />
-              </div>
-
-              <div className="pt-2 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddResourceModal(false)}
-                  className="px-4 py-2 bg-[#FAF8F5] border border-[#E2DDD5] text-[#555555] rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#E31E24] hover:bg-[#B81318] text-white rounded font-bold uppercase"
-                >
-                  Upload Dossier
+                  Save Photo
                 </button>
               </div>
             </form>

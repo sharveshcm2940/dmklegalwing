@@ -3,6 +3,7 @@
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { OrgChart } from '@/components/OrgChart';
+import { TamilNaduMap } from '@/components/TamilNaduMap';
 import { Award, Layers, Users } from 'lucide-react';
 
 export default function StructurePage() {
@@ -91,6 +92,11 @@ export default function StructurePage() {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* 4. Tamil Nadu 74 District Organizational Structure & Map */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <TamilNaduMap />
       </section>
 
     </div>
