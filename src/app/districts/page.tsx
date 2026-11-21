@@ -39,7 +39,7 @@ export default function DistrictsPage() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
-                  {language === 'ta' ? 'மாவட்ட வழக்கறிஞர் அணிகள்' : '38 DISTRICT UNITS'}
+                  {language === 'ta' ? '74 அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள்' : '74 DISTRICT UNITS'}
                 </span>
                 <span className="text-xs font-english text-[#E31E24] font-bold">
                   GRASSROOTS DEFENSE NETWORK
@@ -47,13 +47,13 @@ export default function DistrictsPage() {
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-[#111111] font-dmk-headline tracking-tight uppercase leading-none">
                 {language === 'ta'
-                  ? 'தமிழ்நாடு 38 மாவட்ட வழக்கறிஞர் அணிகள்'
-                  : '38 District Legal Wing Directory'}
+                  ? 'தமிழ்நாடு & புதுச்சேரி 74 மாவட்ட வழக்கறிஞர் அணிகள்'
+                  : '74 District Legal Wing Directory'}
               </h1>
             </div>
             <div className="mt-4 md:mt-0 text-left md:text-right font-english text-[11px] text-neutral-600">
               <p className="font-bold text-[#111111]">COURT SESSIONS DIRECTORY</p>
-              <p>Principal District & Munsif Courts Network</p>
+              <p>74 Party Secretariats & Subordinate Court Network</p>
             </div>
           </div>
 
@@ -61,17 +61,17 @@ export default function DistrictsPage() {
             <div className="lg:col-span-8">
               <p className="text-base sm:text-lg text-neutral-800 leading-relaxed font-dmk-body">
                 {language === 'ta'
-                  ? 'சென்னை உயர் நீதிமன்ற முதன்மை அமர்வு முதல் கன்னியாகுமரி மாவட்ட முதன்மை அமர்வு நீதிமன்றம் வரை பரந்து விரிந்த 38 மாவட்ட வழக்கறிஞர் அணிகள், பொறுப்பாளர்கள் மற்றும் நீதிமன்ற வளாகங்களின் ஒருங்கிணைந்த பட்டியல்.'
-                  : 'From the Madras High Court to subordinate district courts across Tamil Nadu, our verified district coordinators champion citizen legal aid, grassroots defense, and social justice constitutional representation.'}
+                  ? 'சென்னை உயர் நீதிமன்றம், மதுரை கிளை, புதுச்சேரி, காரைக்கால் மற்றும் தமிழகத்தின் அனைத்து அமர்வு நீதிமன்றப் பிரிவுகளையும் உள்ளடக்கிய 74 அமைப்பு மாவட்ட வழக்கறிஞர் அணி அமைப்பாளர்கள், தொலைபேசி எண்கள் மற்றும் நீதிமன்ற வளாகங்களின் அதிகாரப்பூர்வ பட்டியல்.'
+                  : 'Covering 74 party organizational districts across Tamil Nadu and Puducherry, connecting trial court secretariats, official district organizers, and grassroots pro-bono defense networks.'}
               </p>
             </div>
             <div className="lg:col-span-4 bg-[#FAF7F2] border border-neutral-300 p-4">
               <div className="flex items-center justify-between font-english text-xs text-neutral-700 pb-2 border-b border-neutral-300">
                 <span>DISTRICT CADRE</span>
-                <span className="font-bold text-[#E31E24]">38 SESSIONS WINGS</span>
+                <span className="font-bold text-[#E31E24]">74 DISTRICT UNITS</span>
               </div>
               <p className="text-xs text-neutral-600 mt-2 font-english">
-                Grassroots defense clinics active across all revenue districts.
+                Verified district coordinators active across all 74 organizational divisions.
               </p>
             </div>
           </div>
@@ -136,15 +136,22 @@ export default function DistrictsPage() {
             >
               <div>
                 <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                  <div>
-                    <span className="text-[10px] font-english text-[#E31E24] uppercase tracking-wider block font-bold">
-                      {d.zone} ZONE
-                    </span>
-                    <h4 className="text-xl font-black text-[#111111] font-dmk-headline">
-                      {d.name[language]}
-                    </h4>
+                  <div className="flex items-start gap-2.5">
+                    {d.number && (
+                      <span className="w-7 h-7 rounded-full bg-[#E31E24] text-white flex items-center justify-center text-xs font-english font-black shrink-0 mt-0.5">
+                        {d.number}
+                      </span>
+                    )}
+                    <div>
+                      <span className="text-[10px] font-english text-[#E31E24] uppercase tracking-wider block font-bold">
+                        {d.zone} ZONE
+                      </span>
+                      <h4 className="text-xl font-black text-[#111111] font-dmk-headline">
+                        {d.name[language]}
+                      </h4>
+                    </div>
                   </div>
-                  <div className="text-right bg-[#FAF7F2] border border-neutral-300 px-2 py-1">
+                  <div className="text-right bg-[#FAF7F2] border border-neutral-300 px-2 py-1 shrink-0">
                     <span className="text-base font-black text-[#111111] font-english block leading-none">
                       {d.memberCount.toLocaleString()}+
                     </span>

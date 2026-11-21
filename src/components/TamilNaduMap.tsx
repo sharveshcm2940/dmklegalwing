@@ -57,7 +57,10 @@ export const TamilNaduMap: React.FC = () => {
   const [activeZone, setActiveZone] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const selectedDistrict = districts.find((d) => d.id === selectedDistrictId) || districts[0];
+  const selectedDistrict = 
+    districts.find((d) => d.id === selectedDistrictId) || 
+    districts.find((d) => d.id.startsWith(selectedDistrictId)) || 
+    districts[0];
 
   const filteredDistricts = districts.filter((d) => {
     const matchesZone = activeZone === 'All' || d.zone === activeZone;
@@ -167,7 +170,7 @@ export const TamilNaduMap: React.FC = () => {
 
               {/* District Nodes */}
               {DISTRICT_COORDINATES.map((d) => {
-                const isSelected = selectedDistrictId === d.id;
+                const isSelected = selectedDistrict.id === d.id || selectedDistrict.id.startsWith(d.id);
                 const isChennaiOrMadurai = d.id === 'chennai' || d.id === 'madurai';
 
                 return (
@@ -246,9 +249,16 @@ export const TamilNaduMap: React.FC = () => {
             {/* District Header Plate */}
             <div className="flex items-start justify-between border-b border-neutral-300 pb-4 mb-4">
               <div>
-                <span className="text-[10px] font-english font-bold text-[#E31E24] tracking-widest uppercase block">
-                  {selectedDistrict.zone} {language === 'ta' ? 'மண்டலப் பிரிவு' : 'ZONE JURISDICTION'}
-                </span>
+                <div className="flex items-center gap-2 mb-1">
+                  {selectedDistrict.number && (
+                    <span className="w-6 h-6 rounded-full bg-[#E31E24] text-white flex items-center justify-center text-[10px] font-english font-black">
+                      {selectedDistrict.number}
+                    </span>
+                  )}
+                  <span className="text-[10px] font-english font-bold text-[#E31E24] tracking-widest uppercase block">
+                    {selectedDistrict.zone} {language === 'ta' ? 'மண்டலப் பிரிவு' : 'ZONE JURISDICTION'}
+                  </span>
+                </div>
                 <h4 className="text-2xl sm:text-3xl font-black text-[#111111] font-dmk-headline leading-tight mt-0.5">
                   {selectedDistrict.name[language]}
                 </h4>
@@ -360,18 +370,19 @@ export const TamilNaduMap: React.FC = () => {
             <span className="font-mono text-[10px] uppercase font-bold text-neutral-700 block mb-1.5">
               {language === 'ta' ? 'விரைவு மாவட்டத் தேர்வு:' : 'QUICK DISTRICT SELECTOR:'}
             </span>
-            <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
+            <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto pr-1">
               {filteredDistricts.map((d) => (
                 <button
                   key={d.id}
                   onClick={() => setSelectedDistrictId(d.id)}
-                  className={`px-2 py-0.5 text-[11px] font-mono font-semibold border transition-all ${
-                    selectedDistrictId === d.id
+                  className={`px-2 py-0.5 text-[11px] font-mono font-semibold border transition-all flex items-center gap-1 ${
+                    selectedDistrict.id === d.id
                       ? 'bg-[#E31E24] text-white border-neutral-900 font-bold'
                       : 'bg-[#FAF7F2] text-neutral-800 border-neutral-300 hover:border-neutral-900'
                   }`}
                 >
-                  {d.name[language]}
+                  {d.number && <span className="opacity-70 text-[9px]">#{d.number}</span>}
+                  <span>{d.name[language]}</span>
                 </button>
               ))}
             </div>

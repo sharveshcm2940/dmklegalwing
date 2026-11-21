@@ -20,6 +20,7 @@ export interface Leader {
 
 export interface DistrictInfo {
   id: string;
+  number?: number;
   name: { en: string; ta: string };
   headquarters: { en: string; ta: string };
   zone: 'North' | 'South' | 'West' | 'Central' | 'Chennai';

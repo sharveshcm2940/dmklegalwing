@@ -54,13 +54,13 @@ export default function HomePage() {
 
             <div className="p-4 sm:p-5">
               <span className="text-[11px] font-english font-bold uppercase text-neutral-400 tracking-widest block">
-                {language === 'ta' ? 'மாவட்ட நீதிமன்றக் கட்டமைப்பு' : 'DISTRICT JURISDICTIONS'}
+                {language === 'ta' ? 'அமைப்பு மாவட்டக் கட்டமைப்பு' : 'DISTRICT JURISDICTIONS'}
               </span>
               <span className="text-3xl sm:text-4xl lg:text-5xl font-black font-english text-[#E31E24] block my-1 tracking-tight">
-                38 / 38
+                74 / 74
               </span>
               <span className="text-xs text-neutral-300 font-dmk-body block">
-                {language === 'ta' ? 'அனைத்து மாவட்ட அமர்வு நீதிமன்றங்கள்' : 'Active Units in All Sessions Courts'}
+                {language === 'ta' ? 'அனைத்து அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள்' : 'Active Units in All 74 Party Districts'}
               </span>
             </div>
 

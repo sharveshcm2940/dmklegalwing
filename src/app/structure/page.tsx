@@ -31,8 +31,8 @@ export default function StructurePage() {
 
             <p className="text-sm sm:text-base text-neutral-700 leading-relaxed font-english border-l-4 border-[#E31E24] pl-4 py-1">
               {language === 'ta'
-                ? 'மாநில தலைமைச் செயலகம் முதல் 38 மாவட்ட நீதிமன்ற வழக்கறிஞர் பிரிவுகள் வரை இயங்கும் முழுமையான ஜனநாயகப் படிநிலை அமைப்பு.'
-                : 'A structured constitutional vanguard operating from the Apex State Secretariat to 38 District Court units across Tamil Nadu and Puducherry.'}
+                ? 'மாநில தலைமைச் செயலகம் முதல் 74 அமைப்பு மாவட்ட நீதிமன்ற வழக்கறிஞர் பிரிவுகள் வரை இயங்கும் முழுமையான ஜனநாயகப் படிநிலை அமைப்பு.'
+                : 'A structured constitutional vanguard operating from the Apex State Secretariat to 74 District Court units across Tamil Nadu and Puducherry.'}
             </p>
           </div>
         </div>
@@ -82,12 +82,12 @@ export default function StructurePage() {
               <Users className="w-5 h-5 text-[#E31E24]" />
             </div>
             <h4 className="text-lg font-bold text-neutral-900 font-dmk-headline">
-              {language === 'ta' ? 'மாவட்ட வழக்கறிஞர் அணிகள்' : '38 District Court Bar Wings'}
+              {language === 'ta' ? '74 அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள்' : '74 District Legal Wings'}
             </h4>
             <p className="text-xs text-neutral-700 leading-relaxed font-dmk-body">
               {language === 'ta'
-                ? 'மாவட்ட அமைப்பாளர்கள் மூலம் அடிமட்ட வழக்கறிஞர்களை ஒருங்கிணைத்து, கீழமை நீதிமன்றங்களில் எளிய மக்களுக்கான சட்டப் பாதுகாப்பை வழங்குகிறது.'
-                : 'Empowering grassroots trial lawyers across all 38 districts to provide immediate legal defense and rights protection.'}
+                ? '74 மாவட்ட அமைப்பாளர்கள் மூலம் அடிமட்ட வழக்கறிஞர்களை ஒருங்கிணைத்து, கீழமை நீதிமன்றங்களில் எளிய மக்களுக்கான சட்டப் பாதுகாப்பை வழங்குகிறது.'
+                : 'Empowering grassroots trial lawyers across all 74 party districts to provide immediate legal defense and rights protection.'}
             </p>
           </div>
         </div>

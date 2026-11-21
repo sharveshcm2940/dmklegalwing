@@ -76,7 +76,7 @@ export const TRANSLATIONS = {
     districtsPreview: {
       tag: 'GRASSROOTS REACH',
       title: 'Present in Every District & Court Complex',
-      subtitle: 'Interactive directory of 38 Tamil Nadu districts, connecting over 28,500 active advocates.',
+      subtitle: 'Interactive directory of 74 organisational districts across Tamil Nadu and Puducherry, connecting over 28,500 active advocates.',
       exploreMap: 'Open Interactive District Map'
     },
     // CTA
@@ -194,7 +194,7 @@ export const TRANSLATIONS = {
     districtsPreview: {
       tag: 'களக் கட்டமைப்பு',
       title: 'அனைத்து மாவட்ட நீதிமன்ற வளாகங்களிலும் நமது குரல்',
-      subtitle: '38 மாவட்டங்களிலும் 28,500-க்கும் மேற்பட்ட வழக்கறிஞர்களை ஒருங்கிணைக்கும் விரிவான கட்டமைப்பு.',
+      subtitle: '74 அமைப்பு மாவட்டங்களிலும் 28,500-க்கும் மேற்பட்ட வழக்கறிஞர்களை ஒருங்கிணைக்கும் விரிவான கட்டமைப்பு.',
       exploreMap: 'மாவட்ட வரைபடத்தைப் பார்க்க'
     },
     // CTA
