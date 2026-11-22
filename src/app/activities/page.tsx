@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { EventItem } from '@/types';
+import { PageTitleBand } from '@/components/PageTitleBand';
 
 const TA_MONTHS = [
   'ஜனவரி', 'பிப்ரவரி', 'மார்ச்', 'ஏப்ரல்', 'மே', 'ஜூன்',
@@ -200,16 +201,26 @@ export default function ActivitiesPage() {
 
   return (
     <div className="w-full min-h-screen bg-[#FAF8F5] text-[#111111] font-catamaran text-[18px] leading-[1.75] pb-24">
-      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12">
+      {/* Universal Page Title Band */}
+      <PageTitleBand
+        title={language === 'ta' ? 'நிகழ்வுகள் & மாநாடுகள்' : 'Conferences and events'}
+        description={
+          language === 'ta'
+            ? 'கழக வழக்கறிஞர் அணியின் மாநில மாநாடுகள், கருத்தரங்குகள், சட்டப் பயிற்சிப் பட்டறைகள் மற்றும் களப்பணிகள்.'
+            : 'Official agenda of state conferences, legal seminars, workshops, and commemorative sessions.'
+        }
+      />
+
+      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-10">
         {/* ========================================================== */}
         {/* 1. HEADING ROW & FILTERS                                   */}
         {/* ========================================================== */}
         <header className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-2">
-            {/* Title: Kavivanar at clamp(44px, 6vw, 80px) */}
-            <h1 className="font-kavivanar font-normal text-[clamp(44px,6vw,80px)] text-[#111111] leading-none">
-              {language === 'ta' ? 'நிகழ்வுகள்' : 'Conferences and events'}
-            </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#3d3633]/20">
+            {/* Slogan / Subhead */}
+            <span className="font-helvetica font-extrabold text-[14px] uppercase text-[#C41A1F] tracking-normal">
+              {language === 'ta' ? 'கழக நிகழ்வு அட்டவணை' : 'Official Wing Calendar'}
+            </span>
 
             {/* Right: Text buttons "List" and "Month" (Active underlined in red) */}
             <div className="flex items-center gap-6 shrink-0">
@@ -218,8 +229,8 @@ export default function ActivitiesPage() {
                 onClick={() => setActiveView('list')}
                 className={`min-h-[44px] h-[44px] inline-flex items-center font-helvetica font-extrabold text-[17px] cursor-pointer transition-colors ${
                   activeView === 'list'
-                    ? 'text-[#111111] border-b-2 border-[#E31E24]'
-                    : 'text-[#5B5348] hover:text-[#111111] border-b-2 border-transparent'
+                    ? 'text-[#111111] border-b-[3px] border-[#E31E24]'
+                    : 'text-[#5B5348] hover:text-[#111111] border-b-[3px] border-transparent'
                 }`}
               >
                 {language === 'ta' ? 'பட்டியல்' : 'List'}
@@ -229,8 +240,8 @@ export default function ActivitiesPage() {
                 onClick={() => setActiveView('month')}
                 className={`min-h-[44px] h-[44px] inline-flex items-center font-helvetica font-extrabold text-[17px] cursor-pointer transition-colors ${
                   activeView === 'month'
-                    ? 'text-[#111111] border-b-2 border-[#E31E24]'
-                    : 'text-[#5B5348] hover:text-[#111111] border-b-2 border-transparent'
+                    ? 'text-[#111111] border-b-[3px] border-[#E31E24]'
+                    : 'text-[#5B5348] hover:text-[#111111] border-b-[3px] border-transparent'
                 }`}
               >
                 {language === 'ta' ? 'மாதம்' : 'Month'}
@@ -414,25 +425,25 @@ export default function ActivitiesPage() {
                                 </p>
                               )}
 
-                              {/* Actions: Details text link & red rectangular Register button */}
-                              <div className="pt-2 flex flex-wrap items-center gap-6">
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedEvent(event)}
-                                  className="min-h-[44px] inline-flex items-center font-helvetica font-bold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
-                                >
-                                  {language === 'ta' ? 'விவரங்கள்' : 'Details'}
-                                </button>
-
-                                {event.status === 'upcoming' && (
-                                  <Link
-                                    href="/enrol"
-                                    className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer"
+                                {/* Actions: Details text link & red rectangular Register button */}
+                                <div className="pt-2 flex flex-wrap items-center gap-6">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedEvent(event)}
+                                    className="min-h-[44px] inline-flex items-center font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
                                   >
-                                    {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
-                                  </Link>
-                                )}
-                              </div>
+                                    {language === 'ta' ? 'விவரங்கள் →' : 'Details →'}
+                                  </button>
+
+                                  {event.status === 'upcoming' && (
+                                    <Link
+                                      href="/enrol"
+                                      className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer btn-lift"
+                                    >
+                                      {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
+                                    </Link>
+                                  )}
+                                </div>
                             </div>
                           </div>
                         </article>
@@ -581,14 +592,14 @@ export default function ActivitiesPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedEvent(ev)}
-                            className="min-h-[44px] inline-flex items-center font-helvetica font-bold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
+                            className="min-h-[44px] inline-flex items-center font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
                           >
-                            {language === 'ta' ? 'விவரங்கள்' : 'Details'}
+                            {language === 'ta' ? 'விவரங்கள் →' : 'Details →'}
                           </button>
                           {ev.status === 'upcoming' && (
                             <Link
                               href="/enrol"
-                              className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer"
+                              className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer btn-lift"
                             >
                               {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
                             </Link>
