@@ -922,7 +922,7 @@ export default function AdminConsolePage() {
                         setTickedAppIds([]);
                         fetchAllData();
                       }}
-                      className="px-2.5 py-1 bg-white text-[#111111] font-extrabold hover:bg-gray-200 cursor-pointer"
+                      className="px-2.5 py-1 bg-white text-[#111111] font-extrabold hover:bg-[#f1ece2] cursor-pointer"
                     >
                       Bulk Approve
                     </button>
@@ -946,7 +946,7 @@ export default function AdminConsolePage() {
                     <button
                       type="button"
                       onClick={() => setTickedAppIds([])}
-                      className="text-gray-300 underline text-xs cursor-pointer"
+                      className="text-[#d8cfc2] underline text-xs cursor-pointer"
                     >
                       Clear
                     </button>
