@@ -272,3 +272,12 @@ export async function deleteResource(id: string): Promise<boolean> {
 export async function getDistricts(): Promise<DistrictInfo[]> {
   return readTable<DistrictInfo[]>('districts.json', () => TAMIL_NADU_DISTRICTS);
 }
+
+export async function updateDistrict(id: string, updates: Partial<DistrictInfo>): Promise<DistrictInfo | null> {
+  const list = await getDistricts();
+  const index = list.findIndex((d) => d.id === id);
+  if (index === -1) return null;
+  list[index] = { ...list[index], ...updates };
+  await writeTable('districts.json', list);
+  return list[index];
+}

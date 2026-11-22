@@ -31,6 +31,7 @@ export interface DistrictInfo {
   courtComplex: { en: string; ta: string };
   memberCount: number;
   activeCasesAssisted: number;
+  showPhonePublicly?: boolean;
 }
 
 export interface HistoricalMilestone {

@@ -88,15 +88,9 @@ export const TamilNaduMap: React.FC = () => {
         }}
       />
 
-      {/* 1. TOP HEADER BAR: "District Structure" + "View More ↗" Button (Matching Image 3) */}
+      {/* 1. TOP HEADER BAR: "District Structure" + "View More ↗" Button */}
       <div className="flex items-center justify-between pb-6 mb-6 border-b border-white/20 relative z-10">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 bg-[#C41A1F] inline-block" />
-            <span className="text-[11px] font-english font-bold uppercase tracking-[0.2em] text-[#FAF8F5]">
-              {language === 'ta' ? 'அமைப்பு மாவட்டக் கட்டமைப்பு' : 'ORGANISATIONAL DIRECTORY'}
-            </span>
-          </div>
           <h2 className="text-3xl sm:text-5xl font-black text-white font-dmk-headline tracking-tight uppercase">
             {language === 'ta' ? 'மாவட்டக் கட்டமைப்பு' : 'District Structure'}
           </h2>
@@ -107,14 +101,21 @@ export const TamilNaduMap: React.FC = () => {
           </p>
         </div>
 
-        {/* "View More ↗" Button */}
+        {/* "View More ↗" Button (Rectangular red button, 2px radius, min 44px tall) */}
         <button
           onClick={() => setShowFullDirectoryModal(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FAF8F5] hover:bg-white text-[#111111] text-xs sm:text-sm font-english font-black uppercase tracking-wider transition-all shadow-xs shrink-0 cursor-pointer rounded-[2px]"
+          className="min-h-[44px] inline-flex items-center gap-2 px-5 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs sm:text-sm font-dmk-body font-bold uppercase tracking-wider transition-all shadow-xs shrink-0 cursor-pointer rounded-[2px]"
         >
           <span>{language === 'ta' ? 'அனைத்து 74 மாவட்டங்கள்' : 'View More'}</span>
           <span className="text-base leading-none">↗</span>
         </button>
+      </div>
+
+      {/* Explanatory Line: 38 Administrative Districts vs 74 Party Units */}
+      <div className="mb-4 px-4 py-2.5 bg-[#630003] border border-white/20 text-xs text-white/90 font-dmk-body rounded-[2px] relative z-10">
+        {language === 'ta'
+          ? 'இவ்வரைபடம் தமிழ்நாட்டின் 38 வருவாய் மாவட்டங்களையும், 74 அமைப்புப் பிரிவுகளையும் காட்டுவதால், ஒரு மாவட்டத்தைத் தேர்வு செய்யும் போது இரண்டு அல்லது அதற்கு மேற்பட்ட அமைப்பாளர்கள் தோன்றலாம்.'
+          : 'The map has 38 administrative districts and 74 party units, so selecting a district can show two organisers.'}
       </div>
 
       {/* 2. MAIN 2-COLUMN SPLIT (Real Map & Inset on Left, Leader Banner & Units on Right) */}
@@ -140,15 +141,24 @@ export const TamilNaduMap: React.FC = () => {
                   <path
                     key={dist.code}
                     d={dist.path}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`${dist.name.en} (${dist.name.ta}) district`}
                     onClick={() => setSelectedCode(dist.code)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedCode(dist.code);
+                      }
+                    }}
                     onMouseEnter={() => setHoveredCode(dist.code)}
                     onMouseLeave={() => setHoveredCode(null)}
-                    fill={isSelected ? '#FCE8E8' : isHovered ? '#FAF8F5' : '#FFFFFF'}
-                    stroke={isSelected ? '#C41A1F' : '#8A0005'}
-                    strokeWidth={isSelected ? '2' : '0.8'}
+                    fill={isSelected ? '#FCE8E8' : isHovered ? '#FCE8E8' : '#FFFFFF'}
+                    stroke={isSelected ? '#C41A1F' : isHovered ? '#111111' : '#8A0005'}
+                    strokeWidth={isSelected ? '2' : isHovered ? '2' : '0.8'}
                     strokeLinejoin="round"
                     strokeLinecap="round"
-                    className="cursor-pointer transition-colors duration-150"
+                    className="cursor-pointer transition-colors duration-150 focus:outline-none focus:stroke-[#111111]"
                   >
                     <title>{dist.name.en} ({dist.name.ta})</title>
                   </path>
@@ -159,11 +169,11 @@ export const TamilNaduMap: React.FC = () => {
 
           {/* Inset Box showing Zoomed District Outline */}
           <div className="w-full md:w-2/5 flex flex-col items-center justify-center p-4 bg-[#630003] border-2 border-white/40 shadow-xl rounded-[2px]">
-            <span className="text-sm font-english font-black uppercase tracking-wider text-[#FAF8F5] text-center mb-0.5">
+            <span className="text-sm font-dmk-headline font-bold text-[#FAF8F5] text-center mb-0.5">
               {activeAdminDistrict.name[language]}
             </span>
-            <span className="text-[10px] text-white/70 font-mono tracking-wider uppercase mb-2">
-              {language === 'ta' ? 'அமைப்பு எல்லைப் பார்வை' : 'DISTRICT INSET'}
+            <span className="text-xs text-white/80 font-dmk-body mb-2">
+              {language === 'ta' ? 'அமைப்பு எல்லைப் பார்வை' : 'District boundary inset'}
             </span>
             
             {/* Zoomed authentic SVG contour of that exact district */}
@@ -183,11 +193,11 @@ export const TamilNaduMap: React.FC = () => {
               </svg>
             </div>
 
-            <div className="mt-2 text-center text-[11px] text-white/90 font-english space-y-1">
-              <span className="inline-block px-3 py-1 bg-[#FAF8F5] text-[#111111] font-bold uppercase tracking-wider text-[11px] rounded-[2px]">
-                {currentSubDistricts.length} {language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'Party Units'}
+            <div className="mt-2 text-center text-xs text-white/90 font-dmk-body space-y-1">
+              <span className="inline-block px-3 py-1 bg-[#FAF8F5] text-[#111111] font-bold text-xs font-dmk-body rounded-[2px]">
+                {currentSubDistricts.length} {language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'Party units'}
               </span>
-              <p className="text-white/70 text-[10px] pt-1">
+              <p className="text-white/70 text-[11px] pt-1">
                 {language === 'ta' ? 'கள வழக்கறிஞர் பாதுகாப்புப் பிரிவு' : 'Click any district to inspect cadre'}
               </p>
             </div>
@@ -221,13 +231,13 @@ export const TamilNaduMap: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#FAF8F5] block">
-                    {language === 'ta' ? 'மாநிலத் தலைமை வழிகாட்டல்' : 'STATE EXECUTIVE COMMAND'}
+                  <span className="text-xs text-white/80 font-dmk-body block mb-0.5">
+                    {language === 'ta' ? 'மாநிலத் தலைமை வழிகாட்டல்' : 'State executive guidance'}
                   </span>
-                  <h4 className="text-sm font-black text-white font-dmk-headline leading-tight">
+                  <h4 className="text-base font-black text-white font-dmk-headline leading-tight">
                     {language === 'ta' ? 'மு.க. ஸ்டாலின்' : 'M.K. Stalin'}
                   </h4>
-                  <p className="text-[10px] text-white/70 font-english">
+                  <p className="text-xs text-white/70 font-dmk-body">
                     {language === 'ta' ? 'கழகத் தலைவர் & முதலமைச்சர்' : 'DMK President & Chief Minister'}
                   </p>
                 </div>
@@ -264,7 +274,11 @@ export const TamilNaduMap: React.FC = () => {
                       {sub.name[language]}
                     </h5>
                     <p className="text-[11px] text-[#5B5348] truncate font-dmk-body">
-                      {sub.organizer[language]} • <span className="font-mono text-neutral-800">{sub.contactPhone}</span>
+                      {sub.organizer[language]} • {sub.showPhonePublicly !== false ? (
+                        <span className="font-mono text-neutral-800">{sub.contactPhone}</span>
+                      ) : (
+                        <span className="italic text-[#5B5348]">{language === 'ta' ? 'மாநிலத் தலைமைச் செயலகம் வாயிலாகத் தொடர்பு கொள்ளவும்' : 'Contact through the State Secretariat'}</span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -281,14 +295,16 @@ export const TamilNaduMap: React.FC = () => {
                     <Eye className="w-4 h-4" />
                   </button>
 
-                  {/* Direct Phone Call button */}
-                  <a
-                    href={`tel:${sub.contactPhone}`}
-                    className="p-1.5 text-neutral-500 hover:text-[#C41A1F] hover:bg-neutral-100 transition-colors rounded-[2px]"
-                    title={`Call ${sub.contactPhone}`}
-                  >
-                    <Phone className="w-4 h-4" />
-                  </a>
+                  {/* Direct Phone Call button (only if showPhonePublicly is not false) */}
+                  {sub.showPhonePublicly !== false && (
+                    <a
+                      href={`tel:${sub.contactPhone}`}
+                      className="p-1.5 text-neutral-500 hover:text-[#C41A1F] hover:bg-neutral-100 transition-colors rounded-[2px]"
+                      title={`Call ${sub.contactPhone}`}
+                    >
+                      <Phone className="w-4 h-4" />
+                    </a>
+                  )}
 
                 </div>
 
@@ -308,8 +324,8 @@ export const TamilNaduMap: React.FC = () => {
             {/* Header bar */}
             <div className="flex items-start justify-between border-b-2 border-[#111111] pb-4 mb-4">
               <div>
-                <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block mb-1">
-                  OFFICIAL DISTRICT LEGAL DOSSIER
+                <span className="text-xs font-dmk-body text-[#C41A1F] block mb-1">
+                  {language === 'ta' ? 'அதிகாரப்பூர்வ மாவட்ட ஆவணம்' : 'District legal dossier'}
                 </span>
                 <h3 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
                   {selectedSubDistrict.name[language]}
@@ -317,7 +333,8 @@ export const TamilNaduMap: React.FC = () => {
               </div>
               <button
                 onClick={() => setSelectedSubDistrict(null)}
-                className="p-1 text-[#5B5348] hover:text-[#111111] transition-colors rounded-[2px]"
+                className="p-1.5 text-[#5B5348] hover:text-[#111111] transition-colors rounded-[2px] cursor-pointer"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -326,32 +343,38 @@ export const TamilNaduMap: React.FC = () => {
             {/* Dossier Content */}
             <div className="space-y-4 text-xs sm:text-sm">
               <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
-                <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block">
-                  {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'DISTRICT ORGANIZER'}
+                <span className="text-xs font-dmk-body text-[#5B5348] block">
+                  {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'District Organizer'}
                 </span>
                 <p className="text-base font-bold text-[#111111] font-dmk-headline">
                   {selectedSubDistrict.organizer[language]}
                 </p>
-                <p className="text-xs text-[#5B5348] font-english">
+                <p className="text-xs text-[#5B5348] font-dmk-body">
                   Senior Trial Advocate • DMK Legal Wing
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'தொலைபேசி' : 'PHONE CONTACT'}
+                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
+                    {language === 'ta' ? 'தொலைபேசி' : 'Phone Contact'}
                   </span>
-                  <a
-                    href={`tel:${selectedSubDistrict.contactPhone}`}
-                    className="font-mono font-bold text-[#C41A1F] hover:underline"
-                  >
-                    {selectedSubDistrict.contactPhone}
-                  </a>
+                  {selectedSubDistrict.showPhonePublicly !== false ? (
+                    <a
+                      href={`tel:${selectedSubDistrict.contactPhone}`}
+                      className="font-mono font-bold text-[#C41A1F] hover:underline"
+                    >
+                      {selectedSubDistrict.contactPhone}
+                    </a>
+                  ) : (
+                    <span className="text-xs italic text-[#5B5348] block">
+                      {language === 'ta' ? 'மாநிலத் தலைமைச் செயலகம் வாயிலாகத் தொடர்பு கொள்ளவும்' : 'Contact through the State Secretariat'}
+                    </span>
+                  )}
                 </div>
                 <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'மண்டலம்' : 'PARTY ZONE'}
+                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
+                    {language === 'ta' ? 'மண்டலம்' : 'Party Zone'}
                   </span>
                   <span className="font-bold text-[#111111]">
                     {selectedSubDistrict.zone}
@@ -360,8 +383,8 @@ export const TamilNaduMap: React.FC = () => {
               </div>
 
               <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
-                <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block">
-                  {language === 'ta' ? 'நீதிமன்ற வளாகம்' : 'ATTACHED COURT COMPLEX'}
+                <span className="text-xs font-dmk-body text-[#5B5348] block">
+                  {language === 'ta' ? 'நீதிமன்ற வளாகம்' : 'Attached Court Complex'}
                 </span>
                 <p className="text-[#111111] font-dmk-body">
                   {selectedSubDistrict.courtComplex[language]}
@@ -369,8 +392,8 @@ export const TamilNaduMap: React.FC = () => {
               </div>
 
               <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
-                <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block">
-                  {language === 'ta' ? 'மாவட்ட தலைமையகம்' : 'HEADQUARTERS'}
+                <span className="text-xs font-dmk-body text-[#5B5348] block">
+                  {language === 'ta' ? 'மாவட்ட தலைமையகம்' : 'Headquarters'}
                 </span>
                 <p className="text-[#111111] font-dmk-body">
                   {selectedSubDistrict.headquarters[language]}
@@ -380,17 +403,23 @@ export const TamilNaduMap: React.FC = () => {
 
             {/* Bottom Actions */}
             <div className="mt-6 pt-4 border-t border-[#D8D3CB] flex items-center justify-between">
-              <a
-                href={`tel:${selectedSubDistrict.contactPhone}`}
-                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors rounded-[2px]"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                <span>{language === 'ta' ? 'அழைக்க' : 'Direct Call'}</span>
-              </a>
+              {selectedSubDistrict.showPhonePublicly !== false ? (
+                <a
+                  href={`tel:${selectedSubDistrict.contactPhone}`}
+                  className="min-h-[44px] px-5 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-dmk-body font-bold uppercase tracking-wider flex items-center gap-2 transition-colors rounded-[2px]"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>{language === 'ta' ? 'அழைக்க' : 'Direct Call'}</span>
+                </a>
+              ) : (
+                <span className="text-xs text-[#5B5348] italic font-dmk-body">
+                  {language === 'ta' ? 'மாநிலத் தலைமைச் செயலகம் வாயிலாகத் தொடர்பு கொள்ளவும்' : 'Contact through the State Secretariat'}
+                </span>
+              )}
 
               <button
                 onClick={() => setSelectedSubDistrict(null)}
-                className="px-4 py-2 bg-[#D8D3CB] hover:bg-[#FAF8F5] text-[#111111] text-xs font-english font-bold uppercase tracking-wider transition-colors rounded-[2px]"
+                className="min-h-[44px] px-4 py-2 text-xs font-dmk-body font-bold text-[#111111] hover:text-[#C41A1F] underline underline-offset-4 transition-colors cursor-pointer"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
@@ -408,8 +437,8 @@ export const TamilNaduMap: React.FC = () => {
             {/* Modal Header */}
             <div className="p-5 sm:p-6 bg-[#111111] text-white flex items-center justify-between border-b-2 border-[#E31E24]">
               <div>
-                <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#FAF8F5] block">
-                  OFFICIAL CADRE GAZETTE • TAMIL NADU & PUDUCHERRY
+                <span className="text-xs font-dmk-body text-white/80 block mb-1">
+                  {language === 'ta' ? 'அதிகாரப்பூர்வ பொறுப்பாளர் விவரக்குறிப்பு' : 'Official cadre directory'}
                 </span>
                 <h3 className="text-xl sm:text-2xl font-black text-white font-dmk-headline">
                   {language === 'ta' ? '74 அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள் முழுப் பட்டியல்' : 'Complete 74 District Legal Cadre Directory'}
@@ -417,7 +446,8 @@ export const TamilNaduMap: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowFullDirectoryModal(false)}
-                className="p-1.5 text-neutral-400 hover:text-white transition-colors rounded-[2px]"
+                className="p-1.5 text-neutral-400 hover:text-white transition-colors rounded-[2px] cursor-pointer"
+                aria-label="Close"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -432,20 +462,20 @@ export const TamilNaduMap: React.FC = () => {
                   value={directorySearch}
                   onChange={(e) => setDirectorySearch(e.target.value)}
                   placeholder={language === 'ta' ? 'மாவட்டம் அல்லது பொறுப்பாளர் தேடுக...' : 'Search district, organizer or phone...'}
-                  className="w-full bg-[#FAF8F5] border border-[#D8D3CB] pl-9 pr-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] rounded-[2px]"
+                  className="w-full min-h-[44px] bg-[#FAF8F5] border border-[#D8D3CB] pl-9 pr-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] rounded-[2px]"
                 />
               </div>
 
-              {/* Zonal Filter Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto text-xs font-english">
+              {/* Zonal Filter Tabs: Square-cornered text tabs with 3px red underline on active tab, min 44px tall */}
+              <div className="flex items-center gap-2 border-b border-[#D8D3CB] overflow-x-auto w-full sm:w-auto">
                 {['All', 'Chennai', 'North', 'West', 'Central', 'South'].map((z) => (
                   <button
                     key={z}
                     onClick={() => setZoneFilter(z)}
-                    className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border transition-colors rounded-[2px] ${
+                    className={`min-h-[44px] px-3.5 py-2 text-xs font-dmk-body font-bold transition-all border-b-[3px] rounded-none cursor-pointer ${
                       zoneFilter === z
-                        ? 'bg-[#E31E24] text-white border-[#E31E24]'
-                        : 'bg-white text-[#5B5348] border-[#D8D3CB] hover:bg-[#FAF8F5]'
+                        ? 'border-[#E31E24] text-[#111111]'
+                        : 'border-transparent text-[#5B5348] hover:text-[#111111] hover:border-[#D8D3CB]'
                     }`}
                   >
                     {z}
@@ -481,9 +511,15 @@ export const TamilNaduMap: React.FC = () => {
                           {item.organizer[language]}
                         </td>
                         <td className="py-2.5 px-3 font-mono font-bold text-[#C41A1F]">
-                          <a href={`tel:${item.contactPhone}`} className="hover:underline">
-                            {item.contactPhone}
-                          </a>
+                          {item.showPhonePublicly !== false ? (
+                            <a href={`tel:${item.contactPhone}`} className="hover:underline">
+                              {item.contactPhone}
+                            </a>
+                          ) : (
+                            <span className="text-[11px] font-dmk-body text-[#5B5348] italic font-normal">
+                              {language === 'ta' ? 'செயலகம் வாயிலாக' : 'Via Secretariat'}
+                            </span>
+                          )}
                         </td>
                         <td className="py-2.5 px-3 text-[#5B5348] truncate max-w-xs">
                           {item.courtComplex[language]}
@@ -505,13 +541,13 @@ export const TamilNaduMap: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-white border-t border-[#D8D3CB] flex items-center justify-between text-xs font-english">
+            <div className="p-4 bg-white border-t border-[#D8D3CB] flex items-center justify-between text-xs font-dmk-body">
               <span className="text-[#5B5348]">
                 Displaying <strong>{filtered74Districts.length}</strong> of <strong>74</strong> District Secretariats
               </span>
               <button
                 onClick={() => setShowFullDirectoryModal(false)}
-                className="px-4 py-2 bg-[#111111] hover:bg-[#E31E24] text-white font-bold uppercase tracking-wider transition-colors rounded-[2px]"
+                className="min-h-[44px] px-5 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-dmk-body font-bold uppercase tracking-wider transition-colors rounded-[2px] cursor-pointer"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>

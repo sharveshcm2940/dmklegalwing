@@ -56,9 +56,14 @@ export default function AdminPage() {
     enquiries, 
     updateEnquiryStatus,
     districts,
+    updateDistrictPhonePrivacy,
     refreshAllData,
     isLoadingData
   } = useData();
+
+  // District Editor Privacy State
+  const [editingDistrict, setEditingDistrict] = useState<DistrictInfo | null>(null);
+  const [editPhonePublicly, setEditPhonePublicly] = useState<boolean>(true);
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -1293,8 +1298,10 @@ export default function AdminPage() {
                       <th className="p-3.5">Zone</th>
                       <th className="p-3.5">District Organizer</th>
                       <th className="p-3.5">Direct Contact</th>
+                      <th className="p-3.5">Phone Privacy</th>
                       <th className="p-3.5">Court Complex</th>
                       <th className="p-3.5 text-right">Cadre Strength</th>
+                      <th className="p-3.5 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-200">
@@ -1322,11 +1329,37 @@ export default function AdminPage() {
                           </a>
                           <span className="text-[10px] text-neutral-500 block truncate max-w-[150px]">{d.contactEmail}</span>
                         </td>
+                        <td className="p-3.5">
+                          <button
+                            type="button"
+                            onClick={() => updateDistrictPhonePrivacy(d.id, d.showPhonePublicly === false ? true : false)}
+                            className={`min-h-[44px] px-3 py-1.5 text-xs font-bold font-dmk-body rounded-[2px] transition-colors cursor-pointer border ${
+                              d.showPhonePublicly !== false
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                                : 'bg-neutral-900 text-white border-neutral-900 hover:bg-neutral-800'
+                            }`}
+                            title="Click to toggle phone privacy"
+                          >
+                            {d.showPhonePublicly !== false ? 'Public (Visible)' : 'Hidden (Private)'}
+                          </button>
+                        </td>
                         <td className="p-3.5 text-neutral-700 text-[11px] max-w-xs">
                           {d.courtComplex[language]}
                         </td>
                         <td className="p-3.5 text-right font-mono font-bold text-neutral-900">
                           {d.memberCount}+
+                        </td>
+                        <td className="p-3.5 text-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingDistrict(d);
+                              setEditPhonePublicly(d.showPhonePublicly !== false);
+                            }}
+                            className="min-h-[44px] px-3 py-1.5 text-xs font-dmk-body font-bold text-[#111111] hover:text-[#C41A1F] underline underline-offset-4 cursor-pointer"
+                          >
+                            Edit
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1334,6 +1367,91 @@ export default function AdminPage() {
                 </table>
               </div>
             </div>
+
+            {/* DISTRICT PRIVACY & DETAILS EDITOR MODAL */}
+            {editingDistrict && (
+              <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-xs">
+                <div className="bg-white max-w-lg w-full border-2 border-neutral-900 p-6 sm:p-8 shadow-2xl relative font-dmk-body rounded-[2px] space-y-6">
+                  
+                  <div className="flex items-start justify-between border-b border-neutral-300 pb-3">
+                    <div>
+                      <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F] tracking-widest block">
+                        DISTRICT CADRE EDITOR
+                      </span>
+                      <h3 className="text-xl font-black text-neutral-950 font-dmk-headline">
+                        {editingDistrict.name.en} ({editingDistrict.name.ta})
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingDistrict(null)}
+                      className="p-1 text-neutral-500 hover:text-black cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 text-xs font-dmk-body text-neutral-800">
+                    <div>
+                      <span className="block text-neutral-500 text-[11px] mb-0.5">District Organizer</span>
+                      <p className="font-bold text-sm text-neutral-900">
+                        {editingDistrict.organizer.en} / {editingDistrict.organizer.ta}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span className="block text-neutral-500 text-[11px] mb-0.5">Contact Phone</span>
+                      <p className="font-mono font-bold text-sm text-neutral-900">
+                        {editingDistrict.contactPhone}
+                      </p>
+                    </div>
+
+                    {/* PRIVACY TOGGLE: showPhonePublicly */}
+                    <div className="p-4 bg-[#FAF8F5] border border-neutral-300 rounded-[2px] space-y-2">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={editPhonePublicly}
+                          onChange={(e) => setEditPhonePublicly(e.target.checked)}
+                          className="w-4 h-4 accent-[#E31E24] cursor-pointer"
+                        />
+                        <span className="font-bold text-sm text-neutral-900">
+                          Show Phone Publicly on Website
+                        </span>
+                      </label>
+                      <p className="text-xs text-[#5B5348] pl-7 leading-relaxed">
+                        When disabled (unchecked), the phone number is hidden from the public district directory and map, and <strong>&ldquo;Contact through the State Secretariat&rdquo;</strong> is shown instead.
+                      </p>
+                    </div>
+
+                    <div className="text-[11px] text-neutral-500">
+                      Zone: <strong>{editingDistrict.zone}</strong> • Court Complex: {editingDistrict.courtComplex.en}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-neutral-300 flex items-center justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setEditingDistrict(null)}
+                      className="min-h-[44px] px-4 py-2 text-xs font-bold font-dmk-body text-neutral-700 hover:text-black underline underline-offset-4 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await updateDistrictPhonePrivacy(editingDistrict.id, editPhonePublicly);
+                        setEditingDistrict(null);
+                      }}
+                      className="min-h-[44px] px-6 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
+                    >
+                      Save Privacy Setting
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            )}
 
           </div>
         )}

@@ -48,6 +48,7 @@ interface DataContextType {
   submitEnquiry: (data: Omit<PublicEnquiry, 'id' | 'submittedAt' | 'status'>) => Promise<boolean>;
   updateRegistrationStatus: (id: string, status: AdvocateRegistration['status']) => Promise<void>;
   updateEnquiryStatus: (id: string, status: PublicEnquiry['status']) => Promise<void>;
+  updateDistrictPhonePrivacy: (id: string, showPhonePublicly: boolean) => Promise<void>;
   refreshAllData: () => Promise<void>;
 }
 
@@ -55,7 +56,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [leaders, setLeaders] = useState<Leader[]>(LEADERSHIP_PROFILES);
-  const [districts] = useState<DistrictInfo[]>(TAMIL_NADU_DISTRICTS);
+  const [districts, setDistricts] = useState<DistrictInfo[]>(TAMIL_NADU_DISTRICTS);
   const [resources, setResources] = useState<LegalResource[]>(LEGAL_RESOURCES);
   const [events, setEvents] = useState<EventItem[]>(EVENTS_DATA);
   const [news, setNews] = useState<NewsItem[]>(NEWS_ITEMS);
@@ -121,6 +122,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const galData = await galRes.json();
         if (galData.success && Array.isArray(galData.gallery) && galData.gallery.length > 0) {
           setGallery(galData.gallery);
+        }
+      }
+
+      // 7. Fetch Districts
+      const distRes = await fetch('/api/districts');
+      if (distRes.ok) {
+        const distData = await distRes.json();
+        if (distData.success && Array.isArray(distData.districts) && distData.districts.length > 0) {
+          setDistricts(distData.districts);
         }
       }
     } catch (error) {
@@ -356,6 +366,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLeaders((prev) => prev.filter((l) => l.id !== id));
   };
 
+  const updateDistrictPhonePrivacy = async (id: string, showPhonePublicly: boolean) => {
+    setDistricts((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, showPhonePublicly } : d))
+    );
+    try {
+      await fetch('/api/districts', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, showPhonePublicly })
+      });
+    } catch (error) {
+      console.error('Update district phone privacy error:', error);
+    }
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -384,6 +409,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         submitEnquiry,
         updateRegistrationStatus,
         updateEnquiryStatus,
+        updateDistrictPhonePrivacy,
         refreshAllData
       }}
     >
