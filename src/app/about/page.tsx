@@ -1,415 +1,457 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { TRANSLATIONS } from '@/data/translations';
 import { HISTORICAL_MILESTONES } from '@/data/content';
+import { HistoricalMilestone } from '@/types';
 import { PageTitleBand } from '@/components/PageTitleBand';
-import { useReveal } from '@/hooks/useReveal';
-import { 
-  IconScale, 
-  IconShield, 
-  IconCheck, 
-  IconStar, 
-  IconChevronLeft, 
-  IconChevronRight 
-} from '@/components/Icons';
+
+interface MentorItem {
+  id: string;
+  name: { en: string; ta: string };
+  description: { en: string; ta: string };
+  image: string;
+}
+
+const FOUR_MENTORS: MentorItem[] = [
+  {
+    id: 'periyar',
+    name: {
+      en: 'Thanthai Periyar E.V.R.',
+      ta: 'தந்தை பெரியார் ஈ.வெ.ரா.'
+    },
+    description: {
+      en: 'Father of the Self-Respect Movement & Rationalist Pioneer',
+      ta: 'பகுத்தறிவுப் பகலவன் • சுயமரியாதை இயக்கத்தின் தந்தை'
+    },
+    image: '/images/mentors/periyar.jpg'
+  },
+  {
+    id: 'anna',
+    name: {
+      en: 'Perarignar C.N. Annadurai',
+      ta: 'பேரறிஞர் சி.என். அண்ணாதுரை'
+    },
+    description: {
+      en: 'DMK Founder & Chief Minister who legalised Self-Respect Marriages',
+      ta: 'கழக நிறுவனர் • சுயமரியாதைத் திருமண சட்ட வடிவம் தந்தவர்'
+    },
+    image: '/images/mentors/anna.jpg'
+  },
+  {
+    id: 'kalaignar',
+    name: {
+      en: 'Muthamizharignar Kalaignar',
+      ta: 'முத்தமிழறிஞர் கலைஞர்'
+    },
+    description: {
+      en: 'Five-time Chief Minister & Architect of 69% Reservation Architecture',
+      ta: 'முன்னாள் முதல்வர் • 69% இடஒதுக்கீடு & மாநில சுயாட்சியின் பாதுகாவலர்'
+    },
+    image: '/images/mentors/kalaignar.jpg'
+  },
+  {
+    id: 'stalin',
+    name: {
+      en: 'Thalapathi M.K. Stalin',
+      ta: 'தளபதி மு.க. ஸ்டாலின்'
+    },
+    description: {
+      en: 'Party President & Hon’ble Chief Minister of Tamil Nadu',
+      ta: 'கழகத் தலைவர் & மாண்புமிகு தமிழ்நாடு முதலமைச்சர்'
+    },
+    image: '/images/mentors/stalin.jpg'
+  }
+];
+
+const ARCHIVE_ITEMS = [
+  {
+    id: 'res-self-respect-marriage',
+    year: '1967',
+    title: {
+      en: 'Hindu Marriage (Tamil Nadu Amendment) Act 1967 (Section 7A): Statutory Guide',
+      ta: 'இந்து திருமண (தமிழ்நாடு திருத்தச் சட்டம்) 1967 (பிரிவு 7A): சுயமரியாதைத் திருமண சட்ட வழிகாட்டி'
+    },
+    court: { en: 'Madras High Court / Assembly Act', ta: 'சென்னை உயர்நீதிமன்றம் / சட்டப்பேரவை' },
+    link: '/resources#res-self-respect-marriage'
+  },
+  {
+    id: 'res-rajamannar-autonomy',
+    year: '1971',
+    title: {
+      en: 'Rajamannar Committee Report on Centre-State Relations: The Historic Autonomy Foundation',
+      ta: 'மத்திய - மாநில உறவுகள் குறித்த ராஜமன்னார் குழு அறிக்கை (1971): வரலாற்று மாநில சுயாட்சி ஆவணம்'
+    },
+    court: { en: 'Constitutional Commission', ta: 'மாநில அரசமைப்பு ஆணையம்' },
+    link: '/resources#res-rajamannar-autonomy'
+  },
+  {
+    id: 'res-emergency-habeas-corpus',
+    year: '1975',
+    title: {
+      en: 'Internal Emergency MISA Detentions: Madras High Court Habeas Corpus Petitions Compendium',
+      ta: 'நெருக்கடி நிலை மிசா சிறைவாசம்: சென்னை உயர்நீதிமன்ற ஆட்கொணர்வு மனுக்கள் வரலாற்றுத் தொகுப்பு'
+    },
+    court: { en: 'Madras High Court Archives', ta: 'சென்னை உயர்நீதிமன்ற ஆவணக் காப்பகம்' },
+    link: '/resources'
+  },
+  {
+    id: 'res-69-reservation',
+    year: '1994',
+    title: {
+      en: 'Tamil Nadu 69% Reservation Act (Act 45 of 1994) & Ninth Schedule Constitutional Compendium',
+      ta: 'தமிழ்நாடு 69% இடஒதுக்கீட்டுச் சட்டம் (1994 சட்டம் 45) மற்றும் 9-வது அட்டவணை அரசமைப்புத் தொகுப்பு'
+    },
+    court: { en: 'Supreme Court of India', ta: 'இந்திய உச்ச நீதிமன்றம்' },
+    link: '/resources#res-69-reservation'
+  },
+  {
+    id: 'res-governor-assent',
+    year: '2023',
+    title: {
+      en: 'Governor’s Constitutional Discretion under Article 200: Precedent Analysis & Submissions',
+      ta: 'அரசமைப்பு உறுப்பு 200-ன் கீழ் ஆளுநரின் அதிகார வரம்பு: உச்ச நீதிமன்ற வாதங்கள் & தீர்ப்பு ஆய்வு'
+    },
+    court: { en: 'Supreme Court of India', ta: 'இந்திய உச்ச நீதிமன்றம்' },
+    link: '/resources#res-governor-assent'
+  },
+  {
+    id: 'res-legal-aid-handbook',
+    year: '2024',
+    title: {
+      en: 'Citizen’s Guide to Free Legal Aid, Bail Jurisprudence & Fundamental Rights',
+      ta: 'சாமானிய மக்களுக்கான இலவச சட்ட உதவி, பிணை உரிமைகள் & அடிப்படை உரிமைகள் கையேடு'
+    },
+    court: { en: 'DMK Legal Wing Secretariat', ta: 'திமுக வழக்கறிஞர் அணித் தலைமைச் செயலகம்' },
+    link: '/resources#res-legal-aid-handbook'
+  }
+];
+
+function TimelineRow({ milestone, language }: { milestone: HistoricalMilestone; language: 'ta' | 'en' }) {
+  const [inView, setInView] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+        }
+      },
+      {
+        threshold: 0.15,
+        rootMargin: '0px 0px -20% 0px'
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={rowRef}
+      className={`group transition-all duration-700 ease-out ${
+        inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-7'
+      }`}
+    >
+      {/* Desktop Layout (md and above) */}
+      <div className="hidden md:flex items-start gap-8">
+        {/* Year on the left: Helvetica Now Display 800 at 64px, turns red on row hover */}
+        <div className="w-[140px] text-right shrink-0 pt-1">
+          <span className="font-helvetica font-extrabold text-[64px] leading-none text-[#111111] transition-colors duration-200 group-hover:text-[#E31E24]">
+            {milestone.year}
+          </span>
+        </div>
+
+        {/* 14px square red marker centered on the 3px line */}
+        <div className="w-[24px] flex justify-center shrink-0 pt-4 relative">
+          <div className="w-[14px] h-[14px] bg-[#E31E24] shrink-0 z-10 rounded-none" />
+        </div>
+
+        {/* Title (Helvetica Now Display 800, 28px) and Text (18px) */}
+        <div className="flex-1 pt-2 space-y-2">
+          <div className="flex items-center gap-3">
+            <h3 className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-tight">
+              {milestone.title[language]}
+            </h3>
+            {milestone.category && (
+              <span className="text-[11px] font-extrabold uppercase px-2 py-0.5 bg-[#111111] text-white shrink-0">
+                {milestone.category}
+              </span>
+            )}
+          </div>
+          <p className="text-[18px] text-[#3a322d] leading-relaxed max-w-[780px]">
+            {milestone.description[language]}
+          </p>
+          {milestone.significance && (
+            <div className="text-[15px] text-[#5B5348] italic pt-1 border-l-2 border-[#C41A1F] pl-3 mt-2">
+              <span className="font-bold text-[#C41A1F] not-italic mr-1.5">
+                {language === 'ta' ? 'அரசமைப்பு முக்கியத்துவம்:' : 'Significance:'}
+              </span>
+              {milestone.significance[language]}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Layout (below md) */}
+      <div className="md:hidden relative pl-9 space-y-2">
+        {/* 14px square red marker on the line */}
+        <div className="absolute left-[1.5px] top-3 w-[14px] h-[14px] bg-[#E31E24] shrink-0 z-10 rounded-none" />
+
+        {/* Year */}
+        <div className="font-helvetica font-extrabold text-[44px] leading-none text-[#111111] transition-colors duration-200 group-hover:text-[#E31E24]">
+          {milestone.year}
+        </div>
+
+        {/* Title */}
+        <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-snug">
+          {milestone.title[language]}
+        </h3>
+
+        {/* Text */}
+        <p className="text-[17px] text-[#3a322d] leading-relaxed">
+          {milestone.description[language]}
+        </p>
+
+        {milestone.significance && (
+          <div className="text-[14px] text-[#5B5348] italic pt-1 border-l-2 border-[#C41A1F] pl-3">
+            {milestone.significance[language]}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function AboutPage() {
   const { language } = useLanguage();
-  const [selectedMilestoneIndex, setSelectedMilestoneIndex] = useState<number>(0);
-  const [showFullIndex, setShowFullIndex] = useState<boolean>(false);
+  const t = TRANSLATIONS[language];
 
-  const section1 = useReveal();
-  const section2 = useReveal();
-  const section3 = useReveal();
-  const section4 = useReveal();
+  // Timeline line draw trigger
+  const timelineSectionRef = useRef<HTMLElement>(null);
+  const [lineDrawn, setLineDrawn] = useState(false);
 
-  const currentMilestone = HISTORICAL_MILESTONES[selectedMilestoneIndex] || HISTORICAL_MILESTONES[0];
+  useEffect(() => {
+    const el = timelineSectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setLineDrawn(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
+    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65]">
       
       {/* Universal Page Title Band */}
       <PageTitleBand
-        title={language === 'ta' ? 'அணி வரலாறு & அரசமைப்பு நோக்கம்' : 'Historical Profile & Constitutional Mandate'}
+        title={language === 'ta' ? 'எங்களைப் பற்றி' : 'About the Legal Wing'}
         description={
           language === 'ta'
-            ? 'நீதிமன்றங்களில் சமூக நீதியைப் பாதுகாத்து, மாநில சுயாட்சி உரிமைகளை நிலைநிறுத்தும் ஐந்து தசாப்த கால சட்டப் போராட்டம்.'
-            : 'Five decades of constitutional advocacy defending affirmative action, federalism, and human dignity across Indian courts.'
+            ? 'நீதிமன்றங்களில் சமூக நீதியைப் பாதுகாத்து, மாநில சுயாட்சியை நிலைநிறுத்தும் ஐந்து தசாப்த கால சட்டப் போராட்டம்.'
+            : 'Five decades of constitutional advocacy defending social justice, federalism, and the 69% reservation in the courts.'
         }
       />
 
-      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12 space-y-16">
-
-        {/* 1. Core Pillars of Institutional Responsibility (3 columns ruled) */}
-        <section 
-          ref={section1.ref}
-          className={`fade-rise ${section1.revealed ? 'revealed' : ''}`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y-2 md:divide-y-0 md:divide-x-2 divide-[#111111] border-2 border-[#111111] bg-[#FAF8F5]">
+      {/* 1. Introduction: Two columns on parchment */}
+      <section className="bg-[#FAF8F5] py-16 md:py-24 border-b border-[#111111]">
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             
-            <div className="p-8 space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b border-[#3d3633] pb-2">
-                  <span className="text-[12px] font-extrabold text-[#C41A1F] uppercase tracking-normal">
-                    SECTION I
-                  </span>
-                  <IconScale className="w-5 h-5 text-[#C41A1F]" />
-                </div>
-                <h2 className="font-kavivanar font-normal text-[26px] text-[#111111] leading-tight">
-                  {language === 'ta' ? 'அணியின் நோக்கம் & கடமைகள்' : 'Purpose & Responsibilities'}
-                </h2>
-                <p className="text-[16px] text-[#5B5348] leading-relaxed">
-                  {language === 'ta'
-                    ? 'அரசமைப்புச் சட்டத்தில் உறுதி செய்யப்பட்டுள்ள சமூக நீதி, பிற்படுத்தப்பட்ட மற்றும் ஒடுக்கப்பட்டோருக்கான இடஒதுக்கீடு, சமஉரிமை ஆகியவற்றை உயர் மற்றும் உச்ச நீதிமன்றங்களில் வாதாடிப் பாதுகாத்தல்.'
-                    : 'Defending affirmative action, minority guarantees, and social justice before Constitutional Benches of the Madras High Court and the Supreme Court of India.'}
-                </p>
-              </div>
-              <div className="pt-2 text-[12px] font-bold text-[#111111] uppercase tracking-normal">
-                Article 15(4) & 16(4) Shield
-              </div>
-            </div>
-
-            <div className="p-8 space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b border-[#3d3633] pb-2">
-                  <span className="text-[12px] font-extrabold text-[#C41A1F] uppercase tracking-normal">
-                    SECTION II
-                  </span>
-                  <IconShield className="w-5 h-5 text-[#C41A1F]" />
-                </div>
-                <h2 className="font-kavivanar font-normal text-[26px] text-[#111111] leading-tight">
-                  {language === 'ta' ? 'கழகத்தில் அணியின் பங்கு' : 'Role Within the DMK'}
-                </h2>
-                <p className="text-[16px] text-[#5B5348] leading-relaxed">
-                  {language === 'ta'
-                    ? 'கழகத்தின் சட்ட ஆலோசனைக் குழுவாக செயல்பட்டு, சட்டமன்ற மசோதாக்கள், தேர்தல் சட்ட விவகாரங்கள், மற்றும் மாநில உரிமைப் பிரச்னைகளில் அரசமைப்பு வழிகாட்டுதலை வழங்குதல்.'
-                    : 'Acting as the party’s apex legal think-tank, drafting legislative defenses, guiding election law strategies, and challenging unconstitutional central interference.'}
-                </p>
-              </div>
-              <div className="pt-2 text-[12px] font-bold text-[#111111] uppercase tracking-normal">
-                State Autonomy Think-Tank
-              </div>
-            </div>
-
-            <div className="p-8 space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b border-[#3d3633] pb-2">
-                  <span className="text-[12px] font-extrabold text-[#C41A1F] uppercase tracking-normal">
-                    SECTION III
-                  </span>
-                  <IconScale className="w-5 h-5 text-[#C41A1F]" />
-                </div>
-                <h2 className="font-kavivanar font-normal text-[26px] text-[#111111] leading-tight">
-                  {language === 'ta' ? 'இலவச சட்ட உதவி & மக்கள் நலன்' : 'Citizen Access to Justice'}
-                </h2>
-                <p className="text-[16px] text-[#5B5348] leading-relaxed">
-                  {language === 'ta'
-                    ? 'அனைத்து மாவட்ட நீதிமன்றங்களிலும் எளிய மக்களுக்கு, உழைக்கும் மக்களுக்கு இலவச சட்ட உதவிகளை வழங்குதல் மற்றும் சட்ட விழிப்புணர்வு முகாம்களைத் தொடர்ச்சியாக நடத்துதல்.'
-                    : 'Conducting pro-bono legal clinics in all district units, supporting indigent litigants, and ensuring that no citizen is denied justice for want of legal representation.'}
-                </p>
-              </div>
-              <div className="pt-2 text-[12px] font-bold text-[#111111] uppercase tracking-normal">
-                74 District Legal Clinics
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* 2. Visual Heritage Showcase: Two solid framed artwork blocks */}
-        <section 
-          ref={section2.ref}
-          className={`fade-rise ${section2.revealed ? 'revealed' : ''}`}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            {/* Banner 1: Campaign Banner */}
-            <div className="border-2 border-[#111111] bg-[#111111] text-[#FAF8F5] flex flex-col justify-between overflow-hidden">
-              <div className="relative w-full h-72 overflow-hidden bg-[#111111]">
-                <img
-                  src="/images/dmk-campaign-stalin.jpg"
-                  alt="தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!"
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-              <div className="p-6 bg-[#111111] space-y-2 border-t-2 border-[#3d3633]">
-                <h3 className="font-kavivanar font-normal text-[28px] text-white leading-snug">
-                  தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!
-                </h3>
-                <p className="text-[15px] text-[#d8cfc2] leading-relaxed">
-                  {language === 'ta'
-                    ? 'கழகத் தலைவர் மாண்புமிகு முதலமைச்சர் மு.க. ஸ்டாலின் அவர்களின் வழிகாட்டலில் தமிழ்நாட்டின் உரிமைகளையும் தன்மானத்தையும் காக்கும் சட்டக்களம்.'
-                    : 'Under Party President & Hon’ble Chief Minister M.K. Stalin, our legal cadre fiercely protects the constitutional rights and self-respect of Tamil Nadu.'}
-                </p>
-              </div>
-            </div>
-
-            {/* Banner 2: Four Leaders Artwork */}
-            <div className="border-2 border-[#111111] bg-[#111111] text-[#FAF8F5] flex flex-col justify-between overflow-hidden">
-              <div className="relative w-full h-72 overflow-hidden bg-[#111111]">
-                <img
-                  src="/images/dmk-four-leaders.jpg"
-                  alt="கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்!"
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-              <div className="p-6 bg-[#111111] space-y-2 border-t-2 border-[#3d3633]">
-                <h3 className="font-kavivanar font-normal text-[26px] text-white leading-snug">
-                  &ldquo;கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்!&rdquo;
-                </h3>
-                <p className="text-[15px] text-[#d8cfc2] leading-relaxed">
-                  {language === 'ta'
-                    ? 'தந்தை பெரியார், பேரறிஞர் அண்ணா, முத்தமிழறிஞர் கலைஞர் வழியில் சமூக நீதியையும் மாநில சுயாட்சியையும் நீதிமன்றங்களில் வென்றெடுப்போம்.'
-                    : 'Continuing the sacred egalitarian mission of Periyar, Anna, Kalaignar, and Stalin in defending social justice across the halls of justice.'}
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* 3. Constitutional Objectives Schedule */}
-        <section 
-          ref={section3.ref}
-          className={`fade-rise ${section3.revealed ? 'revealed' : ''}`}
-        >
-          <div className="p-8 sm:p-10 bg-[#FAF8F5] border-2 border-[#111111]">
-            <div className="border-b-2 border-[#111111] pb-3 mb-6 flex items-center justify-between">
-              <h2 className="font-kavivanar font-normal text-[32px] text-[#111111]">
-                {language === 'ta' ? 'அணியின் முதன்மைச் சட்ட நோக்கங்கள்' : 'Constitutional Objectives & Principles'}
+            {/* Left: Kavivanar title in #C41A1F */}
+            <div className="lg:col-span-5">
+              <h2 className="font-kavivanar font-normal text-[clamp(32px,4vw,48px)] leading-[1.2] text-[#C41A1F]">
+                {language === 'ta'
+                  ? 'அரசமைப்புப் போராட்டமும் சமூக நீதியும்: தொடரும் அறப்பணி'
+                  : 'A Legacy of Constitutional Resistance & Social Justice'}
               </h2>
-              <span className="text-[13px] font-extrabold text-[#C41A1F] uppercase tracking-normal">
-                SCHEDULE A
-              </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[16px]">
-              {[
-                {
-                  en: 'Constitutional safeguarding of Tamil Nadu’s 69% reservation in education and public employment.',
-                  ta: 'கல்வி மற்றும் அரசுப் பணிகளில் தமிழ்நாட்டின் 69% இடஒதுக்கீட்டு உரிமையை உச்ச நீதிமன்றத்தில் பாதுகாத்தல்.'
-                },
-                {
-                  en: 'Advocating for Tamil as an official language in the Madras High Court under Article 348(2).',
-                  ta: 'அரசமைப்பு உறுப்பு 348(2)-ன் கீழ் சென்னை உயர் நீதிமன்றத்தில் தமிழை வழக்காடு மொழியாக நடைமுறைப்படுத்துதல்.'
-                },
-                {
-                  en: 'Upholding State legislative sovereignty against gubernatorial delays under Article 200.',
-                  ta: 'சட்டப்பேரவை நிறைவேற்றும் மசோதாக்களை ஆளுநர்கள் முடக்குவதற்கு எதிராக அரசமைப்புப் பிரிவு 200-ஐ நிலைநிறுத்துதல்.'
-                },
-                {
-                  en: 'Defending the federal character of India against unitary impositions like NEET and fiscal centralization.',
-                  ta: 'நீட் தேர்வு போன்ற ஒருமுகப்படுத்தப்பட்ட திணிப்புகளுக்கு எதிராக மாநில கல்வி, சுகாதார அதிகாரங்களைப் பாதுகாத்தல்.'
-                },
-                {
-                  en: 'Providing welfare support, orientation camps, and professional stipends for junior advocates.',
-                  ta: 'இளம் வழக்கறிஞர்களுக்கான தொழில்முறை வழிகாட்டுதல்கள் மற்றும் மாதாந்திர நலத்திட்டங்களை முன்னெடுத்தல்.'
-                },
-                {
-                  en: 'Protecting civil liberties against arbitrary misuse of central investigative and preventive detention laws.',
-                  ta: 'அரசியல் உள்நோக்கம் கொண்ட பழிவாங்கும் நடவடிக்கைகள் மற்றும் தடுப்புக் காவல் சட்டங்களுக்கு எதிராக சட்டப்போர் நடத்துதல்.'
-                }
-              ].map((obj, i) => (
-                <div key={i} className="flex items-start gap-3 p-4 bg-[#f1ece2] border border-[#d7d0c3]">
-                  <IconCheck className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5" />
-                  <span className="text-[#111111] leading-relaxed">{obj[language]}</span>
-                </div>
+            {/* Right: Existing introduction text at 20px with line height 1.75 (max 680px wide) */}
+            <div className="lg:col-span-7 max-w-[680px] space-y-6 text-[20px] leading-[1.75] text-[#111111]">
+              <p>
+                {t.intro.p1}
+              </p>
+              <p>
+                {t.intro.p2}
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Timeline: Vertical 3px ink line down the left side of a wide column */}
+      <section ref={timelineSectionRef} className="bg-[#FAF8F5] py-20 md:py-28 border-b border-[#111111]">
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
+          
+          <div className="mb-16">
+            <h2 className="font-kavivanar font-normal text-[clamp(34px,4.5vw,52px)] text-[#111111] leading-none">
+              {language === 'ta' ? 'அரை நூற்றாண்டு கால அரசமைப்பு வரலாற்று மைல்கற்கள்' : '50 Years of Constitutional Litigation & Milestones'}
+            </h2>
+            <p className="text-[17px] text-[#5B5348] mt-3">
+              {language === 'ta'
+                ? 'திராவிட இயக்கத்தின் வரலாற்றுச் சிறப்புமிக்க சட்டப் போராட்டங்கள் • 1921 முதல் 2026 வரை'
+                : 'Defending affirmative action, minority rights, and state autonomy across Indian courts of record.'}
+            </p>
+          </div>
+
+          {/* Wide column with vertical 3px ink line */}
+          <div className="relative">
+            {/* 
+              Vertical 3px ink line down the left side of the wide column:
+              - Desktop: left-[182.5px] (centered behind the 14px red marker at x=184px)
+              - Mobile: left-[7px] (centered behind the 14px red marker at x=8.5px)
+              - Draws downward scaleY: 0 to 1 over 1.4s as section scrolls into view
+            */}
+            <div
+              className="absolute top-4 bottom-4 w-[3px] bg-[#111111] left-[7px] md:left-[182.5px] origin-top transition-transform duration-[1400ms] ease-out pointer-events-none"
+              style={{
+                transform: lineDrawn ? 'scaleY(1)' : 'scaleY(0)',
+              }}
+            />
+
+            {/* Milestone rows */}
+            <div className="space-y-16 md:space-y-20">
+              {HISTORICAL_MILESTONES.map((milestone, idx) => (
+                <TimelineRow
+                  key={milestone.year + idx}
+                  milestone={milestone}
+                  language={language}
+                />
               ))}
             </div>
+
           </div>
-        </section>
 
-        {/* 4. Historical Milestones Timeline */}
-        <section 
-          ref={section4.ref}
-          className={`fade-rise ${section4.revealed ? 'revealed' : ''}`}
-        >
-          <div className="bg-[#FAF8F5] border-2 border-[#111111] p-6 sm:p-10 relative overflow-hidden">
-            
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b-2 border-[#111111] mb-8">
-              <div>
-                <h2 className="font-kavivanar font-normal text-[clamp(34px,4.5vw,52px)] text-[#C41A1F] leading-none">
-                  {language === 'ta' ? 'நமது வரலாற்றுப் பயணம்' : 'Our Journey'}
-                </h2>
-                <p className="text-[16px] text-[#5B5348] mt-2 font-medium">
-                  {language === 'ta'
-                    ? 'நூற்றாண்டு கால சட்டப் போராட்ட வரலாறு • 1921 முதல் 2026 வரை'
-                    : 'Over a Century of Legal Milestones • From 1921 to 2026'}
-                </p>
-              </div>
+        </div>
+      </section>
 
-              <div className="flex items-center gap-3">
-                <span className="text-[14px] text-[#5B5348] font-bold">
-                  {language === 'ta'
-                    ? `மைல்கல் ${selectedMilestoneIndex + 1} / ${HISTORICAL_MILESTONES.length}`
-                    : `Milestone ${selectedMilestoneIndex + 1} of ${HISTORICAL_MILESTONES.length}`}
-                </span>
+      {/* 3. The Four Mentors: An ink band with four portrait frames in a row */}
+      <section className="bg-[#111111] text-[#FAF8F5] py-20 md:py-28">
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
+          
+          <div className="mb-14 border-b border-[#3d3633] pb-6">
+            <h2 className="font-kavivanar font-normal text-[clamp(34px,4.5vw,52px)] text-[#FAF8F5] leading-none">
+              {language === 'ta' ? 'கொள்கை ஆசான்கள் & வழிகாட்டிகள்' : 'Our Ideological Mentors'}
+            </h2>
+            <p className="text-[17px] text-[#d8cfc2] mt-3">
+              {language === 'ta'
+                ? 'திராவிட இயக்கத்தின் தத்துவ அடித்தளத்தில் சமூக நீதிப் பாதையை வகுத்தளித்த வரலாற்றுத் தலைவர்கள்.'
+                : 'The philosophical beacons whose lifelong struggle for social equality and federalism anchors our legal jurisprudence.'}
+            </p>
+          </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowFullIndex(!showFullIndex)}
-                  className="min-h-[44px] px-4 py-2 text-[13px] font-extrabold uppercase bg-white border-2 border-[#111111] hover:bg-[#111111] hover:text-white transition-colors cursor-pointer btn-lift"
-                >
-                  {showFullIndex
-                    ? (language === 'ta' ? 'சுருக்கப் பார்வை' : 'Interactive View')
-                    : (language === 'ta' ? 'அனைத்து மைல்கற்கள்' : 'View Full Index')}
-                </button>
-              </div>
-            </div>
-
-            {/* Timeline Track */}
-            <div className="relative py-8 my-4 overflow-x-auto">
-              <div className="min-w-[700px] relative px-6">
-                
-                {/* Background Line */}
-                <div className="absolute top-[18px] left-8 right-8 h-[2px] bg-[#d7d0c3] z-0" />
-
-                {/* Active Progress Line */}
-                <div 
-                  className="absolute top-[18px] left-8 h-[2px] bg-[#E31E24] z-0 transition-all duration-300" 
-                  style={{ 
-                    width: `calc(${(selectedMilestoneIndex / (HISTORICAL_MILESTONES.length - 1)) * 100}% * ((100% - 64px) / 100))` 
-                  }} 
-                />
-
-                {/* Star Nodes */}
-                <div className="flex items-center justify-between relative z-10">
-                  {HISTORICAL_MILESTONES.map((m, idx) => {
-                    const isSelected = selectedMilestoneIndex === idx;
-                    return (
-                      <button
-                        key={m.year + idx}
-                        type="button"
-                        onClick={() => setSelectedMilestoneIndex(idx)}
-                        className="group flex flex-col items-center focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#E31E24] cursor-pointer"
-                        title={`${m.year}: ${m.title[language]}`}
-                      >
-                        <div className={`p-1.5 bg-[#FAF8F5] border-2 transition-transform duration-200 ${
-                          isSelected ? 'border-[#E31E24] scale-125' : 'border-[#111111] group-hover:scale-110'
-                        }`}>
-                          <IconStar 
-                            className={`w-5 h-5 ${
-                              isSelected ? 'text-[#E31E24]' : 'text-[#5B5348] group-hover:text-[#E31E24]'
-                            }`} 
-                          />
-                        </div>
-
-                        <span className={`text-[14px] mt-2 font-helvetica font-bold ${
-                          isSelected ? 'text-[#C41A1F]' : 'text-[#5B5348] group-hover:text-[#111111]'
-                        }`}>
-                          {m.year}
-                        </span>
-                      </button>
-                    );
-                  })}
+          {/* Four portrait frames in a row (3:4, 2px parchment border) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {FOUR_MENTORS.map((mentor) => (
+              <div key={mentor.id} className="group flex flex-col">
+                {/* 3:4 portrait frame, 2px parchment border, lifts 6px on hover */}
+                <div className="relative aspect-[3/4] border-2 border-[#FAF8F5] bg-[#1a1a1a] overflow-hidden transition-transform duration-250 ease-out group-hover:-translate-y-[6px]">
+                  <img
+                    src={mentor.image}
+                    alt={mentor.name[language]}
+                    className="w-full h-full object-cover object-center"
+                  />
                 </div>
 
-              </div>
-            </div>
+                {/* 6px red bar appears under it on hover */}
+                <div className="w-full h-[6px] bg-[#E31E24] mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
 
-            {/* Detailed Selected Milestone Card */}
-            <div className="mt-8 bg-[#f1ece2] border-2 border-[#111111] p-6 sm:p-10 relative overflow-hidden">
-              <div className="relative z-10 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#3d3633] pb-4">
-                  <div className="flex items-baseline gap-3">
-                    <span className="font-helvetica font-extrabold text-[44px] text-[#C41A1F] leading-none">
-                      {currentMilestone.year}
-                    </span>
-                    <span className="text-[12px] font-extrabold uppercase px-3 py-1 bg-[#111111] text-white">
-                      {currentMilestone.category}
-                    </span>
-                  </div>
-
-                  <div className="text-[14px] text-[#5B5348] font-semibold">
-                    {language === 'ta'
-                      ? `காலவரிசை பதிவு • ${currentMilestone.year}`
-                      : `Chronicle Entry • ${currentMilestone.year}`}
-                  </div>
-                </div>
-
-                <h3 className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-snug">
-                  {currentMilestone.title[language]}
+                {/* Name: Helvetica Now Display 800, 22px */}
+                <h3 className="font-helvetica font-extrabold text-[22px] text-[#FAF8F5] leading-snug mt-3">
+                  {mentor.name[language]}
                 </h3>
 
-                <p className="text-[18px] text-[#3a322d] leading-relaxed max-w-4xl">
-                  {currentMilestone.description[language]}
+                {/* Existing one-line description */}
+                <p className="text-[15px] text-[#d8cfc2] leading-relaxed mt-1">
+                  {mentor.description[language]}
                 </p>
-
-                <div className="p-4 bg-white border-l-4 border-[#E31E24] border-y border-r border-[#111111] flex flex-col sm:flex-row sm:items-baseline gap-2 text-[15px] text-[#111111]">
-                  <span className="font-extrabold uppercase text-[#C41A1F] shrink-0">
-                    {language === 'ta' ? 'அரசமைப்பு முக்கியத்துவம்:' : 'Constitutional Significance:'}
-                  </span>
-                  <span className="italic">
-                    {currentMilestone.significance[language]}
-                  </span>
-                </div>
-
-                {/* Step Controls */}
-                <div className="flex items-center justify-between pt-4 border-t border-[#111111]">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedMilestoneIndex(prev => Math.max(0, prev - 1))}
-                    disabled={selectedMilestoneIndex === 0}
-                    className="min-h-[44px] px-5 py-2 bg-white border-2 border-[#111111] hover:bg-[#111111] hover:text-white font-extrabold text-[14px] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer btn-lift inline-flex items-center gap-2"
-                  >
-                    <IconChevronLeft className="w-4 h-4" />
-                    <span>{language === 'ta' ? 'முந்தைய மைல்கல்' : 'Previous Milestone'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedMilestoneIndex(prev => Math.min(HISTORICAL_MILESTONES.length - 1, prev + 1))}
-                    disabled={selectedMilestoneIndex === HISTORICAL_MILESTONES.length - 1}
-                    className="min-h-[44px] px-5 py-2 bg-white border-2 border-[#111111] hover:bg-[#111111] hover:text-white font-extrabold text-[14px] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer btn-lift inline-flex items-center gap-2"
-                  >
-                    <span>{language === 'ta' ? 'அடுத்த மைல்கல்' : 'Next Milestone'}</span>
-                    <IconChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
               </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* 4. Archives: Ruled list (1px ink lines) with year, title and a "View" link (No cards) */}
+      <section className="bg-[#FAF8F5] py-20 md:py-28 border-t border-[#111111]">
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
+          
+          <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h2 className="font-kavivanar font-normal text-[clamp(32px,4vw,48px)] text-[#111111] leading-none">
+                {language === 'ta' ? 'சட்ட ஆவணக் களஞ்சியம் & வரலாற்றுப் பதிவுகள்' : 'Constitutional Archives & Legal Repositories'}
+              </h2>
+              <p className="text-[17px] text-[#5B5348] mt-3">
+                {language === 'ta'
+                  ? 'அரசமைப்பு அமர்வுகளில் தாக்கல் செய்யப்பட்ட மனுக்கள், வரலாற்றுச் சட்ட அறிக்கைகள் மற்றும் ஆவணங்கள்.'
+                  : 'Key constitutional dossiers, statutory guides, and historic committee reports preserved in the Party archives.'}
+              </p>
             </div>
 
-            {/* Full Index */}
-            {showFullIndex && (
-              <div className="mt-12 pt-8 border-t-2 border-[#111111] space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {HISTORICAL_MILESTONES.map((m, idx) => (
-                    <div 
-                      key={m.year + idx}
-                      onClick={() => {
-                        setSelectedMilestoneIndex(idx);
-                        setShowFullIndex(false);
-                      }}
-                      className={`p-6 border-2 transition-colors cursor-pointer ${
-                        selectedMilestoneIndex === idx
-                          ? 'bg-[#f1ece2] border-[#E31E24]'
-                          : 'bg-white border-[#111111] hover:bg-[#f1ece2]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between border-b border-[#3d3633] pb-2 mb-2">
-                        <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">{m.year}</span>
-                        <span className="text-[11px] font-extrabold uppercase px-2 py-0.5 bg-[#111111] text-white">
-                          {m.category}
-                        </span>
-                      </div>
-                      <h4 className="font-extrabold text-[#111111] text-[17px] mb-1 leading-snug">
-                        {m.title[language]}
-                      </h4>
-                      <p className="text-[14px] text-[#5B5348] line-clamp-2">
-                        {m.description[language]}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
+            <Link
+              href="/resources"
+              className="text-[#C41A1F] font-extrabold text-[15px] hover:underline shrink-0"
+            >
+              {language === 'ta' ? 'முழு ஆவணக் களஞ்சியம் →' : 'Browse All Resources →'}
+            </Link>
           </div>
-        </section>
 
-      </div>
+          {/* Ruled list (1px ink lines). Strictly no cards. */}
+          <div className="border-t border-[#111111] divide-y divide-[#111111]">
+            {ARCHIVE_ITEMS.map((item) => (
+              <div
+                key={item.id}
+                className="py-6 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:bg-[#f1ece2] px-3 transition-colors duration-150"
+              >
+                <div className="flex items-start md:items-center gap-6">
+                  {/* Year */}
+                  <span className="font-helvetica font-extrabold text-[22px] text-[#111111] w-16 shrink-0 group-hover:text-[#E31E24] transition-colors">
+                    {item.year}
+                  </span>
+
+                  {/* Title and court info */}
+                  <div>
+                    <h3 className="font-catamaran font-bold text-[18px] text-[#111111] leading-snug">
+                      {item.title[language]}
+                    </h3>
+                    <span className="text-[13px] text-[#5B5348] mt-0.5 block">
+                      {item.court[language]}
+                    </span>
+                  </div>
+                </div>
+
+                {/* View link */}
+                <Link
+                  href={item.link}
+                  className="inline-flex items-center gap-1.5 font-helvetica font-extrabold text-[15px] text-[#C41A1F] hover:text-[#E31E24] hover:underline shrink-0 md:self-center"
+                >
+                  <span>{language === 'ta' ? 'பார்வையிடுக' : 'View'}</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </Link>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
     </div>
   );
 }
