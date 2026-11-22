@@ -1,35 +1,75 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { EventItem } from '@/types';
-import { PageTitleBand } from '@/components/PageTitleBand';
 
-const MONTH_NAMES = [
-  'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-  'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
+const TA_MONTHS = [
+  'ஜனவரி', 'பிப்ரவரி', 'மார்ச்', 'ஏப்ரல்', 'மே', 'ஜூன்',
+  'ஜூலை', 'ஆகஸ்ட்', 'செப்டம்பர்', 'அக்டோபர்', 'நவம்பர்', 'டிசம்பர்'
 ];
+
+const EN_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const WEEKDAYS_EN = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const WEEKDAYS_TA = ['திங்கள்', 'செவ்வாய்', 'புதன்', 'வியாழன்', 'வெள்ளி', 'சனி', 'ஞாயிறு'];
 
 export default function ActivitiesPage() {
   const { language } = useLanguage();
   const { events } = useData();
 
-  // Filters: Status (Upcoming / Past / All), Category, and Month
-  const [activeStatus, setActiveStatus] = useState<'upcoming' | 'past' | 'all'>('all');
-  const [activeCategory, setActiveCategory] = useState<string>('All');
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  // View: 'list' (default) or 'month'
+  const [activeView, setActiveView] = useState<'list' | 'month'>('list');
 
-  // Modal state
+  // Filters: Status ('all' | 'upcoming' | 'past') and Category ('All' or specific)
+  const [activeStatus, setActiveStatus] = useState<'all' | 'upcoming' | 'past'>('all');
+  const [activeCategory, setActiveCategory] = useState<string>('All');
+
+  // Cross-fade animation over 0.25 s on view or filter change
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+
+  // Month view calendar navigation (Defaulting to December 2026 where nearest conference is)
+  const [calendarYear, setCalendarYear] = useState<number>(2026);
+  const [calendarMonth, setCalendarMonth] = useState<number>(11); // 0-indexed: 11 = December
+
+  // Day selection in Month View
+  const [selectedDay, setSelectedDay] = useState<{ dateStr: string; events: EventItem[] } | null>(null);
+
+  // Event details modal
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
-  const triggerRef = useRef<HTMLElement | null>(null);
   const modalCloseBtnRef = useRef<HTMLButtonElement | null>(null);
 
-  // Current calendar month (November = index 10)
-  const currentCalendarMonth = 10;
+  // Trigger 0.25s crossfade on view or filter change
+  useEffect(() => {
+    setIsTransitioning(true);
+    const timer = setTimeout(() => {
+      setIsTransitioning(false);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [activeView, activeStatus, activeCategory]);
 
-  // Extract distinct categories from events data
+  // Modal accessibility
+  useEffect(() => {
+    if (!selectedEvent) return;
+    setTimeout(() => {
+      modalCloseBtnRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedEvent(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedEvent]);
+
+  // Distinct categories in the data
   const existingCategories = useMemo(() => {
     const set = new Set<string>();
     events.forEach((e) => {
@@ -38,469 +78,628 @@ export default function ActivitiesPage() {
     return ['All', ...Array.from(set)];
   }, [events]);
 
-  // Find nearest upcoming event for Section 1
-  const nearestUpcomingEvent = useMemo(() => {
-    const upcoming = events.filter((e) => e.status === 'upcoming');
-    if (upcoming.length > 0) return upcoming[0];
-    return events[0] || null;
-  }, [events]);
-
   // Filtered events
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
-      // Status filter
       if (activeStatus === 'upcoming' && e.status !== 'upcoming') return false;
       if (activeStatus === 'past' && e.status !== 'completed') return false;
-
-      // Category filter
       if (activeCategory !== 'All' && e.category !== activeCategory) return false;
-
-      // Month filter
-      if (selectedMonth !== null) {
-        const d = new Date(e.date);
-        if (isNaN(d.getTime()) || d.getMonth() !== selectedMonth) return false;
-      }
-
       return true;
     });
-  }, [events, activeStatus, activeCategory, selectedMonth]);
+  }, [events, activeStatus, activeCategory]);
 
-  const handleOpenModal = (event: EventItem, e: React.MouseEvent<HTMLElement>) => {
-    triggerRef.current = e.currentTarget;
-    setSelectedEvent(event);
-  };
+  // Nearest upcoming event in filtered results
+  const nearestUpcomingEvent = useMemo(() => {
+    const upcoming = events.filter((e) => e.status === 'upcoming');
+    return upcoming[0] || null;
+  }, [events]);
 
-  const handleCloseModal = () => {
-    setSelectedEvent(null);
-    setTimeout(() => {
-      triggerRef.current?.focus();
-    }, 10);
-  };
+  // List view: Grouped by month
+  const groupedByMonth = useMemo(() => {
+    const groups: {
+      key: string;
+      year: string;
+      monthIndex: number;
+      events: EventItem[];
+    }[] = [];
 
-  // Keyboard accessibility for modal
-  useEffect(() => {
-    if (!selectedEvent) return;
+    // Sort events descending by date
+    const sorted = [...filteredEvents].sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
 
-    setTimeout(() => {
-      modalCloseBtnRef.current?.focus();
-    }, 50);
+    sorted.forEach((event) => {
+      const d = new Date(event.date);
+      const year = isNaN(d.getFullYear()) ? '2026' : String(d.getFullYear());
+      const monthIndex = isNaN(d.getMonth()) ? 11 : d.getMonth();
+      const key = `${year}-${monthIndex}`;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleCloseModal();
+      let grp = groups.find((g) => g.key === key);
+      if (!grp) {
+        grp = { key, year, monthIndex, events: [] };
+        groups.push(grp);
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedEvent]);
+      grp.events.push(event);
+    });
 
-  // Format date for nearest event
-  const nextEventDate = useMemo(() => {
-    if (!nearestUpcomingEvent) return { day: '14', monthYear: 'DECEMBER 2026' };
-    const d = new Date(nearestUpcomingEvent.date);
-    const day = isNaN(d.getDate()) ? '14' : String(d.getDate()).padStart(2, '0');
-    const monthYear = isNaN(d.getTime())
-      ? 'DECEMBER 2026'
-      : d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }).toUpperCase();
-    return { day, monthYear };
-  }, [nearestUpcomingEvent]);
+    return groups;
+  }, [filteredEvents]);
+
+  // Month name helper
+  const getMonthName = (monthIndex: number, lang: 'en' | 'ta') => {
+    return lang === 'ta' ? TA_MONTHS[monthIndex] : EN_MONTHS[monthIndex];
+  };
+
+  // Month view calendar navigation
+  const goToPrevMonth = () => {
+    if (calendarMonth === 0) {
+      setCalendarMonth(11);
+      setCalendarYear((prev) => prev - 1);
+    } else {
+      setCalendarMonth((prev) => prev - 1);
+    }
+    setSelectedDay(null);
+  };
+
+  const goToNextMonth = () => {
+    if (calendarMonth === 11) {
+      setCalendarMonth(0);
+      setCalendarYear((prev) => prev + 1);
+    } else {
+      setCalendarMonth((prev) => prev + 1);
+    }
+    setSelectedDay(null);
+  };
+
+  // Build calendar cells (Monday to Sunday)
+  const calendarDays = useMemo(() => {
+    const firstDay = new Date(calendarYear, calendarMonth, 1);
+    let startDayIndex = firstDay.getDay() - 1; // 0 = Mon, ..., 6 = Sun
+    if (startDayIndex === -1) startDayIndex = 6;
+
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const cells: {
+      dayNum: number | null;
+      dateStr: string | null;
+      events: EventItem[];
+      isToday: boolean;
+    }[] = [];
+
+    // Empty cells before start day
+    for (let i = 0; i < startDayIndex; i++) {
+      cells.push({ dayNum: null, dateStr: null, events: [], isToday: false });
+    }
+
+    // Days in current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(
+        day
+      ).padStart(2, '0')}`;
+      const dayEvents = filteredEvents.filter((e) => e.date === dateStr);
+      // Fixed reference date: 22 November 2026
+      const isToday = calendarYear === 2026 && calendarMonth === 10 && day === 22;
+
+      cells.push({
+        dayNum: day,
+        dateStr,
+        events: dayEvents,
+        isToday,
+      });
+    }
+
+    // Pad ending cells to complete full 7-day row
+    const remainder = cells.length % 7;
+    if (remainder !== 0) {
+      for (let i = 0; i < 7 - remainder; i++) {
+        cells.push({ dayNum: null, dateStr: null, events: [], isToday: false });
+      }
+    }
+
+    return cells;
+  }, [calendarYear, calendarMonth, filteredEvents]);
 
   return (
-    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
-      
-      {/* Universal Page Title Band */}
-      <PageTitleBand
-        title={language === 'ta' ? 'நிகழ்வுகள்' : 'Conferences and events'}
-        description={
-          language === 'ta'
-            ? 'மாநில வழக்கறிஞர் மாநாடுகள், அரசமைப்பு கருத்தரங்குகள் மற்றும் இலவச சட்ட உதவி முகாம்கள்.'
-            : 'State advocate conferences, constitutional seminars, pro-bono citizen legal clinics, and grassroots sessions.'
-        }
-      />
-
-      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12 space-y-16">
-        
+    <div className="w-full min-h-screen bg-[#FAF8F5] text-[#111111] font-catamaran text-[18px] leading-[1.75] pb-24">
+      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12">
         {/* ========================================================== */}
-        {/* 1. NEXT EVENT: ONE FULL-WIDTH RED BLOCK (WHITE TEXT)       */}
+        {/* 1. HEADING ROW & FILTERS                                   */}
         {/* ========================================================== */}
-        {nearestUpcomingEvent && (
-          <section className="bg-[#E31E24] text-white p-8 md:p-14 border-2 border-[#111111] shadow-lg">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-              
-              <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-12 flex-1">
-                
-                {/* Date in Helvetica Now Display 800 at 96px */}
-                <div className="shrink-0 text-left border-b-2 md:border-b-0 md:border-r-2 border-white/30 pb-6 md:pb-0 md:pr-12">
-                  <span className="font-helvetica font-extrabold text-[80px] md:text-[96px] leading-none text-white block">
-                    {nextEventDate.day}
-                  </span>
-                  <span className="font-helvetica font-extrabold text-[18px] md:text-[20px] uppercase text-white/90 block mt-1 tracking-normal">
-                    {nextEventDate.monthYear}
-                  </span>
-                  <span className="text-[12px] font-extrabold uppercase px-2 py-0.5 bg-black text-white inline-block mt-2">
-                    {nearestUpcomingEvent.category}
-                  </span>
-                </div>
+        <header className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-2">
+            {/* Title: Kavivanar at clamp(44px, 6vw, 80px) */}
+            <h1 className="font-kavivanar font-normal text-[clamp(44px,6vw,80px)] text-[#111111] leading-none">
+              {language === 'ta' ? 'நிகழ்வுகள்' : 'Conferences and events'}
+            </h1>
 
-                {/* Title in 36px, Venue, Time, Speakers */}
-                <div className="space-y-3 flex-1">
-                  <span className="text-[13px] font-extrabold uppercase text-white/80 tracking-normal block">
-                    {language === 'ta' ? 'அடுத்த பெரு நிகழ்வு' : 'NEAREST UPCOMING EVENT'}
-                  </span>
-
-                  <h3 className="font-helvetica font-extrabold text-[28px] md:text-[36px] text-white leading-tight">
-                    {nearestUpcomingEvent.title[language]}
-                  </h3>
-
-                  <div className="text-[16px] text-white/90 space-y-1 pt-1">
-                    <p className="font-bold flex items-center gap-2">
-                      <span>📍</span>
-                      <span>{nearestUpcomingEvent.venue[language]}</span>
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span>⏰</span>
-                      <span>{nearestUpcomingEvent.time}</span>
-                    </p>
-                    {nearestUpcomingEvent.chiefGuest && (
-                      <p className="italic text-white/90 pt-1">
-                        <span className="font-bold not-italic">
-                          {language === 'ta' ? 'சிறப்பு விருந்தினர்: ' : 'Chief Guest / Keynote: '}
-                        </span>
-                        {nearestUpcomingEvent.chiefGuest[language]}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-              </div>
-
-              {/* White button "Register" */}
-              <div className="shrink-0 self-start lg:self-center">
-                <Link
-                  href="/enrol"
-                  className="min-h-[48px] px-8 bg-white hover:bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[15px] uppercase tracking-normal inline-flex items-center justify-center btn-lift transition-colors cursor-pointer"
-                >
-                  {language === 'ta' ? 'பதிவுசெய்க (Register)' : 'Register'}
-                </Link>
-              </div>
-
+            {/* Right: Text buttons "List" and "Month" (Active underlined in red) */}
+            <div className="flex items-center gap-6 shrink-0">
+              <button
+                type="button"
+                onClick={() => setActiveView('list')}
+                className={`min-h-[44px] h-[44px] inline-flex items-center font-helvetica font-extrabold text-[17px] cursor-pointer transition-colors ${
+                  activeView === 'list'
+                    ? 'text-[#111111] border-b-2 border-[#E31E24]'
+                    : 'text-[#5B5348] hover:text-[#111111] border-b-2 border-transparent'
+                }`}
+              >
+                {language === 'ta' ? 'பட்டியல்' : 'List'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveView('month')}
+                className={`min-h-[44px] h-[44px] inline-flex items-center font-helvetica font-extrabold text-[17px] cursor-pointer transition-colors ${
+                  activeView === 'month'
+                    ? 'text-[#111111] border-b-2 border-[#E31E24]'
+                    : 'text-[#5B5348] hover:text-[#111111] border-b-2 border-transparent'
+                }`}
+              >
+                {language === 'ta' ? 'மாதம்' : 'Month'}
+              </button>
             </div>
-          </section>
-        )}
+          </div>
 
-        {/* ========================================================== */}
-        {/* 2. FILTERS: TABS + MONTH STRIP (TWELVE SQUARE BUTTONS)      */}
-        {/* ========================================================== */}
-        <section className="space-y-8 border-b-2 border-[#111111] pb-8">
-          
-          {/* Top filter tabs: Upcoming / Past and Event Types */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#3d3633] pb-4">
-            
-            {/* Status Tabs: All, Upcoming, Past */}
-            <div className="flex items-center gap-6 overflow-x-auto">
-              {[
-                { id: 'all', en: 'All Events', ta: 'அனைத்து நிகழ்வுகள்' },
-                { id: 'upcoming', en: 'Upcoming', ta: 'வரவிருப்பவை' },
-                { id: 'past', en: 'Past', ta: 'நிறைவடைந்தவை' }
-              ].map((tab) => {
-                const isActive = activeStatus === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveStatus(tab.id as 'all' | 'upcoming' | 'past')}
-                    className={`min-h-[44px] pb-2 font-helvetica font-extrabold text-[16px] transition-colors cursor-pointer shrink-0 ${
-                      isActive
-                        ? 'border-b-[3px] border-[#E31E24] text-[#111111]'
-                        : 'border-b-[3px] border-transparent text-[#5B5348] hover:text-[#111111]'
-                    }`}
-                  >
-                    {language === 'ta' ? tab.ta : tab.en}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Filters as plain text links: Upcoming / Past, then each event type */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[15px] pt-1">
+            {/* All / Upcoming / Past */}
+            <button
+              type="button"
+              onClick={() => setActiveStatus('all')}
+              className={`min-h-[44px] inline-flex items-center font-helvetica font-bold cursor-pointer transition-colors ${
+                activeStatus === 'all'
+                  ? 'text-[#111111] border-b-2 border-[#E31E24]'
+                  : 'text-[#5B5348] hover:text-[#111111]'
+              }`}
+            >
+              {language === 'ta' ? 'அனைத்தும்' : 'All'}
+            </button>
+            <span className="text-[#5B5348] select-none">/</span>
+            <button
+              type="button"
+              onClick={() => setActiveStatus('upcoming')}
+              className={`min-h-[44px] inline-flex items-center font-helvetica font-bold cursor-pointer transition-colors ${
+                activeStatus === 'upcoming'
+                  ? 'text-[#111111] border-b-2 border-[#E31E24]'
+                  : 'text-[#5B5348] hover:text-[#111111]'
+              }`}
+            >
+              {language === 'ta' ? 'வரவிருப்பவை' : 'Upcoming'}
+            </button>
+            <span className="text-[#5B5348] select-none">/</span>
+            <button
+              type="button"
+              onClick={() => setActiveStatus('past')}
+              className={`min-h-[44px] inline-flex items-center font-helvetica font-bold cursor-pointer transition-colors ${
+                activeStatus === 'past'
+                  ? 'text-[#111111] border-b-2 border-[#E31E24]'
+                  : 'text-[#5B5348] hover:text-[#111111]'
+              }`}
+            >
+              {language === 'ta' ? 'நிறைவடைந்தவை' : 'Past'}
+            </button>
 
-            {/* Event Type Tabs */}
-            <div className="flex items-center gap-4 overflow-x-auto">
-              <span className="text-[13px] font-extrabold text-[#5B5348] uppercase shrink-0">
-                {language === 'ta' ? 'பிரிவு:' : 'Type:'}
-              </span>
-              {existingCategories.map((cat) => {
-                const isActive = activeCategory === cat;
-                return (
+            <span className="text-[#d7d0c3] font-bold mx-2">|</span>
+
+            {/* Event categories */}
+            {existingCategories.map((cat, idx) => {
+              const isActive = activeCategory === cat;
+              return (
+                <React.Fragment key={cat}>
+                  {idx > 0 && <span className="text-[#5B5348] select-none">/</span>}
                   <button
-                    key={cat}
                     type="button"
                     onClick={() => setActiveCategory(cat)}
-                    className={`min-h-[44px] pb-2 font-helvetica font-extrabold text-[15px] transition-colors cursor-pointer shrink-0 ${
+                    className={`min-h-[44px] inline-flex items-center font-helvetica font-bold cursor-pointer transition-colors ${
                       isActive
-                        ? 'border-b-[3px] border-[#E31E24] text-[#111111]'
-                        : 'border-b-[3px] border-transparent text-[#5B5348] hover:text-[#111111]'
+                        ? 'text-[#111111] border-b-2 border-[#E31E24]'
+                        : 'text-[#5B5348] hover:text-[#111111]'
                     }`}
                   >
-                    {cat === 'All' && language === 'ta' ? 'அனைத்தும்' : cat}
+                    {cat === 'All' && language === 'ta' ? 'அனைத்துப் பிரிவுகள்' : cat}
                   </button>
-                );
-              })}
-            </div>
-
+                </React.Fragment>
+              );
+            })}
           </div>
 
-          {/* Month Strip of twelve square month buttons */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-[13px] text-[#5B5348] font-bold">
-              <span>{language === 'ta' ? 'மாதம் வாரியாக வடிகட்டுக:' : 'Filter by calendar month:'}</span>
-              {selectedMonth !== null && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedMonth(null)}
-                  className="text-[#C41A1F] hover:underline cursor-pointer"
-                >
-                  {language === 'ta' ? 'மாத வடிகட்டலை அழிக்க' : 'Clear month filter'}
-                </button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-6 sm:grid-cols-12 gap-2">
-              {MONTH_NAMES.map((month, idx) => {
-                const isSelected = selectedMonth === idx;
-                const isCurrentMonth = currentCalendarMonth === idx;
-
-                return (
-                  <button
-                    key={month}
-                    type="button"
-                    onClick={() => setSelectedMonth(isSelected ? null : idx)}
-                    className={`w-full aspect-square min-h-[44px] flex flex-col items-center justify-center font-helvetica font-extrabold text-[13px] md:text-[14px] border-2 border-[#111111] transition-colors cursor-pointer relative ${
-                      isSelected
-                        ? 'bg-[#E31E24] text-white border-[#E31E24]'
-                        : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
-                    } ${isCurrentMonth ? 'border-b-[3px] border-b-[#111111]' : ''}`}
-                    title={isCurrentMonth ? `${month} (Current Month)` : month}
-                  >
-                    <span>{month}</span>
-                    {isCurrentMonth && (
-                      <span className={`w-3 h-1 bg-[#111111] mt-0.5 ${isSelected ? 'bg-white' : ''}`} />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-        </section>
+          {/* 3 px ink rule below */}
+          <div className="w-full h-[3px] bg-[#111111] mt-2 mb-12" />
+        </header>
 
         {/* ========================================================== */}
-        {/* 3. EVENT LIST AS RULED ROWS, NOT CARDS                     */}
+        {/* CROSS-FADING CONTENT CONTAINER (0.25 s)                    */}
         {/* ========================================================== */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-helvetica font-extrabold text-[clamp(24px,2.8vw,34px)] text-[#111111]">
-              {language === 'ta' ? 'நிகழ்வுகள் பட்டியல்' : 'Official Event Register'}
-            </h2>
-            <span className="text-[14px] text-[#5B5348] font-bold">
-              {filteredEvents.length} {language === 'ta' ? 'பதிவுகள்' : 'entries'}
-            </span>
-          </div>
-
-          {/* 4. When no event matches a filter: one plain line saying so, not an illustration */}
+        <div
+          className={`transition-opacity duration-250 ease-in-out motion-reduce:transition-none ${
+            isTransitioning ? 'opacity-0' : 'opacity-100'
+          }`}
+        >
+          {/* 4. When nothing matches: one plain sentence, no illustration */}
           {filteredEvents.length === 0 ? (
-            <div className="py-12 px-6 text-center border-t border-b border-[#111111] bg-white">
-              <p className="text-[17px] text-[#5B5348]">
-                {language === 'ta'
-                  ? 'தேர்வு செய்யப்பட்ட வடிகட்டலுக்கு ஏற்ப எந்த நிகழ்வுகளும் காணப்படவில்லை.'
-                  : 'No events match the selected filter criteria.'}
-              </p>
+            <p className="py-20 text-center text-[#5B5348] text-[18px]">
+              {language === 'ta'
+                ? 'தேர்வு செய்யப்பட்ட வடிகட்டலுக்கு ஏற்ப எந்த நிகழ்வுகளும் காணப்படவில்லை.'
+                : 'No events match the selected criteria.'}
+            </p>
+          ) : activeView === 'list' ? (
+            /* ========================================================== */
+            /* 2. LIST VIEW (DEFAULT): GROUPED BY MONTH                   */
+            /* ========================================================== */
+            <div className="space-y-16">
+              {groupedByMonth.map((grp) => (
+                <div
+                  key={grp.key}
+                  className="flex flex-col md:flex-row gap-8 lg:gap-12 pb-12 border-b border-[#d7d0c3] last:border-b-0"
+                >
+                  {/* Left Column (about 200 px, sticky on desktop; heading on phones) */}
+                  <div className="w-full md:w-[200px] shrink-0 md:sticky md:top-24 self-start">
+                    <h2 className="font-kavivanar font-normal text-[36px] text-[#111111] leading-tight">
+                      {getMonthName(grp.monthIndex, language)}
+                    </h2>
+                    <p className="font-helvetica font-bold text-[18px] text-[#5B5348] mt-1">
+                      {grp.year}
+                    </p>
+                  </div>
+
+                  {/* Right Column: Events separated by 1 px #d7d0c3 rules */}
+                  <div className="flex-1 divide-y divide-[#d7d0c3]">
+                    {grp.events.map((event) => {
+                      const isNearest = nearestUpcomingEvent?.id === event.id;
+                      const isPast = event.status === 'completed';
+                      const d = new Date(event.date);
+                      const dayNum = isNaN(d.getDate())
+                        ? '15'
+                        : String(d.getDate()).padStart(2, '0');
+
+                      return (
+                        <article key={event.id} className="py-8 first:pt-0 last:pb-0">
+                          {/* Nearest upcoming event has a 3 px red rule above it */}
+                          {isNearest && (
+                            <div className="w-full h-[3px] bg-[#E31E24] mb-6" />
+                          )}
+
+                          <div className="flex flex-col sm:flex-row items-start gap-6 lg:gap-8">
+                            {/* Day number in Helvetica Now Display 800 at 44 px */}
+                            <div className="shrink-0 w-16">
+                              <span
+                                className={`font-helvetica font-extrabold text-[44px] leading-none block ${
+                                  isPast ? 'text-[#5B5348]' : 'text-[#111111]'
+                                }`}
+                              >
+                                {dayNum}
+                              </span>
+                            </div>
+
+                            {/* Details */}
+                            <div className="flex-1 space-y-2">
+                              {/* Type in #C41A1F 15 px */}
+                              <span
+                                className={`text-[15px] font-bold block ${
+                                  isPast ? 'text-[#5B5348]' : 'text-[#C41A1F]'
+                                }`}
+                              >
+                                {event.category}
+                              </span>
+
+                              {/* Title in Helvetica Now Display 800 at 26 px (Kavivanar for Tamil) */}
+                              <h3
+                                className={`text-[26px] leading-[1.2] ${
+                                  language === 'ta'
+                                    ? 'font-kavivanar font-normal'
+                                    : 'font-helvetica font-extrabold'
+                                } ${isPast ? 'text-[#5B5348]' : 'text-[#111111]'}`}
+                              >
+                                {event.title[language]}
+                              </h3>
+
+                              {/* Venue and time in grey 17 px */}
+                              <p className="text-[17px] text-[#5B5348]">
+                                <span>{event.venue[language]}</span>
+                                {event.time && (
+                                  <>
+                                    <span className="mx-2" aria-hidden="true">
+                                      ·
+                                    </span>
+                                    <span>{event.time}</span>
+                                  </>
+                                )}
+                              </p>
+
+                              {/* Speakers if data has them */}
+                              {event.chiefGuest && (
+                                <p className="text-[15px] text-[#5B5348]">
+                                  <span className="font-bold text-[#111111]">
+                                    {language === 'ta' ? 'சிறப்பு பேச்சாளர்: ' : 'Speaker: '}
+                                  </span>
+                                  <span>{event.chiefGuest[language]}</span>
+                                </p>
+                              )}
+
+                              {/* Actions: Details text link & red rectangular Register button */}
+                              <div className="pt-2 flex flex-wrap items-center gap-6">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedEvent(event)}
+                                  className="min-h-[44px] inline-flex items-center font-helvetica font-bold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
+                                >
+                                  {language === 'ta' ? 'விவரங்கள்' : 'Details'}
+                                </button>
+
+                                {event.status === 'upcoming' && (
+                                  <Link
+                                    href="/enrol"
+                                    className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer"
+                                  >
+                                    {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
+                                  </Link>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
-            <div className="border-t border-b border-[#111111] divide-y divide-[#111111] bg-white">
-              {filteredEvents.map((event) => {
-                const d = new Date(event.date);
-                const dayStr = isNaN(d.getDate()) ? '15' : String(d.getDate()).padStart(2, '0');
-                const monthYearStr = isNaN(d.getTime())
-                  ? 'DEC 2026'
-                  : d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }).toUpperCase();
+            /* ========================================================== */
+            /* 3. MONTH VIEW: SQUARE SEVEN-COLUMN GRID (MON TO SUN)       */
+            /* ========================================================== */
+            <div className="space-y-6">
+              {/* Previous and next month text buttons above grid */}
+              <div className="flex items-center justify-between border-b border-[#d7d0c3] pb-4">
+                <button
+                  type="button"
+                  onClick={goToPrevMonth}
+                  className="min-h-[44px] h-[44px] px-2 font-helvetica font-bold text-[16px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
+                >
+                  ← {getMonthName((calendarMonth - 1 + 12) % 12, language)}
+                </button>
 
-                const isPast = event.status === 'completed';
+                <h2 className="font-kavivanar font-normal text-[28px] md:text-[36px] text-[#111111] leading-none">
+                  {getMonthName(calendarMonth, language)} {calendarYear}
+                </h2>
 
-                return (
+                <button
+                  type="button"
+                  onClick={goToNextMonth}
+                  className="min-h-[44px] h-[44px] px-2 font-helvetica font-bold text-[16px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
+                >
+                  {getMonthName((calendarMonth + 1) % 12, language)} →
+                </button>
+              </div>
+
+              {/* Day headers: Monday to Sunday */}
+              <div className="grid grid-cols-7 border-t border-l border-[#d7d0c3] text-center">
+                {(language === 'ta' ? WEEKDAYS_TA : WEEKDAYS_EN).map((dayName) => (
                   <div
-                    key={event.id}
-                    onClick={(e) => handleOpenModal(event, e)}
-                    className={`group relative py-8 px-6 transition-all duration-200 cursor-pointer overflow-hidden hover:bg-[#f1ece2] ${
-                      isPast ? 'text-[#5B5348]' : 'text-[#111111]'
-                    }`}
+                    key={dayName}
+                    className="border-r border-b border-[#d7d0c3] py-2 font-helvetica font-extrabold text-[14px] text-[#5B5348] uppercase tracking-normal"
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-transform duration-200 ease-out group-hover:translate-x-[18px]">
-                      
-                      {/* Left: 120px date block (day 56px, month and year in grey) */}
-                      <div className="flex items-start gap-8 flex-1">
-                        
-                        <div className="w-[120px] shrink-0 text-left">
-                          <span className={`font-helvetica font-extrabold text-[56px] leading-none block ${
-                            isPast ? 'text-[#5B5348]' : 'text-[#111111]'
-                          }`}>
-                            {dayStr}
-                          </span>
-                          <span className="font-helvetica font-bold text-[14px] text-[#5B5348] uppercase block mt-1">
-                            {monthYearStr}
-                          </span>
-                        </div>
+                    {dayName}
+                  </div>
+                ))}
+              </div>
 
-                        {/* Middle: Type in #C41A1F, Title in 28px, Venue, Speakers */}
-                        <div className="flex-1 space-y-1.5">
-                          <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] block">
-                            {event.category}
-                          </span>
+              {/* Square 7-column grid with 1 px #d7d0c3 lines */}
+              <div className="grid grid-cols-7 border-l border-[#d7d0c3]">
+                {calendarDays.map((cell, idx) => {
+                  const hasEvents = cell.events.length > 0;
+                  const isSelected = selectedDay?.dateStr === cell.dateStr;
 
-                          <h3 className={`font-helvetica font-extrabold text-[24px] md:text-[28px] leading-tight ${
-                            isPast ? 'text-[#5B5348]' : 'text-[#111111] group-hover:text-[#E31E24] transition-colors'
-                          }`}>
-                            {event.title[language]}
-                          </h3>
+                  if (cell.dayNum === null) {
+                    return (
+                      <div
+                        key={`empty-${idx}`}
+                        className="border-r border-b border-[#d7d0c3] aspect-square min-h-[60px] sm:min-h-[90px] bg-[#FAF8F5]/40"
+                      />
+                    );
+                  }
 
-                          <p className="text-[15px] font-semibold text-[#5B5348]">
-                            📍 {event.venue[language]} {event.time ? `• ⏰ ${event.time}` : ''}
+                  return (
+                    <button
+                      key={cell.dateStr || idx}
+                      type="button"
+                      disabled={!hasEvents}
+                      onClick={() =>
+                        hasEvents
+                          ? setSelectedDay({
+                              dateStr: cell.dateStr!,
+                              events: cell.events,
+                            })
+                          : null
+                      }
+                      className={`border-r border-b border-[#d7d0c3] aspect-square min-h-[60px] sm:min-h-[90px] p-2 flex flex-col justify-between text-left transition-colors ${
+                        hasEvents ? 'cursor-pointer hover:bg-white' : 'cursor-default'
+                      } ${cell.isToday ? 'border-2 border-[#111111]' : ''} ${
+                        isSelected ? 'bg-white' : ''
+                      }`}
+                    >
+                      {/* Day number */}
+                      <span className="font-helvetica font-extrabold text-[16px] md:text-[18px] text-[#111111] leading-none">
+                        {cell.dayNum}
+                      </span>
+
+                      {/* 10 px red square under days that have an event */}
+                      {hasEvents && (
+                        <div
+                          className="w-[10px] h-[10px] bg-[#E31E24] mt-1 shrink-0"
+                          aria-label={`${cell.events.length} event(s)`}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Clicking a day with events opens its events in a plain panel below the grid */}
+              {selectedDay && selectedDay.events.length > 0 && (
+                <div className="bg-white border border-[#111111] p-6 md:p-8 mt-8 space-y-6">
+                  <div className="flex items-center justify-between border-b border-[#d7d0c3] pb-4">
+                    <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                      {language === 'ta'
+                        ? `நிகழ்வுகள்: ${selectedDay.dateStr}`
+                        : `Events on ${selectedDay.dateStr}`}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDay(null)}
+                      className="min-h-[44px] h-[44px] px-4 font-helvetica font-bold text-[15px] text-[#5B5348] hover:text-[#111111] cursor-pointer"
+                    >
+                      {language === 'ta' ? 'மூடுக' : 'Close'}
+                    </button>
+                  </div>
+
+                  <div className="divide-y divide-[#d7d0c3]">
+                    {selectedDay.events.map((ev) => (
+                      <div key={ev.id} className="py-4 space-y-2 first:pt-0 last:pb-0">
+                        <span className="text-[14px] font-bold text-[#C41A1F] block">
+                          {ev.category}
+                        </span>
+                        <h4
+                          className={`text-[22px] text-[#111111] leading-snug ${
+                            language === 'ta'
+                              ? 'font-kavivanar font-normal'
+                              : 'font-helvetica font-extrabold'
+                          }`}
+                        >
+                          {ev.title[language]}
+                        </h4>
+                        <p className="text-[16px] text-[#5B5348]">
+                          {ev.venue[language]} {ev.time ? `· ${ev.time}` : ''}
+                        </p>
+                        {ev.chiefGuest && (
+                          <p className="text-[14px] text-[#5B5348]">
+                            <span className="font-bold text-[#111111]">
+                              {language === 'ta' ? 'சிறப்பு பேச்சாளர்: ' : 'Speaker: '}
+                            </span>
+                            {ev.chiefGuest[language]}
                           </p>
-
-                          {event.chiefGuest && (
-                            <p className="text-[14px] text-[#111111] pt-0.5">
-                              <span className="text-[#5B5348] font-bold">
-                                {language === 'ta' ? 'சிறப்பு பேச்சாளர்: ' : 'Speaker: '}
-                              </span>
-                              {event.chiefGuest[language]}
-                            </p>
+                        )}
+                        <div className="pt-2 flex items-center gap-6">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedEvent(ev)}
+                            className="min-h-[44px] inline-flex items-center font-helvetica font-bold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
+                          >
+                            {language === 'ta' ? 'விவரங்கள்' : 'Details'}
+                          </button>
+                          {ev.status === 'upcoming' && (
+                            <Link
+                              href="/enrol"
+                              className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer"
+                            >
+                              {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
+                            </Link>
                           )}
                         </div>
-
                       </div>
-
-                      {/* Right: "Details" link */}
-                      <div className="shrink-0 self-end lg:self-center">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenModal(event, e);
-                          }}
-                          className="font-helvetica font-extrabold text-[15px] text-[#C41A1F] hover:text-[#E31E24] hover:underline inline-flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <span>{language === 'ta' ? 'முழு விவரம்' : 'Details'}</span>
-                          <span>&rarr;</span>
-                        </button>
-                      </div>
-
-                    </div>
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              )}
             </div>
           )}
-
-        </section>
-
+        </div>
       </div>
 
       {/* ========================================================== */}
-      {/* EVENT DETAILS MODAL                                        */}
-      {/* (Square parchment panel, 2px ink border, 6px red top bar)  */}
+      {/* PLAIN EVENT DETAILS MODAL                                  */}
       {/* ========================================================== */}
       {selectedEvent && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="event-modal-title"
-          onClick={handleCloseModal}
-          className="fixed inset-0 z-50 bg-[#111111]/80 flex items-center justify-center p-4"
+          onClick={() => setSelectedEvent(null)}
+          className="fixed inset-0 z-50 bg-[#111111]/70 flex items-center justify-center p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#FAF8F5] text-[#111111] max-w-xl w-full border-2 border-[#111111] p-6 sm:p-8 relative shadow-2xl space-y-6"
+            className="bg-[#FAF8F5] text-[#111111] max-w-xl w-full border border-[#111111] p-6 sm:p-8 space-y-6"
           >
-            {/* 6px red top bar */}
-            <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#E31E24]" />
-
-            {/* Header: Title and Close button */}
-            <div className="flex items-start justify-between gap-4 border-b-2 border-[#111111] pb-4">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 border-b border-[#111111] pb-4">
               <div>
-                <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
-                  [{selectedEvent.category}]
+                <span className="text-[13px] font-bold text-[#C41A1F] block mb-1">
+                  {selectedEvent.category}
                 </span>
-                <h3 id="event-modal-title" className="font-helvetica font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight">
+                <h3
+                  id="event-modal-title"
+                  className={`text-[24px] md:text-[28px] text-[#111111] leading-tight ${
+                    language === 'ta'
+                      ? 'font-kavivanar font-normal'
+                      : 'font-helvetica font-extrabold'
+                  }`}
+                >
                   {selectedEvent.title[language]}
                 </h3>
               </div>
-
               <button
                 ref={modalCloseBtnRef}
                 type="button"
-                onClick={handleCloseModal}
-                className="min-h-[44px] h-[44px] px-4 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase tracking-normal transition-colors cursor-pointer btn-lift"
+                onClick={() => setSelectedEvent(null)}
+                className="min-h-[44px] h-[44px] px-4 font-helvetica font-bold text-[14px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
             </div>
 
             {/* Description */}
-            <p className="text-[17px] text-[#3a322d] leading-relaxed">
+            <p className="text-[17px] text-[#111111] leading-relaxed">
               {selectedEvent.description[language]}
             </p>
 
-            {/* Venue, Date & Speaker */}
-            <div className="p-4 bg-white border border-[#111111] space-y-2 text-[15px]">
-              <div>
-                <strong className="block text-[#5B5348] text-[12px] uppercase">
-                  {language === 'ta' ? 'நடைபெறும் இடம்:' : 'Venue & Location:'}
+            {/* Venue, Schedule, Speakers */}
+            <div className="border-t border-[#d7d0c3] pt-4 space-y-2 text-[15px] text-[#5B5348]">
+              <p>
+                <strong className="text-[#111111]">
+                  {language === 'ta' ? 'இடம்: ' : 'Venue: '}
                 </strong>
-                <span className="font-semibold text-[#111111]">{selectedEvent.venue[language]}</span>
-              </div>
-              <div>
-                <strong className="block text-[#5B5348] text-[12px] uppercase">
-                  {language === 'ta' ? 'தேதி & நேரம்:' : 'Date & Schedule:'}
+                {selectedEvent.venue[language]}
+              </p>
+              <p>
+                <strong className="text-[#111111]">
+                  {language === 'ta' ? 'நேரம்: ' : 'Schedule: '}
                 </strong>
-                <span className="font-semibold text-[#111111]">
-                  {selectedEvent.date} {selectedEvent.time ? `• ${selectedEvent.time}` : ''}
-                </span>
-              </div>
+                {selectedEvent.date} {selectedEvent.time ? `· ${selectedEvent.time}` : ''}
+              </p>
               {selectedEvent.chiefGuest && (
-                <div>
-                  <strong className="block text-[#5B5348] text-[12px] uppercase">
-                    {language === 'ta' ? 'சிறப்பு பேச்சாளர் / தலைவர்:' : 'Keynote / Chief Guest:'}
+                <p>
+                  <strong className="text-[#111111]">
+                    {language === 'ta' ? 'தலைவர் / பேச்சாளர்: ' : 'Keynote / Speaker: '}
                   </strong>
-                  <span className="font-semibold text-[#111111]">{selectedEvent.chiefGuest[language]}</span>
-                </div>
+                  {selectedEvent.chiefGuest[language]}
+                </p>
               )}
             </div>
 
-            {/* Footer Buttons */}
-            <div className="pt-2 flex items-center justify-between border-t border-[#111111]/20">
+            {/* Actions */}
+            <div className="pt-2 flex items-center justify-between border-t border-[#d7d0c3]">
               {selectedEvent.status === 'upcoming' ? (
                 <Link
                   href="/enrol"
-                  className="min-h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center btn-lift"
+                  className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors"
                 >
-                  {language === 'ta' ? 'பதிவுசெய்க (Register)' : 'Register for Event'}
+                  {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
                 </Link>
               ) : (
-                <span className="text-[13px] font-bold text-[#5B5348]">
-                  {language === 'ta' ? 'நிகழ்வு நிறைவடைந்தது' : 'Event completed'}
+                <span className="text-[14px] font-bold text-[#5B5348]">
+                  {language === 'ta' ? 'நிறைவடைந்தது' : 'Event completed'}
                 </span>
               )}
-
               <button
                 type="button"
-                onClick={handleCloseModal}
-                className="min-h-[44px] h-[44px] px-6 bg-[#111111] hover:bg-[#E31E24] text-white font-extrabold text-[14px] uppercase tracking-normal transition-colors cursor-pointer btn-lift"
+                onClick={() => setSelectedEvent(null)}
+                className="min-h-[44px] h-[44px] px-4 font-helvetica font-bold text-[14px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }
