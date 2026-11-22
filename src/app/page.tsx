@@ -17,8 +17,7 @@ import {
   Quote,
   CheckCircle2,
   BookOpen,
-  Award,
-  ShieldCheck
+  Award
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -259,47 +258,8 @@ export default function HomePage() {
       </section>
 
       {/* 6. DISTRICT STRUCTURE & 74 PARTY CADRE DIRECTORY (Tamil Nadu Interactive Cartography) */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10 border-b border-neutral-300">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10">
         <TamilNaduMap />
-      </section>
-
-      {/* 7. OFFICIAL ENROLLMENT NOTICE / ADVOCATE MEMBERSHIP PROCLAMATION (Mass & Stylish) */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12">
-        <div className="bg-[#111111] text-white p-8 sm:p-14 border-t-4 border-[#E31E24] relative overflow-hidden shadow-2xl">
-          
-          {/* Subtle Radiant Sunrise Background Glow */}
-          <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-[#E31E24]/20 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="max-w-4xl space-y-4 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#E31E24] text-white text-[11px] font-english font-bold uppercase tracking-widest">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>{language === 'ta' ? 'அதிகாரப்பூர்வ அழைப்பு • திமுக வழக்கறிஞர் அணி' : 'OFFICIAL MEMBERSHIP ENROLLMENT • DMK LEGAL WING'}</span>
-            </div>
-
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black font-dmk-headline tracking-tight text-white leading-tight">
-              {t.cta.title}
-            </h2>
-
-            <p className="text-sm sm:text-base text-neutral-300 leading-relaxed font-dmk-body max-w-3xl">
-              {t.cta.desc}
-            </p>
-
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              <Link
-                href="/contact#register"
-                className="px-8 py-3.5 bg-[#E31E24] hover:bg-white hover:text-black text-white text-xs sm:text-sm font-english font-bold uppercase tracking-wider transition-all border border-white font-dmk-headline shadow-lg"
-              >
-                {t.cta.button} &rarr;
-              </Link>
-              <Link
-                href="/structure"
-                className="px-8 py-3.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs sm:text-sm font-english font-bold uppercase tracking-wider transition-all border border-neutral-700 font-dmk-headline"
-              >
-                {language === 'ta' ? 'அமைப்புப் பட்டியல்' : 'View Hierarchy'}
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
     </div>
