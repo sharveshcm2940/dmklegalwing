@@ -116,7 +116,7 @@ export default function IdeologyPage() {
                   onKeyDown={(e) => handleKeyDown(e, idx)}
                   className={`w-full min-h-[58px] px-5 flex items-center justify-between text-left border-b border-[#d7d0c3] transition-all duration-150 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E31E24] ${
                     isSelected
-                      ? 'border-l-4 border-l-[#E31E24] text-[#111111] font-bold bg-white shadow-sm'
+                      ? 'border-l-4 border-l-[#E31E24] text-[#111111] font-bold bg-white'
                       : 'border-l-4 border-l-transparent text-[#5B5348] font-normal hover:text-[#111111] hover:bg-[#FAF8F5]'
                   }`}
                 >
@@ -164,13 +164,13 @@ export default function IdeologyPage() {
                 </span>
               </div>
 
-              {/* Title: Kavivanar 52 px (Tamil) or Helvetica Now Display 800 44 px (English) */}
+              {/* Title: Kavivanar 56 px (Tamil) or Helvetica Now Display 800 48 px (English) */}
               {language === 'ta' ? (
-                <h2 className="font-kavivanar font-normal text-[ clamp(32px,4vw,52px) ] text-[#111111] leading-[1.12]">
+                <h2 className="font-kavivanar font-normal text-[56px] text-[#111111] leading-[1.12]">
                   {activePillar.title.ta}
                 </h2>
               ) : (
-                <h2 className="font-helvetica font-extrabold text-[ clamp(30px,3.6vw,44px) ] text-[#111111] leading-[1.12]">
+                <h2 className="font-helvetica font-extrabold text-[48px] text-[#111111] leading-[1.12]">
                   {activePillar.title.en}
                 </h2>
               )}
@@ -333,7 +333,7 @@ export default function IdeologyPage() {
         </div>
 
         {/* TREATY BLOCK: Plain 1 px ink-bordered box with existing text and red download button */}
-        <section className="border border-[#111111] bg-white p-8 md:p-12 mt-16 md:mt-24 shadow-sm relative overflow-hidden">
+        <section className="border border-[#111111] bg-white p-8 md:p-12 mt-16 md:mt-24 relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[5px] dmk-flag-strip" aria-hidden="true" />
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-3xl space-y-4">
