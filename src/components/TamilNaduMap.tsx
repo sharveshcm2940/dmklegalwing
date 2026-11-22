@@ -92,8 +92,8 @@ export const TamilNaduMap: React.FC = () => {
       <div className="flex items-center justify-between pb-6 mb-6 border-b border-white/20 relative z-10">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 bg-[#FFD166] inline-block" />
-            <span className="text-[11px] font-english font-bold uppercase tracking-[0.2em] text-[#FFD166]">
+            <span className="w-2.5 h-2.5 bg-[#C41A1F] inline-block" />
+            <span className="text-[11px] font-english font-bold uppercase tracking-[0.2em] text-[#FAF8F5]">
               {language === 'ta' ? 'அமைப்பு மாவட்டக் கட்டமைப்பு' : 'ORGANISATIONAL DIRECTORY'}
             </span>
           </div>
@@ -107,10 +107,10 @@ export const TamilNaduMap: React.FC = () => {
           </p>
         </div>
 
-        {/* "View More ↗" Yellow Pill Button (Exact match to Image 3) */}
+        {/* "View More ↗" Button */}
         <button
           onClick={() => setShowFullDirectoryModal(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFD166] hover:bg-white text-neutral-900 text-xs sm:text-sm font-english font-black uppercase tracking-wider transition-all shadow-md shrink-0 cursor-pointer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FAF8F5] hover:bg-white text-[#111111] text-xs sm:text-sm font-english font-black uppercase tracking-wider transition-all shadow-xs shrink-0 cursor-pointer rounded-[2px]"
         >
           <span>{language === 'ta' ? 'அனைத்து 74 மாவட்டங்கள்' : 'View More'}</span>
           <span className="text-base leading-none">↗</span>
@@ -143,9 +143,9 @@ export const TamilNaduMap: React.FC = () => {
                     onClick={() => setSelectedCode(dist.code)}
                     onMouseEnter={() => setHoveredCode(dist.code)}
                     onMouseLeave={() => setHoveredCode(null)}
-                    fill={isSelected ? '#F59E0B' : isHovered ? '#FFD166' : '#FFFFFF'}
-                    stroke={isSelected ? '#FFFFFF' : '#8A0005'}
-                    strokeWidth={isSelected ? '1.8' : '0.8'}
+                    fill={isSelected ? '#FCE8E8' : isHovered ? '#FAF8F5' : '#FFFFFF'}
+                    stroke={isSelected ? '#C41A1F' : '#8A0005'}
+                    strokeWidth={isSelected ? '2' : '0.8'}
                     strokeLinejoin="round"
                     strokeLinecap="round"
                     className="cursor-pointer transition-colors duration-150"
@@ -157,9 +157,9 @@ export const TamilNaduMap: React.FC = () => {
             </svg>
           </div>
 
-          {/* Inset Box showing Zoomed District Outline (Matching Image 3) */}
-          <div className="w-full md:w-2/5 flex flex-col items-center justify-center p-4 bg-[#630003] border-2 border-white/40 shadow-xl">
-            <span className="text-sm font-english font-black uppercase tracking-wider text-[#FFD166] text-center mb-0.5">
+          {/* Inset Box showing Zoomed District Outline */}
+          <div className="w-full md:w-2/5 flex flex-col items-center justify-center p-4 bg-[#630003] border-2 border-white/40 shadow-xl rounded-[2px]">
+            <span className="text-sm font-english font-black uppercase tracking-wider text-[#FAF8F5] text-center mb-0.5">
               {activeAdminDistrict.name[language]}
             </span>
             <span className="text-[10px] text-white/70 font-mono tracking-wider uppercase mb-2">
@@ -167,15 +167,15 @@ export const TamilNaduMap: React.FC = () => {
             </span>
             
             {/* Zoomed authentic SVG contour of that exact district */}
-            <div className="w-44 h-44 relative flex items-center justify-center my-2 p-2 bg-[#4D0002]/70 border border-white/20 overflow-hidden">
+            <div className="w-44 h-44 relative flex items-center justify-center my-2 p-2 bg-[#4D0002]/70 border border-white/20 overflow-hidden rounded-[2px]">
               <svg 
                 viewBox={activeAdminDistrict.viewBox} 
                 className="w-full h-full filter drop-shadow-md"
               >
                 <path
                   d={activeAdminDistrict.path}
-                  fill="#F59E0B"
-                  stroke="#FFFFFF"
+                  fill="#FCE8E8"
+                  stroke="#C41A1F"
                   strokeWidth="1.5"
                   strokeLinejoin="round"
                   strokeLinecap="round"
@@ -184,7 +184,7 @@ export const TamilNaduMap: React.FC = () => {
             </div>
 
             <div className="mt-2 text-center text-[11px] text-white/90 font-english space-y-1">
-              <span className="inline-block px-3 py-1 bg-[#FFD166] text-neutral-900 font-bold uppercase tracking-wider text-[11px]">
+              <span className="inline-block px-3 py-1 bg-[#FAF8F5] text-[#111111] font-bold uppercase tracking-wider text-[11px] rounded-[2px]">
                 {currentSubDistricts.length} {language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'Party Units'}
               </span>
               <p className="text-white/70 text-[10px] pt-1">
@@ -200,8 +200,8 @@ export const TamilNaduMap: React.FC = () => {
         {/* ========================================================== */}
         <div className="lg:col-span-5 space-y-4">
           
-          {/* Official DMK Leadership & Rising Sun Flag Banner (Matching Image 3 header) */}
-          <div className="w-full bg-[#111111] border-2 border-white/30 overflow-hidden relative shadow-lg">
+          {/* Official DMK Leadership & Rising Sun Flag Banner */}
+          <div className="w-full bg-[#111111] border-2 border-white/30 overflow-hidden relative shadow-lg rounded-[2px]">
             
             {/* Top red/black dual-tone stripe */}
             <div className="h-1.5 w-full flex">
@@ -213,7 +213,7 @@ export const TamilNaduMap: React.FC = () => {
               
               {/* Leader portrait + attribution */}
               <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#FFD166] shrink-0 bg-neutral-900">
+                <div className="w-14 h-14 rounded-[2px] overflow-hidden border-2 border-[#FAF8F5] shrink-0 bg-neutral-900">
                   <img
                     src="/images/dmk-four-leaders.jpg"
                     alt="DMK Leadership"
@@ -221,7 +221,7 @@ export const TamilNaduMap: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#FFD166] block">
+                  <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#FAF8F5] block">
                     {language === 'ta' ? 'மாநிலத் தலைமை வழிகாட்டல்' : 'STATE EXECUTIVE COMMAND'}
                   </span>
                   <h4 className="text-sm font-black text-white font-dmk-headline leading-tight">
@@ -234,11 +234,11 @@ export const TamilNaduMap: React.FC = () => {
               </div>
 
               {/* DMK Flag with Rising Sun badge */}
-              <div className="flex flex-col items-center justify-center p-2 bg-gradient-to-r from-red-600 via-red-700 to-black border border-white/20 px-3">
+              <div className="flex flex-col items-center justify-center p-2 bg-gradient-to-r from-red-600 via-red-700 to-black border border-white/20 px-3 rounded-[2px]">
                 <span className="text-xs font-black tracking-wider text-white uppercase font-english">
                   DMK
                 </span>
-                <span className="text-[9px] text-[#FFD166] font-bold">
+                <span className="text-[9px] text-[#FAF8F5] font-bold">
                   LEGAL WING
                 </span>
               </div>
@@ -246,24 +246,24 @@ export const TamilNaduMap: React.FC = () => {
             </div>
           </div>
 
-          {/* Sub-Districts List (Matching Image 3 white pill cards) */}
+          {/* Sub-Districts List */}
           <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
             {currentSubDistricts.map((sub, index) => (
               <div
                 key={sub.id}
-                className="bg-white text-neutral-900 p-3 sm:p-3.5 border border-neutral-300 shadow-sm flex items-center justify-between gap-3 hover:border-black transition-all group"
+                className="bg-white text-neutral-900 p-3 sm:p-3.5 border border-neutral-300 shadow-xs flex items-center justify-between gap-3 hover:border-black transition-all group rounded-[2px]"
               >
                 
                 {/* Number badge & Sub-district Name */}
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="w-7 h-7 bg-[#E31E24] text-white rounded-full flex items-center justify-center text-xs font-english font-black shrink-0 shadow-xs">
+                  <span className="w-7 h-7 bg-[#E31E24] text-white rounded-[2px] flex items-center justify-center text-xs font-english font-black shrink-0 shadow-xs">
                     {index + 1}
                   </span>
                   <div className="min-w-0">
-                    <h5 className="text-xs sm:text-sm font-black font-dmk-headline text-neutral-900 group-hover:text-[#E31E24] transition-colors truncate">
+                    <h5 className="text-xs sm:text-sm font-black font-dmk-headline text-neutral-900 group-hover:text-[#C41A1F] transition-colors truncate">
                       {sub.name[language]}
                     </h5>
-                    <p className="text-[11px] text-neutral-600 truncate font-dmk-body">
+                    <p className="text-[11px] text-[#5B5348] truncate font-dmk-body">
                       {sub.organizer[language]} • <span className="font-mono text-neutral-800">{sub.contactPhone}</span>
                     </p>
                   </div>
@@ -275,7 +275,7 @@ export const TamilNaduMap: React.FC = () => {
                   {/* View Details modal button */}
                   <button
                     onClick={() => setSelectedSubDistrict(sub)}
-                    className="p-1.5 text-neutral-500 hover:text-black hover:bg-neutral-100 transition-colors"
+                    className="p-1.5 text-neutral-500 hover:text-black hover:bg-neutral-100 transition-colors rounded-[2px]"
                     title={language === 'ta' ? 'பொறுப்பாளர் விவரம்' : 'View Officer Dossier'}
                   >
                     <Eye className="w-4 h-4" />
@@ -284,7 +284,7 @@ export const TamilNaduMap: React.FC = () => {
                   {/* Direct Phone Call button */}
                   <a
                     href={`tel:${sub.contactPhone}`}
-                    className="p-1.5 text-neutral-500 hover:text-[#E31E24] hover:bg-neutral-100 transition-colors"
+                    className="p-1.5 text-neutral-500 hover:text-[#C41A1F] hover:bg-neutral-100 transition-colors rounded-[2px]"
                     title={`Call ${sub.contactPhone}`}
                   >
                     <Phone className="w-4 h-4" />
@@ -300,24 +300,24 @@ export const TamilNaduMap: React.FC = () => {
 
       </div>
 
-      {/* 3. SUB-DISTRICT DETAILS POPUP MODAL (When clicking Eye icon) */}
+      {/* 3. SUB-DISTRICT DETAILS POPUP MODAL */}
       {selectedSubDistrict && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-[#FAF8F5] text-neutral-900 max-w-lg w-full border-2 border-neutral-900 p-6 sm:p-8 shadow-2xl relative font-dmk-body">
+          <div className="bg-[#FAF8F5] text-neutral-900 max-w-lg w-full border-2 border-[#111111] p-6 sm:p-8 shadow-2xl relative font-dmk-body rounded-[2px]">
             
             {/* Header bar */}
-            <div className="flex items-start justify-between border-b-2 border-neutral-900 pb-4 mb-4">
+            <div className="flex items-start justify-between border-b-2 border-[#111111] pb-4 mb-4">
               <div>
-                <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#E31E24] block mb-1">
+                <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block mb-1">
                   OFFICIAL DISTRICT LEGAL DOSSIER
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-neutral-900 font-dmk-headline">
+                <h3 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
                   {selectedSubDistrict.name[language]}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedSubDistrict(null)}
-                className="p-1 text-neutral-400 hover:text-neutral-900 transition-colors"
+                className="p-1 text-[#5B5348] hover:text-[#111111] transition-colors rounded-[2px]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -325,64 +325,64 @@ export const TamilNaduMap: React.FC = () => {
 
             {/* Dossier Content */}
             <div className="space-y-4 text-xs sm:text-sm">
-              <div className="p-3 bg-white border border-neutral-300 space-y-1">
-                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 block">
+              <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
+                <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block">
                   {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'DISTRICT ORGANIZER'}
                 </span>
-                <p className="text-base font-bold text-neutral-900 font-dmk-headline">
+                <p className="text-base font-bold text-[#111111] font-dmk-headline">
                   {selectedSubDistrict.organizer[language]}
                 </p>
-                <p className="text-xs text-neutral-600 font-english">
+                <p className="text-xs text-[#5B5348] font-english">
                   Senior Trial Advocate • DMK Legal Wing
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-white border border-neutral-300">
-                  <span className="text-[10px] font-english font-bold uppercase text-neutral-500 block mb-1">
+                <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
+                  <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
                     {language === 'ta' ? 'தொலைபேசி' : 'PHONE CONTACT'}
                   </span>
                   <a
                     href={`tel:${selectedSubDistrict.contactPhone}`}
-                    className="font-mono font-bold text-[#E31E24] hover:underline"
+                    className="font-mono font-bold text-[#C41A1F] hover:underline"
                   >
                     {selectedSubDistrict.contactPhone}
                   </a>
                 </div>
-                <div className="p-3 bg-white border border-neutral-300">
-                  <span className="text-[10px] font-english font-bold uppercase text-neutral-500 block mb-1">
+                <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
+                  <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
                     {language === 'ta' ? 'மண்டலம்' : 'PARTY ZONE'}
                   </span>
-                  <span className="font-bold text-neutral-900">
+                  <span className="font-bold text-[#111111]">
                     {selectedSubDistrict.zone}
                   </span>
                 </div>
               </div>
 
-              <div className="p-3 bg-white border border-neutral-300 space-y-1">
-                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 block">
+              <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
+                <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block">
                   {language === 'ta' ? 'நீதிமன்ற வளாகம்' : 'ATTACHED COURT COMPLEX'}
                 </span>
-                <p className="text-neutral-800 font-dmk-body">
+                <p className="text-[#111111] font-dmk-body">
                   {selectedSubDistrict.courtComplex[language]}
                 </p>
               </div>
 
-              <div className="p-3 bg-white border border-neutral-300 space-y-1">
-                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 block">
+              <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
+                <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block">
                   {language === 'ta' ? 'மாவட்ட தலைமையகம்' : 'HEADQUARTERS'}
                 </span>
-                <p className="text-neutral-800 font-dmk-body">
+                <p className="text-[#111111] font-dmk-body">
                   {selectedSubDistrict.headquarters[language]}
                 </p>
               </div>
             </div>
 
             {/* Bottom Actions */}
-            <div className="mt-6 pt-4 border-t border-neutral-300 flex items-center justify-between">
+            <div className="mt-6 pt-4 border-t border-[#D8D3CB] flex items-center justify-between">
               <a
                 href={`tel:${selectedSubDistrict.contactPhone}`}
-                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors rounded-[2px]"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>{language === 'ta' ? 'அழைக்க' : 'Direct Call'}</span>
@@ -390,7 +390,7 @@ export const TamilNaduMap: React.FC = () => {
 
               <button
                 onClick={() => setSelectedSubDistrict(null)}
-                className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 text-neutral-900 text-xs font-english font-bold uppercase tracking-wider transition-colors"
+                className="px-4 py-2 bg-[#D8D3CB] hover:bg-[#FAF8F5] text-[#111111] text-xs font-english font-bold uppercase tracking-wider transition-colors rounded-[2px]"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
@@ -400,15 +400,15 @@ export const TamilNaduMap: React.FC = () => {
         </div>
       )}
 
-      {/* 4. FULL 74 DISTRICT CADRE DIRECTORY MODAL (When clicking "View More ↗") */}
+      {/* 4. FULL 74 DISTRICT CADRE DIRECTORY MODAL */}
       {showFullDirectoryModal && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-[#FAF8F5] text-neutral-900 max-w-5xl w-full max-h-[90vh] flex flex-col border-2 border-neutral-900 shadow-2xl relative font-dmk-body">
+          <div className="bg-[#FAF8F5] text-[#111111] max-w-5xl w-full max-h-[90vh] flex flex-col border-2 border-[#111111] shadow-2xl relative font-dmk-body rounded-[2px]">
             
             {/* Modal Header */}
             <div className="p-5 sm:p-6 bg-[#111111] text-white flex items-center justify-between border-b-2 border-[#E31E24]">
               <div>
-                <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#FFD166] block">
+                <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#FAF8F5] block">
                   OFFICIAL CADRE GAZETTE • TAMIL NADU & PUDUCHERRY
                 </span>
                 <h3 className="text-xl sm:text-2xl font-black text-white font-dmk-headline">
@@ -417,22 +417,22 @@ export const TamilNaduMap: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowFullDirectoryModal(false)}
-                className="p-1.5 text-neutral-400 hover:text-white transition-colors"
+                className="p-1.5 text-neutral-400 hover:text-white transition-colors rounded-[2px]"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="p-4 bg-white border-b border-neutral-300 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="p-4 bg-white border-b border-[#D8D3CB] flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="relative w-full sm:w-80">
-                <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#5B5348] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={directorySearch}
                   onChange={(e) => setDirectorySearch(e.target.value)}
                   placeholder={language === 'ta' ? 'மாவட்டம் அல்லது பொறுப்பாளர் தேடுக...' : 'Search district, organizer or phone...'}
-                  className="w-full bg-[#FAF7F2] border border-neutral-300 pl-9 pr-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
+                  className="w-full bg-[#FAF8F5] border border-[#D8D3CB] pl-9 pr-3 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] rounded-[2px]"
                 />
               </div>
 
@@ -442,10 +442,10 @@ export const TamilNaduMap: React.FC = () => {
                   <button
                     key={z}
                     onClick={() => setZoneFilter(z)}
-                    className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border transition-colors ${
+                    className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border transition-colors rounded-[2px] ${
                       zoneFilter === z
                         ? 'bg-[#E31E24] text-white border-[#E31E24]'
-                        : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100'
+                        : 'bg-white text-[#5B5348] border-[#D8D3CB] hover:bg-[#FAF8F5]'
                     }`}
                   >
                     {z}
@@ -456,42 +456,42 @@ export const TamilNaduMap: React.FC = () => {
 
             {/* Table of 74 Districts */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#FAF8F5]">
-              <div className="border border-neutral-300 bg-white overflow-x-auto">
+              <div className="border border-[#D8D3CB] bg-white overflow-x-auto rounded-[2px]">
                 <table className="w-full text-left text-xs font-dmk-body">
                   <thead className="bg-[#111111] text-white font-english text-[11px] uppercase tracking-wider">
                     <tr>
-                      <th className="py-2.5 px-3 border-b border-neutral-700 w-12 text-center">No.</th>
-                      <th className="py-2.5 px-3 border-b border-neutral-700">District Unit</th>
-                      <th className="py-2.5 px-3 border-b border-neutral-700">Organiser</th>
-                      <th className="py-2.5 px-3 border-b border-neutral-700">Phone</th>
-                      <th className="py-2.5 px-3 border-b border-neutral-700">Court Complex</th>
-                      <th className="py-2.5 px-3 border-b border-neutral-700 text-center">Action</th>
+                      <th className="py-2.5 px-3 border-b border-[#5B5348] w-12 text-center">No.</th>
+                      <th className="py-2.5 px-3 border-b border-[#5B5348]">District Unit</th>
+                      <th className="py-2.5 px-3 border-b border-[#5B5348]">Organiser</th>
+                      <th className="py-2.5 px-3 border-b border-[#5B5348]">Phone</th>
+                      <th className="py-2.5 px-3 border-b border-[#5B5348]">Court Complex</th>
+                      <th className="py-2.5 px-3 border-b border-[#5B5348] text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-200">
+                  <tbody className="divide-y divide-[#D8D3CB]">
                     {filtered74Districts.map((item, idx) => (
-                      <tr key={item.id} className="hover:bg-[#FAF7F2] transition-colors">
-                        <td className="py-2.5 px-3 text-center font-mono font-bold text-neutral-500">
+                      <tr key={item.id} className="hover:bg-[#FAF8F5] transition-colors">
+                        <td className="py-2.5 px-3 text-center font-mono font-bold text-[#5B5348]">
                           {item.number || idx + 1}
                         </td>
-                        <td className="py-2.5 px-3 font-bold text-neutral-900 font-dmk-headline">
+                        <td className="py-2.5 px-3 font-bold text-[#111111] font-dmk-headline">
                           {item.name[language]}
                         </td>
-                        <td className="py-2.5 px-3 font-medium text-neutral-800">
+                        <td className="py-2.5 px-3 font-medium text-[#111111]">
                           {item.organizer[language]}
                         </td>
-                        <td className="py-2.5 px-3 font-mono font-bold text-[#E31E24]">
+                        <td className="py-2.5 px-3 font-mono font-bold text-[#C41A1F]">
                           <a href={`tel:${item.contactPhone}`} className="hover:underline">
                             {item.contactPhone}
                           </a>
                         </td>
-                        <td className="py-2.5 px-3 text-neutral-600 truncate max-w-xs">
+                        <td className="py-2.5 px-3 text-[#5B5348] truncate max-w-xs">
                           {item.courtComplex[language]}
                         </td>
                         <td className="py-2.5 px-3 text-center">
                           <button
                             onClick={() => setSelectedSubDistrict(item)}
-                            className="p-1 hover:text-[#E31E24] text-neutral-500"
+                            className="p-1 hover:text-[#C41A1F] text-[#5B5348] rounded-[2px]"
                             title="View Dossier"
                           >
                             <Eye className="w-4 h-4" />
@@ -505,13 +505,13 @@ export const TamilNaduMap: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-white border-t border-neutral-300 flex items-center justify-between text-xs font-english">
-              <span className="text-neutral-600">
+            <div className="p-4 bg-white border-t border-[#D8D3CB] flex items-center justify-between text-xs font-english">
+              <span className="text-[#5B5348]">
                 Displaying <strong>{filtered74Districts.length}</strong> of <strong>74</strong> District Secretariats
               </span>
               <button
                 onClick={() => setShowFullDirectoryModal(false)}
-                className="px-4 py-2 bg-neutral-900 hover:bg-[#E31E24] text-white font-bold uppercase tracking-wider transition-colors"
+                className="px-4 py-2 bg-[#111111] hover:bg-[#E31E24] text-white font-bold uppercase tracking-wider transition-colors rounded-[2px]"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>

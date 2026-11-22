@@ -42,7 +42,7 @@ export const DmkHeroSlider: React.FC = () => {
       id: 'slide-campaign-stalin',
       theme: 'gold-rally',
       imageType: 'official-banner',
-      bgGradient: 'from-[#FFB703] via-[#FCBF49] to-[#E85D04]',
+      bgGradient: 'from-[#C41A1F] via-[#E31E24] to-[#111111]',
       bannerImage: '/images/dmk-campaign-stalin.jpg',
       tagline: {
         en: 'OFFICIAL PLATFORM • DRAVIDA MUNNETRA KAZHAGAM',
@@ -184,7 +184,7 @@ export const DmkHeroSlider: React.FC = () => {
       id: 'slide-cadre',
       theme: 'emerald-cadre',
       imageType: 'custom-render',
-      bgGradient: 'from-[#B81318] via-[#E31E24] to-[#1C1C1E]',
+      bgGradient: 'from-[#C41A1F] via-[#E31E24] to-[#111111]',
       tagline: {
         en: 'STATE-WIDE ADVOCATE EMPOWERMENT',
         ta: 'மாநில அளவிலான வழக்கறிஞர்கள் கூட்டமைப்பு'
@@ -264,10 +264,10 @@ export const DmkHeroSlider: React.FC = () => {
       {/* Main Slider Display Area */}
       <div className="relative min-h-[460px] sm:min-h-[520px] lg:min-h-[580px] w-full flex items-center justify-center transition-all duration-500">
         
-        {/* OFFICIAL DMK HERO BANNER ARTWORK (uploaded by user) */}
+        {/* OFFICIAL DMK HERO BANNER ARTWORK */}
         {slide.imageType === 'official-banner' ? (
           <div className={`relative w-full h-full min-h-[460px] sm:min-h-[520px] lg:min-h-[580px] flex items-center justify-center overflow-hidden ${
-            slide.id === 'slide-four-mentors' ? 'bg-[#2A1208]' : 'bg-[#F9C300]'
+            slide.id === 'slide-four-mentors' ? 'bg-[#111111]' : 'bg-[#111111]'
           }`}>
             
             {/* The Official Banner Image */}
@@ -282,16 +282,16 @@ export const DmkHeroSlider: React.FC = () => {
             {/* Gradient shadow for text contrast */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
 
-            {/* Interactive Quick Action Button at Bottom Left (leaving right slogan clear) */}
+            {/* Interactive Quick Action Button at Bottom Left */}
             <div className="absolute bottom-5 left-5 sm:bottom-8 sm:left-8 z-20 flex flex-wrap items-center gap-3 animate-in fade-in duration-500">
               <Link
                 href={slide.ctaLink}
-                className="px-6 py-2.5 bg-[#E31E24] hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white shadow-xl transition-all"
+                className="px-6 py-2.5 bg-[#E31E24] hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white shadow-xl transition-all rounded-[2px]"
               >
                 <UserPlus className="w-4 h-4" />
                 <span className="font-dmk-headline font-bold">{slide.ctaText[language]}</span>
               </Link>
-              <span className="text-[11px] font-english text-white font-semibold bg-black/85 px-3 py-1.5 border border-white/20 backdrop-blur-xs">
+              <span className="text-[11px] font-english text-white font-semibold bg-black/85 px-3 py-1.5 border border-white/20 backdrop-blur-xs rounded-[2px]">
                 {language === 'ta' ? 'திமுக வழக்கறிஞர் அணித் தலைமை' : 'DMK Legal Wing Secretariat'}
               </span>
             </div>
@@ -311,7 +311,7 @@ export const DmkHeroSlider: React.FC = () => {
                 
                 {/* Central High-Impact Shield */}
                 <div className="relative group">
-                  <div className="w-48 h-48 sm:w-56 sm:h-56 bg-white p-3 border-2 border-white/80 shadow-2xl flex items-center justify-center relative z-10 transition-transform duration-500 group-hover:scale-105">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 bg-white p-3 border-2 border-white/80 shadow-2xl flex items-center justify-center relative z-10 transition-transform duration-500 group-hover:scale-105 rounded-[2px]">
                     <img
                       src="/images/dmk-flag-sun.jpg"
                       alt="DMK Flag & Rising Sun"
@@ -319,12 +319,12 @@ export const DmkHeroSlider: React.FC = () => {
                     />
                   </div>
                   {/* Glowing background aura */}
-                  <div className="absolute -inset-2 bg-gradient-to-r from-[#E31E24] to-[#FFB703] opacity-40 blur-lg rounded-full pointer-events-none" />
+                  <div className="absolute -inset-2 bg-gradient-to-r from-[#E31E24] to-[#C41A1F] opacity-40 blur-lg rounded-[2px] pointer-events-none" />
                 </div>
 
                 {/* Slogan Banner */}
                 <div className="text-center space-y-1">
-                  <span className="px-3 py-1 bg-black/60 border border-white/20 text-[11px] font-english font-bold uppercase tracking-widest text-[#FFD166] inline-block">
+                  <span className="px-3 py-1 bg-black/60 border border-white/20 text-[11px] font-english font-bold uppercase tracking-widest text-[#FAF8F5] inline-block rounded-[2px]">
                     {language === 'ta' ? 'அரசமைப்புச் சட்ட அரண்' : 'CONSTITUTIONAL CITADEL'}
                   </span>
                   <p className="text-xs text-white/80 font-english">
@@ -334,11 +334,11 @@ export const DmkHeroSlider: React.FC = () => {
 
               </div>
 
-              {/* Right Column: Hero Bold Typography in exact Anek Tamil / Mukta Malar font */}
+              {/* Right Column: Hero Bold Typography */}
               <div className="lg:col-span-7 space-y-5 text-left">
                 
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/50 border border-white/30 text-xs font-english font-bold tracking-widest uppercase">
-                  <span className="w-2.5 h-2.5 bg-[#E31E24] rounded-full inline-block animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/50 border border-white/30 text-xs font-english font-bold tracking-widest uppercase rounded-[2px]">
+                  <span className="w-2.5 h-2.5 bg-[#E31E24] rounded-[2px] inline-block animate-pulse" />
                   <span>{slide.tagline[language]}</span>
                 </div>
 
@@ -346,7 +346,7 @@ export const DmkHeroSlider: React.FC = () => {
                   <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black font-dmk-headline tracking-tight leading-[1.08] text-white">
                     {slide.titlePrimary[language]}
                   </h2>
-                  <h3 className="text-xl sm:text-3xl lg:text-4xl font-extrabold font-dmk-headline text-[#FFD166]">
+                  <h3 className="text-xl sm:text-3xl lg:text-4xl font-extrabold font-dmk-headline text-[#FAF8F5]">
                     {slide.titleSecondary[language]}
                   </h3>
                 </div>
@@ -358,7 +358,7 @@ export const DmkHeroSlider: React.FC = () => {
                 <div className="pt-2 flex flex-wrap items-center gap-4">
                   <Link
                     href={slide.ctaLink}
-                    className="px-7 py-3.5 bg-[#E31E24] hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white/40 shadow-lg transition-all duration-200"
+                    className="px-7 py-3.5 bg-[#E31E24] hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 border border-white/40 shadow-lg transition-all duration-200 rounded-[2px]"
                   >
                     <span>{slide.ctaText[language]}</span>
                     <ChevronRight className="w-4 h-4" />
@@ -366,7 +366,7 @@ export const DmkHeroSlider: React.FC = () => {
 
                   <Link
                     href="/structure"
-                    className="px-7 py-3.5 bg-black/70 hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider border border-white/30 transition-all duration-200"
+                    className="px-7 py-3.5 bg-black/70 hover:bg-black text-white text-xs sm:text-sm font-bold uppercase tracking-wider border border-white/30 transition-all duration-200 rounded-[2px]"
                   >
                     {language === 'ta' ? 'அமைப்பு விவரம்' : 'Organisation Chart'}
                   </Link>
@@ -383,7 +383,7 @@ export const DmkHeroSlider: React.FC = () => {
         <button
           onClick={prevSlide}
           aria-label="Previous Slide"
-          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-black/75 hover:bg-[#E31E24] text-white border border-white/40 flex items-center justify-center transition-colors cursor-pointer"
+          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-black/75 hover:bg-[#E31E24] text-white border border-white/40 flex items-center justify-center transition-colors cursor-pointer rounded-[2px]"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -391,19 +391,19 @@ export const DmkHeroSlider: React.FC = () => {
         <button
           onClick={nextSlide}
           aria-label="Next Slide"
-          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-black/75 hover:bg-[#E31E24] text-white border border-white/40 flex items-center justify-center transition-colors cursor-pointer"
+          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-black/75 hover:bg-[#E31E24] text-white border border-white/40 flex items-center justify-center transition-colors cursor-pointer rounded-[2px]"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
 
         {/* Bottom Slide Dot Indicators + Play/Pause Control */}
-        <div className="absolute bottom-16 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 bg-black/80 px-4 py-2 border border-white/20">
+        <div className="absolute bottom-16 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 bg-black/80 px-4 py-2 border border-white/20 rounded-[2px]">
           {slides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => goToSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`h-2 transition-all cursor-pointer ${
+              className={`h-2 transition-all cursor-pointer rounded-[2px] ${
                 currentSlide === idx
                   ? 'w-6 bg-[#E31E24]'
                   : 'w-2 bg-white/60 hover:bg-white'
@@ -416,7 +416,7 @@ export const DmkHeroSlider: React.FC = () => {
           <button
             onClick={() => setIsPaused(!isPaused)}
             aria-label={isPaused ? 'Resume auto-play' : 'Pause auto-play'}
-            className="text-white/80 hover:text-white transition-colors cursor-pointer"
+            className="text-white/80 hover:text-white transition-colors cursor-pointer rounded-[2px]"
           >
             {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
           </button>
@@ -425,11 +425,11 @@ export const DmkHeroSlider: React.FC = () => {
       </div>
 
       {/* BOTTOM TICKER / CAMPAIGN ACTION BAR */}
-      <div className="bg-[#0C0C0E] border-t border-neutral-800 text-white py-3 px-4 sm:px-6">
+      <div className="bg-[#111111] border-t border-neutral-800 text-white py-3 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           
           <div className="flex items-center gap-2.5 overflow-hidden text-center sm:text-left">
-            <span className="w-2 h-2 bg-[#E31E24] shrink-0 hidden sm:inline-block" />
+            <span className="w-2 h-2 bg-[#E31E24] shrink-0 hidden sm:inline-block rounded-[2px]" />
             <span className="font-dmk-body text-neutral-200 text-xs sm:text-sm font-semibold">
               {slide.tickerText[language]}
             </span>
@@ -437,7 +437,7 @@ export const DmkHeroSlider: React.FC = () => {
 
           <Link
             href={slide.ctaLink}
-            className="shrink-0 px-4 py-1.5 bg-[#E31E24] hover:bg-neutral-900 text-white font-dmk-headline font-bold text-xs uppercase tracking-wider border border-white/20 transition-colors"
+            className="shrink-0 px-4 py-1.5 bg-[#E31E24] hover:bg-neutral-900 text-white font-dmk-headline font-bold text-xs uppercase tracking-wider border border-white/20 transition-colors rounded-[2px]"
           >
             {slide.tickerButton[language]} &rarr;
           </Link>

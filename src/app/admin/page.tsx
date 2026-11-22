@@ -336,11 +336,11 @@ export default function AdminPage() {
           </div>
 
           <div className="text-center space-y-3 mb-8 pt-2">
-            <div className="w-14 h-14 bg-black text-[#E31E24] border-2 border-neutral-900 flex items-center justify-center mx-auto">
+            <div className="w-14 h-14 bg-black text-[#C41A1F] border-2 border-neutral-900 flex items-center justify-center mx-auto">
               <Scale className="w-7 h-7" />
             </div>
             <div>
-              <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#E31E24] block">
+              <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#C41A1F] block">
                 STATE LEGAL SECRETARIAT
               </span>
               <h2 className="text-2xl font-black text-neutral-950 font-dmk-headline tracking-tight uppercase mt-1">
@@ -354,7 +354,7 @@ export default function AdminPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             {authError && (
-              <div className="p-3 bg-red-50 border border-[#E31E24] text-[#E31E24] text-xs font-bold flex items-center gap-2">
+              <div className="p-3 bg-red-50 border border-[#E31E24] text-[#C41A1F] text-xs font-bold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{authError}</span>
               </div>
@@ -407,12 +407,12 @@ export default function AdminPage() {
           
           {/* Identity & Seal */}
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 bg-neutral-900 border border-neutral-700 text-[#E31E24] flex items-center justify-center shrink-0">
+            <div className="w-11 h-11 bg-neutral-900 border border-neutral-700 text-[#C41A1F] flex items-center justify-center shrink-0">
               <Scale className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#E31E24]">
+                <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#C41A1F]">
                   STATE LEGAL SECRETARIAT
                 </span>
                 <span className="text-[10px] font-mono px-2 py-0.2 bg-neutral-800 text-neutral-300 border border-neutral-700 uppercase font-bold">
@@ -429,8 +429,8 @@ export default function AdminPage() {
           <div className="flex flex-wrap items-center gap-2.5 text-xs font-english">
             
             {/* Live Backend Connection Indicator */}
-            <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-1.5 text-neutral-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-1.5 text-neutral-300 rounded-[2px]">
+              <span className="w-2 h-2 rounded-[2px] bg-emerald-500 animate-pulse" />
               <span className="text-[11px] font-mono">
                 {isLoadingData ? 'SYNCING API...' : 'LIVE BACKEND: CONNECTED'}
               </span>
@@ -457,7 +457,7 @@ export default function AdminPage() {
               title="Refresh all records from backend"
               className="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 hover:text-white transition-colors cursor-pointer"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoadingData ? 'animate-spin text-[#E31E24]' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isLoadingData ? 'animate-spin text-[#C41A1F]' : ''}`} />
             </button>
 
             {/* Export JSON Backup */}
@@ -465,7 +465,7 @@ export default function AdminPage() {
               onClick={handleExportJson}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white font-bold text-[11px] uppercase tracking-wider transition-colors cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-[#E31E24]" />
+              <Download className="w-3.5 h-3.5 text-[#C41A1F]" />
               <span>Export DB</span>
             </button>
 
@@ -501,7 +501,7 @@ export default function AdminPage() {
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-3.5 py-2.5 text-xs font-english font-bold uppercase tracking-wider whitespace-nowrap transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
                 activeTab === tab.id
-                  ? 'border-[#E31E24] text-[#E31E24] bg-[#FAF8F5]'
+                  ? 'border-[#E31E24] text-[#C41A1F] bg-[#FAF8F5]'
                   : 'border-transparent text-neutral-600 hover:text-black hover:bg-neutral-50'
               }`}
             >
@@ -544,8 +544,8 @@ export default function AdminPage() {
                 </span>
               </div>
 
-              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden">
-                <span className="w-1.5 h-full bg-amber-500 absolute top-0 left-0" />
+              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden rounded-[2px]">
+                <span className="w-1.5 h-full bg-[#C41A1F] absolute top-0 left-0" />
                 <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
                   PENDING CADRE VERIFICATIONS
                 </span>
@@ -590,7 +590,7 @@ export default function AdminPage() {
               {/* Left Column: Fast Secretariat Actions */}
               <div className="lg:col-span-4 bg-white border border-neutral-300 p-6 space-y-4">
                 <div className="border-b border-neutral-200 pb-3">
-                  <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#E31E24] block">
+                  <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block">
                     FAST ACTIONS
                   </span>
                   <h3 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
@@ -603,7 +603,7 @@ export default function AdminPage() {
                     onClick={() => { setShowAddNewsModal(true); }}
                     className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
                   >
-                    <Plus className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <Plus className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
                     <div>
                       <span className="text-xs font-bold font-english uppercase tracking-wider block">
                         Publish Press Statement
@@ -618,7 +618,7 @@ export default function AdminPage() {
                     onClick={() => { setShowAddResourceModal(true); }}
                     className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
                   >
-                    <BookOpen className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <BookOpen className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
                     <div>
                       <span className="text-xs font-bold font-english uppercase tracking-wider block">
                         Upload Constitutional Judgment
@@ -633,7 +633,7 @@ export default function AdminPage() {
                     onClick={() => { setShowAddEventModal(true); }}
                     className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
                   >
-                    <Calendar className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <Calendar className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
                     <div>
                       <span className="text-xs font-bold font-english uppercase tracking-wider block">
                         Schedule State Conference
@@ -648,7 +648,7 @@ export default function AdminPage() {
                     onClick={() => { setShowAddGalleryModal(true); }}
                     className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
                   >
-                    <Camera className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <Camera className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
                     <div>
                       <span className="text-xs font-bold font-english uppercase tracking-wider block">
                         Archive Press Photography
@@ -667,7 +667,7 @@ export default function AdminPage() {
                     className="w-full py-2.5 bg-neutral-900 hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-1.5"
                   >
                     <span>View Live Public Portal</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[#E31E24]" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-[#C41A1F]" />
                   </Link>
                 </div>
               </div>
@@ -679,7 +679,7 @@ export default function AdminPage() {
                 <div className="bg-white border border-neutral-300 p-6">
                   <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-4">
                     <div>
-                      <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#E31E24] block">
+                      <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block">
                         INFRASTRUCTURE
                       </span>
                       <h3 className="text-base font-black text-neutral-950 font-dmk-headline uppercase">
@@ -702,7 +702,7 @@ export default function AdminPage() {
                     </div>
                     <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
                       <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">districts.json</span>
-                      <span className="text-base font-bold text-[#E31E24] font-mono">74 party units</span>
+                      <span className="text-base font-bold text-[#C41A1F] font-mono">74 party units</span>
                     </div>
                     <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
                       <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">news.json</span>
@@ -727,7 +727,7 @@ export default function AdminPage() {
                     </h3>
                     <button
                       onClick={() => setActiveTab('registrations')}
-                      className="text-xs font-english font-bold text-[#E31E24] hover:underline"
+                      className="text-xs font-english font-bold text-[#C41A1F] hover:underline"
                     >
                       View All ({registrations.length}) &rarr;
                     </button>
@@ -752,8 +752,8 @@ export default function AdminPage() {
                               {reg.barCouncilNumber} • {reg.district}
                             </span>
                           </div>
-                          <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase ${
-                            reg.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                          <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded-[2px] ${
+                            reg.status === 'approved' ? 'bg-[#111111] text-[#FAF8F5]' : 'bg-[#FAF8F5] text-[#111111] border border-[#5B5348]'
                           }`}>
                             {reg.status}
                           </span>
@@ -779,7 +779,7 @@ export default function AdminPage() {
             {/* Header and Filter Controls */}
             <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
                   LEGAL CADRE DIRECTORY
                 </span>
                 <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
@@ -861,7 +861,7 @@ export default function AdminPage() {
                             <span className="text-[11px] text-neutral-500">Enrolled: {reg.yearOfEnrollment}</span>
                           </td>
                           <td className="p-3.5">
-                            <span className="font-mono text-xs font-bold text-[#E31E24] bg-red-50 px-2 py-0.5 border border-red-200">
+                            <span className="font-mono text-xs font-bold text-[#C41A1F] bg-red-50 px-2 py-0.5 border border-red-200">
                               {reg.barCouncilNumber}
                             </span>
                           </td>
@@ -870,7 +870,7 @@ export default function AdminPage() {
                             <span className="text-[11px] text-neutral-600">{reg.courtOfPractice}</span>
                           </td>
                           <td className="p-3.5 font-english">
-                            <a href={`tel:${reg.mobileNumber}`} className="text-xs font-bold text-neutral-900 hover:text-[#E31E24] block">
+                            <a href={`tel:${reg.mobileNumber}`} className="text-xs font-bold text-neutral-900 hover:text-[#C41A1F] block">
                               {reg.mobileNumber}
                             </a>
                             <a href={`mailto:${reg.emailAddress}`} className="text-[11px] text-neutral-600 hover:underline block truncate max-w-[160px]">
@@ -887,14 +887,14 @@ export default function AdminPage() {
                             </div>
                           </td>
                           <td className="p-3.5">
-                            <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider border ${
+                            <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider border rounded-[2px] ${
                               reg.status === 'approved'
                                 ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                                 : reg.status === 'verified'
-                                ? 'bg-blue-50 text-blue-800 border-blue-300'
+                                ? 'bg-[#FAF8F5] text-[#111111] border border-[#111111]'
                                 : reg.status === 'rejected'
                                 ? 'bg-red-50 text-red-800 border-red-300'
-                                : 'bg-amber-50 text-amber-800 border-amber-300'
+                                : 'bg-[#FAF8F5] text-[#5B5348] border border-[#D8D3CB]'
                             }`}>
                               {reg.status}
                             </span>
@@ -902,14 +902,14 @@ export default function AdminPage() {
                           <td className="p-3.5 text-right space-x-1.5">
                             <button
                               onClick={() => setSelectedRegDossier(reg)}
-                              className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                              className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
                             >
                               Inspect
                             </button>
                             {reg.status !== 'approved' && (
                               <button
                                 onClick={() => updateRegistrationStatus(reg.id, 'approved')}
-                                className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                                className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
                               >
                                 Approve
                               </button>
@@ -917,7 +917,7 @@ export default function AdminPage() {
                             {reg.status === 'pending' && (
                               <button
                                 onClick={() => updateRegistrationStatus(reg.id, 'verified')}
-                                className="px-2.5 py-1 bg-blue-700 hover:bg-blue-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                                className="px-2.5 py-1 bg-[#111111] hover:bg-[#E31E24] text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
                               >
                                 Verify Bar
                               </button>
@@ -937,7 +937,7 @@ export default function AdminPage() {
                 <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 relative shadow-2xl space-y-4">
                   <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
                     <div>
-                      <span className="text-[10px] font-english font-bold uppercase text-[#E31E24] tracking-widest block">
+                      <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F] tracking-widest block">
                         ADVOCATE DOSSIER
                       </span>
                       <h4 className="text-xl font-black text-neutral-950 font-dmk-headline">
@@ -956,7 +956,7 @@ export default function AdminPage() {
                     <div className="grid grid-cols-2 gap-3 p-3 bg-[#FAF8F5] border border-neutral-200">
                       <div>
                         <span className="text-[10px] text-neutral-500 uppercase block font-bold">Bar Council No.</span>
-                        <strong className="text-sm font-mono text-[#E31E24]">{selectedRegDossier.barCouncilNumber}</strong>
+                        <strong className="text-sm font-mono text-[#C41A1F]">{selectedRegDossier.barCouncilNumber}</strong>
                       </div>
                       <div>
                         <span className="text-[10px] text-neutral-500 uppercase block font-bold">Enrollment Year</span>
@@ -1005,7 +1005,7 @@ export default function AdminPage() {
                           updateRegistrationStatus(selectedRegDossier.id, 'verified');
                           setSelectedRegDossier(null);
                         }}
-                        className="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider"
+                        className="px-3 py-1.5 bg-[#111111] hover:bg-[#E31E24] text-white text-xs font-bold uppercase tracking-wider rounded-[2px]"
                       >
                         Verify Bar
                       </button>
@@ -1035,7 +1035,7 @@ export default function AdminPage() {
             
             <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
                   PUBLIC DEFENSE DESK
                 </span>
                 <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
@@ -1088,13 +1088,13 @@ export default function AdminPage() {
                   >
                     <div>
                       <div className="flex items-center justify-between text-xs pb-2 border-b border-neutral-200 mb-2.5">
-                        <span className="font-english font-bold uppercase tracking-wider text-[#E31E24]">
+                        <span className="font-english font-bold uppercase tracking-wider text-[#C41A1F]">
                           {enq.category}
                         </span>
-                        <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase border ${
+                        <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase border rounded-[2px] ${
                           enq.status === 'resolved'
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                            : 'bg-amber-50 text-amber-800 border-amber-300'
+                            : 'bg-[#FAF8F5] text-[#5B5348] border-[#D8D3CB]'
                         }`}>
                           {enq.status}
                         </span>
@@ -1111,7 +1111,7 @@ export default function AdminPage() {
                     <div className="pt-3 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                       <div>
                         <strong className="block text-neutral-900">{enq.name} ({enq.district})</strong>
-                        <a href={`tel:${enq.phone}`} className="font-mono text-neutral-600 hover:text-[#E31E24] font-bold">
+                        <a href={`tel:${enq.phone}`} className="font-mono text-neutral-600 hover:text-[#C41A1F] font-bold">
                           {enq.phone}
                         </a>
                       </div>
@@ -1120,7 +1120,7 @@ export default function AdminPage() {
                         {enq.status !== 'resolved' && (
                           <button
                             onClick={() => updateEnquiryStatus(enq.id, 'resolved')}
-                            className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                            className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
                           >
                             Mark Resolved
                           </button>
@@ -1128,7 +1128,7 @@ export default function AdminPage() {
                         {enq.status === 'new' && (
                           <button
                             onClick={() => updateEnquiryStatus(enq.id, 'reviewed')}
-                            className="px-3 py-1 bg-blue-700 hover:bg-blue-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                            className="px-3 py-1 bg-[#111111] hover:bg-[#E31E24] text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
                           >
                             Mark Reviewed
                           </button>
@@ -1151,7 +1151,7 @@ export default function AdminPage() {
             
             <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
                   OFFICIAL PRESS BUREAU
                 </span>
                 <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
@@ -1207,14 +1207,14 @@ export default function AdminPage() {
                         </td>
                         <td className="p-3.5">
                           {item.isLeadStory || item.featured ? (
-                            <span className="text-xs font-bold text-[#E31E24] flex items-center gap-1">
+                            <span className="text-xs font-bold text-[#C41A1F] flex items-center gap-1">
                               <Star className="w-3.5 h-3.5 fill-current" />
                               <span>Active Front-Page Lead</span>
                             </span>
                           ) : (
                             <button
                               onClick={() => setLeadStory(item.id)}
-                              className="text-[11px] font-english font-bold uppercase tracking-wider text-neutral-600 hover:text-[#E31E24] hover:underline cursor-pointer"
+                              className="text-[11px] font-english font-bold uppercase tracking-wider text-neutral-600 hover:text-[#C41A1F] hover:underline cursor-pointer"
                             >
                               Set as Front-Page Lead &rarr;
                             </button>
@@ -1223,7 +1223,7 @@ export default function AdminPage() {
                         <td className="p-3.5 text-right space-x-2">
                           <button
                             onClick={() => deleteNews(item.id)}
-                            className="p-1.5 text-neutral-500 hover:text-[#E31E24] hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors cursor-pointer"
+                            className="p-1.5 text-neutral-500 hover:text-[#C41A1F] hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors cursor-pointer"
                             title="Delete article"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1247,7 +1247,7 @@ export default function AdminPage() {
             
             <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
                   GRASSROOTS UNITS
                 </span>
                 <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
@@ -1300,7 +1300,7 @@ export default function AdminPage() {
                   <tbody className="divide-y divide-neutral-200">
                     {filteredDistricts.map((d) => (
                       <tr key={d.id} className="hover:bg-[#FAF8F5] transition-colors">
-                        <td className="p-3.5 font-mono font-bold text-[#E31E24]">
+                        <td className="p-3.5 font-mono font-bold text-[#C41A1F]">
                           #{d.number || '-'}
                         </td>
                         <td className="p-3.5">
@@ -1317,7 +1317,7 @@ export default function AdminPage() {
                           <span className="text-[10px] text-neutral-500">DMK Legal Wing In-Charge</span>
                         </td>
                         <td className="p-3.5 font-english">
-                          <a href={`tel:${d.contactPhone}`} className="text-xs font-bold text-neutral-900 hover:text-[#E31E24] block">
+                          <a href={`tel:${d.contactPhone}`} className="text-xs font-bold text-neutral-900 hover:text-[#C41A1F] block">
                             {d.contactPhone}
                           </a>
                           <span className="text-[10px] text-neutral-500 block truncate max-w-[150px]">{d.contactEmail}</span>
@@ -1345,7 +1345,7 @@ export default function AdminPage() {
           <div className="space-y-6">
             <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
                   CONSTITUTIONAL JURISPRUDENCE
                 </span>
                 <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
@@ -1365,7 +1365,7 @@ export default function AdminPage() {
               {resources.map((res) => (
                 <div key={res.id} className="bg-white border border-neutral-300 p-5 flex flex-col justify-between space-y-3">
                   <div>
-                    <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-wider block">
+                    <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-wider block">
                       {res.category} • {res.citation || 'Official Filing'}
                     </span>
                     <h4 className="text-base font-black text-neutral-950 font-dmk-headline mt-1">
@@ -1380,7 +1380,7 @@ export default function AdminPage() {
                     <span className="font-mono text-neutral-500">{res.date} • {res.fileSize}</span>
                     <button
                       onClick={() => deleteResource(res.id)}
-                      className="text-neutral-500 hover:text-[#E31E24] text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+                      className="text-neutral-500 hover:text-[#C41A1F] text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       <span>Delete</span>
@@ -1399,7 +1399,7 @@ export default function AdminPage() {
           <div className="space-y-6">
             <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
                   PRESS ARCHIVE
                 </span>
                 <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
@@ -1435,7 +1435,7 @@ export default function AdminPage() {
                       <span className="text-neutral-500 font-mono text-[10px]">{img.date}</span>
                       <button
                         onClick={() => deleteGalleryItem(img.id)}
-                        className="text-neutral-500 hover:text-[#E31E24] text-[11px] font-bold uppercase cursor-pointer"
+                        className="text-neutral-500 hover:text-[#C41A1F] text-[11px] font-bold uppercase cursor-pointer"
                       >
                         Remove
                       </button>
@@ -1454,7 +1454,7 @@ export default function AdminPage() {
           <div className="space-y-6">
             <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase tracking-widest block">
+                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
                   ADVOCATE ADVANCEMENT
                 </span>
                 <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
@@ -1475,7 +1475,7 @@ export default function AdminPage() {
                 <div key={evt.id} className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-english font-bold uppercase text-[#E31E24] bg-red-50 px-2 py-0.5 border border-red-200">
+                      <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F] bg-red-50 px-2 py-0.5 border border-red-200">
                         {evt.category}
                       </span>
                       <span className="text-xs font-mono text-neutral-500">{evt.date} • {evt.time}</span>
@@ -1491,7 +1491,7 @@ export default function AdminPage() {
                   <div className="flex items-center gap-3 shrink-0">
                     <button
                       onClick={() => deleteEvent(evt.id)}
-                      className="px-3 py-1.5 bg-neutral-100 hover:bg-red-50 text-neutral-700 hover:text-[#E31E24] border border-neutral-300 text-xs font-bold uppercase cursor-pointer"
+                      className="px-3 py-1.5 bg-neutral-100 hover:bg-red-50 text-neutral-700 hover:text-[#C41A1F] border border-neutral-300 text-xs font-bold uppercase cursor-pointer"
                     >
                       Delete Event
                     </button>
@@ -1512,7 +1512,7 @@ export default function AdminPage() {
           <div className="bg-white border-2 border-neutral-900 max-w-2xl w-full p-6 sm:p-8 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
               <div>
-                <span className="text-[10px] font-english font-bold uppercase text-[#E31E24] tracking-widest block">
+                <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F] tracking-widest block">
                   EDITORIAL DESK
                 </span>
                 <h4 className="text-xl font-black text-neutral-950 font-dmk-headline uppercase">
@@ -1637,7 +1637,7 @@ export default function AdminPage() {
                   id="leadStoryCheck"
                   checked={newNewsIsLead}
                   onChange={(e) => setNewNewsIsLead(e.target.checked)}
-                  className="w-4 h-4 text-[#E31E24]"
+                  className="w-4 h-4 text-[#C41A1F]"
                 />
                 <label htmlFor="leadStoryCheck" className="text-xs font-bold text-neutral-900 cursor-pointer">
                   Feature this story as the Front-Page Lead Story on the Newsroom

@@ -17,7 +17,7 @@ export default function StructurePage() {
         <div className="bg-white border-y-2 border-neutral-900 p-8 sm:p-12">
           <div className="max-w-3xl space-y-3">
             <div className="flex items-center gap-2 border-b border-neutral-300 pb-2">
-              <span className="text-xs font-english font-bold text-[#E31E24] tracking-[0.2em] uppercase">
+              <span className="text-xs font-english font-bold text-[#C41A1F] tracking-[0.2em] uppercase">
                 {language === 'ta' ? 'அமைப்பு கட்டமைப்பு & பொறுப்பாளர்கள்' : 'ORGANISATIONAL DIRECTORY & CADRE'}
               </span>
               <span className="text-neutral-300">•</span>
@@ -49,8 +49,8 @@ export default function StructurePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-neutral-300 border border-neutral-300 bg-white">
           <div className="p-6 space-y-2">
             <div className="flex items-center justify-between border-b border-neutral-200 pb-1.5">
-              <span className="text-[10px] font-english font-bold uppercase text-[#B81318]">CHAMBER I</span>
-              <Award className="w-5 h-5 text-[#E31E24]" />
+              <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F]">CHAMBER I</span>
+              <Award className="w-5 h-5 text-[#C41A1F]" />
             </div>
             <h4 className="text-lg font-bold text-neutral-900 font-dmk-headline">
               {language === 'ta' ? 'மாநிலச் செயலகம்' : 'State Legal Secretariat'}
@@ -64,8 +64,8 @@ export default function StructurePage() {
 
           <div className="p-6 space-y-2">
             <div className="flex items-center justify-between border-b border-neutral-200 pb-1.5">
-              <span className="text-[10px] font-english font-bold uppercase text-[#B81318]">CHAMBER II</span>
-              <Layers className="w-5 h-5 text-[#E31E24]" />
+              <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F]">CHAMBER II</span>
+              <Layers className="w-5 h-5 text-[#C41A1F]" />
             </div>
             <h4 className="text-lg font-bold text-neutral-900 font-dmk-headline">
               {language === 'ta' ? 'உயர்நீதிமன்றக் கிளைப் பிரிவுகள்' : 'Madras High Court & Madurai Bench'}
@@ -79,8 +79,8 @@ export default function StructurePage() {
 
           <div className="p-6 space-y-2">
             <div className="flex items-center justify-between border-b border-neutral-200 pb-1.5">
-              <span className="text-[10px] font-english font-bold uppercase text-[#B81318]">CHAMBER III</span>
-              <Users className="w-5 h-5 text-[#E31E24]" />
+              <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F]">CHAMBER III</span>
+              <Users className="w-5 h-5 text-[#C41A1F]" />
             </div>
             <h4 className="text-lg font-bold text-neutral-900 font-dmk-headline">
               {language === 'ta' ? '74 அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள்' : '74 District Legal Wings'}

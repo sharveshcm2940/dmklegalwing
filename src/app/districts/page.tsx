@@ -41,7 +41,7 @@ export default function DistrictsPage() {
                 <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
                   {language === 'ta' ? '74 அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள்' : '74 DISTRICT UNITS'}
                 </span>
-                <span className="text-xs font-english text-[#E31E24] font-bold">
+                <span className="text-xs font-english text-[#C41A1F] font-bold">
                   GRASSROOTS DEFENSE NETWORK
                 </span>
               </div>
@@ -68,7 +68,7 @@ export default function DistrictsPage() {
             <div className="lg:col-span-4 bg-[#FAF7F2] border border-neutral-300 p-4">
               <div className="flex items-center justify-between font-english text-xs text-neutral-700 pb-2 border-b border-neutral-300">
                 <span>DISTRICT CADRE</span>
-                <span className="font-bold text-[#E31E24]">74 DISTRICT UNITS</span>
+                <span className="font-bold text-[#C41A1F]">74 DISTRICT UNITS</span>
               </div>
               <p className="text-xs text-neutral-600 mt-2 font-english">
                 Verified district coordinators active across all 74 organizational divisions.
@@ -89,7 +89,7 @@ export default function DistrictsPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2.5 h-2.5 bg-[#E31E24]" />
-              <span className="font-english text-[11px] font-bold uppercase tracking-widest text-[#E31E24]">
+              <span className="font-english text-[11px] font-bold uppercase tracking-widest text-[#C41A1F]">
                 {language === 'ta' ? 'அனைத்து மாவட்டங்களின் விவரங்கள்' : 'DISTRICT LEGAL DIRECTORY'}
               </span>
             </div>
@@ -138,12 +138,12 @@ export default function DistrictsPage() {
                 <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
                   <div className="flex items-start gap-2.5">
                     {d.number && (
-                      <span className="w-7 h-7 rounded-full bg-[#E31E24] text-white flex items-center justify-center text-xs font-english font-black shrink-0 mt-0.5">
+                      <span className="w-7 h-7 rounded-[2px] bg-[#E31E24] text-white flex items-center justify-center text-xs font-english font-black shrink-0 mt-0.5">
                         {d.number}
                       </span>
                     )}
                     <div>
-                      <span className="text-[10px] font-english text-[#E31E24] uppercase tracking-wider block font-bold">
+                      <span className="text-[10px] font-english text-[#C41A1F] uppercase tracking-wider block font-bold">
                         {d.zone} ZONE
                       </span>
                       <h4 className="text-xl font-black text-[#111111] font-dmk-headline">
@@ -151,7 +151,7 @@ export default function DistrictsPage() {
                       </h4>
                     </div>
                   </div>
-                  <div className="text-right bg-[#FAF7F2] border border-neutral-300 px-2 py-1 shrink-0">
+                  <div className="text-right bg-[#FAF7F2] border border-neutral-300 px-2 py-1 shrink-0 rounded-[2px]">
                     <span className="text-base font-black text-[#111111] font-english block leading-none">
                       {d.memberCount.toLocaleString()}+
                     </span>
@@ -185,16 +185,16 @@ export default function DistrictsPage() {
               <div className="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between text-xs font-english">
                 <a
                   href={`tel:${d.contactPhone}`}
-                  className="flex items-center gap-1.5 text-neutral-800 hover:text-[#E31E24] transition-colors font-bold"
+                  className="flex items-center gap-1.5 text-neutral-800 hover:text-[#C41A1F] transition-colors font-bold"
                 >
-                  <Phone className="w-3.5 h-3.5 text-[#E31E24]" />
+                  <Phone className="w-3.5 h-3.5 text-[#C41A1F]" />
                   <span>{d.contactPhone}</span>
                 </a>
                 <a
                   href={`mailto:${d.contactEmail}`}
-                  className="flex items-center gap-1.5 text-neutral-800 hover:text-[#E31E24] transition-colors font-bold uppercase tracking-wider text-[11px]"
+                  className="flex items-center gap-1.5 text-neutral-800 hover:text-[#C41A1F] transition-colors font-bold uppercase tracking-wider text-[11px]"
                 >
-                  <Mail className="w-3.5 h-3.5 text-[#E31E24]" />
+                  <Mail className="w-3.5 h-3.5 text-[#C41A1F]" />
                   <span>{language === 'ta' ? 'மின்னஞ்சல்' : 'Email'}</span>
                 </a>
               </div>

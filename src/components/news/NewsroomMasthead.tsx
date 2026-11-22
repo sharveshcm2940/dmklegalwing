@@ -67,7 +67,7 @@ export const NewsroomMasthead: React.FC<NewsroomMastheadProps> = ({
           </div>
 
           <div className="flex items-center gap-3 text-[11px]">
-            <span className="font-bold text-[#E31E24]">
+            <span className="font-bold text-[#C41A1F]">
               {language === 'ta' ? 'அரசமைப்புச் சட்ட ஊடக மையம்' : 'CONSTITUTIONAL MEDIA WIRE'}
             </span>
             <span className="text-neutral-400">•</span>
@@ -84,7 +84,7 @@ export const NewsroomMasthead: React.FC<NewsroomMastheadProps> = ({
           <div className="space-y-3 max-w-3xl">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 bg-[#E31E24] inline-block" />
-              <span className="text-xs font-english font-bold uppercase tracking-[0.25em] text-[#E31E24]">
+              <span className="text-xs font-english font-bold uppercase tracking-[0.25em] text-[#C41A1F]">
                 {language === 'ta' ? 'திராவிட முன்னேற்றக் கழகம் • வழக்கறிஞர் அணி' : 'DMK LEGAL WING • EDITORIAL PRESS OFFICE'}
               </span>
             </div>
@@ -104,7 +104,7 @@ export const NewsroomMasthead: React.FC<NewsroomMastheadProps> = ({
 
           {/* Quick Institutional Stats Stamp */}
           <div className="border border-neutral-300 bg-white p-4 shrink-0 sm:w-80 shadow-2xs">
-            <div className="text-[10px] font-english font-bold uppercase tracking-wider text-[#E31E24] border-b border-neutral-200 pb-1 mb-2">
+            <div className="text-[10px] font-english font-bold uppercase tracking-wider text-[#C41A1F] border-b border-neutral-200 pb-1 mb-2">
               {language === 'ta' ? 'ஊடகச் செயலகப் பதிவகம்' : 'SECRETARIAT DISPATCH REGISTRY'}
             </div>
             <div className="grid grid-cols-2 gap-3 text-xs font-english">
@@ -114,7 +114,7 @@ export const NewsroomMasthead: React.FC<NewsroomMastheadProps> = ({
               </div>
               <div>
                 <span className="block text-neutral-500 text-[10px] uppercase">{language === 'ta' ? 'நீதிமன்ற வழக்குகள்' : 'Active Litigations'}</span>
-                <span className="text-lg font-black text-[#E31E24] font-dmk-headline">280+</span>
+                <span className="text-lg font-black text-[#C41A1F] font-dmk-headline">280+</span>
               </div>
             </div>
           </div>
@@ -124,7 +124,7 @@ export const NewsroomMasthead: React.FC<NewsroomMastheadProps> = ({
         {latestDispatches.length > 0 && (
           <div className="mt-4 bg-white border border-neutral-300 flex items-stretch overflow-hidden text-xs">
             <div className="bg-neutral-900 text-white px-3 sm:px-4 py-2 font-english font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5 shrink-0 z-10">
-              <span className="w-2 h-2 rounded-full bg-[#E31E24] animate-ping" />
+              <span className="w-2 h-2 rounded-[2px] bg-[#E31E24] animate-ping" />
               <span>{language === 'ta' ? 'உடனடிச் செய்திகள்' : 'DISPATCH WIRE'}</span>
             </div>
 
@@ -134,9 +134,9 @@ export const NewsroomMasthead: React.FC<NewsroomMastheadProps> = ({
                   <button
                     key={item.id}
                     onClick={() => onSelectArticle && onSelectArticle(item)}
-                    className="inline-flex items-center gap-2 text-neutral-800 hover:text-[#E31E24] transition-colors text-left"
+                    className="inline-flex items-center gap-2 text-neutral-800 hover:text-[#C41A1F] transition-colors text-left"
                   >
-                    <span className="text-[10px] font-english font-bold text-[#E31E24] uppercase">
+                    <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase">
                       [{item.category}]
                     </span>
                     <span className="font-semibold font-dmk-body">

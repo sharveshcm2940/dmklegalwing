@@ -23,7 +23,7 @@ export const LeadStory: React.FC<LeadStoryProps> = ({ story, onReadMore }) => {
       <div className="bg-[#FAF7F2] border-b border-neutral-300 px-4 sm:px-6 py-2 flex items-center justify-between text-[11px] font-english">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 bg-[#E31E24]" />
-          <span className="font-bold text-[#E31E24] uppercase tracking-widest">
+          <span className="font-bold text-[#C41A1F] uppercase tracking-widest">
             {language === 'ta' ? 'முக்கியச் செய்தி • முதன்மை அறிக்கை' : 'LEAD EDITORIAL DISPATCH'}
           </span>
         </div>
@@ -90,7 +90,7 @@ export const LeadStory: React.FC<LeadStoryProps> = ({ story, onReadMore }) => {
           <div className="space-y-4">
             
             <div className="flex items-center justify-between text-xs text-neutral-500 font-english border-b border-neutral-200 pb-2">
-              <span className="font-bold text-[#E31E24] uppercase tracking-wider">
+              <span className="font-bold text-[#C41A1F] uppercase tracking-wider">
                 {story.issuingAuthority ? story.issuingAuthority[language] : (language === 'ta' ? 'திமுக வழக்கறிஞர் அணித் தலைமை' : 'DMK Legal Wing Secretariat')}
               </span>
               {story.caseNumber && (

@@ -74,8 +74,8 @@ export const PressArchive: React.FC<PressArchiveProps> = ({ items }) => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-neutral-900 pb-5 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <Camera className="w-4 h-4 text-[#E31E24]" />
-            <span className="text-[11px] font-english font-bold uppercase tracking-[0.25em] text-[#E31E24]">
+            <Camera className="w-4 h-4 text-[#C41A1F]" />
+            <span className="text-[11px] font-english font-bold uppercase tracking-[0.25em] text-[#C41A1F]">
               {language === 'ta' ? 'அதிகாரப்பூர்வ நிழற்படக் காப்பகம்' : 'OFFICIAL DOCUMENTARY PRESS ARCHIVE'}
             </span>
           </div>
@@ -145,13 +145,13 @@ export const PressArchive: React.FC<PressArchiveProps> = ({ items }) => {
               <div className="p-4 space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-english text-neutral-500">
                   <span className="flex items-center gap-1 font-bold text-neutral-900">
-                    <MapPin className="w-3 h-3 text-[#E31E24]" />
+                    <MapPin className="w-3 h-3 text-[#C41A1F]" />
                     {heroPhoto.location[language]}
                   </span>
                   <span>{heroPhoto.date}</span>
                 </div>
 
-                <h4 className="text-xl font-bold text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors">
+                <h4 className="text-xl font-bold text-neutral-900 font-dmk-headline group-hover:text-[#C41A1F] transition-colors">
                   {heroPhoto.title[language]}
                 </h4>
 
@@ -189,7 +189,7 @@ export const PressArchive: React.FC<PressArchiveProps> = ({ items }) => {
                         <span className="truncate">{photo.location[language]}</span>
                         <span className="shrink-0">{photo.date}</span>
                       </div>
-                      <h5 className="text-sm font-bold text-neutral-900 font-dmk-headline line-clamp-2 group-hover:text-[#E31E24] transition-colors leading-snug">
+                      <h5 className="text-sm font-bold text-neutral-900 font-dmk-headline line-clamp-2 group-hover:text-[#C41A1F] transition-colors leading-snug">
                         {photo.title[language]}
                       </h5>
                     </div>
@@ -267,7 +267,7 @@ export const PressArchive: React.FC<PressArchiveProps> = ({ items }) => {
                     {activePhoto.category}
                   </span>
                   <span className="font-bold text-neutral-800 flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-[#E31E24]" />
+                    <MapPin className="w-3 h-3 text-[#C41A1F]" />
                     {activePhoto.location[language]}
                   </span>
                 </div>

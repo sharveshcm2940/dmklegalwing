@@ -54,7 +54,7 @@ export default function ActivitiesPage() {
                 <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
                   {language === 'ta' ? 'களப்பணிகள் & மாநாடுகள்' : 'CAMPAIGNS & LEGAL CONFERENCES'}
                 </span>
-                <span className="text-xs font-english text-[#E31E24] font-bold">
+                <span className="text-xs font-english text-[#C41A1F] font-bold">
                   CITIZEN DEFENSE INITIATIVES
                 </span>
               </div>
@@ -81,7 +81,7 @@ export default function ActivitiesPage() {
             <div className="lg:col-span-4 bg-[#FAF7F2] border border-neutral-300 p-4">
               <div className="flex items-center justify-between font-english text-xs text-neutral-700 pb-2 border-b border-neutral-300">
                 <span>CONFERENCE RECORD</span>
-                <span className="font-bold text-[#E31E24]">STATEWIDE COVERAGE</span>
+                <span className="font-bold text-[#C41A1F]">STATEWIDE COVERAGE</span>
               </div>
               <p className="text-xs text-neutral-600 mt-2 font-english">
                 Dispatches from High Court Benches, district bar associations, and grassroots sessions.
@@ -209,17 +209,17 @@ export default function ActivitiesPage() {
                 <div className="p-5 space-y-2.5">
                   <div className="flex items-center gap-2 text-xs font-english text-neutral-600 border-b border-neutral-200 pb-2">
                     <div className="flex items-center gap-1 font-bold text-neutral-800">
-                      <Calendar className="w-3.5 h-3.5 text-[#E31E24]" />
+                      <Calendar className="w-3.5 h-3.5 text-[#C41A1F]" />
                       <span>{evt.date}</span>
                     </div>
                     <span>•</span>
                     <div className="flex items-center gap-1 font-bold">
-                      <Clock className="w-3.5 h-3.5 text-[#E31E24]" />
+                      <Clock className="w-3.5 h-3.5 text-[#C41A1F]" />
                       <span>{evt.time}</span>
                     </div>
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-black text-[#111111] font-dmk-headline group-hover:text-[#E31E24] transition-colors line-clamp-2 leading-snug">
+                  <h3 className="text-lg sm:text-xl font-black text-[#111111] font-dmk-headline group-hover:text-[#C41A1F] transition-colors line-clamp-2 leading-snug">
                     {evt.title[language]}
                   </h3>
 
@@ -228,7 +228,7 @@ export default function ActivitiesPage() {
                   </p>
 
                   <div className="pt-2 text-xs text-neutral-800 flex items-start gap-1.5 font-dmk-body">
-                    <MapPin className="w-3.5 h-3.5 text-[#E31E24] shrink-0 mt-0.5" />
+                    <MapPin className="w-3.5 h-3.5 text-[#C41A1F] shrink-0 mt-0.5" />
                     <span className="line-clamp-1 font-semibold">{evt.venue[language]}</span>
                   </div>
                 </div>
@@ -283,13 +283,13 @@ export default function ActivitiesPage() {
               </h2>
 
               <div className="p-3 bg-white border border-neutral-300 text-xs text-neutral-900 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#E31E24]" />
+                <MapPin className="w-4 h-4 text-[#C41A1F]" />
                 <span><strong>{language === 'ta' ? 'இடம்:' : 'Venue:'}</strong> {selectedEvent.venue[language]}</span>
               </div>
 
               {selectedEvent.chiefGuest && (
                 <div className="p-3 bg-[#F3EFE6] border border-neutral-300 text-xs text-neutral-900 flex items-center gap-2">
-                  <Award className="w-4 h-4 text-[#E31E24]" />
+                  <Award className="w-4 h-4 text-[#C41A1F]" />
                   <span><strong>{language === 'ta' ? 'தலைமை:' : 'Presided By:'}</strong> {selectedEvent.chiefGuest[language]}</span>
                 </div>
               )}

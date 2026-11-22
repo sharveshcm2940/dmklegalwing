@@ -61,21 +61,21 @@ export const Header: React.FC = () => {
             {/* Masthead Typography */}
             <div className="flex flex-col">
               <div className="flex items-center gap-2 justify-center md:justify-start">
-                <span className="text-[10px] sm:text-xs font-bold tracking-[0.25em] text-[#E31E24] uppercase font-english">
+                <span className="text-[10px] sm:text-xs font-bold tracking-[0.25em] text-[#C41A1F] uppercase font-english">
                   {language === 'ta' ? 'திராவிட முன்னேற்றக் கழகம்' : 'DRAVIDA MUNNETRA KAZHAGAM'}
                 </span>
               </div>
 
               <div className="flex items-baseline gap-2 justify-center md:justify-start my-0.5">
-                <h1 className="text-3xl sm:text-5xl font-black text-neutral-900 tracking-tight leading-none font-dmk-headline group-hover:text-[#E31E24] transition-colors">
+                <h1 className="text-3xl sm:text-5xl font-black text-[#111111] tracking-tight leading-none font-dmk-headline group-hover:text-[#E31E24] transition-colors">
                   {language === 'ta' ? 'வழக்கறிஞர் அணி' : 'Legal Wing'}
                 </h1>
-                <span className="text-xs sm:text-sm font-english text-neutral-500 font-bold hidden sm:inline">
+                <span className="text-xs sm:text-sm font-english text-[#5B5348] font-bold hidden sm:inline">
                   (Estd. 1971)
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 justify-center md:justify-start text-[11px] sm:text-xs font-english text-neutral-600">
+              <div className="flex items-center gap-2 justify-center md:justify-start text-[11px] sm:text-xs font-english text-[#5B5348]">
                 <span>{language === 'ta' ? 'சமூக நீதி' : 'Social Justice'}</span>
                 <span>•</span>
                 <span>{language === 'ta' ? 'மாநில சுயாட்சி' : 'State Autonomy'}</span>
@@ -90,7 +90,7 @@ export const Header: React.FC = () => {
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className="px-2.5 py-1 text-xs font-english font-bold bg-[#FAF7F2] hover:bg-neutral-200 border border-neutral-300 text-neutral-900 transition-colors"
+              className="px-2.5 py-1 text-xs font-english font-bold bg-[#FAF8F5] hover:bg-neutral-200 border border-[#D8D3CB] text-[#111111] transition-colors rounded-[2px]"
               title="Toggle Language"
             >
               {language === 'ta' ? 'English' : 'தமிழ்'}
@@ -99,16 +99,16 @@ export const Header: React.FC = () => {
             {/* Admin Portal Button */}
             <Link
               href="/admin"
-              className="px-2.5 py-1 text-xs font-english font-bold bg-[#FAF7F2] hover:bg-neutral-200 border border-neutral-300 text-neutral-900 transition-colors flex items-center gap-1"
+              className="px-2.5 py-1 text-xs font-english font-bold bg-[#FAF8F5] hover:bg-neutral-200 border border-[#D8D3CB] text-[#111111] transition-colors flex items-center gap-1 rounded-[2px]"
             >
-              <Shield className="w-3.5 h-3.5 text-[#E31E24]" />
+              <Shield className="w-3.5 h-3.5 text-[#C41A1F]" />
               <span>{language === 'ta' ? 'நிர்வாகம்' : 'Admin'}</span>
             </Link>
 
             {/* Join Legal Wing Action Button */}
             <Link
               href="/contact#register"
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-english font-bold uppercase tracking-wider text-white bg-[#E31E24] hover:bg-neutral-900 border border-neutral-900 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-english font-bold uppercase tracking-wider text-white bg-[#E31E24] hover:bg-[#111111] border border-[#111111] transition-colors rounded-[2px]"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>{language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'JOIN LEGAL WING'}</span>
@@ -117,7 +117,7 @@ export const Header: React.FC = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 bg-white border border-neutral-900 text-neutral-900 hover:text-white hover:bg-neutral-900 transition-colors"
+              className="lg:hidden p-1.5 bg-white border border-[#111111] text-[#111111] hover:text-white hover:bg-[#111111] transition-colors rounded-[2px]"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -142,7 +142,7 @@ export const Header: React.FC = () => {
                   className={`px-3 xl:px-4 py-2.5 text-[11px] xl:text-xs font-english font-bold uppercase tracking-wider transition-colors whitespace-nowrap text-center ${
                     isActive
                       ? 'text-white bg-[#E31E24] font-black'
-                      : 'text-neutral-900 hover:text-[#E31E24] hover:bg-[#FAF7F2]'
+                      : 'text-[#111111] hover:text-[#C41A1F] hover:bg-[#FAF8F5]'
                   }`}
                 >
                   {link.label}
@@ -156,23 +156,23 @@ export const Header: React.FC = () => {
 
       {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b-2 border-neutral-900 px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top-4 duration-200">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
+        <div className="lg:hidden bg-white border-b-2 border-[#111111] px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top-4 duration-200">
+          <div className="flex items-center justify-between pb-3 border-b border-[#D8D3CB]">
             <button
               onClick={toggleLanguage}
-              className="px-3 py-1 bg-[#FAF7F2] border border-neutral-300 text-xs font-english font-bold text-neutral-800"
+              className="px-3 py-1 bg-[#FAF8F5] border border-[#D8D3CB] text-xs font-english font-bold text-[#111111] rounded-[2px]"
             >
               {language === 'ta' ? 'Switch to English' : 'தமிழுக்கு மாறுக'}
             </button>
             <Link
               href="/admin"
-              className="px-3 py-1 bg-neutral-900 text-white text-xs font-english font-bold uppercase tracking-wider"
+              className="px-3 py-1 bg-[#111111] text-white text-xs font-english font-bold uppercase tracking-wider rounded-[2px]"
             >
               {language === 'ta' ? 'நிர்வாகப் பக்கம்' : 'Admin Portal'}
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 divide-y divide-neutral-100">
+          <div className="grid grid-cols-1 divide-y divide-[#D8D3CB]">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -180,11 +180,11 @@ export const Header: React.FC = () => {
                   key={link.href}
                   href={link.href}
                   className={`flex items-center justify-between py-2 text-xs font-english font-bold uppercase tracking-wider ${
-                    isActive ? 'text-[#E31E24]' : 'text-neutral-800 hover:text-[#E31E24]'
+                    isActive ? 'text-[#C41A1F]' : 'text-[#111111] hover:text-[#C41A1F]'
                   }`}
                 >
                   <span>{link.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
+                  <ChevronRight className="w-3.5 h-3.5 text-[#5B5348]" />
                 </Link>
               );
             })}
@@ -193,7 +193,7 @@ export const Header: React.FC = () => {
           <div className="pt-2">
             <Link
               href="/contact#register"
-              className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-english font-bold uppercase tracking-wider text-white bg-[#E31E24] transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-english font-bold uppercase tracking-wider text-white bg-[#E31E24] hover:bg-[#111111] transition-colors rounded-[2px]"
             >
               <UserPlus className="w-4 h-4" />
               <span>{language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'JOIN LEGAL WING'}</span>

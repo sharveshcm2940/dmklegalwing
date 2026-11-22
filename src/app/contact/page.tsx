@@ -150,7 +150,7 @@ export default function ContactPage() {
                 <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
                   {language === 'ta' ? 'தலைமைச் செயலகம்' : 'STATE SECRETARIAT'}
                 </span>
-                <span className="text-xs font-english text-[#E31E24] font-bold">
+                <span className="text-xs font-english text-[#C41A1F] font-bold">
                   ANNA ARIVALAYAM, CHENNAI
                 </span>
               </div>
@@ -177,7 +177,7 @@ export default function ContactPage() {
             <div className="lg:col-span-4 bg-[#FAF7F2] border border-neutral-300 p-4">
               <div className="flex items-center justify-between font-english text-xs text-neutral-700 pb-2 border-b border-neutral-300">
                 <span>COMMUNICATIONS DESK</span>
-                <span className="font-bold text-[#E31E24]">SECRETARIAT LIVE</span>
+                <span className="font-bold text-[#C41A1F]">SECRETARIAT LIVE</span>
               </div>
               <p className="text-xs text-neutral-600 mt-2 font-english">
                 Operating under the Advocates Act 1961 and Bar Council protocols.
@@ -194,7 +194,7 @@ export default function ContactPage() {
           {/* Left Column: Official Addresses & Verified Details */}
           <div className="lg:col-span-5 space-y-6">
             <div className="border-b border-neutral-300 pb-3">
-              <span className="text-xs font-english font-bold text-[#E31E24] uppercase tracking-wider block mb-1">
+              <span className="text-xs font-english font-bold text-[#C41A1F] uppercase tracking-wider block mb-1">
                 {language === 'ta' ? 'அலுவலக முகவரிகள்' : 'OFFICIAL PREMISES REGISTER'}
               </span>
               <h2 className="text-2xl font-black text-[#111111] font-dmk-headline uppercase">
@@ -206,7 +206,7 @@ export default function ContactPage() {
               {/* Anna Arivalayam Office */}
               <div className="p-5 bg-white border border-neutral-300 space-y-2">
                 <div className="flex items-start gap-3">
-                  <Building2 className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5" />
+                  <Building2 className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5" />
                   <div>
                     <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider font-dmk-headline">
                       {language === 'ta' ? 'தலைமைச் செயலகம் (அண்ணா அறிவாலயம்)' : 'Apex Secretariat (Anna Arivalayam)'}
@@ -221,7 +221,7 @@ export default function ContactPage() {
               {/* Madras High Court Chambers */}
               <div className="p-5 bg-white border border-neutral-300 space-y-2">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-[#E31E24] shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5" />
                   <div>
                     <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider font-dmk-headline">
                       {language === 'ta' ? 'சென்னை உயர் நீதிமன்ற வளாக அலுவலகம்' : 'Madras High Court Chambers'}
@@ -241,7 +241,7 @@ export default function ContactPage() {
               </h4>
 
               <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-[#E31E24]" />
+                <Phone className="w-4 h-4 text-[#C41A1F]" />
                 <div>
                   <span className="text-[10px] text-neutral-600 block font-english">
                     {language === 'ta' ? 'தொலைபேசி' : 'PHONE DESPATCH'}
@@ -251,7 +251,7 @@ export default function ContactPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-[#E31E24]" />
+                <Mail className="w-4 h-4 text-[#C41A1F]" />
                 <div>
                   <span className="text-[10px] text-neutral-600 block font-english">
                     {language === 'ta' ? 'மின்னஞ்சல் முகவரி' : 'OFFICIAL SECRETARIAT EMAIL'}
@@ -263,7 +263,7 @@ export default function ContactPage() {
 
             {/* Regulatory Notice */}
             <div className="p-4 bg-[#FAF7F2] border border-neutral-300 text-xs text-neutral-800 space-y-1">
-              <span className="font-english font-bold text-[#E31E24] uppercase tracking-wider block text-[11px]">
+              <span className="font-english font-bold text-[#C41A1F] uppercase tracking-wider block text-[11px]">
                 {language === 'ta' ? 'வழக்கறிஞர்கள் நெறிமுறை அறிவிப்பு' : 'BAR COUNCIL REGULATORY NOTICE'}
               </span>
               <p className="leading-relaxed font-dmk-body text-xs">
@@ -318,7 +318,7 @@ export default function ContactPage() {
                 <div>
                   {advFormSuccess ? (
                     <div className="p-8 text-center space-y-3 bg-[#FAF7F2] border border-neutral-300">
-                      <div className="w-12 h-12 bg-white border border-[#E31E24] text-[#E31E24] flex items-center justify-center mx-auto">
+                      <div className="w-12 h-12 bg-white border border-[#E31E24] text-[#C41A1F] flex items-center justify-center mx-auto">
                         <CheckCircle2 className="w-6 h-6" />
                       </div>
                       <h3 className="text-xl font-black text-[#111111] font-dmk-headline">
@@ -343,7 +343,7 @@ export default function ContactPage() {
                   ) : (
                     <form onSubmit={handleAdvocateSubmit} className="space-y-4">
                       {advFormError && (
-                        <div className="p-3 bg-red-50 border border-red-400 text-xs text-[#E31E24] flex items-center gap-2 font-english font-bold">
+                        <div className="p-3 bg-red-50 border border-red-400 text-xs text-[#C41A1F] flex items-center gap-2 font-english font-bold">
                           <AlertCircle className="w-4 h-4 shrink-0" />
                           <span>{advFormError}</span>
                         </div>
@@ -512,7 +512,7 @@ export default function ContactPage() {
                 <div>
                   {inqFormSuccess ? (
                     <div className="p-8 text-center space-y-3 bg-[#FAF7F2] border border-neutral-300">
-                      <div className="w-12 h-12 bg-white border border-[#E31E24] text-[#E31E24] flex items-center justify-center mx-auto">
+                      <div className="w-12 h-12 bg-white border border-[#E31E24] text-[#C41A1F] flex items-center justify-center mx-auto">
                         <CheckCircle2 className="w-6 h-6" />
                       </div>
                       <h3 className="text-xl font-black text-[#111111] font-dmk-headline">
@@ -538,7 +538,7 @@ export default function ContactPage() {
                   ) : (
                     <form onSubmit={handleInquirySubmit} className="space-y-4">
                       {inqFormError && (
-                        <div className="p-3 bg-red-50 border border-red-400 text-xs text-[#E31E24] flex items-center gap-2 font-english font-bold">
+                        <div className="p-3 bg-red-50 border border-red-400 text-xs text-[#C41A1F] flex items-center gap-2 font-english font-bold">
                           <AlertCircle className="w-4 h-4 shrink-0" />
                           <span>{inqFormError}</span>
                         </div>

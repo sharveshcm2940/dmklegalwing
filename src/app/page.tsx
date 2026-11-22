@@ -47,7 +47,7 @@ export default function HomePage() {
               <span className="text-3xl sm:text-4xl lg:text-5xl font-black font-english text-white block my-1 tracking-tight">
                 {DMK_ORGANISATION_INFO.barCountEstimated}
               </span>
-              <span className="text-xs text-[#FFB703] font-dmk-body block">
+              <span className="text-xs text-neutral-300 font-dmk-body block">
                 {language === 'ta' ? 'தமிழ்நாடு & புதுச்சேரி வழக்கறிஞர்கள் அரண்' : 'Tamil Nadu & Puducherry Legal Cadre'}
               </span>
             </div>
@@ -71,7 +71,7 @@ export default function HomePage() {
               <span className="text-3xl sm:text-4xl lg:text-5xl font-black font-english text-white block my-1 tracking-tight">
                 50+ Years
               </span>
-              <span className="text-xs text-[#FFB703] font-dmk-body block">
+              <span className="text-xs text-neutral-300 font-dmk-body block">
                 {language === 'ta' ? '1971 முதல் தொடரும் மக்கள் சட்டப்பணி' : 'Continuous Jurisprudence Since 1971'}
               </span>
             </div>
@@ -99,7 +99,7 @@ export default function HomePage() {
           {/* Left: Lead Editorial Column */}
           <div className="lg:col-span-7 space-y-4 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-neutral-300 pb-8 lg:pb-0">
             <div className="flex items-center justify-between border-b-2 border-neutral-900 pb-2.5">
-              <span className="text-xs font-english font-bold text-[#E31E24] tracking-[0.2em] uppercase">
+              <span className="text-xs font-english font-bold text-[#C41A1F] tracking-[0.2em] uppercase">
                 {language === 'ta' ? 'தலைமை தலையங்கம்' : 'LEAD EDITORIAL DISPATCH'}
               </span>
               <span className="text-xs font-english font-bold text-neutral-500">
@@ -126,7 +126,7 @@ export default function HomePage() {
               </span>
               <Link
                 href="/about"
-                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#E31E24] hover:text-black font-dmk-headline group"
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#C41A1F] hover:text-black font-dmk-headline group"
               >
                 <span>{t.intro.readMore}</span>
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -136,7 +136,7 @@ export default function HomePage() {
 
           {/* Right: Four Mentors Banner & Slogan */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="relative w-full h-72 sm:h-80 overflow-hidden bg-black border-2 border-neutral-900 shadow-xl group">
+            <div className="relative w-full h-72 sm:h-80 overflow-hidden bg-black border-2 border-neutral-900 shadow-xl group rounded-[2px]">
               <img
                 src="/images/dmk-four-leaders.jpg"
                 alt="கொள்கை தலைவர்கள்: பெரியார், அண்ணா, கலைஞர், ஸ்டாலின்"
@@ -144,13 +144,13 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute top-3 left-3">
-                <span className="text-[10px] font-english font-bold uppercase tracking-widest px-2.5 py-1 bg-black/90 text-[#FFD166] border border-[#FFD166]/40">
+                <span className="text-[10px] font-english font-bold uppercase tracking-widest px-2.5 py-1 bg-black/90 text-[#FAF8F5] border border-white/40 rounded-[2px]">
                   {language === 'ta' ? 'கொள்கைப் பிரகடனம்' : 'IDEOLOGICAL DOCTRINE'}
                 </span>
               </div>
             </div>
 
-            <div className="p-5 bg-[#FAF7F2] border-l-4 border-[#E31E24] space-y-3">
+            <div className="p-5 bg-[#FAF7F2] border-l-4 border-[#E31E24] space-y-3 rounded-[2px]">
               <p className="text-lg sm:text-xl font-dmk-slogan text-neutral-900 leading-snug">
                 &ldquo;கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!&rdquo;
               </p>
@@ -161,7 +161,7 @@ export default function HomePage() {
                 </span>
                 <Link
                   href="/ideology"
-                  className="text-[#E31E24] hover:underline font-bold"
+                  className="text-[#C41A1F] hover:underline font-bold"
                 >
                   {language === 'ta' ? 'கொள்கைப் பார்வை →' : 'Explore →'}
                 </Link>
@@ -172,11 +172,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. PHOTOJOURNALISM & FIELD DISPATCHES (Editorial Press Layout, No Bulky Cards) */}
+      {/* 4. PHOTOJOURNALISM & FIELD DISPATCHES */}
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10 border-b border-neutral-300">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-3 border-b-2 border-neutral-900 mb-8">
           <div>
-            <span className="text-xs font-mono font-bold text-[#E31E24] tracking-[0.2em] uppercase block mb-1">
+            <span className="text-xs font-mono font-bold text-[#C41A1F] tracking-[0.2em] uppercase block mb-1">
               {t.activitiesPreview.tag}
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline">
@@ -189,7 +189,7 @@ export default function HomePage() {
 
           <Link
             href="/activities"
-            className="text-xs font-english font-bold text-[#E31E24] hover:underline uppercase tracking-wider flex items-center gap-1"
+            className="text-xs font-english font-bold text-[#C41A1F] hover:underline uppercase tracking-wider flex items-center gap-1"
           >
             <span>{t.activitiesPreview.allActivities}</span>
             <span>&rarr;</span>
@@ -203,13 +203,13 @@ export default function HomePage() {
               key={evt.id}
               className={`flex flex-col sm:flex-row gap-5 pt-6 md:pt-0 ${idx > 0 ? 'md:pl-8' : ''} group`}
             >
-              <div className="sm:w-2/5 h-48 sm:h-auto relative overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300">
+              <div className="sm:w-2/5 h-48 sm:h-auto relative overflow-hidden bg-neutral-900 shrink-0 border border-neutral-300 rounded-[2px]">
                 <img
                   src={evt.image}
                   alt={evt.title[language]}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <span className={`absolute top-2 left-2 text-[10px] font-english font-bold uppercase tracking-wider px-2.5 py-1 text-white shadow-md ${
+                <span className={`absolute top-2 left-2 text-[10px] font-english font-bold uppercase tracking-wider px-2.5 py-1 text-white shadow-xs rounded-[2px] ${
                   evt.status === 'upcoming' ? 'bg-[#E31E24]' : 'bg-black'
                 }`}>
                   {evt.status === 'upcoming'
@@ -221,13 +221,13 @@ export default function HomePage() {
               <div className="flex flex-col justify-between flex-1 space-y-2">
                 <div>
                   <div className="flex items-center gap-2 text-xs text-neutral-600 font-english mb-1 border-b border-neutral-200 pb-1">
-                    <Calendar className="w-3.5 h-3.5 text-[#E31E24]" />
+                    <Calendar className="w-3.5 h-3.5 text-[#C41A1F]" />
                     <span className="font-semibold">{evt.date}</span>
                     <span>•</span>
                     <span className="font-bold text-neutral-900 uppercase">{evt.category}</span>
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors leading-snug">
+                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 font-dmk-headline group-hover:text-[#C41A1F] transition-colors leading-snug">
                     {evt.title[language]}
                   </h3>
 
@@ -240,7 +240,7 @@ export default function HomePage() {
                   <span className="truncate max-w-[180px] font-english text-[11px] font-bold text-neutral-800">{evt.venue[language]}</span>
                   <Link
                     href="/activities"
-                    className="text-[#E31E24] font-bold hover:underline font-dmk-headline"
+                    className="text-[#C41A1F] font-bold hover:underline font-dmk-headline"
                   >
                     {language === 'ta' ? 'முழு விவரம்' : 'Details'} &rarr;
                   </Link>

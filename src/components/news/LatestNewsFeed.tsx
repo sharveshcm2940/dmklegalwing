@@ -36,7 +36,7 @@ export const LatestNewsFeed: React.FC<LatestNewsFeedProps> = ({ articles, totalC
       {/* Section Header */}
       <div className="flex items-center justify-between border-b-2 border-neutral-900 pb-3 mb-6">
         <div>
-          <span className="text-[10px] font-english font-bold uppercase tracking-[0.2em] text-[#E31E24] block mb-0.5">
+          <span className="text-[10px] font-english font-bold uppercase tracking-[0.2em] text-[#C41A1F] block mb-0.5">
             {language === 'ta' ? 'அனைத்துப் பதிப்புகளின் காலவரிசை' : 'CHRONOLOGICAL DISPATCH ARCHIVE'}
           </span>
           <h3 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline">
@@ -74,7 +74,7 @@ export const LatestNewsFeed: React.FC<LatestNewsFeedProps> = ({ articles, totalC
                   {/* Left Column: Metadata & Timing */}
                   <div className="lg:w-48 shrink-0 space-y-1.5 text-xs font-english">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#E31E24] uppercase tracking-wider text-[11px]">
+                      <span className="font-bold text-[#C41A1F] uppercase tracking-wider text-[11px]">
                         {item.category}
                       </span>
                       {isNewest && (
@@ -98,7 +98,7 @@ export const LatestNewsFeed: React.FC<LatestNewsFeedProps> = ({ articles, totalC
 
                   {/* Center Column: Headline, Summary & Authority */}
                   <div className="flex-1 space-y-2">
-                    <h4 className="text-lg sm:text-xl font-bold text-neutral-900 font-dmk-headline leading-snug group-hover:text-[#E31E24] transition-colors">
+                    <h4 className="text-lg sm:text-xl font-bold text-neutral-900 font-dmk-headline leading-snug group-hover:text-[#C41A1F] transition-colors">
                       <Link href={`/news/${item.id}`} className="block">
                         {item.title[language]}
                       </Link>
@@ -111,7 +111,7 @@ export const LatestNewsFeed: React.FC<LatestNewsFeedProps> = ({ articles, totalC
                     <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] font-english text-neutral-500">
                       {item.author && (
                         <span className="flex items-center gap-1 font-semibold text-neutral-800">
-                          <User className="w-3 h-3 text-[#E31E24]" />
+                          <User className="w-3 h-3 text-[#C41A1F]" />
                           {item.author[language]}
                         </span>
                       )}
@@ -134,7 +134,7 @@ export const LatestNewsFeed: React.FC<LatestNewsFeedProps> = ({ articles, totalC
                   <div className="lg:w-44 shrink-0 flex items-center lg:flex-col lg:items-end justify-between lg:justify-start gap-3 pt-2 lg:pt-0">
                     <Link
                       href={`/news/${item.id}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-english font-bold uppercase tracking-wider text-neutral-900 group-hover:text-[#E31E24] transition-colors border-b border-transparent group-hover:border-[#E31E24] pb-0.5"
+                      className="inline-flex items-center gap-1.5 text-xs font-english font-bold uppercase tracking-wider text-neutral-900 group-hover:text-[#C41A1F] transition-colors border-b border-transparent group-hover:border-[#E31E24] pb-0.5"
                     >
                       <span>{language === 'ta' ? 'முழு அறிக்கை' : 'Read Dispatch'}</span>
                       <ChevronRight className="w-3.5 h-3.5" />

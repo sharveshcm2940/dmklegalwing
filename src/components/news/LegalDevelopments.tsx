@@ -27,8 +27,8 @@ export const LegalDevelopments: React.FC<LegalDevelopmentsProps> = ({ items }) =
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-neutral-900 pb-5 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <Scale className="w-4 h-4 text-[#E31E24]" />
-            <span className="text-[11px] font-english font-bold uppercase tracking-[0.25em] text-[#E31E24]">
+            <Scale className="w-4 h-4 text-[#C41A1F]" />
+            <span className="text-[11px] font-english font-bold uppercase tracking-[0.25em] text-[#C41A1F]">
               {language === 'ta' ? 'அரசமைப்பு & நீதிமன்ற நடவடிக்கைகள்' : 'CONSTITUTIONAL JURISPRUDENCE & DOCKET'}
             </span>
           </div>
@@ -79,7 +79,7 @@ export const LegalDevelopments: React.FC<LegalDevelopmentsProps> = ({ items }) =
               {/* Category, Court & Date */}
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-english border-b border-neutral-200 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#E31E24] uppercase tracking-wider text-[11px]">
+                  <span className="font-bold text-[#C41A1F] uppercase tracking-wider text-[11px]">
                     {item.category}
                   </span>
                   <span className="text-neutral-300">•</span>
@@ -88,7 +88,7 @@ export const LegalDevelopments: React.FC<LegalDevelopmentsProps> = ({ items }) =
                   </span>
                 </div>
 
-                <span className="bg-[#FFF5F5] text-[#B81318] border border-[#E31E24] px-2 py-0.5 text-[10px] font-bold uppercase">
+                <span className="bg-[#FFF5F5] text-[#C41A1F] border border-[#E31E24] px-2 py-0.5 text-[10px] font-bold uppercase rounded-[2px]">
                   {item.statusTag[language]}
                 </span>
               </div>
@@ -111,7 +111,7 @@ export const LegalDevelopments: React.FC<LegalDevelopmentsProps> = ({ items }) =
                 </div>
                 <div>
                   <span className="text-neutral-500 text-[10px] uppercase block">{language === 'ta' ? 'கழக மூத்த வழக்கறிஞர்:' : 'Lead Counsel:'}</span>
-                  <span className="font-bold text-[#E31E24]">{item.counsel[language]}</span>
+                  <span className="font-bold text-[#C41A1F]">{item.counsel[language]}</span>
                 </div>
               </div>
 
@@ -139,9 +139,9 @@ export const LegalDevelopments: React.FC<LegalDevelopmentsProps> = ({ items }) =
               <div className="flex items-center gap-2">
                 <a
                   href="#legal-docket"
-                  className="inline-flex items-center gap-1 text-neutral-900 hover:text-[#E31E24] font-bold uppercase transition-colors"
+                  className="inline-flex items-center gap-1 text-neutral-900 hover:text-[#C41A1F] font-bold uppercase transition-colors"
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#E31E24]" />
+                  <FileText className="w-3.5 h-3.5 text-[#C41A1F]" />
                   <span>{language === 'ta' ? 'வழக்கு ஆவணம்' : 'Docket Record'}</span>
                 </a>
               </div>

@@ -32,7 +32,7 @@ export default function AboutPage() {
         <div className="bg-white border-y-2 border-neutral-900 p-8 sm:p-12">
           <div className="max-w-3xl space-y-3">
             <div className="flex items-center gap-2 border-b border-neutral-300 pb-2">
-              <span className="text-xs font-bold text-[#E31E24] tracking-[0.2em] uppercase font-english">
+              <span className="text-xs font-bold text-[#C41A1F] tracking-[0.2em] uppercase font-english">
                 {language === 'ta' ? 'அமைப்பு வரலாறு & அரசமைப்பு நோக்கம்' : 'HISTORICAL PROFILE & CONSTITUTIONAL MANDATE'}
               </span>
               <span className="text-neutral-300">•</span>
@@ -61,8 +61,8 @@ export default function AboutPage() {
           <div className="p-6 space-y-3 flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
-                <span className="text-xs font-bold text-[#B81318] uppercase font-english">SECTION I</span>
-                <Scale className="w-5 h-5 text-[#E31E24]" />
+                <span className="text-xs font-bold text-[#C41A1F] uppercase font-english">SECTION I</span>
+                <Scale className="w-5 h-5 text-[#C41A1F]" />
               </div>
               <h3 className="text-xl font-bold text-neutral-900 font-dmk-headline">
                 {language === 'ta' ? 'அணியின் நோக்கம் & கடமைகள்' : 'Purpose & Responsibilities'}
@@ -79,8 +79,8 @@ export default function AboutPage() {
           <div className="p-6 space-y-3 flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
-                <span className="text-xs font-bold text-[#B81318] uppercase font-english">SECTION II</span>
-                <ShieldCheck className="w-5 h-5 text-[#E31E24]" />
+                <span className="text-xs font-bold text-[#C41A1F] uppercase font-english">SECTION II</span>
+                <ShieldCheck className="w-5 h-5 text-[#C41A1F]" />
               </div>
               <h3 className="text-xl font-bold text-neutral-900 font-dmk-headline">
                 {language === 'ta' ? 'கழகத்தில் அணியின் பங்கு' : 'Role Within the DMK'}
@@ -97,8 +97,8 @@ export default function AboutPage() {
           <div className="p-6 space-y-3 flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
-                <span className="text-xs font-bold text-[#B81318] uppercase font-english">SECTION III</span>
-                <Gavel className="w-5 h-5 text-[#E31E24]" />
+                <span className="text-xs font-bold text-[#C41A1F] uppercase font-english">SECTION III</span>
+                <Gavel className="w-5 h-5 text-[#C41A1F]" />
               </div>
               <h3 className="text-xl font-bold text-neutral-900 font-dmk-headline">
                 {language === 'ta' ? 'இலவச சட்ட உதவி & மக்கள் நலன்' : 'Citizen Access to Justice'}
@@ -120,8 +120,8 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* Banner 1: Official Campaign Banner with Thalapathi M.K. Stalin */}
-          <div className="border border-neutral-300 bg-[#FAF7F2] flex flex-col justify-between group overflow-hidden">
-            <div className="relative w-full h-64 sm:h-72 overflow-hidden flex items-center justify-center bg-[#F9C300]">
+          <div className="border border-neutral-300 bg-[#FAF7F2] flex flex-col justify-between group overflow-hidden rounded-[2px]">
+            <div className="relative w-full h-64 sm:h-72 overflow-hidden flex items-center justify-center bg-[#111111]">
               <img
                 src="/images/dmk-campaign-stalin.jpg"
                 alt="தமிழ்நாட்டை தலைகுனிய விடமாட்டேன்!"
@@ -129,7 +129,7 @@ export default function AboutPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
               <div className="absolute top-4 left-4">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-black text-white font-english">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-black text-white font-english rounded-[2px]">
                   {language === 'ta' ? 'களப் பிரகடனம்' : 'CAMPAIGN DECLARATION'}
                 </span>
               </div>
@@ -147,8 +147,8 @@ export default function AboutPage() {
           </div>
 
           {/* Banner 2: Four Leaders Panoramic Heritage Artwork */}
-          <div className="border border-neutral-300 bg-[#FAF7F2] flex flex-col justify-between group overflow-hidden">
-            <div className="relative w-full h-64 sm:h-72 overflow-hidden flex items-center justify-center bg-[#2A1208]">
+          <div className="border border-neutral-300 bg-[#FAF7F2] flex flex-col justify-between group overflow-hidden rounded-[2px]">
+            <div className="relative w-full h-64 sm:h-72 overflow-hidden flex items-center justify-center bg-[#111111]">
               <img
                 src="/images/dmk-four-leaders.jpg"
                 alt="கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!"
@@ -156,13 +156,13 @@ export default function AboutPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
               <div className="absolute top-4 left-4">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-black/85 text-[#FFD166] border border-[#FFD166]/40 font-english">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-black/85 text-[#FAF8F5] border border-white/40 font-english rounded-[2px]">
                   {language === 'ta' ? 'கொள்கை வழிகாட்டிகள்' : 'IDEOLOGICAL MENTORS'}
                 </span>
               </div>
             </div>
-            <div className="p-6 bg-[#180A04] text-white space-y-2 border-t border-amber-950">
-              <h3 className="text-xl sm:text-2xl font-dmk-slogan text-[#FFE8A3] leading-snug">
+            <div className="p-6 bg-[#111111] text-white space-y-2 border-t border-neutral-800">
+              <h3 className="text-xl sm:text-2xl font-dmk-slogan text-[#FAF8F5] leading-snug">
                 &ldquo;கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!&rdquo;
               </h3>
               <p className="text-xs text-neutral-300 font-dmk-body leading-relaxed">
@@ -183,7 +183,7 @@ export default function AboutPage() {
             <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline">
               {language === 'ta' ? 'அணியின் முதன்மைச் சட்ட நோக்கங்கள்' : 'Constitutional Objectives & Principles'}
             </h2>
-            <span className="text-xs font-bold text-[#E31E24] uppercase font-english">SCHEDULE A</span>
+            <span className="text-xs font-bold text-[#C41A1F] uppercase font-english">SCHEDULE A</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
@@ -213,8 +213,8 @@ export default function AboutPage() {
                 ta: 'அரசியல் உள்நோக்கம் கொண்ட பழிவாங்கும் நடவடிக்கைகள் மற்றும் தடுப்புக் காவல் சட்டங்களுக்கு எதிராக சட்டப்போர் நடத்துதல்.'
               }
             ].map((obj, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 bg-[#FAF7F2] border border-neutral-200">
-                <CheckCircle2 className="w-4 h-4 text-[#E31E24] shrink-0 mt-0.5" />
+              <div key={i} className="flex items-start gap-3 p-4 bg-[#FAF7F2] border border-neutral-200 rounded-[2px]">
+                <CheckCircle2 className="w-4 h-4 text-[#C41A1F] shrink-0 mt-0.5" />
                 <span className="text-neutral-900 leading-relaxed font-dmk-body">{obj[language]}</span>
               </div>
             ))}
@@ -224,7 +224,7 @@ export default function AboutPage() {
 
       {/* 5. Historical Milestones Timeline (Our Journey - Star Timeline) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-white border border-neutral-300 p-6 sm:p-10 relative overflow-hidden">
+        <div className="bg-white border border-neutral-300 p-6 sm:p-10 relative overflow-hidden rounded-[2px]">
           
           {/* Section Header Matching Reference Image */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-neutral-300 mb-8">
@@ -248,7 +248,7 @@ export default function AboutPage() {
 
               <button
                 onClick={() => setShowFullIndex(!showFullIndex)}
-                className="px-3 py-1.5 text-xs font-english font-bold uppercase tracking-wider border border-neutral-300 hover:border-black text-neutral-700 hover:text-black transition-colors"
+                className="px-3 py-1.5 text-xs font-english font-bold uppercase tracking-wider border border-neutral-300 hover:border-black text-neutral-700 hover:text-black transition-colors rounded-[2px]"
               >
                 {showFullIndex
                   ? (language === 'ta' ? 'சுருக்கப் பார்வை' : 'Interactive View')
@@ -257,7 +257,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Interactive Star Timeline Track (Exact Replica of Reference Design) */}
+          {/* Interactive Star Timeline Track */}
           <div className="relative py-10 my-4 overflow-x-auto scrollbar-none">
             <div className="min-w-[700px] relative px-6">
               
@@ -284,7 +284,7 @@ export default function AboutPage() {
                       title={`${m.year}: ${m.title[language]}`}
                     >
                       {/* 5-Pointed Star Icon */}
-                      <div className={`p-1 bg-white rounded-full transition-transform duration-300 ${
+                      <div className={`p-1 bg-white rounded-[2px] transition-transform duration-300 ${
                         isSelected ? 'scale-125' : 'group-hover:scale-115'
                       }`}>
                         <Star 

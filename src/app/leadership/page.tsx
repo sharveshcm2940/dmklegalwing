@@ -35,7 +35,7 @@ export default function LeadershipPage() {
                 <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
                   {language === 'ta' ? 'மாநிலத் தலைமைப் பொறுப்பாளர்கள்' : 'LEADERSHIP COUNCIL'}
                 </span>
-                <span className="text-xs font-english text-[#E31E24] font-bold">
+                <span className="text-xs font-english text-[#C41A1F] font-bold">
                   ESTD. 1971 • CHENNAI
                 </span>
               </div>
@@ -65,7 +65,7 @@ export default function LeadershipPage() {
           
           <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
             <span className="font-english text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1 shrink-0">
-              <Filter className="w-3.5 h-3.5 text-[#E31E24]" />
+              <Filter className="w-3.5 h-3.5 text-[#C41A1F]" />
               {language === 'ta' ? 'வடிகட்டுக:' : 'FILTER:'}
             </span>
             {[
@@ -167,7 +167,7 @@ export default function LeadershipPage() {
 
                   {/* Editorial Body */}
                   <div className="p-5 space-y-2">
-                    <span className="text-xs font-english font-bold text-[#E31E24] uppercase tracking-wider block">
+                    <span className="text-xs font-english font-bold text-[#C41A1F] uppercase tracking-wider block">
                       {leader.designation[language]}
                     </span>
 
@@ -193,7 +193,7 @@ export default function LeadershipPage() {
 
                   <button
                     onClick={() => setSelectedLeader(leader)}
-                    className="font-english text-xs font-bold text-[#E31E24] hover:text-black flex items-center gap-1 uppercase tracking-wider"
+                    className="font-english text-xs font-bold text-[#C41A1F] hover:text-black flex items-center gap-1 uppercase tracking-wider"
                   >
                     <span>{language === 'ta' ? 'முழு விவரம்' : 'View Profile'}</span>
                     <span>&rarr;</span>
@@ -234,7 +234,7 @@ export default function LeadershipPage() {
               </div>
 
               <div className="flex-1 space-y-1">
-                <span className="text-xs font-mono font-bold text-[#E31E24] uppercase tracking-wider block">
+                <span className="text-xs font-mono font-bold text-[#C41A1F] uppercase tracking-wider block">
                   {selectedLeader.designation[language]}
                 </span>
 
@@ -248,7 +248,7 @@ export default function LeadershipPage() {
 
                 <div className="flex flex-wrap items-center gap-2 pt-1 font-mono text-[11px]">
                   {selectedLeader.barCouncilNo && (
-                    <span className="bg-red-50 text-[#E31E24] border border-red-300 px-2 py-0.5 font-bold">
+                    <span className="bg-red-50 text-[#C41A1F] border border-red-300 px-2 py-0.5 font-bold">
                       Bar Council: {selectedLeader.barCouncilNo}
                     </span>
                   )}
@@ -286,18 +286,18 @@ export default function LeadershipPage() {
                 {selectedLeader.email && (
                   <a
                     href={`mailto:${selectedLeader.email}`}
-                    className="flex items-center gap-1.5 hover:text-[#E31E24] bg-white border border-neutral-300 px-2 py-1"
+                    className="flex items-center gap-1.5 hover:text-[#C41A1F] bg-white border border-neutral-300 px-2 py-1"
                   >
-                    <Mail className="w-3.5 h-3.5 text-[#E31E24]" />
+                    <Mail className="w-3.5 h-3.5 text-[#C41A1F]" />
                     <span>{selectedLeader.email}</span>
                   </a>
                 )}
                 {selectedLeader.phone && (
                   <a
                     href={`tel:${selectedLeader.phone}`}
-                    className="flex items-center gap-1.5 hover:text-[#E31E24] bg-white border border-neutral-300 px-2 py-1"
+                    className="flex items-center gap-1.5 hover:text-[#C41A1F] bg-white border border-neutral-300 px-2 py-1"
                   >
-                    <Phone className="w-3.5 h-3.5 text-[#E31E24]" />
+                    <Phone className="w-3.5 h-3.5 text-[#C41A1F]" />
                     <span>{selectedLeader.phone}</span>
                   </a>
                 )}

@@ -32,7 +32,7 @@ export const Footer: React.FC = () => {
           {/* Col 1 & 2: Brand Profile with authentic DMK Flag & Rising Sun Emblem */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-lg bg-white p-1 border border-neutral-700 shrink-0 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-[2px] bg-white p-1 border border-neutral-700 shrink-0 flex items-center justify-center">
                 <img
                   src="/images/dmk-flag-sun.jpg"
                   alt="DMK Flag & Rising Sun"
@@ -41,7 +41,7 @@ export const Footer: React.FC = () => {
               </div>
 
               <div>
-                <span className="text-xs font-bold tracking-widest text-[#E31E24] uppercase block font-tamil-serif">
+                <span className="text-xs font-bold tracking-widest text-[#C41A1F] uppercase block font-tamil-serif">
                   {language === 'ta' ? 'திமுக வழக்கறிஞர் அணி' : 'DMK LEGAL WING'}
                 </span>
                 <span className="text-base font-tamil-serif font-bold text-white tracking-wide block">
@@ -58,8 +58,8 @@ export const Footer: React.FC = () => {
             </p>
 
             {/* Core Ideological Maxim */}
-            <div className="p-4 rounded-lg bg-black/60 border-l-4 border-[#E31E24] border-t border-r border-b border-neutral-800 text-xs">
-              <span className="text-[#E31E24] font-bold block mb-1 uppercase tracking-wider text-[11px]">
+            <div className="p-4 rounded-[2px] bg-black/60 border-l-4 border-[#E31E24] border-t border-r border-b border-neutral-800 text-xs">
+              <span className="text-[#C41A1F] font-bold block mb-1 uppercase tracking-wider text-[11px]">
                 {language === 'ta' ? 'கொள்கை முழக்கம்:' : 'Guiding Maxim:'}
               </span>
               <p className="italic text-neutral-200 font-tamil-serif text-sm">
@@ -72,7 +72,7 @@ export const Footer: React.FC = () => {
             {/* Official Headquarters */}
             <div className="space-y-3 pt-2 text-xs text-neutral-400">
               <div className="flex items-start gap-2.5">
-                <Building2 className="w-4 h-4 text-[#E31E24] shrink-0 mt-0.5" />
+                <Building2 className="w-4 h-4 text-[#C41A1F] shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-neutral-200 block">
                     {language === 'ta' ? 'கழகத் தலைமைச் செயலகம்:' : 'Party Headquarters:'}
@@ -82,7 +82,7 @@ export const Footer: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#E31E24] shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 text-[#C41A1F] shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-neutral-200 block">
                     {language === 'ta' ? 'உயர் நீதிமன்ற அலுவலகம்:' : 'High Court Chambers:'}
@@ -113,7 +113,7 @@ export const Footer: React.FC = () => {
                     href={item.href}
                     className="hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1.5 text-neutral-400"
                   >
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[#E31E24]" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-[#C41A1F]" />
                     <span>{item.label}</span>
                   </Link>
                 </li>
@@ -140,7 +140,7 @@ export const Footer: React.FC = () => {
                     href={item.href}
                     className="hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1.5 text-neutral-400"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#E31E24]" />
+                    <span className="w-1.5 h-1.5 rounded-[2px] bg-[#E31E24]" />
                     <span>{item.label}</span>
                   </Link>
                 </li>
@@ -158,7 +158,7 @@ export const Footer: React.FC = () => {
                 href={`tel:${DMK_ORGANISATION_INFO.phone}`}
                 className="flex items-center gap-2 text-neutral-300 hover:text-white transition-colors"
               >
-                <Phone className="w-3.5 h-3.5 text-[#E31E24]" />
+                <Phone className="w-3.5 h-3.5 text-[#C41A1F]" />
                 <span className="font-mono">{DMK_ORGANISATION_INFO.phone}</span>
               </a>
 
@@ -166,14 +166,14 @@ export const Footer: React.FC = () => {
                 href={`mailto:${DMK_ORGANISATION_INFO.email}`}
                 className="flex items-center gap-2 text-neutral-300 hover:text-white transition-colors"
               >
-                <Mail className="w-3.5 h-3.5 text-[#E31E24]" />
+                <Mail className="w-3.5 h-3.5 text-[#C41A1F]" />
                 <span className="font-mono">{DMK_ORGANISATION_INFO.email}</span>
               </a>
 
               <div className="pt-2 border-t border-neutral-800">
                 <Link
                   href="/contact#register"
-                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-[#E31E24] hover:bg-[#B81318] text-white rounded text-xs font-bold uppercase tracking-wider transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-[#E31E24] hover:bg-[#C41A1F] text-white rounded-[2px] text-xs font-bold uppercase tracking-wider transition-all"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
                   <span>{t.nav.registerAdvocate}</span>
@@ -186,7 +186,7 @@ export const Footer: React.FC = () => {
                   className="text-neutral-400 hover:text-white text-[11px] flex items-center gap-1 transition-colors"
                 >
                   <span>{language === 'ta' ? 'அங்கீகரிக்கப்பட்ட நிர்வாக போர்டல்' : 'Authorized Admin Portal'}</span>
-                  <ExternalLink className="w-3 h-3 text-[#E31E24]" />
+                  <ExternalLink className="w-3 h-3 text-[#C41A1F]" />
                 </Link>
               </div>
             </div>

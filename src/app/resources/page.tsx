@@ -97,7 +97,7 @@ export default function ResourcesPage() {
                 <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
                   {language === 'ta' ? 'அரசமைப்பு & சட்ட ஆவணக் களஞ்சியம்' : 'CONSTITUTIONAL LAW REPOSITORY'}
                 </span>
-                <span className="text-xs font-english text-[#E31E24] font-bold">
+                <span className="text-xs font-english text-[#C41A1F] font-bold">
                   50+ YEARS LEGAL ARCHIVE
                 </span>
               </div>
@@ -127,7 +127,7 @@ export default function ResourcesPage() {
           
           <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1 shrink-0">
-              <Filter className="w-3.5 h-3.5 text-[#E31E24]" />
+              <Filter className="w-3.5 h-3.5 text-[#C41A1F]" />
               {language === 'ta' ? 'வகைப்பாடு:' : 'SERIES:'}
             </span>
             {categories.map((c) => (
@@ -162,7 +162,7 @@ export default function ResourcesPage() {
       {/* Download Alert Toast */}
       {downloadSuccessToast && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#111111] text-white border-2 border-[#E31E24] px-5 py-3 shadow-md flex items-center gap-3 font-mono">
-          <CheckCircle2 className="w-5 h-5 text-[#E31E24] shrink-0" />
+          <CheckCircle2 className="w-5 h-5 text-[#C41A1F] shrink-0" />
           <div className="text-xs">
             <strong className="block font-bold text-white">
               {language === 'ta' ? 'ஆவணம் பதிவிறக்கம் தொடங்கப்பட்டது' : 'LEGAL DOSSIER DOWNLOAD INITIATED'}
@@ -182,7 +182,7 @@ export default function ResourcesPage() {
             >
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-300 pb-2">
-                  <span className="text-xs font-mono font-bold text-[#E31E24] bg-red-50 border border-red-200 px-2 py-0.5 uppercase">
+                  <span className="text-xs font-mono font-bold text-[#C41A1F] bg-red-50 border border-red-200 px-2 py-0.5 uppercase">
                     {res.category}
                   </span>
                   {res.citation && (
@@ -225,7 +225,7 @@ export default function ResourcesPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setSelectedResource(res)}
-                    className="text-xs font-mono font-bold text-neutral-900 hover:text-[#E31E24] px-3 py-1 bg-[#FAF7F2] hover:bg-neutral-200 border border-neutral-300 transition-colors"
+                    className="text-xs font-mono font-bold text-neutral-900 hover:text-[#C41A1F] px-3 py-1 bg-[#FAF7F2] hover:bg-neutral-200 border border-neutral-300 transition-colors"
                   >
                     {language === 'ta' ? 'விளக்கம்' : 'Digest'}
                   </button>
@@ -247,7 +247,7 @@ export default function ResourcesPage() {
       {/* Frequently Asked Legal Questions Section */}
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
         <div className="border-t-2 border-neutral-900 pt-8">
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#E31E24] uppercase tracking-widest mb-1">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#C41A1F] uppercase tracking-widest mb-1">
             <HelpCircle className="w-4 h-4" />
             <span>{language === 'ta' ? 'அடிக்கடி கேட்கப்படும் சட்டக் கேள்விகள்' : 'CONSTITUTIONAL & STATUTORY FAQ'}</span>
           </div>
@@ -271,7 +271,7 @@ export default function ResourcesPage() {
                       {faq.q[language]}
                     </span>
                     {isOpen ? (
-                      <ChevronUp className="w-5 h-5 text-[#E31E24] shrink-0" />
+                      <ChevronUp className="w-5 h-5 text-[#C41A1F] shrink-0" />
                     ) : (
                       <ChevronDown className="w-5 h-5 text-neutral-700 shrink-0" />
                     )}
@@ -308,7 +308,7 @@ export default function ResourcesPage() {
             </button>
 
             <div className="space-y-4 mt-2">
-              <span className="text-xs font-mono font-bold text-[#E31E24] uppercase tracking-wider block">
+              <span className="text-xs font-mono font-bold text-[#C41A1F] uppercase tracking-wider block">
                 {selectedResource.category} • {selectedResource.court || 'Constitutional Repository'}
               </span>
 
@@ -333,7 +333,7 @@ export default function ResourcesPage() {
                 <div className="space-y-1.5">
                   {selectedResource.keyHighlights[language].map((h, i) => (
                     <div key={i} className="flex items-start gap-2 text-xs text-neutral-800 font-dmk-body">
-                      <CheckCircle2 className="w-4 h-4 text-[#E31E24] shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-[#C41A1F] shrink-0 mt-0.5" />
                       <span>{h}</span>
                     </div>
                   ))}

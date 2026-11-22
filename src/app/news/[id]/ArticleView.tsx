@@ -84,14 +84,14 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
         <div className="border-b border-neutral-300 pb-4 flex items-center justify-between text-xs font-english text-neutral-600">
           <Link
             href="/news"
-            className="inline-flex items-center gap-1.5 font-bold uppercase tracking-wider text-neutral-900 hover:text-[#E31E24] transition-colors"
+            className="inline-flex items-center gap-1.5 font-bold uppercase tracking-wider text-neutral-900 hover:text-[#C41A1F] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>{language === 'ta' ? 'செய்திக் களத்திற்குத் திரும்பு' : 'BACK TO NEWSROOM'}</span>
           </Link>
 
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="font-bold text-[#E31E24] uppercase">{article.category}</span>
+            <span className="font-bold text-[#C41A1F] uppercase">{article.category}</span>
             <span>•</span>
             <span className="text-neutral-500">DISPATCH REF: {article.id.toUpperCase()}</span>
           </div>
@@ -111,7 +111,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
 
               <div className="flex items-center gap-3 text-neutral-600">
                 <span className="flex items-center gap-1 font-semibold text-neutral-800">
-                  <Calendar className="w-3.5 h-3.5 text-[#E31E24]" />
+                  <Calendar className="w-3.5 h-3.5 text-[#C41A1F]" />
                   {article.date}
                 </span>
                 {article.time && <span>• {article.time}</span>}
@@ -205,9 +205,9 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
 
           {/* Court & Case Reference Dossier Bar (if applicable) */}
           {(article.court || article.caseNumber) && (
-            <div className="bg-[#FFF5F5] border border-[#E31E24] p-4 my-6 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-[#FFF5F5] border border-[#E31E24] p-4 my-6 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[2px]">
               <div className="space-y-0.5">
-                <span className="text-[10px] font-english font-bold uppercase tracking-wider text-[#B81318] block">
+                <span className="text-[10px] font-english font-bold uppercase tracking-wider text-[#C41A1F] block">
                   {language === 'ta' ? 'நீதிமன்ற வழக்கு விவரம்' : 'OFFICIAL COURT DOCKET REFERENCE'}
                 </span>
                 <span className="font-bold text-neutral-900 text-sm">
@@ -221,7 +221,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 text-[#B81318] font-bold text-xs uppercase bg-white px-2.5 py-1 border border-[#E31E24]">
+                <span className="inline-flex items-center gap-1 text-[#C41A1F] font-bold text-xs uppercase bg-white px-2.5 py-1 border border-[#E31E24] rounded-[2px]">
                   <Scale className="w-3.5 h-3.5" />
                   Official Proceeding
                 </span>
@@ -251,7 +251,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
           <div className="mt-12 pt-8 border-t-2 border-neutral-900 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[#FAF7F2] p-6 border border-neutral-300">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white border border-neutral-900 p-2 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-7 h-7 text-[#E31E24]" />
+                <ShieldCheck className="w-7 h-7 text-[#C41A1F]" />
               </div>
               <div className="text-xs font-english">
                 <span className="font-bold text-neutral-900 block uppercase tracking-wider text-sm">
@@ -292,11 +292,11 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-[11px] font-english text-neutral-500 border-b border-neutral-200 pb-1.5">
-                    <span className="font-bold text-[#E31E24] uppercase">{item.category}</span>
+                    <span className="font-bold text-[#C41A1F] uppercase">{item.category}</span>
                     <span>{item.date}</span>
                   </div>
 
-                  <h4 className="text-base font-bold text-neutral-900 font-dmk-headline group-hover:text-[#E31E24] transition-colors leading-snug">
+                  <h4 className="text-base font-bold text-neutral-900 font-dmk-headline group-hover:text-[#C41A1F] transition-colors leading-snug">
                     <Link href={`/news/${item.id}`}>
                       {item.title[language]}
                     </Link>
@@ -310,7 +310,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
                 <div className="pt-4 mt-4 border-t border-neutral-200">
                   <Link
                     href={`/news/${item.id}`}
-                    className="inline-flex items-center gap-1 text-xs font-english font-bold text-neutral-900 group-hover:text-[#E31E24] uppercase tracking-wider"
+                    className="inline-flex items-center gap-1 text-xs font-english font-bold text-neutral-900 group-hover:text-[#C41A1F] uppercase tracking-wider"
                   >
                     <span>{language === 'ta' ? 'படிக்க' : 'Read Dispatch'}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
