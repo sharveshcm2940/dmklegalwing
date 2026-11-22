@@ -1,341 +1,67 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Link from 'next/link';
 import { useLanguage } from '../context/LanguageContext';
 import { useData } from '../context/DataContext';
 import { DistrictInfo } from '../types';
 import { 
-  Building2, 
+  REAL_TN_DISTRICTS, 
+  TN_MAP_VIEWBOX, 
+  RealDistrictMapMeta 
+} from '../data/tamilNaduMapData';
+import { 
   Phone, 
-  Mail, 
-  Users, 
-  Scale, 
   Search, 
   Filter, 
-  ExternalLink,
   Eye, 
-  Download, 
-  MapPin, 
   X, 
-  CheckCircle2,
-  ChevronRight,
-  ShieldCheck
+  CheckCircle2, 
+  Building2, 
+  Scale, 
+  MapPin, 
+  ShieldCheck 
 } from 'lucide-react';
-
-interface AdminDistrictMeta {
-  id: string;
-  name: { en: string; ta: string };
-  pathD: string;
-  center: [number, number];
-  subDistrictIds: string[];
-}
-
-// Geographically positioned SVG polygons and centers for Tamil Nadu administrative districts
-const TN_ADMIN_DISTRICTS: AdminDistrictMeta[] = [
-  {
-    id: 'tiruvannamalai',
-    name: { en: 'Tiruvannamalai', ta: 'திருவண்ணாமலை' },
-    center: [280, 140],
-    pathD: 'M 255,120 L 300,110 L 315,135 L 305,165 L 280,175 L 255,160 L 245,135 Z',
-    subDistrictIds: ['thiruvannamalai-north', 'thiruvannamalai-south']
-  },
-  {
-    id: 'chennai',
-    name: { en: 'Chennai', ta: 'சென்னை' },
-    center: [348, 82],
-    pathD: 'M 342,75 L 356,76 L 358,90 L 344,89 Z',
-    subDistrictIds: [
-      'chennai-east',
-      'chennai-north',
-      'chennai-west',
-      'chennai-north-east',
-      'chennai-south',
-      'chennai-south-west'
-    ]
-  },
-  {
-    id: 'thiruvallur',
-    name: { en: 'Tiruvallur', ta: 'திருவள்ளூர்' },
-    center: [325, 70],
-    pathD: 'M 305,55 L 345,60 L 344,82 L 320,85 L 305,75 Z',
-    subDistrictIds: ['thiruvallur-central', 'thiruvallur-east', 'thiruvallur-west']
-  },
-  {
-    id: 'kancheepuram',
-    name: { en: 'Kancheepuram', ta: 'காஞ்சிபுரம்' },
-    center: [320, 105],
-    pathD: 'M 305,95 L 335,92 L 340,115 L 315,122 L 300,110 Z',
-    subDistrictIds: ['kancheepuram-north', 'kancheepuram-south']
-  },
-  {
-    id: 'ranipet',
-    name: { en: 'Ranipet', ta: 'ராணிப்பேட்டை' },
-    center: [290, 88],
-    pathD: 'M 275,80 L 305,78 L 305,96 L 278,98 Z',
-    subDistrictIds: ['ranipet']
-  },
-  {
-    id: 'vellore',
-    name: { en: 'Vellore', ta: 'வேலூர்' },
-    center: [265, 96],
-    pathD: 'M 250,88 L 275,86 L 278,110 L 250,112 Z',
-    subDistrictIds: ['vellore']
-  },
-  {
-    id: 'thiruppathur',
-    name: { en: 'Tirupathur', ta: 'திருப்பத்தூர்' },
-    center: [240, 115],
-    pathD: 'M 228,105 L 252,106 L 250,130 L 225,126 Z',
-    subDistrictIds: ['thiruppathur']
-  },
-  {
-    id: 'krishnagiri',
-    name: { en: 'Krishnagiri', ta: 'கிருஷ்ணகிரி' },
-    center: [215, 105],
-    pathD: 'M 195,90 L 230,92 L 228,125 L 195,115 Z',
-    subDistrictIds: ['krishnagiri-east', 'krishnagiri-west']
-  },
-  {
-    id: 'dharmapuri',
-    name: { en: 'Dharmapuri', ta: 'தர்மபுரி' },
-    center: [220, 140],
-    pathD: 'M 200,125 L 238,126 L 240,158 L 202,155 Z',
-    subDistrictIds: ['dharmapuri-east', 'dharmapuri-west']
-  },
-  {
-    id: 'vilupuram',
-    name: { en: 'Viluppuram', ta: 'விழுப்புரம்' },
-    center: [295, 170],
-    pathD: 'M 275,155 L 320,150 L 325,185 L 285,188 L 272,170 Z',
-    subDistrictIds: ['vilupuram-north', 'vilupuram-south']
-  },
-  {
-    id: 'kallakurichi',
-    name: { en: 'Kallakurichi', ta: 'கள்ளக்குறிச்சி' },
-    center: [255, 180],
-    pathD: 'M 235,165 L 275,162 L 275,195 L 235,195 Z',
-    subDistrictIds: ['kallakurichi-north', 'kallakurichi-south']
-  },
-  {
-    id: 'cuddalore',
-    name: { en: 'Cuddalore', ta: 'கடலூர்' },
-    center: [310, 205],
-    pathD: 'M 285,190 L 335,185 L 330,225 L 285,220 Z',
-    subDistrictIds: ['cuddalore-east', 'cuddalore-west']
-  },
-  {
-    id: 'salem',
-    name: { en: 'Salem', ta: 'சேலம்' },
-    center: [215, 180],
-    pathD: 'M 195,160 L 238,160 L 240,205 L 195,200 Z',
-    subDistrictIds: ['salem-central', 'salem-east', 'salem-west']
-  },
-  {
-    id: 'namakkal',
-    name: { en: 'Namakkal', ta: 'நாமக்கல்' },
-    center: [215, 220],
-    pathD: 'M 198,205 L 238,206 L 236,238 L 195,235 Z',
-    subDistrictIds: ['namakkal-east', 'namakkal-west']
-  },
-  {
-    id: 'erode',
-    name: { en: 'Erode', ta: 'ஈரோடு' },
-    center: [175, 195],
-    pathD: 'M 155,175 L 195,178 L 195,215 L 150,210 Z',
-    subDistrictIds: ['erode-north', 'erode-south']
-  },
-  {
-    id: 'nilagiri',
-    name: { en: 'Nilgiris', ta: 'நீலகிரி' },
-    center: [125, 190],
-    pathD: 'M 110,180 L 145,178 L 145,205 L 115,208 Z',
-    subDistrictIds: ['nilagiri']
-  },
-  {
-    id: 'covai',
-    name: { en: 'Coimbatore', ta: 'கோயம்புத்தூர்' },
-    center: [140, 235],
-    pathD: 'M 125,215 L 160,212 L 158,260 L 122,250 Z',
-    subDistrictIds: ['covai-city', 'covai-north', 'covai-south']
-  },
-  {
-    id: 'tiruppur',
-    name: { en: 'Tiruppur', ta: 'திருப்பூர்' },
-    center: [175, 238],
-    pathD: 'M 160,220 L 195,218 L 192,260 L 158,258 Z',
-    subDistrictIds: ['tiruppur-north', 'tiruppur-south']
-  },
-  {
-    id: 'karur',
-    name: { en: 'Karur', ta: 'கரூர்' },
-    center: [215, 252],
-    pathD: 'M 198,240 L 235,240 L 232,270 L 195,268 Z',
-    subDistrictIds: ['karur']
-  },
-  {
-    id: 'trichy',
-    name: { en: 'Tiruchirappalli', ta: 'திருச்சிராப்பள்ளி' },
-    center: [255, 250],
-    pathD: 'M 235,235 L 275,232 L 275,275 L 232,272 Z',
-    subDistrictIds: ['trichy-north', 'trichy-south', 'trichy-central']
-  },
-  {
-    id: 'perambalur',
-    name: { en: 'Perambalur', ta: 'பெரம்பலூர்' },
-    center: [260, 220],
-    pathD: 'M 245,210 L 275,208 L 275,232 L 245,232 Z',
-    subDistrictIds: ['perambalur']
-  },
-  {
-    id: 'ariyalur',
-    name: { en: 'Ariyalur', ta: 'அரியலூர்' },
-    center: [285, 222],
-    pathD: 'M 275,210 L 305,212 L 302,238 L 275,235 Z',
-    subDistrictIds: ['ariyalur']
-  },
-  {
-    id: 'mayiladuthurai',
-    name: { en: 'Mayiladuthurai', ta: 'மயிலாடுதுறை' },
-    center: [320, 235],
-    pathD: 'M 308,225 L 335,225 L 332,248 L 308,245 Z',
-    subDistrictIds: ['mayiladuthurai']
-  },
-  {
-    id: 'thiruvarur',
-    name: { en: 'Tiruvarur', ta: 'திருவாரூர்' },
-    center: [315, 260],
-    pathD: 'M 305,250 L 330,250 L 325,278 L 302,272 Z',
-    subDistrictIds: ['thiruvarur']
-  },
-  {
-    id: 'nagapattinam',
-    name: { en: 'Nagapattinam', ta: 'நாகப்பட்டினம்' },
-    center: [332, 275],
-    pathD: 'M 325,260 L 340,260 L 338,295 L 322,290 Z',
-    subDistrictIds: ['nagapattinam']
-  },
-  {
-    id: 'thanjavur',
-    name: { en: 'Thanjavur', ta: 'தஞ்சாவூர்' },
-    center: [290, 255],
-    pathD: 'M 275,242 L 310,242 L 308,280 L 275,275 Z',
-    subDistrictIds: ['thanjavur-central', 'thanjavur-north', 'thanjavur-south']
-  },
-  {
-    id: 'pudukottai',
-    name: { en: 'Pudukkottai', ta: 'புதுக்கோட்டை' },
-    center: [275, 292],
-    pathD: 'M 255,278 L 298,276 L 295,315 L 255,310 Z',
-    subDistrictIds: ['pudukottai-north', 'pudukottai-south']
-  },
-  {
-    id: 'dindugal',
-    name: { en: 'Dindigul', ta: 'திண்டுக்கல்' },
-    center: [195, 285],
-    pathD: 'M 175,265 L 225,265 L 220,312 L 170,305 Z',
-    subDistrictIds: ['dindugal-east', 'dindugal-west']
-  },
-  {
-    id: 'theni',
-    name: { en: 'Theni', ta: 'தேனி' },
-    center: [165, 320],
-    pathD: 'M 145,305 L 182,305 L 180,345 L 145,340 Z',
-    subDistrictIds: ['theni-north', 'theni-south']
-  },
-  {
-    id: 'madurai',
-    name: { en: 'Madurai', ta: 'மதுரை' },
-    center: [215, 330],
-    pathD: 'M 195,312 L 240,312 L 238,355 L 192,350 Z',
-    subDistrictIds: ['madurai-city', 'madurai-north', 'madurai-south']
-  },
-  {
-    id: 'sivagangai',
-    name: { en: 'Sivaganga', ta: 'சிவகங்கை' },
-    center: [265, 332],
-    pathD: 'M 242,318 L 290,315 L 285,355 L 240,352 Z',
-    subDistrictIds: ['sivagangai']
-  },
-  {
-    id: 'ramanathapuram',
-    name: { en: 'Ramanathapuram', ta: 'ராமநாதபுரம்' },
-    center: [280, 375],
-    pathD: 'M 250,358 L 320,358 L 305,400 L 250,395 Z',
-    subDistrictIds: ['ramanathapuram']
-  },
-  {
-    id: 'virudhunagar',
-    name: { en: 'Virudhunagar', ta: 'விருதுநகர்' },
-    center: [195, 375],
-    pathD: 'M 175,358 L 225,358 L 222,398 L 175,395 Z',
-    subDistrictIds: ['virudhunagar-north', 'virudhunagar-south']
-  },
-  {
-    id: 'thenkasi',
-    name: { en: 'Tenkasi', ta: 'தென்காசி' },
-    center: [165, 415],
-    pathD: 'M 148,398 L 185,398 L 182,438 L 145,432 Z',
-    subDistrictIds: ['thenkasi-north', 'thenkasi-south']
-  },
-  {
-    id: 'thoothukudi',
-    name: { en: 'Thoothukudi', ta: 'தூத்துக்குடி' },
-    center: [225, 420],
-    pathD: 'M 205,400 L 250,398 L 245,450 L 205,445 Z',
-    subDistrictIds: ['thoothukudi-north', 'thoothukudi-south']
-  },
-  {
-    id: 'tirunelveli',
-    name: { en: 'Tirunelveli', ta: 'திருநெல்வேலி' },
-    center: [185, 445],
-    pathD: 'M 165,430 L 210,430 L 205,475 L 165,470 Z',
-    subDistrictIds: ['tirunelveli-central', 'tirunelveli-east']
-  },
-  {
-    id: 'kanniyakumari',
-    name: { en: 'Kanniyakumari', ta: 'கன்னியாகுமரி' },
-    center: [175, 485],
-    pathD: 'M 160,472 L 195,472 L 188,505 L 160,500 Z',
-    subDistrictIds: ['kanniyakumari-east', 'kanniyakumari-west']
-  },
-  {
-    id: 'puducherry',
-    name: { en: 'Puducherry & Karaikal', ta: 'புதுச்சேரி & காரைக்கால்' },
-    center: [322, 172],
-    pathD: 'M 320,165 L 330,165 L 330,178 L 320,178 Z',
-    subDistrictIds: ['puducherry', 'karaikal']
-  }
-];
 
 export const TamilNaduMap: React.FC = () => {
   const { language } = useLanguage();
   const { districts } = useData();
 
-  // Default selection: Tiruvannamalai (matches user's reference mockup image!)
-  const [selectedAdminId, setSelectedAdminId] = useState<string>('tiruvannamalai');
-  const [hoveredAdminId, setHoveredAdminId] = useState<string | null>(null);
+  // Default selection: Tiruvannamalai (TVM) matching user's reference mockup image!
+  const [selectedCode, setSelectedCode] = useState<string>('TVM');
+  const [hoveredCode, setHoveredCode] = useState<string | null>(null);
   const [selectedSubDistrict, setSelectedSubDistrict] = useState<DistrictInfo | null>(null);
   const [showFullDirectoryModal, setShowFullDirectoryModal] = useState<boolean>(false);
   const [directorySearch, setDirectorySearch] = useState<string>('');
   const [zoneFilter, setZoneFilter] = useState<string>('All');
 
-  // Find active admin district
+  // Active administrative district from REAL_TN_DISTRICTS
   const activeAdminDistrict = useMemo(() => {
     return (
-      TN_ADMIN_DISTRICTS.find((d) => d.id === selectedAdminId) ||
-      TN_ADMIN_DISTRICTS[0]
+      REAL_TN_DISTRICTS.find((d) => d.code === selectedCode) ||
+      REAL_TN_DISTRICTS.find((d) => d.code === 'TVM') ||
+      REAL_TN_DISTRICTS[0]
     );
-  }, [selectedAdminId]);
+  }, [selectedCode]);
 
   // Retrieve matching party sub-districts for the selected administrative district
   const currentSubDistricts = useMemo(() => {
-    return activeAdminDistrict.subDistrictIds
+    const list = activeAdminDistrict.subDistrictIds
       .map((subId) => districts.find((d) => d.id === subId))
       .filter((d): d is DistrictInfo => Boolean(d));
+
+    // Fallback if none mapped: search by district name prefix
+    if (list.length === 0) {
+      const fallback = districts.filter((d) =>
+        d.name.en.toLowerCase().includes(activeAdminDistrict.name.en.toLowerCase())
+      );
+      if (fallback.length > 0) return fallback;
+      return [districts[0]];
+    }
+
+    return list;
   }, [activeAdminDistrict, districts]);
 
-  // Filtered 74 districts for the directory modal
+  // Filtered 74 districts for the full directory modal
   const filtered74Districts = useMemo(() => {
     return districts.filter((d) => {
       const matchesZone = zoneFilter === 'All' || d.zone === zoneFilter;
@@ -377,7 +103,7 @@ export const TamilNaduMap: React.FC = () => {
           <p className="text-xs sm:text-sm text-white/80 font-dmk-body mt-1">
             {language === 'ta'
               ? 'தமிழ்நாட்டின் 38 வருவாய் மாவட்டங்களில் செயல்படும் 74 அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள்'
-              : '74 Party Legal Wing Units across all jurisdictions of Tamil Nadu and Puducherry'}
+              : '74 Party Legal Wing Units across all 38 Administrative Districts of Tamil Nadu & Puducherry'}
           </p>
         </div>
 
@@ -391,57 +117,41 @@ export const TamilNaduMap: React.FC = () => {
         </button>
       </div>
 
-      {/* 2. MAIN 2-COLUMN SPLIT (Map & Inset on Left, Leader Banner & Units on Right) */}
+      {/* 2. MAIN 2-COLUMN SPLIT (Real Map & Inset on Left, Leader Banner & Units on Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start relative z-10">
         
         {/* ========================================================== */}
-        {/* LEFT COLUMN: TAMIL NADU MAP + ZOOMED INSET (7 cols)        */}
+        {/* LEFT COLUMN: REAL TAMIL NADU MAP + INSET ZOOM (7 cols)    */}
         {/* ========================================================== */}
-        <div className="lg:col-span-7 bg-[#780004]/90 border border-white/30 p-5 sm:p-7 relative shadow-inner flex flex-col md:flex-row items-center gap-6">
+        <div className="lg:col-span-7 bg-[#780004]/95 border-2 border-white/30 p-4 sm:p-6 relative shadow-inner flex flex-col md:flex-row items-center gap-6">
           
-          {/* Main Tamil Nadu Map SVG */}
+          {/* Main Authentic Geographic Tamil Nadu Map SVG */}
           <div className="w-full md:w-3/5 aspect-[4/5] relative flex items-center justify-center">
             <svg
-              viewBox="90 40 280 480"
-              className="w-full h-full filter drop-shadow-lg"
+              viewBox={TN_MAP_VIEWBOX}
+              className="w-full h-full filter drop-shadow-xl"
             >
-              {/* All Districts Paths */}
-              {TN_ADMIN_DISTRICTS.map((dist) => {
-                const isSelected = activeAdminDistrict.id === dist.id;
-                const isHovered = hoveredAdminId === dist.id;
+              {/* All 37/38 Real Geographic District Polygons */}
+              {REAL_TN_DISTRICTS.map((dist) => {
+                const isSelected = activeAdminDistrict.code === dist.code;
+                const isHovered = hoveredCode === dist.code;
 
                 return (
                   <path
-                    key={dist.id}
-                    d={dist.pathD}
-                    onClick={() => setSelectedAdminId(dist.id)}
-                    onMouseEnter={() => setHoveredAdminId(dist.id)}
-                    onMouseLeave={() => setHoveredAdminId(null)}
+                    key={dist.code}
+                    d={dist.path}
+                    onClick={() => setSelectedCode(dist.code)}
+                    onMouseEnter={() => setHoveredCode(dist.code)}
+                    onMouseLeave={() => setHoveredCode(null)}
                     fill={isSelected ? '#F59E0B' : isHovered ? '#FFD166' : '#FFFFFF'}
-                    stroke="#8A0005"
-                    strokeWidth="1.5"
+                    stroke={isSelected ? '#FFFFFF' : '#8A0005'}
+                    strokeWidth={isSelected ? '1.8' : '0.8'}
                     strokeLinejoin="round"
-                    className="cursor-pointer transition-all duration-200 hover:scale-105 origin-center"
-                  />
-                );
-              })}
-
-              {/* District Labels */}
-              {TN_ADMIN_DISTRICTS.map((dist) => {
-                const isSelected = activeAdminDistrict.id === dist.id;
-                return (
-                  <text
-                    key={`lbl-${dist.id}`}
-                    x={dist.center[0]}
-                    y={dist.center[1]}
-                    textAnchor="middle"
-                    fill={isSelected ? '#111111' : '#660000'}
-                    fontSize="7"
-                    fontWeight="bold"
-                    className="pointer-events-none select-none font-english"
+                    strokeLinecap="round"
+                    className="cursor-pointer transition-colors duration-150"
                   >
-                    {dist.name.en.slice(0, 3).toUpperCase()}
-                  </text>
+                    <title>{dist.name.en} ({dist.name.ta})</title>
+                  </path>
                 );
               })}
             </svg>
@@ -449,33 +159,36 @@ export const TamilNaduMap: React.FC = () => {
 
           {/* Inset Box showing Zoomed District Outline (Matching Image 3) */}
           <div className="w-full md:w-2/5 flex flex-col items-center justify-center p-4 bg-[#630003] border-2 border-white/40 shadow-xl">
-            <span className="text-xs font-english font-bold uppercase tracking-wider text-[#FFD166] text-center mb-2">
+            <span className="text-sm font-english font-black uppercase tracking-wider text-[#FFD166] text-center mb-0.5">
               {activeAdminDistrict.name[language]}
             </span>
+            <span className="text-[10px] text-white/70 font-mono tracking-wider uppercase mb-2">
+              {language === 'ta' ? 'அமைப்பு எல்லைப் பார்வை' : 'DISTRICT INSET'}
+            </span>
             
-            {/* Zoomed SVG contour with sub-division lines */}
-            <div className="w-40 h-40 relative flex items-center justify-center my-2">
-              <svg viewBox="0 0 100 100" className="w-full h-full">
-                {/* Outer Zoomed Shape */}
-                <polygon
-                  points="20,15 75,10 90,45 80,85 45,95 15,75 10,40"
+            {/* Zoomed authentic SVG contour of that exact district */}
+            <div className="w-44 h-44 relative flex items-center justify-center my-2 p-2 bg-[#4D0002]/70 border border-white/20 overflow-hidden">
+              <svg 
+                viewBox={activeAdminDistrict.viewBox} 
+                className="w-full h-full filter drop-shadow-md"
+              >
+                <path
+                  d={activeAdminDistrict.path}
                   fill="#F59E0B"
                   stroke="#FFFFFF"
-                  strokeWidth="2.5"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
                 />
-                {/* Internal sub-district boundary lines */}
-                <line x1="20" y1="15" x2="45" y2="95" stroke="#FFFFFF" strokeWidth="1.5" strokeDasharray="2 2" />
-                <line x1="10" y1="40" x2="80" y2="85" stroke="#FFFFFF" strokeWidth="1.5" strokeDasharray="2 2" />
-                <line x1="75" y1="10" x2="45" y2="50" stroke="#FFFFFF" strokeWidth="1.5" />
               </svg>
             </div>
 
             <div className="mt-2 text-center text-[11px] text-white/90 font-english space-y-1">
-              <span className="inline-block px-2.5 py-0.5 bg-[#FFD166] text-neutral-900 font-bold uppercase tracking-wider text-[10px]">
-                {currentSubDistricts.length} {language === 'ta' ? 'அமைப்புப் பிரிவுகள்' : 'Party Units'}
+              <span className="inline-block px-3 py-1 bg-[#FFD166] text-neutral-900 font-bold uppercase tracking-wider text-[11px]">
+                {currentSubDistricts.length} {language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'Party Units'}
               </span>
-              <p className="text-white/70 text-[10px]">
-                {language === 'ta' ? 'கள வழக்கறிஞர் பாதுகாப்பு நெட்வொர்க்' : 'Jurisdictional Legal Cadre'}
+              <p className="text-white/70 text-[10px] pt-1">
+                {language === 'ta' ? 'கள வழக்கறிஞர் பாதுகாப்புப் பிரிவு' : 'Click any district to inspect cadre'}
               </p>
             </div>
           </div>
@@ -741,7 +454,7 @@ export const TamilNaduMap: React.FC = () => {
               </div>
             </div>
 
-            {/* Table of 74 Districts (Matching Images 4-7) */}
+            {/* Table of 74 Districts */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#FAF8F5]">
               <div className="border border-neutral-300 bg-white overflow-x-auto">
                 <table className="w-full text-left text-xs font-dmk-body">
