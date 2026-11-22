@@ -342,7 +342,7 @@ export const OrgChart: React.FC = () => {
           <div
             ref={modalRef}
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#FAF8F5] text-[#111111] max-w-xl w-full border-2 border-[#111111] p-6 md:p-8 relative shadow-2xl space-y-6"
+            className="bg-[#FAF8F5] text-[#111111] max-w-xl w-full border-2 border-[#111111] p-6 md:p-8 relative space-y-6"
           >
             {/* 6px red top bar */}
             <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#E31E24]" />
