@@ -243,10 +243,11 @@ export default function CitizenDeskPage() {
             
             {/* Citizen Name */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="citizenName" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'உங்கள் பெயர் *' : 'Your Name *'}
               </label>
               <input
+                id="citizenName"
                 type="text"
                 required
                 value={name}
@@ -258,10 +259,11 @@ export default function CitizenDeskPage() {
 
             {/* Contact Phone */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="citizenPhone" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'கைபேசி எண் *' : 'Contact Phone Number *'}
               </label>
               <input
+                id="citizenPhone"
                 type="tel"
                 required
                 value={phone}
@@ -273,10 +275,11 @@ export default function CitizenDeskPage() {
 
             {/* Email (Optional) */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="citizenEmail" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'மின்னஞ்சல் (தேவைப்பட்டால்)' : 'Email Address (Optional)'}
               </label>
               <input
+                id="citizenEmail"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -287,10 +290,11 @@ export default function CitizenDeskPage() {
 
             {/* 74-District Dropdown */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="citizenDistrict" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'மாவட்டம் / பகுதி *' : 'District / Jurisdiction *'}
               </label>
               <select
+                id="citizenDistrict"
                 required
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
@@ -306,10 +310,11 @@ export default function CitizenDeskPage() {
 
             {/* Category */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="citizenCategory" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'விண்ணப்ப வகை *' : 'Grievance Category *'}
               </label>
               <select
+                id="citizenCategory"
                 value={category}
                 onChange={(e) => setCategory(e.target.value as any)}
                 className="w-full min-h-[44px] px-3.5 py-2 border border-[#D8D3CB] focus:border-[#111111] text-xs sm:text-sm bg-[#FAF8F5] rounded-[2px] outline-none cursor-pointer"
@@ -323,10 +328,11 @@ export default function CitizenDeskPage() {
 
             {/* Subject */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="citizenSubject" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'கோரிக்கையின் சுருக்கம் / பொருள்' : 'Matter Subject'}
               </label>
               <input
+                id="citizenSubject"
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
@@ -337,10 +343,11 @@ export default function CitizenDeskPage() {
 
             {/* Message Description */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="citizenMessage" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'விவரமான கோரிக்கை / புகார் *' : 'Detailed Grievance Description *'}
               </label>
               <textarea
+                id="citizenMessage"
                 required
                 rows={5}
                 value={message}

@@ -234,9 +234,9 @@ export const TamilNaduMap: React.FC = () => {
                   <span className="text-xs text-white/80 font-dmk-body block mb-0.5">
                     {language === 'ta' ? 'மாநிலத் தலைமை வழிகாட்டல்' : 'State executive guidance'}
                   </span>
-                  <h4 className="text-base font-black text-white font-dmk-headline leading-tight">
+                  <h3 className="text-base font-black text-white font-dmk-headline leading-tight">
                     {language === 'ta' ? 'மு.க. ஸ்டாலின்' : 'M.K. Stalin'}
-                  </h4>
+                  </h3>
                   <p className="text-xs text-white/70 font-dmk-body">
                     {language === 'ta' ? 'கழகத் தலைவர் & முதலமைச்சர்' : 'DMK President & Chief Minister'}
                   </p>
@@ -270,9 +270,9 @@ export const TamilNaduMap: React.FC = () => {
                     {index + 1}
                   </span>
                   <div className="min-w-0">
-                    <h5 className="text-xs sm:text-sm font-black font-dmk-headline text-neutral-900 group-hover:text-[#C41A1F] transition-colors truncate">
+                    <h4 className="text-xs sm:text-sm font-black font-dmk-headline text-neutral-900 group-hover:text-[#C41A1F] transition-colors truncate">
                       {sub.name[language]}
-                    </h5>
+                    </h4>
                     <p className="text-[11px] text-[#5B5348] truncate font-dmk-body">
                       {sub.organizer[language]} • {sub.showPhonePublicly !== false ? (
                         <span className="font-mono text-neutral-800">{sub.contactPhone}</span>

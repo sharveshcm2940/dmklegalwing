@@ -11,11 +11,6 @@ const nextConfig: NextConfig = {
         destination: '/structure',
         permanent: true,
       },
-      {
-        source: '/news',
-        destination: '/activities',
-        permanent: true,
-      },
     ];
   },
   turbopack: {

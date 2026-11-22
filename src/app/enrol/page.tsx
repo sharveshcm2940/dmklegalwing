@@ -246,10 +246,11 @@ export default function EnrolPage() {
             
             {/* Full Name */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="enrolFullName" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'முழு பெயர் *' : 'Full Name *'}
               </label>
               <input
+                id="enrolFullName"
                 type="text"
                 required
                 value={fullName}
@@ -261,10 +262,11 @@ export default function EnrolPage() {
 
             {/* Bar Council Number */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="enrolBarCouncil" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'பார் கவுன்சில் பதிவெண் *' : 'Bar Council Number *'}
               </label>
               <input
+                id="enrolBarCouncil"
                 type="text"
                 required
                 value={barCouncilNumber}
@@ -276,10 +278,11 @@ export default function EnrolPage() {
 
             {/* Year of Enrollment */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="enrolYear" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'சேர்க்கை ஆண்டு' : 'Year of Enrolment'}
               </label>
               <input
+                id="enrolYear"
                 type="number"
                 min="1950"
                 max="2030"
@@ -292,10 +295,11 @@ export default function EnrolPage() {
 
             {/* 74-District Dropdown */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="enrolDistrict" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'கழக மாவட்டம் *' : 'Party District *'}
               </label>
               <select
+                id="enrolDistrict"
                 required
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
@@ -311,10 +315,11 @@ export default function EnrolPage() {
 
             {/* Court of Practice */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="enrolCourt" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'பணிபுரியும் நீதிமன்றம்' : 'Primary Court of Practice'}
               </label>
               <input
+                id="enrolCourt"
                 type="text"
                 value={courtOfPractice}
                 onChange={(e) => setCourtOfPractice(e.target.value)}
@@ -325,10 +330,11 @@ export default function EnrolPage() {
 
             {/* Mobile Number */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="enrolMobile" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'கைபேசி எண் *' : 'Mobile Number *'}
               </label>
               <input
+                id="enrolMobile"
                 type="tel"
                 required
                 value={mobileNumber}
@@ -340,10 +346,11 @@ export default function EnrolPage() {
 
             {/* Email Address */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="enrolEmail" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'மின்னஞ்சல் முகவரி *' : 'Email Address *'}
               </label>
               <input
+                id="enrolEmail"
                 type="email"
                 required
                 value={emailAddress}
@@ -355,10 +362,11 @@ export default function EnrolPage() {
 
             {/* Chamber / Office Address */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
+              <label htmlFor="enrolAddress" className="block text-xs font-bold text-[#111111] uppercase tracking-wider mb-1.5">
                 {language === 'ta' ? 'அலுவலக முகவரி' : 'Chamber / Residential Address'}
               </label>
               <textarea
+                id="enrolAddress"
                 rows={3}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}

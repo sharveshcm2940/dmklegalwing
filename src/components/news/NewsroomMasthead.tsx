@@ -177,8 +177,10 @@ export const NewsroomMasthead: React.FC<NewsroomMastheadProps> = ({
 
           {/* Functional Search Field */}
           <div className="relative w-full md:w-80 shrink-0">
-            <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-[#5B5348] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
+              id="newsSearchInput"
+              aria-label={language === 'ta' ? 'அறிக்கைகள் அல்லது வழக்குகளைத் தேடுக' : 'Search dispatches, orders, or dates'}
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}

@@ -41,25 +41,25 @@ export const Footer: React.FC = () => {
               </div>
 
               <div>
-                <span className="text-xs font-bold tracking-widest text-[#C41A1F] uppercase block font-tamil-serif">
+                <span className="text-xs font-bold tracking-widest text-[#FAF8F5] uppercase block font-tamil-serif">
                   {language === 'ta' ? 'திமுக வழக்கறிஞர் அணி' : 'DMK LEGAL WING'}
                 </span>
                 <span className="text-base font-tamil-serif font-bold text-white tracking-wide block">
                   {language === 'ta' ? 'திராவிட முன்னேற்றக் கழகம்' : 'Dravida Munnetra Kazhagam'}
                 </span>
-                <span className="text-[11px] text-neutral-400 font-mono">
+                <span className="text-[11px] text-[#D8D3CB] font-mono">
                   Tamil Nadu, India • Estd. 1971
                 </span>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed max-w-md font-tamil-sans">
+            <p className="text-xs sm:text-sm text-[#D8D3CB] leading-relaxed max-w-md font-tamil-sans">
               {t.footer.desc}
             </p>
 
             {/* Core Ideological Maxim */}
             <div className="p-4 rounded-[2px] bg-black/60 border-l-4 border-[#E31E24] border-t border-r border-b border-neutral-800 text-xs">
-              <span className="text-[#C41A1F] font-bold block mb-1 uppercase tracking-wider text-[11px]">
+              <span className="text-white font-bold block mb-1 uppercase tracking-wider text-[11px]">
                 {language === 'ta' ? 'கொள்கை முழக்கம்:' : 'Guiding Maxim:'}
               </span>
               <p className="italic text-neutral-200 font-tamil-serif text-sm">
@@ -70,7 +70,7 @@ export const Footer: React.FC = () => {
             </div>
 
             {/* Official Headquarters */}
-            <div className="space-y-3 pt-2 text-xs text-neutral-400">
+            <div className="space-y-3 pt-2 text-xs text-[#D8D3CB]">
               <div className="flex items-start gap-2.5">
                 <Building2 className="w-4 h-4 text-[#C41A1F] shrink-0 mt-0.5" />
                 <div>
@@ -111,7 +111,7 @@ export const Footer: React.FC = () => {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1.5 text-neutral-400"
+                    className="hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1.5 text-[#D8D3CB]"
                   >
                     <ArrowUpRight className="w-3.5 h-3.5 text-[#C41A1F]" />
                     <span>{item.label}</span>
@@ -138,7 +138,7 @@ export const Footer: React.FC = () => {
                 <li key={idx}>
                   <Link
                     href={item.href}
-                    className="hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1.5 text-neutral-400"
+                    className="hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1.5 text-[#D8D3CB]"
                   >
                     <span className="w-1.5 h-1.5 rounded-[2px] bg-[#E31E24]" />
                     <span>{item.label}</span>
@@ -183,7 +183,7 @@ export const Footer: React.FC = () => {
               <div className="pt-1">
                 <Link
                   href="/admin"
-                  className="text-neutral-400 hover:text-white text-[11px] flex items-center gap-1 transition-colors"
+                  className="text-[#D8D3CB] hover:text-white text-[11px] flex items-center gap-1 transition-colors"
                 >
                   <span>{language === 'ta' ? 'அங்கீகரிக்கப்பட்ட நிர்வாக போர்டல்' : 'Authorized Admin Portal'}</span>
                   <ExternalLink className="w-3 h-3 text-[#C41A1F]" />
@@ -195,12 +195,12 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Legal Disclaimer & Bottom Credits */}
-        <div className="mt-12 pt-8 border-t border-neutral-800 text-xs text-neutral-500 flex flex-col md:flex-row items-center justify-between gap-4 font-tamil-sans">
+        <div className="mt-12 pt-8 border-t border-neutral-800 text-xs text-[#D8D3CB] flex flex-col md:flex-row items-center justify-between gap-4 font-tamil-sans">
           <p className="max-w-2xl text-center md:text-left leading-relaxed">
             {t.footer.disclaimer}
           </p>
           <div className="text-center md:text-right shrink-0">
-            <p className="text-neutral-400 font-mono">
+            <p className="text-[#D8D3CB] font-mono">
               {t.footer.copyright}
             </p>
           </div>

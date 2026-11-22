@@ -65,7 +65,7 @@ export const LeadStory: React.FC<LeadStoryProps> = ({ story, onReadMore }) => {
                     {story.caption ? story.caption[language] : story.title[language]}
                   </p>
                   {story.photoCredit && (
-                    <span className="font-english text-[10px] text-[#5B5348]/80 shrink-0">
+                    <span className="font-english text-[10px] text-[#5B5348] shrink-0">
                       Photo: {story.photoCredit}
                     </span>
                   )}

@@ -131,7 +131,7 @@ export default function HomePage() {
                           <span className="italic">{leadStory.caption[language]}</span>
                         )}
                         {leadStory.photoCredit && (
-                          <span className="font-english text-[10px] text-[#5B5348]/80">
+                          <span className="font-english text-[10px] text-[#5B5348]">
                             {leadStory.photoCredit}
                           </span>
                         )}
@@ -217,7 +217,7 @@ export default function HomePage() {
                             <span className="italic">{story.caption[language]}</span>
                           )}
                           {story.photoCredit && (
-                            <span className="font-english text-[10px] text-[#5B5348]/80">
+                            <span className="font-english text-[10px] text-[#5B5348]">
                               {story.photoCredit}
                             </span>
                           )}
@@ -358,7 +358,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-neutral-800 text-center">
             {SITE_STATS.metrics.map((metric) => (
               <div key={metric.id} className="p-4 sm:p-5">
-                <span className="text-xs font-dmk-body font-bold text-neutral-400 block mb-1">
+                <span className="text-xs font-dmk-body font-bold text-[#D8D3CB] block mb-1">
                   {metric.label[language]}
                 </span>
                 <span className={`text-3xl sm:text-4xl lg:text-5xl font-black font-english block my-1 tracking-tight ${
@@ -366,7 +366,7 @@ export default function HomePage() {
                 }`}>
                   {metric.figure}
                 </span>
-                <span className="text-xs text-neutral-300 font-dmk-body block">
+                <span className="text-xs text-[#D8D3CB] font-dmk-body block">
                   {metric.subtext[language]}
                 </span>
               </div>
@@ -374,7 +374,7 @@ export default function HomePage() {
           </div>
 
           {/* "as of November 2026" line under the strip */}
-          <div className="mt-6 pt-4 border-t border-neutral-800 text-center text-xs text-neutral-400 font-dmk-body">
+          <div className="mt-6 pt-4 border-t border-neutral-800 text-center text-xs text-[#D8D3CB] font-dmk-body">
             {language === 'ta' 
               ? `${SITE_STATS.asOf.ta} நிலவரப்படி` 
               : `as of ${SITE_STATS.asOf.en}`}

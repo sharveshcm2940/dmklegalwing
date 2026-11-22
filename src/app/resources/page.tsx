@@ -194,6 +194,8 @@ export default function ResourcesPage() {
           <div className="relative w-full">
             <Search className="w-4 h-4 text-[#5B5348] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
+              id="resourceSearchInput"
+              aria-label={language === 'ta' ? 'ஆவணத்தின் தலைப்பு அல்லது நீதிமன்றம் கொண்டு தேடுக' : 'Search by title, court, statute, or citation number'}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

@@ -126,11 +126,13 @@ function TrackContent() {
 
         {/* Search Form */}
         <form onSubmit={handleSubmit} className="bg-white border-2 border-[#111111] p-6 rounded-[2px] shadow-xs space-y-4">
-          <label className="block text-xs font-bold text-[#111111] uppercase tracking-wider">
+          <label htmlFor="trackingInput" className="block text-xs font-bold text-[#111111] uppercase tracking-wider">
             {language === 'ta' ? 'கண்காணிப்பு அடையாள எண் (Tracking ID)' : 'Enter Tracking ID'}
           </label>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
+              id="trackingInput"
+              aria-label={language === 'ta' ? 'கண்காணிப்பு அடையாள எண்' : 'Tracking ID'}
               type="text"
               required
               value={inputVal}

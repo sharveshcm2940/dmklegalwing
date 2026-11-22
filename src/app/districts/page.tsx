@@ -79,6 +79,8 @@ export default function DistrictsPage() {
               <div className="relative w-full">
                 <Search className="w-4 h-4 text-[#5B5348] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="districtSearchInput"
+                  aria-label={language === 'ta' ? 'மாவட்டப் பெயர் அல்லது அமைப்பாளர் பெயரைத் தேடுக' : 'Search by district name or organiser'}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
