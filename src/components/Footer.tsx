@@ -172,8 +172,8 @@ export const Footer: React.FC = () => {
 
               <div className="pt-2 border-t border-neutral-800">
                 <Link
-                  href="/contact#register"
-                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-[#E31E24] hover:bg-[#C41A1F] text-white rounded-[2px] text-xs font-bold uppercase tracking-wider transition-all"
+                  href="/enrol"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-2 py-2 px-3 bg-[#E31E24] hover:bg-[#C41A1F] text-white rounded-[2px] text-xs font-bold uppercase tracking-wider transition-all"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
                   <span>{t.nav.registerAdvocate}</span>

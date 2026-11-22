@@ -1,9 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* ============================================================== */
-  /* OFFICIAL DMK DESIGN SYSTEM TOKENS                              */
-  /* ============================================================== */
+
   --color-dmk-red: #E31E24;
   --color-dmk-red-dark: #C41A1F;
   --color-ink: #111111;
@@ -11,8 +9,6 @@
   --color-warm-grey: #5B5348;
   --color-dmk-red-tint: #FCE8E8;
   --color-border-subtle: #D8D3CB;
-
-  /* Aliased Neutral Palette to enforce consistency */
   --color-neutral-900: #111111;
   --color-neutral-800: #1E1D1B;
   --color-neutral-700: #3E3830;

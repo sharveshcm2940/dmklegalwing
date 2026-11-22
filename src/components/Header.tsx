@@ -107,8 +107,8 @@ export const Header: React.FC = () => {
 
             {/* Join Legal Wing Action Button */}
             <Link
-              href="/contact#register"
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-english font-bold uppercase tracking-wider text-white bg-[#E31E24] hover:bg-[#111111] border border-[#111111] transition-colors rounded-[2px]"
+              href="/enrol"
+              className="inline-flex items-center min-h-[44px] gap-1.5 px-4 py-2 text-xs font-english font-bold uppercase tracking-wider text-white bg-[#E31E24] hover:bg-[#111111] border border-[#111111] transition-colors rounded-[2px]"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>{language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'JOIN LEGAL WING'}</span>
@@ -192,8 +192,8 @@ export const Header: React.FC = () => {
 
           <div className="pt-2">
             <Link
-              href="/contact#register"
-              className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-english font-bold uppercase tracking-wider text-white bg-[#E31E24] hover:bg-[#111111] transition-colors rounded-[2px]"
+              href="/enrol"
+              className="w-full min-h-[44px] flex items-center justify-center gap-2 py-2.5 text-xs font-english font-bold uppercase tracking-wider text-white bg-[#E31E24] hover:bg-[#111111] transition-colors rounded-[2px]"
             >
               <UserPlus className="w-4 h-4" />
               <span>{language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'JOIN LEGAL WING'}</span>

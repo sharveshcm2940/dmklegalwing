@@ -61,15 +61,12 @@ export const OrgChart: React.FC = () => {
       <div className="bg-white border-2 border-[#111111] p-5 sm:p-6 shadow-xs rounded-[2px]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2.5 h-2.5 bg-[#E31E24] inline-block" />
-              <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#C41A1F]">
-                {language === 'ta' ? 'அதிகாரப்பூர்வ படிநிலை வரைபடம்' : 'EXECUTIVE COMMAND HIERARCHY'}
-              </span>
-            </div>
             <h3 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
               {language === 'ta' ? 'திமுக வழக்கறிஞர் அணி தலைமைப் படிநிலை' : 'DMK Legal Wing Organisational Chart'}
             </h3>
+            <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body mt-0.5">
+              {language === 'ta' ? 'தலைமை நிர்வாகிகள் & பொறுப்பாளர்கள் பட்டியல்' : 'Executive leadership & designated portfolio officers'}
+            </p>
           </div>
 
           {/* Search box */}
@@ -80,14 +77,15 @@ export const OrgChart: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={language === 'ta' ? 'பொறுப்பாளர் அல்லது ஊர் தேடுக...' : 'Search officer or station...'}
-              className="w-full bg-[#FAF8F5] border border-[#D8D3CB] pl-9 pr-8 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] rounded-[2px]"
+              className="w-full min-h-[44px] bg-[#FAF8F5] border border-[#D8D3CB] pl-9 pr-8 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] rounded-[2px]"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#5B5348] hover:text-[#111111] rounded-[2px]"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#5B5348] hover:text-[#111111] rounded-[2px] cursor-pointer p-1"
+                aria-label="Clear search"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -117,7 +115,7 @@ export const OrgChart: React.FC = () => {
               {/* Top Accent Header Stripe */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-[#111111]" />
 
-              <span className="text-[11px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block mb-0.5">
+              <span className="text-xs font-dmk-body text-[#C41A1F] block mb-0.5">
                 {president.designation[language]}
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline group-hover:text-[#C41A1F] transition-colors">
@@ -157,7 +155,7 @@ export const OrgChart: React.FC = () => {
                 <div className="w-1/2 bg-[#E31E24]" />
               </div>
 
-              <span className="text-[11px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block mb-0.5">
+              <span className="text-xs font-dmk-body text-[#C41A1F] block mb-0.5">
                 {secretary.designation[language]}
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline group-hover:text-[#C41A1F] transition-colors">
@@ -215,7 +213,7 @@ export const OrgChart: React.FC = () => {
                     <h4 className="text-base font-black text-[#111111] font-dmk-headline">
                       {language === 'ta' ? 'இணைச் செயலாளர்கள் (9)' : 'Joint Secretaries (9)'}
                     </h4>
-                    <span className="text-[10px] font-english uppercase tracking-wider text-[#C41A1F] font-bold">
+                    <span className="text-xs font-dmk-body text-[#C41A1F] block mt-0.5">
                       Zonal Coordination & Bar Liaison
                     </span>
                   </div>
@@ -245,7 +243,7 @@ export const OrgChart: React.FC = () => {
                 </div>
 
                 <div className="mt-4 pt-2 border-t border-[#D8D3CB] text-center">
-                  <span className="text-[10px] font-english text-[#5B5348]">
+                  <span className="text-xs font-dmk-body text-[#5B5348]">
                     9 Advocates • Apex Secretariat
                   </span>
                 </div>
@@ -260,7 +258,7 @@ export const OrgChart: React.FC = () => {
                     <h4 className="text-base font-black text-[#111111] font-dmk-headline">
                       {language === 'ta' ? 'துணைச் செயலாளர்கள் (5)' : 'Deputy Secretaries (5)'}
                     </h4>
-                    <span className="text-[10px] font-english uppercase tracking-wider text-[#C41A1F] font-bold">
+                    <span className="text-xs font-dmk-body text-[#C41A1F] block mt-0.5">
                       Secretariat Administration & Training
                     </span>
                   </div>
@@ -290,7 +288,7 @@ export const OrgChart: React.FC = () => {
                 </div>
 
                 <div className="mt-4 pt-2 border-t border-[#D8D3CB] text-center">
-                  <span className="text-[10px] font-english text-[#5B5348]">
+                  <span className="text-xs font-dmk-body text-[#5B5348]">
                     5 Advocates • State Operations
                   </span>
                 </div>
@@ -305,7 +303,7 @@ export const OrgChart: React.FC = () => {
                     <h4 className="text-base font-black text-[#111111] font-dmk-headline">
                       {language === 'ta' ? 'தலைமையக வழக்கறிஞர்கள் (9)' : 'Head Office Advocates (9)'}
                     </h4>
-                    <span className="text-[10px] font-english uppercase tracking-wider text-[#C41A1F] font-bold">
+                    <span className="text-xs font-dmk-body text-[#C41A1F] block mt-0.5">
                       Arivalayam HQ Legal Chamber
                     </span>
                   </div>
@@ -335,7 +333,7 @@ export const OrgChart: React.FC = () => {
                 </div>
 
                 <div className="mt-4 pt-2 border-t border-[#D8D3CB] text-center">
-                  <span className="text-[10px] font-english text-[#5B5348]">
+                  <span className="text-xs font-dmk-body text-[#5B5348]">
                     9 Advocates • Headquarters Liaison
                   </span>
                 </div>
@@ -357,19 +355,20 @@ export const OrgChart: React.FC = () => {
             {/* Header */}
             <div className="flex items-start justify-between border-b-2 border-[#111111] pb-4 mb-4">
               <div>
-                <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block mb-1">
-                  OFFICIAL CADRE DOSSIER
+                <span className="text-xs font-dmk-body text-[#C41A1F] block mb-1">
+                  {language === 'ta' ? 'அதிகாரப்பூர்வ பொறுப்பாளர் விவரக்குறிப்பு' : 'Official cadre dossier'}
                 </span>
                 <h3 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
                   {selectedOfficer.name[language]}
                 </h3>
-                <span className="text-xs font-bold text-[#5B5348] font-english uppercase">
+                <span className="text-xs font-bold text-[#5B5348] font-dmk-body">
                   {selectedOfficer.designation[language]}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedOfficer(null)}
-                className="p-1 text-[#5B5348] hover:text-[#111111] transition-colors rounded-[2px]"
+                className="p-1.5 text-[#5B5348] hover:text-[#111111] transition-colors rounded-[2px] cursor-pointer"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -378,8 +377,8 @@ export const OrgChart: React.FC = () => {
             {/* Details */}
             <div className="space-y-4 text-xs sm:text-sm">
               <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
-                  {language === 'ta' ? 'பொறுப்பு & துறை' : 'PORTFOLIO & JURISDICTION'}
+                <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
+                  {language === 'ta' ? 'பொறுப்பு & துறை' : 'Portfolio & Jurisdiction'}
                 </span>
                 <p className="font-semibold text-[#111111]">
                   {selectedOfficer.role[language]}
@@ -388,16 +387,16 @@ export const OrgChart: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'தளம் / ஊர்' : 'STATION'}
+                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
+                    {language === 'ta' ? 'தளம் / ஊர்' : 'Station'}
                   </span>
                   <span className="font-bold text-[#111111]">
                     {selectedOfficer.district[language]}
                   </span>
                 </div>
                 <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'நீதிமன்றப் பிரிவு' : 'COURT AFFILIATION'}
+                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
+                    {language === 'ta' ? 'நீதிமன்றப் பிரிவு' : 'Court Affiliation'}
                   </span>
                   <span className="font-bold text-[#111111]">
                     {selectedOfficer.court}
@@ -407,8 +406,8 @@ export const OrgChart: React.FC = () => {
 
               {selectedOfficer.barCouncilNo && (
                 <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'பார் கவுன்சில் எண்' : 'BAR ENROLLMENT'}
+                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
+                    {language === 'ta' ? 'பார் கவுன்சில் எண்' : 'Bar Enrollment'}
                   </span>
                   <span className="font-mono font-bold text-[#C41A1F]">
                     {selectedOfficer.barCouncilNo}
@@ -418,8 +417,8 @@ export const OrgChart: React.FC = () => {
 
               {selectedOfficer.bio && (
                 <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-[10px] font-english font-bold uppercase text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'குறிப்பு' : 'OFFICIAL DISPATCH'}
+                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
+                    {language === 'ta' ? 'குறிப்பு' : 'Official Dispatch'}
                   </span>
                   <p className="text-[#5B5348] leading-relaxed font-dmk-body text-xs">
                     {selectedOfficer.bio[language]}
@@ -432,7 +431,7 @@ export const OrgChart: React.FC = () => {
             <div className="mt-6 pt-4 border-t border-[#D8D3CB] flex justify-end">
               <button
                 onClick={() => setSelectedOfficer(null)}
-                className="px-5 py-2 bg-[#111111] hover:bg-[#E31E24] text-white text-xs font-english font-bold uppercase tracking-wider transition-colors rounded-[2px]"
+                className="min-h-[44px] px-5 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-dmk-body font-bold uppercase tracking-wider transition-colors rounded-[2px] cursor-pointer"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close Dossier'}
               </button>
