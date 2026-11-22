@@ -1,24 +1,31 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import { AdvocateRegistration, PublicEnquiry, NewsItem, PressGalleryItem, EventItem, LegalResource, DistrictInfo } from '@/types';
+import { 
+  AdvocateRegistration, 
+  PublicEnquiry, 
+  NewsItem, 
+  PressGalleryItem, 
+  EventItem, 
+  LegalResource, 
+  DistrictInfo,
+  AuditLogItem 
+} from '@/types';
 import { 
   Shield, 
   Lock, 
   Trash2, 
   Plus, 
   Calendar, 
-  BookOpen, 
   LogOut,
   Star,
   Camera,
   ExternalLink,
   Eye,
   CheckCircle,
-  MapPin,
   Search,
   Filter,
   Download,
@@ -30,20 +37,26 @@ import {
   RefreshCw,
   Clock,
   Database,
-  ArrowUpRight,
   X,
-  FileText
+  FileText,
+  Activity,
+  Layers,
+  Crop,
+  Sliders,
+  Check
 } from 'lucide-react';
 
-export default function AdminPage() {
+export type AdminRole = 'super_admin' | 'editorial' | 'legal_desk';
+
+export default function AdminConsolePage() {
   const { language } = useLanguage();
   const { 
     news, 
     addNews, 
     deleteNews, 
     setLeadStory,
-    gallery,
-    addGalleryItem,
+    gallery, 
+    addGalleryItem, 
     deleteGalleryItem,
     events, 
     addEvent, 
@@ -61,54 +74,89 @@ export default function AdminPage() {
     isLoadingData
   } = useData();
 
-  // District Editor Privacy State
-  const [editingDistrict, setEditingDistrict] = useState<DistrictInfo | null>(null);
-  const [editPhonePublicly, setEditPhonePublicly] = useState<boolean>(true);
+  // ---------------------------------------------------------------------------
+  // AUTHENTICATION & ROLE STATE (Server-Enforced)
+  // ---------------------------------------------------------------------------
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authenticatedRole, setAuthenticatedRole] = useState<AdminRole>('super_admin');
+  const [authenticatedUser, setAuthenticatedUser] = useState<string>('admin');
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
-  // Authentication State
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [adminRole, setAdminRole] = useState<'super_admin' | 'content_admin' | 'legal_officer'>('super_admin');
-  const [adminPassword, setAdminPassword] = useState('');
-  const [authError, setAuthError] = useState('');
+  // Client-side view filter: ONLY changes what tabs/buttons are shown in UI
+  const [viewRole, setViewRole] = useState<'all' | AdminRole>('all');
+
+  // Login form state
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginRole, setLoginRole] = useState<AdminRole>('super_admin');
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Global action status toast / error banner
+  const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Active Admin Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'registrations' | 'enquiries' | 'news' | 'districts' | 'gallery' | 'events' | 'resources'
+    'overview' | 'news' | 'registrations' | 'enquiries' | 'districts' | 'gallery' | 'events' | 'resources' | 'audit'
   >('overview');
 
-  // Filter & Search States
+  // Audit Log State
+  const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditSearchQuery, setAuditSearchQuery] = useState('');
+
+  // Search & Filter states
+  const [newsSearchQuery, setNewsSearchQuery] = useState('');
+  const [newsCategoryFilter, setNewsCategoryFilter] = useState('all');
+  const [newsStatusFilter, setNewsStatusFilter] = useState<'all' | 'published' | 'draft' | 'scheduled'>('all');
+
   const [regStatusFilter, setRegStatusFilter] = useState<'all' | 'pending' | 'verified' | 'approved' | 'rejected'>('all');
   const [regSearchQuery, setRegSearchQuery] = useState('');
   const [selectedRegDossier, setSelectedRegDossier] = useState<AdvocateRegistration | null>(null);
 
-  const [enqCategoryFilter, setEnqCategoryFilter] = useState<string>('all');
-  const [enqStatusFilter, setEnqStatusFilter] = useState<string>('all');
+  const [enqCategoryFilter, setEnqCategoryFilter] = useState('all');
+  const [enqStatusFilter, setEnqStatusFilter] = useState('all');
   const [enqSearchQuery, setEnqSearchQuery] = useState('');
-
-  const [newsSearchQuery, setNewsSearchQuery] = useState('');
-  const [newsCategoryFilter, setNewsCategoryFilter] = useState<string>('all');
 
   const [districtSearchQuery, setDistrictSearchQuery] = useState('');
   const [districtZoneFilter, setDistrictZoneFilter] = useState('All');
+  const [editingDistrict, setEditingDistrict] = useState<DistrictInfo | null>(null);
+  const [editPhonePublicly, setEditPhonePublicly] = useState<boolean>(true);
 
-  // Modals
-  const [showAddNewsModal, setShowAddNewsModal] = useState(false);
-  const [newNewsTitleEn, setNewNewsTitleEn] = useState('');
-  const [newNewsTitleTa, setNewNewsTitleTa] = useState('');
-  const [newNewsCategory, setNewNewsCategory] = useState<'Press Release' | 'Statement' | 'Court Watch' | 'Resolution' | 'Gazette' | 'Media'>('Press Release');
-  const [newNewsSummaryEn, setNewNewsSummaryEn] = useState('');
-  const [newNewsSummaryTa, setNewNewsSummaryTa] = useState('');
-  const [newNewsContentEn, setNewNewsContentEn] = useState('');
-  const [newNewsContentTa, setNewNewsContentTa] = useState('');
-  const [newNewsCourt, setNewNewsCourt] = useState('');
-  const [newNewsCaseNo, setNewNewsCaseNo] = useState('');
-  const [newNewsIsLead, setNewNewsIsLead] = useState(false);
-  const [newNewsImage, setNewNewsImage] = useState('/images/dmk-slider-official.jpg');
+  // ---------------------------------------------------------------------------
+  // NEWS EDITOR MODAL STATE (Side-by-side, Draft/Scheduled/Published, Crop, Preview)
+  // ---------------------------------------------------------------------------
+  const [showNewsEditor, setShowNewsEditor] = useState(false);
+  const [newsEditMode, setNewsEditMode] = useState<'create' | 'edit'>('create');
+  const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
 
+  // Editor Fields
+  const [editorStatus, setEditorStatus] = useState<'Draft' | 'Scheduled' | 'Published'>('Published');
+  const [editorPublishDate, setEditorPublishDate] = useState('2026-11-22');
+  const [editorPublishTime, setEditorPublishTime] = useState('09:00');
+  const [editorCategory, setEditorCategory] = useState<NewsItem['category']>('Press Release');
+  const [editorIsLead, setEditorIsLead] = useState(false);
+  const [editorImage, setEditorImage] = useState('/images/dmk-slider-official.jpg');
+  const [editorCourt, setEditorCourt] = useState('');
+  const [editorCaseNo, setEditorCaseNo] = useState('');
+
+  // Side-by-side Bilingual Text Fields
+  const [editorTitleEn, setEditorTitleEn] = useState('');
+  const [editorTitleTa, setEditorTitleTa] = useState('');
+  const [editorSummaryEn, setEditorSummaryEn] = useState('');
+  const [editorSummaryTa, setEditorSummaryTa] = useState('');
+  const [editorContentEn, setEditorContentEn] = useState('');
+  const [editorContentTa, setEditorContentTa] = useState('');
+
+  // Image Crop Settings
+  const [editorCropPosition, setEditorCropPosition] = useState<'center' | 'top' | 'bottom' | 'custom'>('center');
+  const [editorCropZoom, setEditorCropZoom] = useState<number>(1.0);
+  const [activePreviewTab, setActivePreviewTab] = useState<'en' | 'ta'>('en');
+
+  // Other Modals
   const [showAddGalleryModal, setShowAddGalleryModal] = useState(false);
   const [newGalTitleEn, setNewGalTitleEn] = useState('');
   const [newGalTitleTa, setNewGalTitleTa] = useState('');
-  const [newGalCategory, setNewGalCategory] = useState<'Press Conferences' | 'Legal Wing Events' | 'Advocates Meetings' | 'Official Programmes' | 'Historical Archive'>('Press Conferences');
+  const [newGalCategory, setNewGalCategory] = useState<PressGalleryItem['category']>('Press Conferences');
   const [newGalLocationEn, setNewGalLocationEn] = useState('');
   const [newGalLocationTa, setNewGalLocationTa] = useState('');
   const [newGalCaptionEn, setNewGalCaptionEn] = useState('');
@@ -128,359 +176,717 @@ export default function AdminPage() {
   const [showAddResourceModal, setShowAddResourceModal] = useState(false);
   const [newResTitleEn, setNewResTitleEn] = useState('');
   const [newResTitleTa, setNewResTitleTa] = useState('');
-  const [newResCategory, setNewResCategory] = useState<'Supreme Court' | 'High Court' | 'Constitution' | 'Statute'>('Supreme Court');
+  const [newResCategory, setNewResCategory] = useState<LegalResource['category']>('Supreme Court');
   const [newResCitation, setNewResCitation] = useState('');
   const [newResSummaryEn, setNewResSummaryEn] = useState('');
   const [newResSummaryTa, setNewResSummaryTa] = useState('');
 
-  // Authentication Handlers
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (adminPassword === 'dmk1971' || adminPassword === 'admin') {
-      setIsAuthenticated(true);
-      setAuthError('');
-    } else {
-      setAuthError('Invalid credentials. (Hint: use "dmk1971" or "admin")');
+  // ---------------------------------------------------------------------------
+  // AUTHENTICATION CHECK ON MOUNT
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    async function checkAuthSession() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated) {
+            setIsAuthenticated(true);
+            setAuthenticatedRole(data.role || 'super_admin');
+            setAuthenticatedUser(data.user || 'admin');
+          }
+        }
+      } catch (err) {
+        console.warn('Session check fallback:', err);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    }
+    checkAuthSession();
+  }, []);
+
+  // Fetch Audit Logs when Audit tab is activated
+  const fetchAuditLogs = async () => {
+    setAuditLoading(true);
+    try {
+      const res = await fetch('/api/audit');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.logs)) {
+          setAuditLogs(data.logs);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch audit log:', err);
+    } finally {
+      setAuditLoading(false);
     }
   };
 
-  // Form Submission Handlers
-  const handleCreateNews = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newNewsTitleEn.trim()) return;
+  useEffect(() => {
+    if (activeTab === 'audit' && isAuthenticated) {
+      fetchAuditLogs();
+    }
+  }, [activeTab, isAuthenticated]);
 
-    await addNews({
-      title: { en: newNewsTitleEn, ta: newNewsTitleTa || newNewsTitleEn },
-      category: newNewsCategory,
-      date: new Date().toISOString().split('T')[0],
-      time: '11:00 AM IST',
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setActionNotice({ type, message });
+    setTimeout(() => setActionNotice(null), 5000);
+  };
+
+  // ---------------------------------------------------------------------------
+  // LOGIN / LOGOUT HANDLERS
+  // ---------------------------------------------------------------------------
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    setIsLoggingIn(true);
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: loginPassword,
+          role: loginRole,
+          username: `${loginRole}-operator`
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        setAuthenticatedRole(data.role);
+        setAuthenticatedUser(data.user);
+        setViewRole(data.role);
+        setLoginPassword('');
+        refreshAllData();
+      } else {
+        setLoginError(data.error || 'Authentication rejected. Verify security passcode.');
+      }
+    } catch {
+      setLoginError('Authentication server unreachable. Please try again.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {}
+    setIsAuthenticated(false);
+    setAuthenticatedRole('super_admin');
+    setViewRole('all');
+    showToast('success', 'Logged out of administrative session.');
+  };
+
+  // ---------------------------------------------------------------------------
+  // NEWS EDITOR ACTIONS
+  // ---------------------------------------------------------------------------
+  const openCreateNewsModal = () => {
+    setNewsEditMode('create');
+    setEditingNewsId(null);
+    setEditorTitleEn('');
+    setEditorTitleTa('');
+    setEditorCategory('Press Release');
+    setEditorSummaryEn('');
+    setEditorSummaryTa('');
+    setEditorContentEn('');
+    setEditorContentTa('');
+    setEditorCourt('');
+    setEditorCaseNo('');
+    setEditorIsLead(false);
+    setEditorStatus('Published');
+    setEditorPublishDate(new Date().toISOString().split('T')[0]);
+    setEditorPublishTime('10:00');
+    setEditorImage('/images/dmk-slider-official.jpg');
+    setEditorCropPosition('center');
+    setEditorCropZoom(1.0);
+    setShowNewsEditor(true);
+  };
+
+  const openEditNewsModal = (item: NewsItem) => {
+    setNewsEditMode('edit');
+    setEditingNewsId(item.id);
+    setEditorTitleEn(item.title.en);
+    setEditorTitleTa(item.title.ta || item.title.en);
+    setEditorCategory(item.category);
+    setEditorSummaryEn(item.summary.en);
+    setEditorSummaryTa(item.summary.ta || item.summary.en);
+    setEditorContentEn(item.content.en);
+    setEditorContentTa(item.content.ta || item.content.en);
+    setEditorCourt(item.court || '');
+    setEditorCaseNo(item.caseNumber || '');
+    setEditorIsLead(Boolean(item.isLeadStory));
+    setEditorStatus(item.status ? (item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase() as any) : 'Published');
+    setEditorPublishDate(item.publishDate || item.date || new Date().toISOString().split('T')[0]);
+    setEditorPublishTime(item.publishTime || item.time || '10:00');
+    setEditorImage(item.image || '/images/dmk-slider-official.jpg');
+    setEditorCropPosition(item.imageCrop?.position || 'center');
+    setEditorCropZoom(item.imageCrop?.zoom || 1.0);
+    setShowNewsEditor(true);
+  };
+
+  const handleSaveNews = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editorTitleEn.trim()) {
+      showToast('error', 'English headline is required.');
+      return;
+    }
+
+    const payload = {
+      title: { en: editorTitleEn.trim(), ta: editorTitleTa.trim() || editorTitleEn.trim() },
+      category: editorCategory,
+      summary: { en: editorSummaryEn.trim(), ta: editorSummaryTa.trim() || editorSummaryEn.trim() },
+      content: { en: editorContentEn.trim(), ta: editorContentTa.trim() || editorSummaryTa.trim() || editorContentEn.trim() },
+      court: editorCourt.trim(),
+      caseNumber: editorCaseNo.trim(),
+      image: editorImage.trim() || '/images/dmk-slider-official.jpg',
+      isLeadStory: editorIsLead,
+      status: editorStatus,
+      publishDate: editorPublishDate,
+      publishTime: editorPublishTime,
+      date: editorPublishDate,
+      time: editorPublishTime,
       readTime: '3 min read',
       author: { en: 'DMK Legal Wing Secretariat', ta: 'திமுக வழக்கறிஞர் அணித் தலைமை' },
       issuingAuthority: { en: 'Apex Constitutional Panel, Anna Arivalayam', ta: 'அரசமைப்புச் சட்டப் பிரிவு, அண்ணா அறிவாலயம்' },
-      summary: { en: newNewsSummaryEn, ta: newNewsSummaryTa || newNewsSummaryEn },
-      content: { en: newNewsContentEn || newNewsSummaryEn, ta: newNewsContentTa || newNewsSummaryTa || newNewsSummaryEn },
-      image: newNewsImage,
-      court: newNewsCourt || undefined,
-      caseNumber: newNewsCaseNo || undefined,
-      featured: newNewsIsLead,
-      isLeadStory: newNewsIsLead,
-      status: 'published'
-    });
+      imageCrop: {
+        position: editorCropPosition,
+        zoom: editorCropZoom
+      }
+    };
 
-    setShowAddNewsModal(false);
-    setNewNewsTitleEn('');
-    setNewNewsTitleTa('');
-    setNewNewsSummaryEn('');
-    setNewNewsSummaryTa('');
-    setNewNewsContentEn('');
-    setNewNewsContentTa('');
-    setNewNewsCourt('');
-    setNewNewsCaseNo('');
-    setNewNewsIsLead(false);
+    try {
+      if (newsEditMode === 'create') {
+        const res = await fetch('/api/news', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast('success', `Created story: "${editorTitleEn.slice(0, 35)}..." (${editorStatus})`);
+          setShowNewsEditor(false);
+          refreshAllData();
+        } else {
+          showToast('error', data.error || 'Server rejected news creation. Check permissions.');
+        }
+      } else if (newsEditMode === 'edit' && editingNewsId) {
+        const res = await fetch(`/api/news/${editingNewsId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast('success', `Updated story: "${editorTitleEn.slice(0, 35)}..."`);
+          setShowNewsEditor(false);
+          refreshAllData();
+        } else {
+          showToast('error', data.error || 'Server rejected news update. Check permissions.');
+        }
+      }
+    } catch {
+      showToast('error', 'Network error communicating with API.');
+    }
   };
 
+  const handleDeleteNews = async (id: string, title: string) => {
+    if (!confirm(`Confirm deletion of news story:\n"${title}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/news/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Deleted news story: ${id}`);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Server rejected deletion. Insufficient permissions.');
+      }
+    } catch {
+      showToast('error', 'Network error contacting server.');
+    }
+  };
+
+  const handleSetLeadStory = async (id: string) => {
+    try {
+      const res = await fetch(`/api/news/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'setLeadStory' })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Promoted ${id} to Lead Story`);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Failed to promote lead story. Insufficient permissions.');
+      }
+    } catch {
+      showToast('error', 'Network error contacting server.');
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // REGISTRATIONS & ENQUIRIES ACTIONS (Legal Desk & Super Admin)
+  // ---------------------------------------------------------------------------
+  const handleUpdateRegStatus = async (id: string, newStatus: AdvocateRegistration['status']) => {
+    try {
+      const res = await fetch(`/api/registrations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Registration ${id} set to '${newStatus}'`);
+        refreshAllData();
+        if (selectedRegDossier && selectedRegDossier.id === id) {
+          setSelectedRegDossier({ ...selectedRegDossier, status: newStatus });
+        }
+      } else {
+        showToast('error', data.error || `Server 403: Role '${authenticatedRole}' cannot modify registrations.`);
+      }
+    } catch {
+      showToast('error', 'Network error contacting server.');
+    }
+  };
+
+  const handleDeleteRegistration = async (id: string) => {
+    if (!confirm(`Confirm deletion of advocate registration ${id}?`)) return;
+    try {
+      const res = await fetch(`/api/registrations/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Deleted registration ${id}`);
+        setSelectedRegDossier(null);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || `Server 403: Role '${authenticatedRole}' cannot delete registrations.`);
+      }
+    } catch {
+      showToast('error', 'Network error contacting server.');
+    }
+  };
+
+  const handleUpdateEnqStatus = async (id: string, newStatus: PublicEnquiry['status']) => {
+    try {
+      const res = await fetch(`/api/enquiries/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Enquiry ${id} set to '${newStatus}'`);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || `Server 403: Role '${authenticatedRole}' cannot modify enquiries.`);
+      }
+    } catch {
+      showToast('error', 'Network error contacting server.');
+    }
+  };
+
+  const handleDeleteEnquiry = async (id: string) => {
+    if (!confirm(`Confirm deletion of grievance enquiry ${id}?`)) return;
+    try {
+      const res = await fetch(`/api/enquiries/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Deleted enquiry ${id}`);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || `Server 403: Role '${authenticatedRole}' cannot delete enquiries.`);
+      }
+    } catch {
+      showToast('error', 'Network error contacting server.');
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // DISTRICT PHONE PRIVACY ACTION (Super Admin only)
+  // ---------------------------------------------------------------------------
+  const handleSaveDistrictPrivacy = async () => {
+    if (!editingDistrict) return;
+    try {
+      const res = await fetch('/api/districts', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingDistrict.id,
+          showPhonePublicly: editPhonePublicly
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Updated phone privacy for ${editingDistrict.name.en}`);
+        setEditingDistrict(null);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || `Server 403: Role '${authenticatedRole}' cannot modify districts.`);
+      }
+    } catch {
+      showToast('error', 'Network error contacting server.');
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // GALLERY, EVENTS, RESOURCES MUTATIONS
+  // ---------------------------------------------------------------------------
   const handleCreateGallery = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGalTitleEn.trim()) return;
+    try {
+      const res = await fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: { en: newGalTitleEn, ta: newGalTitleTa || newGalTitleEn },
+          category: newGalCategory,
+          date: new Date().toISOString().split('T')[0],
+          location: { en: newGalLocationEn || 'Chennai', ta: newGalLocationTa || 'சென்னை' },
+          caption: { en: newGalCaptionEn, ta: newGalCaptionTa || newGalCaptionEn },
+          imageUrl: newGalImage || '/images/dmk-press-meet.jpg'
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', 'Created gallery record');
+        setShowAddGalleryModal(false);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Server rejected gallery creation.');
+      }
+    } catch {
+      showToast('error', 'Network error.');
+    }
+  };
 
-    await addGalleryItem({
-      title: { en: newGalTitleEn, ta: newGalTitleTa || newGalTitleEn },
-      category: newGalCategory,
-      date: new Date().toISOString().split('T')[0],
-      location: { en: newGalLocationEn || 'Chennai, Tamil Nadu', ta: newGalLocationTa || 'சென்னை, தமிழ்நாடு' },
-      image: newGalImage,
-      caption: { en: newGalCaptionEn || newGalTitleEn, ta: newGalCaptionTa || newGalTitleTa || newGalTitleEn },
-      photographer: 'State Press Bureau'
-    });
-
-    setShowAddGalleryModal(false);
-    setNewGalTitleEn('');
-    setNewGalTitleTa('');
-    setNewGalLocationEn('');
-    setNewGalLocationTa('');
-    setNewGalCaptionEn('');
-    setNewGalCaptionTa('');
+  const handleDeleteGallery = async (id: string) => {
+    if (!confirm('Confirm deletion of gallery photo?')) return;
+    try {
+      const res = await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', 'Deleted gallery photo');
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Server rejected gallery deletion.');
+      }
+    } catch {
+      showToast('error', 'Network error.');
+    }
   };
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEventTitleEn.trim()) return;
+    try {
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: { en: newEventTitleEn, ta: newEventTitleTa || newEventTitleEn },
+          category: newEventCategory,
+          date: newEventDate,
+          venue: { en: newEventVenueEn || 'High Court Campus', ta: newEventVenueTa || 'உயர் நீதிமன்ற வளாகம்' },
+          description: { en: newEventDescEn, ta: newEventDescTa || newEventDescEn },
+          isUpcoming: true
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', 'Created event record');
+        setShowAddEventModal(false);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Server rejected event creation.');
+      }
+    } catch {
+      showToast('error', 'Network error.');
+    }
+  };
 
-    await addEvent({
-      title: { en: newEventTitleEn, ta: newEventTitleTa || newEventTitleEn },
-      category: newEventCategory,
-      date: newEventDate,
-      time: '10:00 AM - 05:00 PM',
-      venue: { en: newEventVenueEn || 'Anna Arivalayam, Chennai', ta: newEventVenueTa || 'அண்ணா அறிவாலயம், சென்னை' },
-      status: 'upcoming',
-      description: { en: newEventDescEn, ta: newEventDescTa || newEventDescEn },
-      image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&q=80&w=1200'
-    });
-
-    setShowAddEventModal(false);
-    setNewEventTitleEn('');
-    setNewEventTitleTa('');
-    setNewEventVenueEn('');
-    setNewEventVenueTa('');
-    setNewEventDescEn('');
+  const handleDeleteEvent = async (id: string) => {
+    if (!confirm('Confirm deletion of event record?')) return;
+    try {
+      const res = await fetch(`/api/events/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', 'Deleted event record');
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Server rejected event deletion.');
+      }
+    } catch {
+      showToast('error', 'Network error.');
+    }
   };
 
   const handleCreateResource = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newResTitleEn.trim()) return;
-
-    await addResource({
-      title: { en: newResTitleEn, ta: newResTitleTa || newResTitleEn },
-      category: newResCategory,
-      citation: newResCitation,
-      summary: { en: newResSummaryEn, ta: newResSummaryTa || newResSummaryEn },
-      keyHighlights: {
-        en: ['Approved constitutional submission', 'Published by State Legal Secretariat'],
-        ta: ['அங்கீகரிக்கப்பட்ட அரசமைப்பு ஆவணம்', 'மாநில சட்டச் செயலக வெளியீடு']
-      },
-      fileSize: '3.1 MB',
-      downloadUrl: '#',
-      date: new Date().toISOString().split('T')[0],
-      isOfficial: true
-    });
-
-    setShowAddResourceModal(false);
-    setNewResTitleEn('');
-    setNewResTitleTa('');
-    setNewResSummaryEn('');
+    try {
+      const res = await fetch('/api/resources', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: { en: newResTitleEn, ta: newResTitleTa || newResTitleEn },
+          category: newResCategory,
+          citation: newResCitation,
+          summary: { en: newResSummaryEn, ta: newResSummaryTa || newResSummaryEn },
+          keyHighlights: { en: ['Statutory provision analysis'], ta: ['சட்டப்பிரிவு ஆய்வு'] },
+          fileSize: '3.5 MB',
+          downloadUrl: '#',
+          date: new Date().toISOString().split('T')[0],
+          isOfficial: true
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', 'Created legal resource');
+        setShowAddResourceModal(false);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Server rejected resource creation.');
+      }
+    } catch {
+      showToast('error', 'Network error.');
+    }
   };
 
-  // Filtered Lists
-  const filteredRegistrations = registrations.filter((reg) => {
-    const matchesStatus = regStatusFilter === 'all' || reg.status === regStatusFilter;
-    const query = regSearchQuery.toLowerCase();
-    const matchesQuery = 
-      !query ||
-      reg.fullName.toLowerCase().includes(query) ||
-      reg.barCouncilNumber.toLowerCase().includes(query) ||
-      reg.district.toLowerCase().includes(query) ||
-      reg.mobileNumber.toLowerCase().includes(query) ||
-      reg.emailAddress.toLowerCase().includes(query);
-    return matchesStatus && matchesQuery;
-  });
+  const handleDeleteResource = async (id: string) => {
+    if (!confirm('Confirm deletion of legal resource dossier?')) return;
+    try {
+      const res = await fetch(`/api/resources/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', 'Deleted legal resource');
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Server rejected resource deletion.');
+      }
+    } catch {
+      showToast('error', 'Network error.');
+    }
+  };
 
-  const filteredEnquiries = enquiries.filter((enq) => {
-    const matchesCategory = enqCategoryFilter === 'all' || enq.category === enqCategoryFilter;
-    const matchesStatus = enqStatusFilter === 'all' || enq.status === enqStatusFilter;
-    const query = enqSearchQuery.toLowerCase();
-    const matchesQuery = 
-      !query ||
-      enq.name.toLowerCase().includes(query) ||
-      enq.district.toLowerCase().includes(query) ||
-      enq.subject.toLowerCase().includes(query) ||
-      enq.phone.toLowerCase().includes(query);
-    return matchesCategory && matchesStatus && matchesQuery;
-  });
-
+  // ---------------------------------------------------------------------------
+  // FILTERED DATA VIEWS
+  // ---------------------------------------------------------------------------
   const filteredNews = news.filter((item) => {
-    const matchesCategory = newsCategoryFilter === 'all' || item.category === newsCategoryFilter;
-    const query = newsSearchQuery.toLowerCase();
-    const matchesQuery =
-      !query ||
-      item.title.en.toLowerCase().includes(query) ||
-      item.title.ta.toLowerCase().includes(query) ||
-      item.summary.en.toLowerCase().includes(query);
-    return matchesCategory && matchesQuery;
+    const matchesCat = newsCategoryFilter === 'all' || item.category === newsCategoryFilter;
+    const matchesStatus = 
+      newsStatusFilter === 'all' || 
+      (item.status && item.status.toLowerCase() === newsStatusFilter.toLowerCase());
+    const q = newsSearchQuery.toLowerCase();
+    const matchesQ = 
+      !q || 
+      item.title.en.toLowerCase().includes(q) || 
+      item.title.ta?.toLowerCase().includes(q) ||
+      item.summary.en.toLowerCase().includes(q);
+    return matchesCat && matchesStatus && matchesQ;
+  });
+
+  const filteredRegistrations = registrations.filter((r) => {
+    const matchesStatus = regStatusFilter === 'all' || r.status === regStatusFilter;
+    const q = regSearchQuery.toLowerCase();
+    const matchesQ = 
+      !q || 
+      r.fullName.toLowerCase().includes(q) || 
+      r.barCouncilNumber.toLowerCase().includes(q) || 
+      r.district.toLowerCase().includes(q) ||
+      r.mobileNumber.includes(q);
+    return matchesStatus && matchesQ;
+  });
+
+  const filteredEnquiries = enquiries.filter((e) => {
+    const matchesCat = enqCategoryFilter === 'all' || e.category === enqCategoryFilter;
+    const matchesStatus = enqStatusFilter === 'all' || e.status === enqStatusFilter;
+    const q = enqSearchQuery.toLowerCase();
+    const matchesQ = 
+      !q || 
+      e.name.toLowerCase().includes(q) || 
+      e.district.toLowerCase().includes(q) || 
+      e.phone.includes(q) ||
+      e.message.toLowerCase().includes(q);
+    return matchesCat && matchesStatus && matchesQ;
   });
 
   const filteredDistricts = districts.filter((d) => {
     const matchesZone = districtZoneFilter === 'All' || d.zone === districtZoneFilter;
-    const query = districtSearchQuery.toLowerCase();
-    const matchesQuery =
-      !query ||
-      d.name.en.toLowerCase().includes(query) ||
-      d.name.ta.toLowerCase().includes(query) ||
-      d.organizer.en.toLowerCase().includes(query) ||
-      d.contactPhone.toLowerCase().includes(query);
-    return matchesZone && matchesQuery;
+    const q = districtSearchQuery.toLowerCase();
+    const matchesQ = 
+      !q || 
+      d.name.en.toLowerCase().includes(q) || 
+      d.name.ta.toLowerCase().includes(q) || 
+      d.organizer.en.toLowerCase().includes(q) ||
+      d.contactPhone.includes(q);
+    return matchesZone && matchesQ;
   });
 
-  // Export Data Dump
-  const handleExportJson = () => {
-    const dataDump = {
-      exportTimestamp: new Date().toISOString(),
-      counts: {
-        registrations: registrations.length,
-        enquiries: enquiries.length,
-        news: news.length,
-        events: events.length,
-        resources: resources.length,
-        districts: districts.length
-      },
-      registrations,
-      enquiries,
-      news,
-      events,
-      resources
-    };
-    const blob = new Blob([JSON.stringify(dataDump, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `dmk-legal-wing-export-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  // -------------------------------------------------------------
-  // AUTHENTICATION LOGIN LOCK SCREEN (INSTITUTIONAL PARCHMENT)
-  // -------------------------------------------------------------
-  if (!isAuthenticated) {
+  const filteredAuditLogs = auditLogs.filter((log) => {
+    const q = auditSearchQuery.toLowerCase();
     return (
-      <div className="min-h-[85vh] bg-[#FAF8F5] flex items-center justify-center p-4 font-dmk-body">
-        <div className="bg-white border-2 border-neutral-900 max-w-md w-full p-8 sm:p-10 relative shadow-2xl">
-          {/* Dual Party Stripe */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 flex">
-            <div className="w-1/2 bg-black" />
-            <div className="w-1/2 bg-[#E31E24]" />
-          </div>
+      !q ||
+      log.who.toLowerCase().includes(q) ||
+      log.what.toLowerCase().includes(q) ||
+      log.role.toLowerCase().includes(q)
+    );
+  });
 
-          <div className="text-center space-y-3 mb-8 pt-2">
-            <div className="w-14 h-14 bg-black text-[#C41A1F] border-2 border-neutral-900 flex items-center justify-center mx-auto">
-              <Scale className="w-7 h-7" />
-            </div>
-            <div>
-              <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#C41A1F] block">
-                STATE LEGAL SECRETARIAT
-              </span>
-              <h2 className="text-2xl font-black text-neutral-950 font-dmk-headline tracking-tight uppercase mt-1">
-                Command Access
-              </h2>
-            </div>
-            <p className="text-xs text-neutral-600 font-dmk-body leading-relaxed">
-              Authorized legal wing officers, secretariat controllers & bar registrars only.
+  // ---------------------------------------------------------------------------
+  // LOGIN SCREEN (PLAIN NEUTRAL WORK-TOOL)
+  // ---------------------------------------------------------------------------
+  if (!isAuthenticated && !isCheckingAuth) {
+    return (
+      <div className="min-h-[85vh] bg-[#FAF8F5] flex items-center justify-center p-4 font-mono text-[#111111]">
+        <div className="bg-white border-2 border-[#111111] max-w-md w-full p-8 rounded-[2px] shadow-sm space-y-6">
+          
+          <div className="border-b border-[#D8D3CB] pb-4">
+            <span className="text-[11px] font-bold text-[#C41A1F] uppercase tracking-widest block mb-1">
+              DMK LEGAL WING • STATE SECRETARIAT
+            </span>
+            <h1 className="text-xl font-black text-[#111111]">
+              Administrative Work Console
+            </h1>
+            <p className="text-xs text-[#5B5348] mt-1 font-sans">
+              Enter security passcode to authenticate your role session. Server strictly validates privileges on all mutations.
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            {authError && (
-              <div className="p-3 bg-red-50 border border-[#E31E24] text-[#C41A1F] text-xs font-bold flex items-center gap-2">
+          <form onSubmit={handleLoginSubmit} className="space-y-4">
+            {loginError && (
+              <div className="p-3 bg-[#FCE8E8] border border-[#C41A1F] text-[#C41A1F] text-xs font-sans font-bold flex items-center gap-2 rounded-[2px]">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{authError}</span>
+                <span>{loginError}</span>
               </div>
             )}
+
             <div>
-              <label className="text-[11px] font-english font-bold text-neutral-900 uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold uppercase tracking-wider block mb-1.5">
+                Designated Role
+              </label>
+              <select
+                value={loginRole}
+                onChange={(e) => setLoginRole(e.target.value as AdminRole)}
+                className="w-full min-h-[44px] px-3 border border-[#D8D3CB] focus:border-[#111111] text-xs bg-[#FAF8F5] rounded-[2px] outline-none cursor-pointer"
+              >
+                <option value="super_admin">Super Admin (Apex Authority — Full Access)</option>
+                <option value="editorial">Editorial Desk (News, Events, Gallery)</option>
+                <option value="legal_desk">Legal Desk (Registrations & Enquiries)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider block mb-1.5">
                 Security Passcode
               </label>
               <input
                 type="password"
                 required
-                value={adminPassword}
-                onChange={(e) => setAdminPassword(e.target.value)}
-                placeholder="Enter passcode (hint: dmk1971)"
-                className="w-full bg-[#FAF8F5] border border-neutral-400 p-2.5 text-xs text-neutral-950 font-english placeholder-neutral-500 focus:outline-none focus:border-black focus:bg-white"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                placeholder="Enter passcode (e.g. dmk1971)"
+                className="w-full min-h-[44px] px-3 border border-[#D8D3CB] focus:border-[#111111] text-xs bg-[#FAF8F5] rounded-[2px] outline-none"
               />
+              <span className="text-[11px] text-[#5B5348] font-sans block mt-1">
+                Passcodes: <code className="font-mono text-[#111111]">dmk1971</code> (Master), <code className="font-mono text-[#111111]">editorial</code>, or <code className="font-mono text-[#111111]">legaldesk</code>
+              </span>
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-black uppercase tracking-widest transition-colors border border-black shadow-md cursor-pointer"
+              disabled={isLoggingIn}
+              className="w-full min-h-[44px] bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
-              Sign In to Command Console
+              <Lock className="w-3.5 h-3.5" />
+              <span>{isLoggingIn ? 'Authenticating...' : 'Sign In to Console'}</span>
             </button>
           </form>
 
-          <div className="mt-6 pt-4 border-t border-neutral-300 text-center text-[10px] text-neutral-500 font-mono">
-            HEADQUARTERS: ANNA ARIVALAYAM • CHENNAI 600018
+          <div className="pt-2 text-center">
+            <Link href="/" className="text-xs text-[#5B5348] hover:text-[#111111] underline font-sans">
+              &larr; Return to public portal
+            </Link>
           </div>
+
         </div>
       </div>
     );
   }
 
-  // -------------------------------------------------------------
-  // MAIN INSTITUTIONAL COMMAND CONSOLE
-  // -------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // MAIN WORK-TOOL CONSOLE
+  // ---------------------------------------------------------------------------
   return (
-    <div className="w-full min-h-screen bg-[#FAF8F5] text-neutral-950 font-dmk-body">
+    <div className="w-full min-h-screen bg-[#FAF8F5] text-[#111111] font-sans">
       
-      {/* 1. HIGH COMMAND APEX STRIP */}
-      <header className="bg-[#111111] text-white border-b-2 border-[#E31E24]">
-        {/* Dual Party Stripe */}
-        <div className="h-1 flex">
-          <div className="w-1/2 bg-black" />
-          <div className="w-1/2 bg-[#E31E24]" />
-        </div>
-
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-4 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+      {/* 1. COMPACT TOP UTILITY BAR */}
+      <header className="bg-[#111111] text-white border-b border-neutral-800 px-4 sm:px-6 py-2.5">
+        <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
           
-          {/* Identity & Seal */}
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 bg-neutral-900 border border-neutral-700 text-[#C41A1F] flex items-center justify-center shrink-0">
-              <Scale className="w-6 h-6" />
+          {/* Brand & Identity */}
+          <div className="flex items-center gap-3">
+            <span className="w-2.5 h-2.5 bg-[#E31E24] shrink-0" />
+            <div className="font-mono">
+              <span className="font-black text-white uppercase tracking-wider">DMK LEGAL WING</span>
+              <span className="text-neutral-400 ml-2">Administration Console</span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-english font-bold uppercase tracking-[0.25em] text-[#C41A1F]">
-                  STATE LEGAL SECRETARIAT
-                </span>
-                <span className="text-[10px] font-mono px-2 py-0.2 bg-neutral-800 text-neutral-300 border border-neutral-700 uppercase font-bold">
-                  {adminRole.replace('_', ' ')}
-                </span>
-              </div>
-              <h1 className="text-xl sm:text-2xl font-black font-dmk-headline uppercase tracking-tight text-white leading-tight">
-                Control Console & Database Hub
-              </h1>
-            </div>
+            <span className="px-2 py-0.5 bg-neutral-800 text-neutral-300 font-mono text-[10px] rounded-[2px] border border-neutral-700">
+              v2.4
+            </span>
           </div>
 
-          {/* Telemetry & Action Strip */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs font-english">
+          {/* Authenticated Server Credentials & View Mode Filter */}
+          <div className="flex flex-wrap items-center gap-4">
             
-            {/* Live Backend Connection Indicator */}
-            <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-1.5 text-neutral-300 rounded-[2px]">
-              <span className="w-2 h-2 rounded-[2px] bg-emerald-500 animate-pulse" />
-              <span className="text-[11px] font-mono">
-                {isLoadingData ? 'SYNCING API...' : 'LIVE BACKEND: CONNECTED'}
+            {/* Real Server Authenticated Role (Enforced) */}
+            <div className="flex items-center gap-1.5 font-mono text-[11px] bg-neutral-900 border border-neutral-700 px-2.5 py-1 rounded-[2px]">
+              <Lock className="w-3 h-3 text-[#E31E24]" />
+              <span className="text-neutral-400">Server Role:</span>
+              <span className="font-bold text-white uppercase">
+                {authenticatedRole.replace('_', ' ')}
               </span>
             </div>
 
-            {/* Role Switcher */}
-            <div className="flex items-center border border-neutral-700 bg-neutral-900 p-0.5">
-              {(['super_admin', 'content_admin', 'legal_officer'] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setAdminRole(r)}
-                  className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-colors ${
-                    adminRole === r ? 'bg-[#E31E24] text-white' : 'text-neutral-400 hover:text-white'
-                  }`}
-                >
-                  {r === 'super_admin' ? 'Super Admin' : r === 'content_admin' ? 'Editorial' : 'Legal Desk'}
-                </button>
-              ))}
+            {/* Role View Switcher: "The role switcher in the interface must only change what is shown; it must never grant permission." */}
+            <div className="flex items-center gap-1 font-mono text-[11px]">
+              <span className="text-neutral-400 mr-1 hidden sm:inline">View Mode:</span>
+              {(['all', 'super_admin', 'editorial', 'legal_desk'] as const).map((r) => {
+                const isSelected = viewRole === r;
+                const label = 
+                  r === 'all' ? 'All Modules' : 
+                  r === 'super_admin' ? 'Super Admin' : 
+                  r === 'editorial' ? 'Editorial' : 'Legal Desk';
+
+                return (
+                  <button
+                    key={r}
+                    onClick={() => setViewRole(r)}
+                    className={`px-2 py-1 text-[11px] rounded-[2px] transition-colors cursor-pointer border ${
+                      isSelected
+                        ? 'bg-[#E31E24] text-white border-[#E31E24] font-bold'
+                        : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:text-white'
+                    }`}
+                    title="Filter interface view (permissions strictly enforced by server)"
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Manual Sync */}
+            {/* Logout Action */}
             <button
-              onClick={() => refreshAllData()}
-              title="Refresh all records from backend"
-              className="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 hover:text-white transition-colors cursor-pointer"
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 rounded-[2px] transition-colors cursor-pointer font-mono"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoadingData ? 'animate-spin text-[#C41A1F]' : ''}`} />
-            </button>
-
-            {/* Export JSON Backup */}
-            <button
-              onClick={handleExportJson}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white font-bold text-[11px] uppercase tracking-wider transition-colors cursor-pointer"
-            >
-              <Download className="w-3.5 h-3.5 text-[#C41A1F]" />
-              <span>Export DB</span>
-            </button>
-
-            {/* Lock Console */}
-            <button
-              onClick={() => setIsAuthenticated(false)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E31E24] hover:bg-red-700 text-white font-bold text-[11px] uppercase tracking-wider transition-colors cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Lock</span>
+              <LogOut className="w-3 h-3" />
+              <span>Log out</span>
             </button>
 
           </div>
@@ -488,754 +894,427 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* 2. INSTITUTIONAL HORIZONTAL COMMAND TABS */}
-      <nav className="bg-white border-b border-neutral-300 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto scrollbar-none py-1">
-          {[
-            { id: 'overview', label: '01. Telemetry & Overview', count: null },
-            { id: 'registrations', label: '02. Advocate Cadre Applications', count: registrations.length },
-            { id: 'enquiries', label: '03. Citizen Legal Desk', count: enquiries.length },
-            { id: 'news', label: '04. Editorial Newsroom', count: news.length },
-            { id: 'districts', label: '05. 74 District Cadre Directory', count: 74 },
-            { id: 'resources', label: '06. Legal Dossiers & Archive', count: resources.length },
-            { id: 'gallery', label: '07. Press Photojournalism', count: gallery.length },
-            { id: 'events', label: '08. State Conferences', count: events.length }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-3.5 py-2.5 text-xs font-english font-bold uppercase tracking-wider whitespace-nowrap transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
-                activeTab === tab.id
-                  ? 'border-[#E31E24] text-[#C41A1F] bg-[#FAF8F5]'
-                  : 'border-transparent text-neutral-600 hover:text-black hover:bg-neutral-50'
-              }`}
-            >
-              <span>{tab.label}</span>
-              {tab.count !== null && (
-                <span className={`px-1.5 py-0.2 text-[10px] font-mono font-bold ${
-                  activeTab === tab.id
-                    ? 'bg-[#E31E24] text-white'
-                    : 'bg-neutral-200 text-neutral-800'
-                }`}>
-                  {tab.count}
-                </span>
-              )}
+      {/* 2. NOTICE TOAST / SERVER FEEDBACK */}
+      {actionNotice && (
+        <div className={`px-4 sm:px-6 py-2.5 text-xs font-mono font-bold flex items-center justify-between border-b ${
+          actionNotice.type === 'success'
+            ? 'bg-green-50 border-green-300 text-green-900'
+            : 'bg-[#FCE8E8] border-[#C41A1F] text-[#C41A1F]'
+        }`}>
+          <div className="max-w-[1500px] mx-auto w-full flex items-center justify-between">
+            <span>{actionNotice.message}</span>
+            <button onClick={() => setActionNotice(null)} className="p-1 hover:opacity-70 cursor-pointer">
+              <X className="w-3.5 h-3.5" />
             </button>
-          ))}
+          </div>
         </div>
-      </nav>
+      )}
 
-      {/* 3. MAIN WORKSPACE AREA */}
-      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 py-8 space-y-8">
+      {/* 3. CONSOLE WORKSPACE */}
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+        
+        {/* Navigation Tabs Bar */}
+        <div className="bg-white border-2 border-[#111111] p-1.5 rounded-[2px] flex items-center gap-1 overflow-x-auto scrollbar-thin shadow-xs">
+          {[
+            { id: 'overview', label: 'Overview', icon: Layers, allowed: ['all', 'super_admin', 'editorial', 'legal_desk'] },
+            { id: 'news', label: `Newsroom (${news.length})`, icon: FileText, allowed: ['all', 'super_admin', 'editorial'] },
+            { id: 'registrations', label: `Advocates (${registrations.length})`, icon: Scale, allowed: ['all', 'super_admin', 'legal_desk'] },
+            { id: 'enquiries', label: `Citizen Grievances (${enquiries.length})`, icon: Mail, allowed: ['all', 'super_admin', 'legal_desk'] },
+            { id: 'districts', label: `Districts (${districts.length})`, icon: Building2, allowed: ['all', 'super_admin'] },
+            { id: 'gallery', label: `Gallery (${gallery.length})`, icon: Camera, allowed: ['all', 'super_admin', 'editorial'] },
+            { id: 'events', label: `Hearings (${events.length})`, icon: Calendar, allowed: ['all', 'super_admin', 'editorial'] },
+            { id: 'resources', label: `Repository (${resources.length})`, icon: Database, allowed: ['all', 'super_admin'] },
+            { id: 'audit', label: `Audit Log (${auditLogs.length})`, icon: Activity, allowed: ['all', 'super_admin', 'editorial', 'legal_desk'] }
+          ].map((tab) => {
+            // Apply view role filter
+            if (viewRole !== 'all' && !tab.allowed.includes(viewRole)) {
+              return null;
+            }
 
-        {/* ============================================================== */}
-        {/* TAB 1: TELEMETRY & OVERVIEW                                    */}
-        {/* ============================================================== */}
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`min-h-[44px] px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 rounded-[2px] transition-colors shrink-0 cursor-pointer ${
+                  isActive
+                    ? 'bg-[#111111] text-white'
+                    : 'text-[#5B5348] hover:text-[#111111] hover:bg-[#FAF8F5]'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#E31E24]' : 'text-[#5B5348]'}`} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ------------------------------------------------------------------- */}
+        {/* TAB 1: OVERVIEW METRICS & STATUS */}
+        {/* ------------------------------------------------------------------- */}
         {activeTab === 'overview' && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             
-            {/* Top Stat Ledger Strip */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden">
-                <span className="w-1.5 h-full bg-[#E31E24] absolute top-0 left-0" />
-                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
-                  REGISTERED ADVOCATES CADRE
-                </span>
-                <span className="text-3xl font-black text-neutral-900 font-english block my-1">
-                  28,500+
-                </span>
-                <span className="text-[11px] text-emerald-700 font-bold font-english flex items-center gap-1">
-                  <span>●</span> 74 Party Districts Mobilized
+            {/* Quick Metrics Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 font-mono">
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px]">
+                <span className="text-[10px] uppercase text-[#5B5348] block mb-1">Total Stories</span>
+                <span className="text-2xl font-black text-[#111111]">{news.length}</span>
+                <span className="text-[10px] text-[#5B5348] block mt-1">
+                  Published: {news.filter(n => !n.status || n.status.toLowerCase() === 'published').length}
                 </span>
               </div>
 
-              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden rounded-[2px]">
-                <span className="w-1.5 h-full bg-[#C41A1F] absolute top-0 left-0" />
-                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
-                  PENDING CADRE VERIFICATIONS
-                </span>
-                <span className="text-3xl font-black text-[#E31E24] font-english block my-1">
-                  {registrations.filter((r) => r.status === 'pending').length}
-                </span>
-                <span className="text-[11px] text-neutral-600 font-english">
-                  Awaiting Bar Council Review
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px]">
+                <span className="text-[10px] uppercase text-[#5B5348] block mb-1">Advocates</span>
+                <span className="text-2xl font-black text-[#111111]">{registrations.length}</span>
+                <span className="text-[10px] text-amber-700 block mt-1">
+                  Pending: {registrations.filter(r => r.status === 'pending').length}
                 </span>
               </div>
 
-              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden">
-                <span className="w-1.5 h-full bg-neutral-900 absolute top-0 left-0" />
-                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
-                  CITIZEN GRIEVANCES INTAKE
-                </span>
-                <span className="text-3xl font-black text-neutral-900 font-english block my-1">
-                  {enquiries.filter((e) => e.status === 'new').length}
-                </span>
-                <span className="text-[11px] text-neutral-600 font-english">
-                  Active Legal Aid Dispatches
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px]">
+                <span className="text-[10px] uppercase text-[#5B5348] block mb-1">Grievances</span>
+                <span className="text-2xl font-black text-[#111111]">{enquiries.length}</span>
+                <span className="text-[10px] text-[#C41A1F] block mt-1">
+                  New: {enquiries.filter(e => e.status === 'new').length}
                 </span>
               </div>
 
-              <div className="bg-white border border-neutral-300 p-5 relative overflow-hidden">
-                <span className="w-1.5 h-full bg-[#E31E24] absolute top-0 left-0" />
-                <span className="text-[10px] font-english font-bold uppercase text-neutral-500 tracking-wider block">
-                  PUBLISHED LEGAL DOSSIERS
-                </span>
-                <span className="text-3xl font-black text-neutral-900 font-english block my-1">
-                  {resources.length}
-                </span>
-                <span className="text-[11px] text-neutral-600 font-english">
-                  Supreme Court & Madras HC Judgments
-                </span>
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px]">
+                <span className="text-[10px] uppercase text-[#5B5348] block mb-1">Party Districts</span>
+                <span className="text-2xl font-black text-[#111111]">{districts.length}</span>
+                <span className="text-[10px] text-[#5B5348] block mt-1">74 Official Units</span>
+              </div>
+
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px]">
+                <span className="text-[10px] uppercase text-[#5B5348] block mb-1">Court Hearings</span>
+                <span className="text-2xl font-black text-[#111111]">{events.length}</span>
+                <span className="text-[10px] text-[#5B5348] block mt-1">Docket records</span>
+              </div>
+
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px]">
+                <span className="text-[10px] uppercase text-[#5B5348] block mb-1">Repository</span>
+                <span className="text-2xl font-black text-[#111111]">{resources.length}</span>
+                <span className="text-[10px] text-[#5B5348] block mt-1">Law volumes</span>
               </div>
             </div>
 
-            {/* Split Screen: Quick Dispatches & Actions */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
-              {/* Left Column: Fast Secretariat Actions */}
-              <div className="lg:col-span-4 bg-white border border-neutral-300 p-6 space-y-4">
-                <div className="border-b border-neutral-200 pb-3">
-                  <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block">
-                    FAST ACTIONS
-                  </span>
-                  <h3 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
-                    Publish & Dispatch
-                  </h3>
-                </div>
-
-                <div className="space-y-2.5">
-                  <button
-                    onClick={() => { setShowAddNewsModal(true); }}
-                    className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
-                  >
-                    <Plus className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                    <div>
-                      <span className="text-xs font-bold font-english uppercase tracking-wider block">
-                        Publish Press Statement
-                      </span>
-                      <span className="text-[11px] text-neutral-600 group-hover:text-neutral-300 block mt-0.5">
-                        Add official press release, resolution, or court update
-                      </span>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => { setShowAddResourceModal(true); }}
-                    className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
-                  >
-                    <BookOpen className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                    <div>
-                      <span className="text-xs font-bold font-english uppercase tracking-wider block">
-                        Upload Constitutional Judgment
-                      </span>
-                      <span className="text-[11px] text-neutral-600 group-hover:text-neutral-300 block mt-0.5">
-                        Record Supreme Court or Madras High Court filing
-                      </span>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => { setShowAddEventModal(true); }}
-                    className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
-                  >
-                    <Calendar className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                    <div>
-                      <span className="text-xs font-bold font-english uppercase tracking-wider block">
-                        Schedule State Conference
-                      </span>
-                      <span className="text-[11px] text-neutral-600 group-hover:text-neutral-300 block mt-0.5">
-                        Announce advocate legal workshop or seminar
-                      </span>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => { setShowAddGalleryModal(true); }}
-                    className="w-full p-3.5 bg-[#FAF8F5] hover:bg-neutral-900 hover:text-white border border-neutral-300 text-left transition-all group flex items-start gap-3 cursor-pointer"
-                  >
-                    <Camera className="w-5 h-5 text-[#C41A1F] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                    <div>
-                      <span className="text-xs font-bold font-english uppercase tracking-wider block">
-                        Archive Press Photography
-                      </span>
-                      <span className="text-[11px] text-neutral-600 group-hover:text-neutral-300 block mt-0.5">
-                        Upload high-resolution event documentation
-                      </span>
-                    </div>
-                  </button>
-                </div>
-
-                <div className="pt-3 border-t border-neutral-200">
-                  <Link
-                    href="/"
-                    target="_blank"
-                    className="w-full py-2.5 bg-neutral-900 hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-1.5"
-                  >
-                    <span>View Live Public Portal</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[#C41A1F]" />
-                  </Link>
-                </div>
+            {/* Role Privileges Matrix Callout */}
+            <div className="bg-white border-2 border-[#111111] p-5 rounded-[2px] space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-2">
+                <span className="font-bold text-[#111111] uppercase tracking-wider flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-[#C41A1F]" />
+                  Server Role Privileges & Enforced Boundaries
+                </span>
+                <span className="text-[11px] text-[#5B5348]">
+                  Strict HTTP 401 & 403 Enforcement
+                </span>
               </div>
 
-              {/* Right Column: Database Health & Recent Feed */}
-              <div className="lg:col-span-8 space-y-6">
-                
-                {/* Database Telemetry Table */}
-                <div className="bg-white border border-neutral-300 p-6">
-                  <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-4">
-                    <div>
-                      <span className="text-[10px] font-english font-bold uppercase tracking-widest text-[#C41A1F] block">
-                        INFRASTRUCTURE
-                      </span>
-                      <h3 className="text-base font-black text-neutral-950 font-dmk-headline uppercase">
-                        Server File Database Health
-                      </h3>
-                    </div>
-                    <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 border border-emerald-200">
-                      STORAGE: ATOMIC JSON
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
-                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">registrations.json</span>
-                      <span className="text-base font-bold text-neutral-900 font-mono">{registrations.length} live records</span>
-                    </div>
-                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
-                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">enquiries.json</span>
-                      <span className="text-base font-bold text-neutral-900 font-mono">{enquiries.length} live records</span>
-                    </div>
-                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
-                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">districts.json</span>
-                      <span className="text-base font-bold text-[#C41A1F] font-mono">74 party units</span>
-                    </div>
-                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
-                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">news.json</span>
-                      <span className="text-base font-bold text-neutral-900 font-mono">{news.length} items</span>
-                    </div>
-                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
-                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">events.json</span>
-                      <span className="text-base font-bold text-neutral-900 font-mono">{events.length} events</span>
-                    </div>
-                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200">
-                      <span className="text-[10px] uppercase font-bold text-neutral-500 font-mono block">resources.json</span>
-                      <span className="text-base font-bold text-neutral-900 font-mono">{resources.length} filings</span>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-sans text-xs pt-1">
+                <div className={`p-3 border rounded-[2px] ${authenticatedRole === 'super_admin' ? 'border-[#E31E24] bg-[#FAF8F5]' : 'border-[#D8D3CB]'}`}>
+                  <strong className="block font-mono font-bold text-[#111111] mb-1">Super Admin</strong>
+                  <p className="text-[#5B5348]">Full access to all 14 API endpoints: news, gallery, events, districts privacy, resources, registrations, enquiries, and audit records.</p>
                 </div>
-
-                {/* Recent Unverified Registrations Alert */}
-                <div className="bg-white border border-neutral-300 p-6">
-                  <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-4">
-                    <h3 className="text-base font-black text-neutral-950 font-dmk-headline uppercase">
-                      Recent Advocate Applications Queue
-                    </h3>
-                    <button
-                      onClick={() => setActiveTab('registrations')}
-                      className="text-xs font-english font-bold text-[#C41A1F] hover:underline"
-                    >
-                      View All ({registrations.length}) &rarr;
-                    </button>
-                  </div>
-
-                  {registrations.length === 0 ? (
-                    <div className="py-8 text-center bg-[#FAF8F5] border border-dashed border-neutral-300">
-                      <CheckCircle className="w-6 h-6 text-neutral-400 mx-auto mb-1" />
-                      <p className="text-xs font-bold text-neutral-700">No pending advocate registrations</p>
-                      <p className="text-[11px] text-neutral-500">Live submissions through `/contact#register` appear here instantly.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {registrations.slice(0, 3).map((reg) => (
-                        <div
-                          key={reg.id}
-                          className="p-3 bg-[#FAF8F5] border border-neutral-200 flex items-center justify-between text-xs"
-                        >
-                          <div>
-                            <span className="font-bold text-neutral-900 block">{reg.fullName}</span>
-                            <span className="text-neutral-500 font-mono text-[11px]">
-                              {reg.barCouncilNumber} • {reg.district}
-                            </span>
-                          </div>
-                          <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded-[2px] ${
-                            reg.status === 'approved' ? 'bg-[#111111] text-[#FAF8F5]' : 'bg-[#FAF8F5] text-[#111111] border border-[#5B5348]'
-                          }`}>
-                            {reg.status}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <div className={`p-3 border rounded-[2px] ${authenticatedRole === 'editorial' ? 'border-[#E31E24] bg-[#FAF8F5]' : 'border-[#D8D3CB]'}`}>
+                  <strong className="block font-mono font-bold text-[#111111] mb-1">Editorial Desk</strong>
+                  <p className="text-[#5B5348]">Authorized for news publication, image cropping, lead story promotion, press gallery curation, and court hearing dockets.</p>
                 </div>
-
+                <div className={`p-3 border rounded-[2px] ${authenticatedRole === 'legal_desk' ? 'border-[#E31E24] bg-[#FAF8F5]' : 'border-[#D8D3CB]'}`}>
+                  <strong className="block font-mono font-bold text-[#111111] mb-1">Legal Desk</strong>
+                  <p className="text-[#5B5348]">Authorized for advocate membership review, status promotion, and confidential citizen custody & grievance processing.</p>
+                </div>
               </div>
-
             </div>
 
           </div>
         )}
 
-        {/* ============================================================== */}
-        {/* TAB 2: ADVOCATE CADRE APPLICATIONS                             */}
-        {/* ============================================================== */}
-        {activeTab === 'registrations' && (
-          <div className="space-y-6">
+        {/* ------------------------------------------------------------------- */}
+        {/* TAB 2: NEWSROOM (Compact Table, Status, Side-by-side Editor) */}
+        {/* ------------------------------------------------------------------- */}
+        {activeTab === 'news' && (
+          <div className="space-y-4">
             
-            {/* Header and Filter Controls */}
-            <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
-                  LEGAL CADRE DIRECTORY
-                </span>
-                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
-                  Advocate Membership Applications ({filteredRegistrations.length})
-                </h3>
+            {/* Action Bar */}
+            <div className="bg-white border-2 border-[#111111] p-4 rounded-[2px] flex flex-col md:flex-row md:items-center justify-between gap-3 font-mono text-xs">
+              
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative w-64">
+                  <Search className="w-3.5 h-3.5 text-[#5B5348] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={newsSearchQuery}
+                    onChange={(e) => setNewsSearchQuery(e.target.value)}
+                    placeholder="Search stories..."
+                    className="w-full pl-9 pr-3 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none"
+                  />
+                </div>
+
+                {/* Status Filter */}
+                <select
+                  value={newsStatusFilter}
+                  onChange={(e) => setNewsStatusFilter(e.target.value as any)}
+                  className="px-2.5 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none cursor-pointer"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                  <option value="scheduled">Scheduled</option>
+                </select>
+
+                {/* Category Filter */}
+                <select
+                  value={newsCategoryFilter}
+                  onChange={(e) => setNewsCategoryFilter(e.target.value)}
+                  className="px-2.5 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none cursor-pointer"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="Press Release">Press Release</option>
+                  <option value="Statement">Statement</option>
+                  <option value="Court Watch">Court Watch</option>
+                  <option value="Resolution">Resolution</option>
+                  <option value="Gazette">Gazette</option>
+                  <option value="Media">Media</option>
+                </select>
               </div>
 
-              {/* Filters */}
-              <div className="flex flex-wrap items-center gap-2.5">
-                {/* Search */}
-                <div className="relative w-full sm:w-64">
-                  <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <button
+                onClick={openCreateNewsModal}
+                className="min-h-[44px] px-5 py-2 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Compose Story</span>
+              </button>
+
+            </div>
+
+            {/* Compact News Table */}
+            <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#111111] text-white font-mono uppercase tracking-wider">
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3">Headline (EN / TA)</th>
+                      <th className="py-2.5 px-3">Category</th>
+                      <th className="py-2.5 px-3">Publish Date</th>
+                      <th className="py-2.5 px-3">Lead Slot</th>
+                      <th className="py-2.5 px-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#D8D3CB] font-sans">
+                    {filteredNews.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-[#5B5348] font-mono">
+                          No news stories matching current filters.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredNews.map((item) => {
+                        const status = item.status ? item.status.toLowerCase() : 'published';
+                        const isScheduled = status === 'scheduled';
+                        const isDraft = status === 'draft';
+
+                        return (
+                          <tr key={item.id} className="hover:bg-[#FAF8F5] transition-colors">
+                            {/* Status badge */}
+                            <td className="py-2.5 px-3 font-mono whitespace-nowrap">
+                              <span className={`px-2 py-0.5 rounded-[2px] font-bold text-[10px] uppercase border ${
+                                isDraft
+                                  ? 'bg-neutral-100 text-neutral-800 border-neutral-300'
+                                  : isScheduled
+                                  ? 'bg-blue-50 text-blue-800 border-blue-200'
+                                  : 'bg-green-50 text-green-800 border-green-200'
+                              }`}>
+                                {item.status || 'Published'}
+                              </span>
+                            </td>
+
+                            {/* Title (En & Ta) */}
+                            <td className="py-2.5 px-3 max-w-md">
+                              <span className="font-bold text-[#111111] block leading-snug">
+                                {item.title.en}
+                              </span>
+                              {item.title.ta && item.title.ta !== item.title.en && (
+                                <span className="text-[11px] text-[#5B5348] block mt-0.5 font-dmk-body">
+                                  {item.title.ta}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Category */}
+                            <td className="py-2.5 px-3 font-mono text-[#5B5348] whitespace-nowrap">
+                              {item.category}
+                            </td>
+
+                            {/* Date */}
+                            <td className="py-2.5 px-3 font-mono whitespace-nowrap">
+                              {item.publishDate || item.date}
+                              {item.publishTime && (
+                                <span className="text-[#5B5348] block text-[10px]">
+                                  {item.publishTime}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Lead Story Indicator */}
+                            <td className="py-2.5 px-3 whitespace-nowrap">
+                              {item.isLeadStory ? (
+                                <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-[#C41A1F] bg-[#FCE8E8] px-2 py-0.5 border border-[#C41A1F] rounded-[2px]">
+                                  <Star className="w-3 h-3 fill-[#C41A1F]" />
+                                  Lead Hero
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => handleSetLeadStory(item.id)}
+                                  className="text-[11px] text-[#5B5348] hover:text-[#111111] underline cursor-pointer font-mono"
+                                  title="Promote to 60% lead story on homepage"
+                                >
+                                  Make Lead
+                                </button>
+                              )}
+                            </td>
+
+                            {/* Actions */}
+                            <td className="py-2.5 px-3 text-right whitespace-nowrap font-mono">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => openEditNewsModal(item)}
+                                  className="px-2.5 py-1 text-xs text-[#111111] hover:text-[#C41A1F] underline cursor-pointer"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteNews(item.id, item.title.en)}
+                                  className="p-1.5 text-neutral-400 hover:text-[#C41A1F] cursor-pointer"
+                                  title="Delete story"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------------- */}
+        {/* TAB 3: ADVOCATES REGISTRATION (Compact Table & Dossier) */}
+        {/* ------------------------------------------------------------------- */}
+        {activeTab === 'registrations' && (
+          <div className="space-y-4">
+            
+            <div className="bg-white border-2 border-[#111111] p-4 rounded-[2px] flex flex-col md:flex-row md:items-center justify-between gap-3 font-mono text-xs">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative w-64">
+                  <Search className="w-3.5 h-3.5 text-[#5B5348] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={regSearchQuery}
                     onChange={(e) => setRegSearchQuery(e.target.value)}
                     placeholder="Search name, bar no, district..."
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 pl-8 pr-3 py-1.5 text-xs text-neutral-900 font-english placeholder-neutral-500 focus:outline-none focus:border-black focus:bg-white"
-                  />
-                </div>
-
-                {/* Status Filter Buttons */}
-                <div className="flex items-center border border-neutral-300 bg-[#FAF8F5] p-0.5 text-xs font-english">
-                  {(['all', 'pending', 'verified', 'approved', 'rejected'] as const).map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => setRegStatusFilter(st)}
-                      className={`px-2.5 py-1 text-[11px] font-bold uppercase transition-colors cursor-pointer ${
-                        regStatusFilter === st
-                          ? 'bg-[#E31E24] text-white'
-                          : 'text-neutral-700 hover:text-black'
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Applications Table */}
-            {filteredRegistrations.length === 0 ? (
-              <div className="p-16 text-center bg-white border border-neutral-300 space-y-2">
-                <FileText className="w-10 h-10 text-neutral-400 mx-auto" />
-                <h4 className="text-base font-bold text-neutral-900 font-dmk-headline uppercase">
-                  No Advocate Applications Found
-                </h4>
-                <p className="text-xs text-neutral-600 max-w-md mx-auto font-dmk-body">
-                  {regSearchQuery || regStatusFilter !== 'all'
-                    ? 'No applications match your active search filter. Clear the search or status filter to see all records.'
-                    : 'Applications submitted by advocates via the website enrollment form will appear in this verified queue.'}
-                </p>
-              </div>
-            ) : (
-              <div className="bg-white border border-neutral-300 overflow-hidden shadow-xs">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-neutral-800 font-dmk-body">
-                    <thead className="bg-[#FAF8F5] text-neutral-700 uppercase font-english text-[11px] font-bold border-b border-neutral-300 tracking-wider">
-                      <tr>
-                        <th className="p-3.5">Ref / Date</th>
-                        <th className="p-3.5">Advocate Name</th>
-                        <th className="p-3.5">Bar Council Reg.</th>
-                        <th className="p-3.5">District / Practice</th>
-                        <th className="p-3.5">Contact Despatch</th>
-                        <th className="p-3.5">Specializations</th>
-                        <th className="p-3.5">Status</th>
-                        <th className="p-3.5 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-200">
-                      {filteredRegistrations.map((reg) => (
-                        <tr key={reg.id} className="hover:bg-[#FAF8F5] transition-colors">
-                          <td className="p-3.5 font-mono text-[11px] text-neutral-600">
-                            <span className="block font-bold text-neutral-900">{reg.id.slice(0, 10)}</span>
-                            <span>{new Date(reg.submittedAt).toLocaleDateString()}</span>
-                          </td>
-                          <td className="p-3.5">
-                            <strong className="text-sm text-neutral-950 font-bold block">{reg.fullName}</strong>
-                            <span className="text-[11px] text-neutral-500">Enrolled: {reg.yearOfEnrollment}</span>
-                          </td>
-                          <td className="p-3.5">
-                            <span className="font-mono text-xs font-bold text-[#C41A1F] bg-red-50 px-2 py-0.5 border border-red-200">
-                              {reg.barCouncilNumber}
-                            </span>
-                          </td>
-                          <td className="p-3.5">
-                            <strong className="block text-neutral-900 font-bold">{reg.district}</strong>
-                            <span className="text-[11px] text-neutral-600">{reg.courtOfPractice}</span>
-                          </td>
-                          <td className="p-3.5 font-english">
-                            <a href={`tel:${reg.mobileNumber}`} className="text-xs font-bold text-neutral-900 hover:text-[#C41A1F] block">
-                              {reg.mobileNumber}
-                            </a>
-                            <a href={`mailto:${reg.emailAddress}`} className="text-[11px] text-neutral-600 hover:underline block truncate max-w-[160px]">
-                              {reg.emailAddress}
-                            </a>
-                          </td>
-                          <td className="p-3.5">
-                            <div className="flex flex-wrap gap-1 max-w-[180px]">
-                              {reg.areasOfSpecialization?.map((spec, i) => (
-                                <span key={i} className="text-[10px] bg-neutral-100 text-neutral-800 px-1.5 py-0.2 border border-neutral-300">
-                                  {spec}
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-                          <td className="p-3.5">
-                            <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider border rounded-[2px] ${
-                              reg.status === 'approved'
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                                : reg.status === 'verified'
-                                ? 'bg-[#FAF8F5] text-[#111111] border border-[#111111]'
-                                : reg.status === 'rejected'
-                                ? 'bg-red-50 text-red-800 border-red-300'
-                                : 'bg-[#FAF8F5] text-[#5B5348] border border-[#D8D3CB]'
-                            }`}>
-                              {reg.status}
-                            </span>
-                          </td>
-                          <td className="p-3.5 text-right space-x-1.5">
-                            <button
-                              onClick={() => setSelectedRegDossier(reg)}
-                              className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
-                            >
-                              Inspect
-                            </button>
-                            {reg.status !== 'approved' && (
-                              <button
-                                onClick={() => updateRegistrationStatus(reg.id, 'approved')}
-                                className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
-                              >
-                                Approve
-                              </button>
-                            )}
-                            {reg.status === 'pending' && (
-                              <button
-                                onClick={() => updateRegistrationStatus(reg.id, 'verified')}
-                                className="px-2.5 py-1 bg-[#111111] hover:bg-[#E31E24] text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
-                              >
-                                Verify Bar
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* Dossier Detail Inspection Modal */}
-            {selectedRegDossier && (
-              <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-                <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 relative shadow-2xl space-y-4">
-                  <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
-                    <div>
-                      <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F] tracking-widest block">
-                        ADVOCATE DOSSIER
-                      </span>
-                      <h4 className="text-xl font-black text-neutral-950 font-dmk-headline">
-                        {selectedRegDossier.fullName}
-                      </h4>
-                    </div>
-                    <button
-                      onClick={() => setSelectedRegDossier(null)}
-                      className="p-1 hover:bg-neutral-100 text-neutral-600 cursor-pointer"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-3 text-xs">
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-[#FAF8F5] border border-neutral-200">
-                      <div>
-                        <span className="text-[10px] text-neutral-500 uppercase block font-bold">Bar Council No.</span>
-                        <strong className="text-sm font-mono text-[#C41A1F]">{selectedRegDossier.barCouncilNumber}</strong>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-neutral-500 uppercase block font-bold">Enrollment Year</span>
-                        <strong className="text-sm font-english">{selectedRegDossier.yearOfEnrollment}</strong>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-neutral-500 uppercase block font-bold">District</span>
-                        <strong className="text-sm">{selectedRegDossier.district}</strong>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-neutral-500 uppercase block font-bold">Court Complex</span>
-                        <strong className="text-sm">{selectedRegDossier.courtOfPractice}</strong>
-                      </div>
-                    </div>
-
-                    <div className="p-3 bg-[#FAF8F5] border border-neutral-200 space-y-1">
-                      <span className="text-[10px] text-neutral-500 uppercase block font-bold">Direct Contact</span>
-                      <div className="flex items-center justify-between text-xs font-mono font-bold">
-                        <span>Phone: {selectedRegDossier.mobileNumber}</span>
-                        <span>Email: {selectedRegDossier.emailAddress}</span>
-                      </div>
-                      {selectedRegDossier.address && (
-                        <p className="text-[11px] text-neutral-600 pt-1">
-                          Chambers: {selectedRegDossier.address}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] text-neutral-500 uppercase block font-bold mb-1">Areas of Practice</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {selectedRegDossier.areasOfSpecialization?.map((s, i) => (
-                          <span key={i} className="px-2 py-0.5 bg-neutral-100 border border-neutral-300 text-xs">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-neutral-200">
-                    <span className="text-xs font-mono">Status: <strong>{selectedRegDossier.status}</strong></span>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          updateRegistrationStatus(selectedRegDossier.id, 'verified');
-                          setSelectedRegDossier(null);
-                        }}
-                        className="px-3 py-1.5 bg-[#111111] hover:bg-[#E31E24] text-white text-xs font-bold uppercase tracking-wider rounded-[2px]"
-                      >
-                        Verify Bar
-                      </button>
-                      <button
-                        onClick={() => {
-                          updateRegistrationStatus(selectedRegDossier.id, 'approved');
-                          setSelectedRegDossier(null);
-                        }}
-                        className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase tracking-wider"
-                      >
-                        Approve Cadre
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 3: CITIZEN LEGAL AID INQUIRIES                             */}
-        {/* ============================================================== */}
-        {activeTab === 'enquiries' && (
-          <div className="space-y-6">
-            
-            <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
-                  PUBLIC DEFENSE DESK
-                </span>
-                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
-                  Citizen Legal Grievance Inquiries ({filteredEnquiries.length})
-                </h3>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5">
-                <div className="relative w-full sm:w-64">
-                  <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={enqSearchQuery}
-                    onChange={(e) => setEnqSearchQuery(e.target.value)}
-                    placeholder="Search citizen, district, subject..."
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 pl-8 pr-3 py-1.5 text-xs text-neutral-900 font-english placeholder-neutral-500 focus:outline-none focus:border-black focus:bg-white"
+                    className="w-full pl-9 pr-3 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none"
                   />
                 </div>
 
                 <select
-                  value={enqCategoryFilter}
-                  onChange={(e) => setEnqCategoryFilter(e.target.value)}
-                  className="bg-[#FAF8F5] border border-neutral-300 px-3 py-1.5 text-xs font-english focus:outline-none"
+                  value={regStatusFilter}
+                  onChange={(e) => setRegStatusFilter(e.target.value as any)}
+                  className="px-2.5 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none cursor-pointer"
                 >
-                  <option value="all">All Categories</option>
-                  <option value="Legal Aid">Free Legal Aid</option>
-                  <option value="General Query">General Inquiry</option>
-                  <option value="High Court Wing">High Court Wing</option>
-                  <option value="Press / Media">Press / Media</option>
+                  <option value="all">All Verification Stages</option>
+                  <option value="pending">Pending Review</option>
+                  <option value="verified">Verified</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
                 </select>
               </div>
+
+              <span className="text-xs text-[#5B5348]">
+                Showing {filteredRegistrations.length} applications
+              </span>
             </div>
 
-            {filteredEnquiries.length === 0 ? (
-              <div className="p-16 text-center bg-white border border-neutral-300 space-y-2">
-                <Eye className="w-10 h-10 text-neutral-400 mx-auto" />
-                <h4 className="text-base font-bold text-neutral-900 font-dmk-headline uppercase">
-                  No Citizen Inquiries Recorded
-                </h4>
-                <p className="text-xs text-neutral-600 max-w-md mx-auto font-dmk-body">
-                  Public grievance requests submitted via the `/contact#inquiry` pro-bono assistance desk will arrive here.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredEnquiries.map((enq) => (
-                  <article
-                    key={enq.id}
-                    className="bg-white border border-neutral-300 p-5 flex flex-col justify-between space-y-4 shadow-2xs hover:border-black transition-colors"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between text-xs pb-2 border-b border-neutral-200 mb-2.5">
-                        <span className="font-english font-bold uppercase tracking-wider text-[#C41A1F]">
-                          {enq.category}
-                        </span>
-                        <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase border rounded-[2px] ${
-                          enq.status === 'resolved'
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                            : 'bg-[#FAF8F5] text-[#5B5348] border-[#D8D3CB]'
-                        }`}>
-                          {enq.status}
-                        </span>
-                      </div>
-
-                      <h4 className="text-base font-black text-neutral-950 font-dmk-headline">
-                        {enq.subject}
-                      </h4>
-                      <p className="text-xs text-neutral-700 leading-relaxed font-dmk-body mt-2">
-                        {enq.message}
-                      </p>
-                    </div>
-
-                    <div className="pt-3 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                      <div>
-                        <strong className="block text-neutral-900">{enq.name} ({enq.district})</strong>
-                        <a href={`tel:${enq.phone}`} className="font-mono text-neutral-600 hover:text-[#C41A1F] font-bold">
-                          {enq.phone}
-                        </a>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {enq.status !== 'resolved' && (
-                          <button
-                            onClick={() => updateEnquiryStatus(enq.id, 'resolved')}
-                            className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
-                          >
-                            Mark Resolved
-                          </button>
-                        )}
-                        {enq.status === 'new' && (
-                          <button
-                            onClick={() => updateEnquiryStatus(enq.id, 'reviewed')}
-                            className="px-3 py-1 bg-[#111111] hover:bg-[#E31E24] text-white text-[11px] font-bold uppercase tracking-wider cursor-pointer rounded-[2px]"
-                          >
-                            Mark Reviewed
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 4: EDITORIAL NEWSROOM MANAGER                              */}
-        {/* ============================================================== */}
-        {activeTab === 'news' && (
-          <div className="space-y-6">
-            
-            <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
-                  OFFICIAL PRESS BUREAU
-                </span>
-                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
-                  Editorial Newsroom & Statements ({filteredNews.length})
-                </h3>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5">
-                <button
-                  onClick={() => setShowAddNewsModal(true)}
-                  className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Publish New Story</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Articles Table */}
-            <div className="bg-white border border-neutral-300 overflow-hidden shadow-xs">
+            <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-neutral-800 font-dmk-body">
-                  <thead className="bg-[#FAF8F5] text-neutral-700 uppercase font-english text-[11px] font-bold border-b border-neutral-300 tracking-wider">
-                    <tr>
-                      <th className="p-3.5">Headline & Summary</th>
-                      <th className="p-3.5">Category</th>
-                      <th className="p-3.5">Date Stamp</th>
-                      <th className="p-3.5">Lead Story Status</th>
-                      <th className="p-3.5 text-right">Actions</th>
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#111111] text-white font-mono uppercase tracking-wider">
+                      <th className="py-2.5 px-3">Tracking ID</th>
+                      <th className="py-2.5 px-3">Advocate Name</th>
+                      <th className="py-2.5 px-3">Bar Council No</th>
+                      <th className="py-2.5 px-3">District</th>
+                      <th className="py-2.5 px-3">Phone</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-200">
-                    {filteredNews.map((item) => (
-                      <tr key={item.id} className="hover:bg-[#FAF8F5] transition-colors">
-                        <td className="p-3.5 max-w-md">
-                          <div className="flex items-center gap-2">
-                            {(item.isLeadStory || item.featured) && (
-                              <span className="px-2 py-0.2 bg-[#E31E24] text-white text-[9px] font-bold uppercase font-english">
-                                LEAD
-                              </span>
-                            )}
-                            <strong className="text-sm text-neutral-950 font-bold block">{item.title[language]}</strong>
-                          </div>
-                          <p className="text-[11px] text-neutral-600 line-clamp-2 mt-1">{item.summary[language]}</p>
-                        </td>
-                        <td className="p-3.5">
-                          <span className="font-mono text-xs font-bold text-neutral-700 bg-neutral-100 px-2 py-0.5 border border-neutral-200">
-                            {item.category}
-                          </span>
-                        </td>
-                        <td className="p-3.5 font-mono text-[11px] text-neutral-600">
-                          {item.date}
-                        </td>
-                        <td className="p-3.5">
-                          {item.isLeadStory || item.featured ? (
-                            <span className="text-xs font-bold text-[#C41A1F] flex items-center gap-1">
-                              <Star className="w-3.5 h-3.5 fill-current" />
-                              <span>Active Front-Page Lead</span>
-                            </span>
-                          ) : (
-                            <button
-                              onClick={() => setLeadStory(item.id)}
-                              className="text-[11px] font-english font-bold uppercase tracking-wider text-neutral-600 hover:text-[#C41A1F] hover:underline cursor-pointer"
-                            >
-                              Set as Front-Page Lead &rarr;
-                            </button>
-                          )}
-                        </td>
-                        <td className="p-3.5 text-right space-x-2">
-                          <button
-                            onClick={() => deleteNews(item.id)}
-                            className="p-1.5 text-neutral-500 hover:text-[#C41A1F] hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors cursor-pointer"
-                            title="Delete article"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                  <tbody className="divide-y divide-[#D8D3CB] font-sans">
+                    {filteredRegistrations.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-[#5B5348] font-mono">
+                          No advocate registrations match current criteria.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      filteredRegistrations.map((reg) => (
+                        <tr key={reg.id} className="hover:bg-[#FAF8F5] transition-colors">
+                          <td className="py-2.5 px-3 font-mono font-bold text-[#C41A1F] whitespace-nowrap">
+                            {reg.id}
+                          </td>
+                          <td className="py-2.5 px-3 font-bold text-[#111111] whitespace-nowrap">
+                            {reg.fullName}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-[#5B5348] whitespace-nowrap">
+                            {reg.barCouncilNumber}
+                          </td>
+                          <td className="py-2.5 px-3 text-[#5B5348] whitespace-nowrap">
+                            {reg.district}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono whitespace-nowrap">
+                            {reg.mobileNumber}
+                          </td>
+                          <td className="py-2.5 px-3 whitespace-nowrap">
+                            <span className={`px-2 py-0.5 rounded-[2px] font-mono text-[10px] font-bold uppercase border ${
+                              reg.status === 'approved' ? 'bg-green-50 text-green-800 border-green-200' :
+                              reg.status === 'verified' ? 'bg-blue-50 text-blue-800 border-blue-200' :
+                              reg.status === 'rejected' ? 'bg-red-50 text-red-800 border-red-200' :
+                              'bg-amber-50 text-amber-800 border-amber-200'
+                            }`}>
+                              {reg.status}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-right whitespace-nowrap font-mono">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => setSelectedRegDossier(reg)}
+                                className="px-2 py-1 text-xs text-[#111111] hover:text-[#C41A1F] underline cursor-pointer"
+                              >
+                                Review Dossier
+                              </button>
+                              <button
+                                onClick={() => handleDeleteRegistration(reg.id)}
+                                className="p-1 text-neutral-400 hover:text-[#C41A1F] cursor-pointer"
+                                title="Delete record"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1244,818 +1323,1056 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ============================================================== */}
-        {/* TAB 5: 74 DISTRICT CADRE DIRECTORY                            */}
-        {/* ============================================================== */}
-        {activeTab === 'districts' && (
-          <div className="space-y-6">
+        {/* ------------------------------------------------------------------- */}
+        {/* TAB 4: CITIZEN ENQUIRIES (Compact Table) */}
+        {/* ------------------------------------------------------------------- */}
+        {activeTab === 'enquiries' && (
+          <div className="space-y-4">
             
-            <div className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
-                  GRASSROOTS UNITS
-                </span>
-                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
-                  Official 74 District Legal Secretariats
-                </h3>
+            <div className="bg-white border-2 border-[#111111] p-4 rounded-[2px] flex flex-col md:flex-row md:items-center justify-between gap-3 font-mono text-xs">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative w-64">
+                  <Search className="w-3.5 h-3.5 text-[#5B5348] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={enqSearchQuery}
+                    onChange={(e) => setEnqSearchQuery(e.target.value)}
+                    placeholder="Search citizen or query..."
+                    className="w-full pl-9 pr-3 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none"
+                  />
+                </div>
+
+                <select
+                  value={enqStatusFilter}
+                  onChange={(e) => setEnqStatusFilter(e.target.value)}
+                  className="px-2.5 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none cursor-pointer"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="new">New</option>
+                  <option value="reviewed">In Progress (Reviewed)</option>
+                  <option value="resolved">Resolved</option>
+                </select>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5">
-                <div className="relative w-full sm:w-64">
-                  <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <span className="text-xs text-[#5B5348]">
+                Showing {filteredEnquiries.length} grievances
+              </span>
+            </div>
+
+            <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#111111] text-white font-mono uppercase tracking-wider">
+                      <th className="py-2.5 px-3">Tracking ID</th>
+                      <th className="py-2.5 px-3">Applicant Name</th>
+                      <th className="py-2.5 px-3">Phone</th>
+                      <th className="py-2.5 px-3">District</th>
+                      <th className="py-2.5 px-3">Category</th>
+                      <th className="py-2.5 px-3">Matter Details</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#D8D3CB] font-sans">
+                    {filteredEnquiries.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="p-8 text-center text-[#5B5348] font-mono">
+                          No citizen grievance enquiries match current filters.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredEnquiries.map((enq) => (
+                        <tr key={enq.id} className="hover:bg-[#FAF8F5] transition-colors">
+                          <td className="py-2.5 px-3 font-mono font-bold text-[#C41A1F] whitespace-nowrap">
+                            {enq.id}
+                          </td>
+                          <td className="py-2.5 px-3 font-bold text-[#111111] whitespace-nowrap">
+                            {enq.name}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono whitespace-nowrap">
+                            {enq.phone}
+                          </td>
+                          <td className="py-2.5 px-3 text-[#5B5348] whitespace-nowrap">
+                            {enq.district}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-[#5B5348] whitespace-nowrap">
+                            {enq.category}
+                          </td>
+                          <td className="py-2.5 px-3 max-w-xs truncate">
+                            <span className="font-bold text-[#111111]">{enq.subject}: </span>
+                            <span className="text-[#5B5348]">{enq.message}</span>
+                          </td>
+                          <td className="py-2.5 px-3 whitespace-nowrap">
+                            <select
+                              value={enq.status}
+                              onChange={(e) => handleUpdateEnqStatus(enq.id, e.target.value as any)}
+                              className="px-2 py-1 text-[11px] font-mono font-bold rounded-[2px] border border-[#D8D3CB] bg-[#FAF8F5] outline-none cursor-pointer"
+                            >
+                              <option value="new">New</option>
+                              <option value="reviewed">In Progress</option>
+                              <option value="resolved">Resolved</option>
+                            </select>
+                          </td>
+                          <td className="py-2.5 px-3 text-right whitespace-nowrap font-mono">
+                            <button
+                              onClick={() => handleDeleteEnquiry(enq.id)}
+                              className="p-1 text-neutral-400 hover:text-[#C41A1F] cursor-pointer"
+                              title="Delete enquiry"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------------- */}
+        {/* TAB 5: DISTRICTS (Compact List, Phone Privacy Toggle) */}
+        {/* ------------------------------------------------------------------- */}
+        {activeTab === 'districts' && (
+          <div className="space-y-4">
+            
+            <div className="bg-white border-2 border-[#111111] p-4 rounded-[2px] flex flex-col md:flex-row md:items-center justify-between gap-3 font-mono text-xs">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative w-64">
+                  <Search className="w-3.5 h-3.5 text-[#5B5348] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={districtSearchQuery}
                     onChange={(e) => setDistrictSearchQuery(e.target.value)}
-                    placeholder="Search district, organizer, phone..."
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 pl-8 pr-3 py-1.5 text-xs text-neutral-900 font-english placeholder-neutral-500 focus:outline-none focus:border-black focus:bg-white"
+                    placeholder="Search district or organizer..."
+                    className="w-full pl-9 pr-3 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none"
                   />
                 </div>
 
-                <div className="flex items-center border border-neutral-300 bg-[#FAF8F5] p-0.5 text-xs font-english">
-                  {['All', 'Chennai', 'North', 'West', 'Central', 'South'].map((z) => (
-                    <button
-                      key={z}
-                      onClick={() => setDistrictZoneFilter(z)}
-                      className={`px-2.5 py-1 text-[11px] font-bold uppercase transition-colors cursor-pointer ${
-                        districtZoneFilter === z ? 'bg-[#E31E24] text-white' : 'text-neutral-700 hover:text-black'
-                      }`}
-                    >
-                      {z}
-                    </button>
-                  ))}
-                </div>
+                <select
+                  value={districtZoneFilter}
+                  onChange={(e) => setDistrictZoneFilter(e.target.value)}
+                  className="px-2.5 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none cursor-pointer"
+                >
+                  <option value="All">All Zones</option>
+                  <option value="North">North Zone</option>
+                  <option value="South">South Zone</option>
+                  <option value="West">West Zone</option>
+                  <option value="Central">Central Zone</option>
+                  <option value="Chennai">Chennai Zone</option>
+                </select>
               </div>
+
+              <span className="text-xs text-[#5B5348]">
+                {filteredDistricts.length} units listed
+              </span>
             </div>
 
-            <div className="bg-white border border-neutral-300 overflow-hidden shadow-xs">
+            <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-neutral-800 font-dmk-body">
-                  <thead className="bg-[#FAF8F5] text-neutral-700 uppercase font-english text-[11px] font-bold border-b border-neutral-300 tracking-wider">
-                    <tr>
-                      <th className="p-3.5">No.</th>
-                      <th className="p-3.5">District Unit</th>
-                      <th className="p-3.5">Zone</th>
-                      <th className="p-3.5">District Organizer</th>
-                      <th className="p-3.5">Direct Contact</th>
-                      <th className="p-3.5">Phone Privacy</th>
-                      <th className="p-3.5">Court Complex</th>
-                      <th className="p-3.5 text-right">Cadre Strength</th>
-                      <th className="p-3.5 text-center">Actions</th>
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#111111] text-white font-mono uppercase tracking-wider">
+                      <th className="py-2.5 px-3">No</th>
+                      <th className="py-2.5 px-3">Party District</th>
+                      <th className="py-2.5 px-3">Zone</th>
+                      <th className="py-2.5 px-3">Designated Organizer</th>
+                      <th className="py-2.5 px-3">Phone Line</th>
+                      <th className="py-2.5 px-3">Public Phone Visibility</th>
+                      <th className="py-2.5 px-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-200">
-                    {filteredDistricts.map((d) => (
-                      <tr key={d.id} className="hover:bg-[#FAF8F5] transition-colors">
-                        <td className="p-3.5 font-mono font-bold text-[#C41A1F]">
-                          #{d.number || '-'}
-                        </td>
-                        <td className="p-3.5">
-                          <strong className="text-sm font-bold text-neutral-950 block">{d.name[language]}</strong>
-                          <span className="text-[11px] text-neutral-500">{d.headquarters[language]}</span>
-                        </td>
-                        <td className="p-3.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider bg-neutral-100 text-neutral-800 px-2 py-0.5 border border-neutral-200">
+                  <tbody className="divide-y divide-[#D8D3CB] font-sans">
+                    {filteredDistricts.map((d) => {
+                      const isPublic = d.showPhonePublicly !== false;
+                      return (
+                        <tr key={d.id} className="hover:bg-[#FAF8F5] transition-colors">
+                          <td className="py-2.5 px-3 font-mono text-[#5B5348]">
+                            {d.number || d.id}
+                          </td>
+                          <td className="py-2.5 px-3 font-bold text-[#111111]">
+                            {d.name.en}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-[#5B5348]">
                             {d.zone}
-                          </span>
-                        </td>
-                        <td className="p-3.5">
-                          <strong className="text-xs font-bold text-neutral-900 block">{d.organizer[language]}</strong>
-                          <span className="text-[10px] text-neutral-500">DMK Legal Wing In-Charge</span>
-                        </td>
-                        <td className="p-3.5 font-english">
-                          <a href={`tel:${d.contactPhone}`} className="text-xs font-bold text-neutral-900 hover:text-[#C41A1F] block">
+                          </td>
+                          <td className="py-2.5 px-3 text-[#111111]">
+                            {d.organizer.en}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-[#5B5348]">
                             {d.contactPhone}
-                          </a>
-                          <span className="text-[10px] text-neutral-500 block truncate max-w-[150px]">{d.contactEmail}</span>
-                        </td>
-                        <td className="p-3.5">
-                          <button
-                            type="button"
-                            onClick={() => updateDistrictPhonePrivacy(d.id, d.showPhonePublicly === false ? true : false)}
-                            className={`min-h-[44px] px-3 py-1.5 text-xs font-bold font-dmk-body rounded-[2px] transition-colors cursor-pointer border ${
-                              d.showPhonePublicly !== false
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-                                : 'bg-neutral-900 text-white border-neutral-900 hover:bg-neutral-800'
-                            }`}
-                            title="Click to toggle phone privacy"
-                          >
-                            {d.showPhonePublicly !== false ? 'Public (Visible)' : 'Hidden (Private)'}
-                          </button>
-                        </td>
-                        <td className="p-3.5 text-neutral-700 text-[11px] max-w-xs">
-                          {d.courtComplex[language]}
-                        </td>
-                        <td className="p-3.5 text-right font-mono font-bold text-neutral-900">
-                          {d.memberCount}+
-                        </td>
-                        <td className="p-3.5 text-center">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingDistrict(d);
-                              setEditPhonePublicly(d.showPhonePublicly !== false);
-                            }}
-                            className="min-h-[44px] px-3 py-1.5 text-xs font-dmk-body font-bold text-[#111111] hover:text-[#C41A1F] underline underline-offset-4 cursor-pointer"
-                          >
-                            Edit
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono">
+                            <span className={`px-2 py-0.5 rounded-[2px] text-[10px] font-bold uppercase border ${
+                              isPublic 
+                                ? 'bg-green-50 text-green-800 border-green-200' 
+                                : 'bg-amber-50 text-amber-800 border-amber-200'
+                            }`}>
+                              {isPublic ? 'Publicly Visible' : 'State Secretariat Routing'}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono">
+                            <button
+                              onClick={() => {
+                                setEditingDistrict(d);
+                                setEditPhonePublicly(d.showPhonePublicly !== false);
+                              }}
+                              className="px-2.5 py-1 text-xs text-[#111111] hover:text-[#C41A1F] underline cursor-pointer"
+                            >
+                              Edit Privacy
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             </div>
 
-            {/* DISTRICT PRIVACY & DETAILS EDITOR MODAL */}
-            {editingDistrict && (
-              <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-xs">
-                <div className="bg-white max-w-lg w-full border-2 border-neutral-900 p-6 sm:p-8 shadow-2xl relative font-dmk-body rounded-[2px] space-y-6">
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------------- */}
+        {/* TAB 6: ACTIVITY AUDIT LOG (data/db/audit.json Viewer) */}
+        {/* ------------------------------------------------------------------- */}
+        {activeTab === 'audit' && (
+          <div className="space-y-4">
+            
+            <div className="bg-white border-2 border-[#111111] p-4 rounded-[2px] flex flex-col md:flex-row md:items-center justify-between gap-3 font-mono text-xs">
+              <div className="flex items-center gap-3">
+                <div className="relative w-72">
+                  <Search className="w-3.5 h-3.5 text-[#5B5348] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={auditSearchQuery}
+                    onChange={(e) => setAuditSearchQuery(e.target.value)}
+                    placeholder="Search who or action..."
+                    className="w-full pl-9 pr-3 py-1.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none"
+                  />
+                </div>
+
+                <button
+                  onClick={fetchAuditLogs}
+                  disabled={auditLoading}
+                  className="min-h-[44px] px-3.5 py-1 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] rounded-[2px] flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} />
+                  <span>Refresh Log</span>
+                </button>
+              </div>
+
+              <div className="text-[#5B5348]">
+                <span>Storage: </span>
+                <code className="text-[#111111] font-bold">data/db/audit.json</code>
+                <span className="ml-2">({filteredAuditLogs.length} entries)</span>
+              </div>
+            </div>
+
+            <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#111111] text-white font-mono uppercase tracking-wider">
+                      <th className="py-2.5 px-3">When (Timestamp)</th>
+                      <th className="py-2.5 px-3">Who (Operator)</th>
+                      <th className="py-2.5 px-3">Role</th>
+                      <th className="py-2.5 px-3">What (Action Description)</th>
+                      <th className="py-2.5 px-3">Log ID</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#D8D3CB] font-mono">
+                    {filteredAuditLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-8 text-center text-[#5B5348]">
+                          {auditLoading ? 'Reading atomic audit log records...' : 'No activity logs found.'}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredAuditLogs.map((log) => (
+                        <tr key={log.id} className="hover:bg-[#FAF8F5] transition-colors">
+                          <td className="py-2.5 px-3 whitespace-nowrap text-[#5B5348]">
+                            {new Date(log.when).toLocaleString()}
+                          </td>
+                          <td className="py-2.5 px-3 font-bold text-[#111111] whitespace-nowrap">
+                            {log.who}
+                          </td>
+                          <td className="py-2.5 px-3 whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded-[2px] text-[10px] uppercase font-bold border border-[#D8D3CB] bg-[#FAF8F5]">
+                              {log.role}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 font-sans text-xs text-[#111111]">
+                            {log.what}
+                          </td>
+                          <td className="py-2.5 px-3 text-[#5B5348] text-[10px] whitespace-nowrap">
+                            {log.id}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------------- */}
+        {/* TAB 7: GALLERY / EVENTS / RESOURCES MODULES */}
+        {/* ------------------------------------------------------------------- */}
+        {activeTab === 'gallery' && (
+          <div className="space-y-4">
+            <div className="bg-white border-2 border-[#111111] p-4 rounded-[2px] flex items-center justify-between font-mono text-xs">
+              <span className="font-bold text-[#111111]">Press Gallery ({gallery.length} photos)</span>
+              <button
+                onClick={() => setShowAddGalleryModal(true)}
+                className="min-h-[44px] px-4 py-2 bg-[#E31E24] hover:bg-[#111111] text-white font-bold uppercase tracking-wider rounded-[2px] flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Photo</span>
+              </button>
+            </div>
+            <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#111111] text-white font-mono uppercase">
+                    <th className="py-2.5 px-3">Title</th>
+                    <th className="py-2.5 px-3">Category</th>
+                    <th className="py-2.5 px-3">Location</th>
+                    <th className="py-2.5 px-3">Date</th>
+                    <th className="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#D8D3CB]">
+                  {gallery.map((g) => (
+                    <tr key={g.id} className="hover:bg-[#FAF8F5]">
+                      <td className="py-2 px-3 font-bold">{g.title.en}</td>
+                      <td className="py-2 px-3 font-mono">{g.category}</td>
+                      <td className="py-2 px-3">{g.location.en}</td>
+                      <td className="py-2 px-3 font-mono">{g.date}</td>
+                      <td className="py-2 px-3 text-right">
+                        <button onClick={() => handleDeleteGallery(g.id)} className="p-1 hover:text-[#C41A1F]">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'events' && (
+          <div className="space-y-4">
+            <div className="bg-white border-2 border-[#111111] p-4 rounded-[2px] flex items-center justify-between font-mono text-xs">
+              <span className="font-bold text-[#111111]">Court Hearings & Docket ({events.length} hearings)</span>
+              <button
+                onClick={() => setShowAddEventModal(true)}
+                className="min-h-[44px] px-4 py-2 bg-[#E31E24] hover:bg-[#111111] text-white font-bold uppercase tracking-wider rounded-[2px] flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Hearing</span>
+              </button>
+            </div>
+            <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#111111] text-white font-mono uppercase">
+                    <th className="py-2.5 px-3">Hearing / Event Title</th>
+                    <th className="py-2.5 px-3">Category</th>
+                    <th className="py-2.5 px-3">Court / Venue</th>
+                    <th className="py-2.5 px-3">Date</th>
+                    <th className="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#D8D3CB]">
+                  {events.map((e) => (
+                    <tr key={e.id} className="hover:bg-[#FAF8F5]">
+                      <td className="py-2 px-3 font-bold">{e.title.en}</td>
+                      <td className="py-2 px-3 font-mono">{e.category}</td>
+                      <td className="py-2 px-3">{e.venue.en}</td>
+                      <td className="py-2 px-3 font-mono">{e.date}</td>
+                      <td className="py-2 px-3 text-right">
+                        <button onClick={() => handleDeleteEvent(e.id)} className="p-1 hover:text-[#C41A1F]">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'resources' && (
+          <div className="space-y-4">
+            <div className="bg-white border-2 border-[#111111] p-4 rounded-[2px] flex items-center justify-between font-mono text-xs">
+              <span className="font-bold text-[#111111]">Legal Repository Compendiums ({resources.length} volumes)</span>
+              <button
+                onClick={() => setShowAddResourceModal(true)}
+                className="min-h-[44px] px-4 py-2 bg-[#E31E24] hover:bg-[#111111] text-white font-bold uppercase tracking-wider rounded-[2px] flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Upload Volume</span>
+              </button>
+            </div>
+            <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#111111] text-white font-mono uppercase">
+                    <th className="py-2.5 px-3">Volume Title</th>
+                    <th className="py-2.5 px-3">Category</th>
+                    <th className="py-2.5 px-3">Court / Authority</th>
+                    <th className="py-2.5 px-3">File Size</th>
+                    <th className="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#D8D3CB]">
+                  {resources.map((r) => (
+                    <tr key={r.id} className="hover:bg-[#FAF8F5]">
+                      <td className="py-2 px-3 font-bold">{r.title.en}</td>
+                      <td className="py-2 px-3 font-mono">{r.category}</td>
+                      <td className="py-2 px-3">{r.court || 'Constitutional Repository'}</td>
+                      <td className="py-2 px-3 font-mono">{r.fileSize}</td>
+                      <td className="py-2 px-3 text-right">
+                        <button onClick={() => handleDeleteResource(r.id)} className="p-1 hover:text-[#C41A1F]">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* --------------------------------------------------------------------- */}
+      {/* ADVANCED NEWS EDITOR MODAL (Side-by-side, Status, Crop, Live Lead Preview) */}
+      {/* --------------------------------------------------------------------- */}
+      {showNewsEditor && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-[#FAF8F5] border-2 border-[#111111] max-w-5xl w-full p-6 sm:p-8 rounded-[2px] shadow-2xl relative my-auto max-h-[92vh] overflow-y-auto font-sans space-y-6">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-4">
+              <div>
+                <span className="text-[11px] font-mono font-bold text-[#C41A1F] uppercase tracking-wider block">
+                  NEWSROOM DISPATCH DESK • {newsEditMode === 'create' ? 'NEW PUBLICATION' : 'EDIT STORY'}
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
+                  {newsEditMode === 'create' ? 'Compose News Story & Set Publication Controls' : 'Edit Story & Layout Controls'}
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowNewsEditor(false)}
+                className="p-2 border border-[#111111] hover:bg-[#E31E24] hover:text-white rounded-[2px] cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveNews} className="space-y-6">
+              
+              {/* 1. Publication Status & Schedule Controls */}
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px] space-y-4">
+                <span className="text-xs font-mono font-bold text-[#111111] uppercase tracking-wider block">
+                  1. Publication Status & Release Cadence
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Status Selector */}
+                  <div>
+                    <label className="text-xs font-bold text-[#111111] block mb-1">
+                      Publication Status
+                    </label>
+                    <select
+                      value={editorStatus}
+                      onChange={(e) => setEditorStatus(e.target.value as any)}
+                      className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5] text-xs font-mono font-bold rounded-[2px] outline-none cursor-pointer"
+                    >
+                      <option value="Published">Published (Public immediately upon date)</option>
+                      <option value="Scheduled">Scheduled (Auto-publish at release time)</option>
+                      <option value="Draft">Draft (Internal editorial work only)</option>
+                    </select>
+                  </div>
+
+                  {/* Publish Date */}
+                  <div>
+                    <label className="text-xs font-bold text-[#111111] block mb-1">
+                      Release Date
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={editorPublishDate}
+                      onChange={(e) => setEditorPublishDate(e.target.value)}
+                      className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5] text-xs font-mono rounded-[2px] outline-none"
+                    />
+                  </div>
+
+                  {/* Publish Time */}
+                  <div>
+                    <label className="text-xs font-bold text-[#111111] block mb-1">
+                      Release Time (IST)
+                    </label>
+                    <input
+                      type="time"
+                      value={editorPublishTime}
+                      onChange={(e) => setEditorPublishTime(e.target.value)}
+                      className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5] text-xs font-mono rounded-[2px] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-6 pt-2 border-t border-[#D8D3CB]">
+                  {/* Lead Hero Checkbox */}
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold">
+                    <input
+                      type="checkbox"
+                      checked={editorIsLead}
+                      onChange={(e) => setEditorIsLead(e.target.checked)}
+                      className="w-4 h-4 accent-[#E31E24]"
+                    />
+                    <span>Designate as Home Page Lead Story (60% hero position)</span>
+                  </label>
+
+                  {/* Category */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold">Category Tag:</span>
+                    <select
+                      value={editorCategory}
+                      onChange={(e) => setEditorCategory(e.target.value as any)}
+                      className="px-2 py-1 border border-[#D8D3CB] bg-[#FAF8F5] text-xs font-mono rounded-[2px] outline-none cursor-pointer"
+                    >
+                      <option value="Press Release">Press Release</option>
+                      <option value="Statement">Statement</option>
+                      <option value="Court Watch">Court Watch</option>
+                      <option value="Resolution">Resolution</option>
+                      <option value="Gazette">Gazette</option>
+                      <option value="Media">Media</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Side-by-Side Tamil and English Fields */}
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px] space-y-4">
+                <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-2">
+                  <span className="text-xs font-mono font-bold text-[#111111] uppercase tracking-wider">
+                    2. Bilingual Editorial Content (English & Tamil Side by Side)
+                  </span>
+                  <span className="text-[11px] text-[#5B5348]">Tamil fields render without uppercase or letter-spacing</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
-                  <div className="flex items-start justify-between border-b border-neutral-300 pb-3">
-                    <div>
-                      <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F] tracking-widest block">
-                        DISTRICT CADRE EDITOR
-                      </span>
-                      <h3 className="text-xl font-black text-neutral-950 font-dmk-headline">
-                        {editingDistrict.name.en} ({editingDistrict.name.ta})
-                      </h3>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setEditingDistrict(null)}
-                      className="p-1 text-neutral-500 hover:text-black cursor-pointer"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-4 text-xs font-dmk-body text-neutral-800">
-                    <div>
-                      <span className="block text-neutral-500 text-[11px] mb-0.5">District Organizer</span>
-                      <p className="font-bold text-sm text-neutral-900">
-                        {editingDistrict.organizer.en} / {editingDistrict.organizer.ta}
-                      </p>
+                  {/* Left Column: English */}
+                  <div className="space-y-4 border-r border-[#D8D3CB] md:pr-4">
+                    <div className="flex items-center gap-1.5 text-xs font-bold font-mono text-[#C41A1F] uppercase">
+                      <span>English Text Version</span>
                     </div>
 
                     <div>
-                      <span className="block text-neutral-500 text-[11px] mb-0.5">Contact Phone</span>
-                      <p className="font-mono font-bold text-sm text-neutral-900">
-                        {editingDistrict.contactPhone}
-                      </p>
+                      <label className="text-xs font-bold block mb-1">Headline (English) *</label>
+                      <input
+                        type="text"
+                        required
+                        value={editorTitleEn}
+                        onChange={(e) => setEditorTitleEn(e.target.value)}
+                        placeholder="Supreme Court Upholds State Policy..."
+                        className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none font-serif"
+                      />
                     </div>
 
-                    {/* PRIVACY TOGGLE: showPhonePublicly */}
-                    <div className="p-4 bg-[#FAF8F5] border border-neutral-300 rounded-[2px] space-y-2">
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editPhonePublicly}
-                          onChange={(e) => setEditPhonePublicly(e.target.checked)}
-                          className="w-4 h-4 accent-[#E31E24] cursor-pointer"
-                        />
-                        <span className="font-bold text-sm text-neutral-900">
-                          Show Phone Publicly on Website
-                        </span>
-                      </label>
-                      <p className="text-xs text-[#5B5348] pl-7 leading-relaxed">
-                        When disabled (unchecked), the phone number is hidden from the public district directory and map, and <strong>&ldquo;Contact through the State Secretariat&rdquo;</strong> is shown instead.
-                      </p>
+                    <div>
+                      <label className="text-xs font-bold block mb-1">Two-line Summary (English) *</label>
+                      <textarea
+                        rows={2}
+                        value={editorSummaryEn}
+                        onChange={(e) => setEditorSummaryEn(e.target.value)}
+                        placeholder="Brief two-line summary of the legal statement or ruling..."
+                        className="w-full p-2.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none"
+                      />
                     </div>
 
-                    <div className="text-[11px] text-neutral-500">
-                      Zone: <strong>{editingDistrict.zone}</strong> • Court Complex: {editingDistrict.courtComplex.en}
+                    <div>
+                      <label className="text-xs font-bold block mb-1">Full Statement Content (English)</label>
+                      <textarea
+                        rows={6}
+                        value={editorContentEn}
+                        onChange={(e) => setEditorContentEn(e.target.value)}
+                        placeholder="Complete paragraphs of the press dispatch..."
+                        className="w-full p-2.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none leading-relaxed font-serif"
+                      />
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-neutral-300 flex items-center justify-end gap-3">
+                  {/* Right Column: Tamil */}
+                  <div className="space-y-4 md:pl-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold font-mono text-[#C41A1F] uppercase">
+                      <span>தமிழ் பதிப்பு (Tamil Version)</span>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold block mb-1 font-dmk-body">தலைப்பு (தமிழ்)</label>
+                      <input
+                        type="text"
+                        value={editorTitleTa}
+                        onChange={(e) => setEditorTitleTa(e.target.value)}
+                        placeholder="உச்ச நீதிமன்றத்தில் மாநில அரசின் சட்டப் போராட்டம் வெற்றி..."
+                        className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none font-dmk-headline"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold block mb-1 font-dmk-body">இருவரிச் சுருக்கம் (தமிழ்)</label>
+                      <textarea
+                        rows={2}
+                        value={editorSummaryTa}
+                        onChange={(e) => setEditorSummaryTa(e.target.value)}
+                        placeholder="அறிக்கை அல்லது தீர்ப்பின் இருவரிச் சுருக்கம்..."
+                        className="w-full p-2.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none font-dmk-body"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold block mb-1 font-dmk-body">முழு அறிக்கை உரை (தமிழ்)</label>
+                      <textarea
+                        rows={6}
+                        value={editorContentTa}
+                        onChange={(e) => setEditorContentTa(e.target.value)}
+                        placeholder="முழுமையான அறிக்கை பத்திகள்..."
+                        className="w-full p-2.5 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none leading-relaxed font-dmk-body"
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* 3. Image Focal Crop & Positioning */}
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px] space-y-4">
+                <span className="text-xs font-mono font-bold text-[#111111] uppercase tracking-wider block">
+                  3. Lead Story Picture & Image Crop Alignment
+                </span>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                  
+                  <div className="space-y-3 font-mono text-xs">
+                    <div>
+                      <label className="font-bold text-[#111111] block mb-1">Image Source Path / URL</label>
+                      <input
+                        type="text"
+                        value={editorImage}
+                        onChange={(e) => setEditorImage(e.target.value)}
+                        className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5] text-xs rounded-[2px] outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-[#111111] block mb-1">Focal Crop Position</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['center', 'top', 'bottom'] as const).map((pos) => (
+                          <button
+                            key={pos}
+                            type="button"
+                            onClick={() => setEditorCropPosition(pos)}
+                            className={`min-h-[44px] px-3 py-1.5 text-xs font-bold uppercase rounded-[2px] border cursor-pointer ${
+                              editorCropPosition === pos
+                                ? 'bg-[#E31E24] text-white border-[#E31E24]'
+                                : 'bg-[#FAF8F5] text-[#111111] border-[#D8D3CB] hover:border-[#111111]'
+                            }`}
+                          >
+                            {pos}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="font-bold text-[#111111]">Crop Zoom Level</label>
+                        <span className="font-bold">{editorCropZoom}x</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="1"
+                        max="1.8"
+                        step="0.05"
+                        value={editorCropZoom}
+                        onChange={(e) => setEditorCropZoom(parseFloat(e.target.value))}
+                        className="w-full accent-[#E31E24]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Crop Aspect Preview Frame */}
+                  <div>
+                    <span className="text-[11px] font-mono font-bold text-[#5B5348] uppercase block mb-1">
+                      Lead Slot 16:9 Aspect Crop Window
+                    </span>
+                    <div className="aspect-video w-full bg-neutral-900 border-2 border-[#111111] overflow-hidden rounded-[2px] relative flex items-center justify-center">
+                      <img
+                        src={editorImage}
+                        alt="Crop target"
+                        className="w-full h-full object-cover transition-all"
+                        style={{
+                          objectPosition: editorCropPosition,
+                          transform: `scale(${editorCropZoom})`
+                        }}
+                      />
+                      <div className="absolute inset-0 border border-white/40 pointer-events-none" />
+                      <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/80 text-white font-mono text-[10px]">
+                        {editorCropPosition} • {editorCropZoom}x
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* 4. Live Lead Position Preview on Home Page */}
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px] space-y-3">
+                <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-2 font-mono text-xs">
+                  <span className="font-bold text-[#111111] uppercase tracking-wider flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-[#C41A1F]" />
+                    Live Preview: How this Story Appears in Home Page Lead Position
+                  </span>
+                  <div className="flex gap-1">
                     <button
                       type="button"
-                      onClick={() => setEditingDistrict(null)}
-                      className="min-h-[44px] px-4 py-2 text-xs font-bold font-dmk-body text-neutral-700 hover:text-black underline underline-offset-4 cursor-pointer"
+                      onClick={() => setActivePreviewTab('en')}
+                      className={`px-2 py-1 text-[11px] rounded-[2px] cursor-pointer ${
+                        activePreviewTab === 'en' ? 'bg-[#111111] text-white font-bold' : 'text-[#5B5348]'
+                      }`}
                     >
-                      Cancel
+                      English Preview
                     </button>
                     <button
                       type="button"
-                      onClick={async () => {
-                        await updateDistrictPhonePrivacy(editingDistrict.id, editPhonePublicly);
-                        setEditingDistrict(null);
+                      onClick={() => setActivePreviewTab('ta')}
+                      className={`px-2 py-1 text-[11px] rounded-[2px] cursor-pointer ${
+                        activePreviewTab === 'ta' ? 'bg-[#111111] text-white font-bold' : 'text-[#5B5348]'
+                      }`}
+                    >
+                      Tamil Preview
+                    </button>
+                  </div>
+                </div>
+
+                {/* Simulated ~60% Lead Card Box */}
+                <div className="bg-[#FAF8F5] border border-[#D8D3CB] p-6 rounded-[2px] max-w-xl mx-auto shadow-sm">
+                  
+                  {/* Photo with caption */}
+                  <div className="aspect-[16/9] w-full overflow-hidden bg-neutral-900 mb-3 border border-[#D8D3CB]">
+                    <img
+                      src={editorImage}
+                      alt="Lead story"
+                      className="w-full h-full object-cover"
+                      style={{
+                        objectPosition: editorCropPosition,
+                        transform: `scale(${editorCropZoom})`
                       }}
-                      className="min-h-[44px] px-6 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
-                    >
-                      Save Privacy Setting
-                    </button>
+                    />
                   </div>
 
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#C41A1F] border border-[#C41A1F] px-1.5 py-0.5">
+                        {editorCategory}
+                      </span>
+                      <span className="text-[11px] font-mono text-[#5B5348]">
+                        {editorPublishDate}
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-black text-[#111111] font-dmk-headline leading-snug">
+                      {activePreviewTab === 'en' 
+                        ? (editorTitleEn || 'Lead story headline preview will appear here...')
+                        : (editorTitleTa || editorTitleEn || 'தலைப்பு முன்னோட்டம் இங்கே தோன்றும்...')}
+                    </h3>
+
+                    <p className="text-xs text-[#5B5348] line-clamp-2 leading-relaxed">
+                      {activePreviewTab === 'en'
+                        ? (editorSummaryEn || 'Two-line executive summary of the legal statement or ruling...')
+                        : (editorSummaryTa || editorSummaryEn || 'அறிக்கையின் இருவரிச் சுருக்கம்...')}
+                    </p>
+
+                    <div className="pt-2">
+                      <span className="text-xs font-bold text-[#E31E24] underline flex items-center gap-1">
+                        <span>{activePreviewTab === 'ta' ? 'முழு அறிக்கையைப் படிக்க' : 'Read the full statement'}</span>
+                        <span>&rarr;</span>
+                      </span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="pt-4 border-t border-[#D8D3CB] flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs">
+                <button
+                  type="button"
+                  onClick={() => setShowNewsEditor(false)}
+                  className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] rounded-[2px] cursor-pointer"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto min-h-[44px] px-8 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-2"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>
+                    {newsEditMode === 'create' ? `Publish / Commit (${editorStatus})` : 'Update Story'}
+                  </span>
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* --------------------------------------------------------------------- */}
+      {/* DISTRICT PHONE PRIVACY MODAL */}
+      {/* --------------------------------------------------------------------- */}
+      {editingDistrict && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-[#111111] max-w-md w-full p-6 rounded-[2px] shadow-2xl space-y-4 font-mono text-xs">
+            <div className="border-b border-[#D8D3CB] pb-3">
+              <span className="text-[10px] font-bold text-[#C41A1F] uppercase block mb-1">
+                SUPER ADMIN DISTRICT CONTROLS
+              </span>
+              <h3 className="text-base font-black text-[#111111]">
+                {editingDistrict.name.en} ({editingDistrict.zone} Zone)
+              </h3>
+            </div>
+
+            <div className="space-y-3 font-sans">
+              <p className="text-xs text-[#5B5348]">
+                Designated Organizer: <strong className="text-[#111111]">{editingDistrict.organizer.en}</strong><br />
+                Direct Telephone: <strong className="font-mono text-[#111111]">{editingDistrict.contactPhone}</strong>
+              </p>
+
+              <div className="p-3 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px] space-y-2">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-xs">
+                  <input
+                    type="checkbox"
+                    checked={editPhonePublicly}
+                    onChange={(e) => setEditPhonePublicly(e.target.checked)}
+                    className="w-4 h-4 accent-[#E31E24]"
+                  />
+                  <span>Show phone publicly on /districts</span>
+                </label>
+                <p className="text-[11px] text-[#5B5348]">
+                  When unchecked, the phone number is hidden from the public table and replaced with &ldquo;Contact through the State Secretariat&rdquo;.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingDistrict(null)}
+                className="px-4 py-2 border border-[#111111] bg-white text-[#111111] rounded-[2px] cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveDistrictPrivacy}
+                className="px-5 py-2 bg-[#E31E24] hover:bg-[#111111] text-white font-bold uppercase rounded-[2px] cursor-pointer"
+              >
+                Save Privacy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --------------------------------------------------------------------- */}
+      {/* ADVOCATE REGISTRATION DOSSIER MODAL */}
+      {/* --------------------------------------------------------------------- */}
+      {selectedRegDossier && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-[#FAF8F5] border-2 border-[#111111] max-w-xl w-full p-6 rounded-[2px] shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            
+            <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-3">
+              <div>
+                <span className="text-[10px] font-mono font-bold text-[#C41A1F] uppercase block">
+                  ADVOCATE MEMBERSHIP DOSSIER • {selectedRegDossier.id}
+                </span>
+                <h3 className="text-lg font-black text-[#111111] font-dmk-headline">
+                  {selectedRegDossier.fullName}
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedRegDossier(null)}
+                className="p-1.5 border border-[#111111] hover:bg-[#E31E24] hover:text-white rounded-[2px] cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+              <div className="p-3 bg-white border border-[#D8D3CB]">
+                <span className="text-[#5B5348] text-[10px] block">BAR COUNCIL NUMBER</span>
+                <span className="font-bold text-[#111111]">{selectedRegDossier.barCouncilNumber}</span>
+              </div>
+              <div className="p-3 bg-white border border-[#D8D3CB]">
+                <span className="text-[#5B5348] text-[10px] block">ENROLMENT YEAR</span>
+                <span className="font-bold text-[#111111]">{selectedRegDossier.yearOfEnrollment}</span>
+              </div>
+              <div className="p-3 bg-white border border-[#D8D3CB]">
+                <span className="text-[#5B5348] text-[10px] block">PARTY DISTRICT</span>
+                <span className="font-bold text-[#111111]">{selectedRegDossier.district}</span>
+              </div>
+              <div className="p-3 bg-white border border-[#D8D3CB]">
+                <span className="text-[#5B5348] text-[10px] block">PRIMARY COURT</span>
+                <span className="font-bold text-[#111111]">{selectedRegDossier.courtOfPractice}</span>
+              </div>
+              <div className="p-3 bg-white border border-[#D8D3CB]">
+                <span className="text-[#5B5348] text-[10px] block">MOBILE LINE</span>
+                <span className="font-bold text-[#111111]">{selectedRegDossier.mobileNumber}</span>
+              </div>
+              <div className="p-3 bg-white border border-[#D8D3CB]">
+                <span className="text-[#5B5348] text-[10px] block">EMAIL</span>
+                <span className="font-bold text-[#111111] truncate block">{selectedRegDossier.emailAddress}</span>
+              </div>
+            </div>
+
+            {selectedRegDossier.address && (
+              <div className="p-3 bg-white border border-[#D8D3CB] text-xs">
+                <span className="text-[#5B5348] text-[10px] font-mono block mb-0.5">RESIDENTIAL / CHAMBER ADDRESS</span>
+                <p className="text-[#111111]">{selectedRegDossier.address}</p>
+              </div>
+            )}
+
+            {/* Specializations */}
+            {selectedRegDossier.areasOfSpecialization && (
+              <div className="space-y-1.5 text-xs">
+                <span className="text-[#5B5348] text-[10px] font-mono block">SPECIALIZATION DOMAINS</span>
+                <div className="flex flex-wrap gap-1">
+                  {selectedRegDossier.areasOfSpecialization.map((spec, i) => (
+                    <span key={i} className="px-2 py-0.5 bg-white border border-[#D8D3CB] font-mono text-[10px]">
+                      {spec}
+                    </span>
+                  ))}
                 </div>
               </div>
             )}
 
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 6: LEGAL RESOURCES & ARCHIVE                               */}
-        {/* ============================================================== */}
-        {activeTab === 'resources' && (
-          <div className="space-y-6">
-            <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
-                  CONSTITUTIONAL JURISPRUDENCE
-                </span>
-                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
-                  Published Legal Resources ({resources.length})
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowAddResourceModal(true)}
-                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Upload Legal Resource</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {resources.map((res) => (
-                <div key={res.id} className="bg-white border border-neutral-300 p-5 flex flex-col justify-between space-y-3">
-                  <div>
-                    <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-wider block">
-                      {res.category} • {res.citation || 'Official Filing'}
-                    </span>
-                    <h4 className="text-base font-black text-neutral-950 font-dmk-headline mt-1">
-                      {res.title[language]}
-                    </h4>
-                    <p className="text-xs text-neutral-700 mt-2 leading-relaxed font-dmk-body">
-                      {res.summary[language]}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 border-t border-neutral-200 flex items-center justify-between text-xs">
-                    <span className="font-mono text-neutral-500">{res.date} • {res.fileSize}</span>
-                    <button
-                      onClick={() => deleteResource(res.id)}
-                      className="text-neutral-500 hover:text-[#C41A1F] text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Delete</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 7: PRESS PHOTOJOURNALISM GALLERY                           */}
-        {/* ============================================================== */}
-        {activeTab === 'gallery' && (
-          <div className="space-y-6">
-            <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
-                  PRESS ARCHIVE
-                </span>
-                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
-                  Press Photography Gallery ({gallery.length})
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowAddGalleryModal(true)}
-                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Upload Photograph</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {gallery.map((img) => (
-                <div key={img.id} className="bg-white border border-neutral-300 overflow-hidden group">
-                  <div className="h-48 overflow-hidden bg-neutral-900 relative">
-                    <img src={img.image} alt={img.title.en} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    <span className="absolute top-2 left-2 bg-black/80 text-white text-[10px] font-english uppercase px-2 py-0.5">
-                      {img.category}
-                    </span>
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <h4 className="text-sm font-black text-neutral-900 font-dmk-headline">
-                      {img.title[language]}
-                    </h4>
-                    <p className="text-xs text-neutral-600 line-clamp-2">
-                      {img.caption[language]}
-                    </p>
-                    <div className="pt-2 border-t border-neutral-200 flex items-center justify-between text-xs">
-                      <span className="text-neutral-500 font-mono text-[10px]">{img.date}</span>
-                      <button
-                        onClick={() => deleteGalleryItem(img.id)}
-                        className="text-neutral-500 hover:text-[#C41A1F] text-[11px] font-bold uppercase cursor-pointer"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 8: EVENTS & CONFERENCES                                    */}
-        {/* ============================================================== */}
-        {activeTab === 'events' && (
-          <div className="space-y-6">
-            <div className="bg-white border border-neutral-300 p-5 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-english font-bold text-[#C41A1F] uppercase tracking-widest block">
-                  ADVOCATE ADVANCEMENT
-                </span>
-                <h3 className="text-2xl font-black text-neutral-950 font-dmk-headline uppercase">
-                  State Conferences & Seminars ({events.length})
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowAddEventModal(true)}
-                className="px-4 py-2 bg-[#E31E24] hover:bg-black text-white text-xs font-english font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Schedule Conference</span>
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {events.map((evt) => (
-                <div key={evt.id} className="bg-white border border-neutral-300 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F] bg-red-50 px-2 py-0.5 border border-red-200">
-                        {evt.category}
-                      </span>
-                      <span className="text-xs font-mono text-neutral-500">{evt.date} • {evt.time}</span>
-                    </div>
-                    <h4 className="text-base font-black text-neutral-900 font-dmk-headline">
-                      {evt.title[language]}
-                    </h4>
-                    <p className="text-xs text-neutral-600 font-dmk-body">
-                      {evt.venue[language]}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3 shrink-0">
-                    <button
-                      onClick={() => deleteEvent(evt.id)}
-                      className="px-3 py-1.5 bg-neutral-100 hover:bg-red-50 text-neutral-700 hover:text-[#C41A1F] border border-neutral-300 text-xs font-bold uppercase cursor-pointer"
-                    >
-                      Delete Event
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-      </main>
-
-      {/* ============================================================== */}
-      {/* MODAL: PUBLISH EDITORIAL STORY                                 */}
-      {/* ============================================================== */}
-      {showAddNewsModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white border-2 border-neutral-900 max-w-2xl w-full p-6 sm:p-8 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
-              <div>
-                <span className="text-[10px] font-english font-bold uppercase text-[#C41A1F] tracking-widest block">
-                  EDITORIAL DESK
-                </span>
-                <h4 className="text-xl font-black text-neutral-950 font-dmk-headline uppercase">
-                  Publish Press Release / Statement
-                </h4>
-              </div>
-              <button onClick={() => setShowAddNewsModal(false)} className="p-1 hover:bg-neutral-100 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateNews} className="space-y-4 text-xs font-english">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Headline (English) *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newNewsTitleEn}
-                    onChange={(e) => setNewNewsTitleEn(e.target.value)}
-                    placeholder="Enter prominent headline..."
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Headline (Tamil)</label>
-                  <input
-                    type="text"
-                    value={newNewsTitleTa}
-                    onChange={(e) => setNewNewsTitleTa(e.target.value)}
-                    placeholder="தமிழில் தலைப்பு..."
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white font-tamil-sans"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Category</label>
-                  <select
-                    value={newNewsCategory}
-                    onChange={(e) => setNewNewsCategory(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
+            {/* Status Change Buttons (Legal Desk & Super Admin) */}
+            <div className="pt-3 border-t border-[#D8D3CB] flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <span className="text-[#5B5348]">Update Verification Stage:</span>
+              <div className="flex gap-1.5">
+                {(['pending', 'verified', 'approved', 'rejected'] as const).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => handleUpdateRegStatus(selectedRegDossier.id, s)}
+                    className={`px-3 py-1 uppercase font-bold rounded-[2px] border cursor-pointer ${
+                      selectedRegDossier.status === s
+                        ? 'bg-[#111111] text-white border-[#111111]'
+                        : 'bg-white hover:bg-[#FAF8F5] text-[#111111] border-[#D8D3CB]'
+                    }`}
                   >
-                    <option value="Press Release">Press Release</option>
-                    <option value="Statement">Official Statement</option>
-                    <option value="Court Watch">Court Watch</option>
-                    <option value="Resolution">Resolution</option>
-                    <option value="Gazette">Gazette</option>
-                    <option value="Media">Media Report</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Court Name (Optional)</label>
-                  <input
-                    type="text"
-                    value={newNewsCourt}
-                    onChange={(e) => setNewNewsCourt(e.target.value)}
-                    placeholder="e.g. Supreme Court of India"
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Case Number (Optional)</label>
-                  <input
-                    type="text"
-                    value={newNewsCaseNo}
-                    onChange={(e) => setNewNewsCaseNo(e.target.value)}
-                    placeholder="e.g. WP (C) No. 1245/2026"
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none font-mono"
-                  />
-                </div>
+                    {s}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Summary (English) *</label>
-                <textarea
-                  rows={2}
-                  required
-                  value={newNewsSummaryEn}
-                  onChange={(e) => setNewNewsSummaryEn(e.target.value)}
-                  placeholder="Concise editorial summary..."
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Summary (Tamil)</label>
-                <textarea
-                  rows={2}
-                  value={newNewsSummaryTa}
-                  onChange={(e) => setNewNewsSummaryTa(e.target.value)}
-                  placeholder="தமிழில் சுருக்கம்..."
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white font-tamil-sans"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Full Statement Content (English)</label>
-                <textarea
-                  rows={4}
-                  value={newNewsContentEn}
-                  onChange={(e) => setNewNewsContentEn(e.target.value)}
-                  placeholder="Complete text of statement / resolution..."
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Image URL / Asset</label>
-                <input
-                  type="text"
-                  value={newNewsImage}
-                  onChange={(e) => setNewNewsImage(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none font-mono"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200">
-                <input
-                  type="checkbox"
-                  id="leadStoryCheck"
-                  checked={newNewsIsLead}
-                  onChange={(e) => setNewNewsIsLead(e.target.checked)}
-                  className="w-4 h-4 text-[#C41A1F]"
-                />
-                <label htmlFor="leadStoryCheck" className="text-xs font-bold text-neutral-900 cursor-pointer">
-                  Feature this story as the Front-Page Lead Story on the Newsroom
-                </label>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
-                <button
-                  type="button"
-                  onClick={() => setShowAddNewsModal(false)}
-                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold uppercase tracking-wider cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-[#E31E24] hover:bg-black text-white font-bold uppercase tracking-wider cursor-pointer transition-colors"
-                >
-                  Publish Statement
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
 
-      {/* ============================================================== */}
-      {/* MODAL: UPLOAD LEGAL RESOURCE                                   */}
-      {/* ============================================================== */}
-      {showAddResourceModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 sm:p-8 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
-              <h4 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
-                Upload Constitutional Judgment / Dossier
-              </h4>
-              <button onClick={() => setShowAddResourceModal(false)} className="p-1 hover:bg-neutral-100 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateResource} className="space-y-3.5 text-xs font-english">
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Document Title (English) *</label>
-                <input
-                  type="text"
-                  required
-                  value={newResTitleEn}
-                  onChange={(e) => setNewResTitleEn(e.target.value)}
-                  placeholder="e.g. 69% Reservation Ninth Schedule Compendium"
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Forum / Category</label>
-                  <select
-                    value={newResCategory}
-                    onChange={(e) => setNewResCategory(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
-                  >
-                    <option value="Supreme Court">Supreme Court</option>
-                    <option value="High Court">High Court</option>
-                    <option value="Constitution">Constitution</option>
-                    <option value="Statute">Statute</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Official Citation</label>
-                  <input
-                    type="text"
-                    value={newResCitation}
-                    onChange={(e) => setNewResCitation(e.target.value)}
-                    placeholder="e.g. 1994 SCC (Cri) 45"
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none font-mono"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Executive Summary *</label>
-                <textarea
-                  rows={3}
-                  required
-                  value={newResSummaryEn}
-                  onChange={(e) => setNewResSummaryEn(e.target.value)}
-                  placeholder="Summary of constitutional significance..."
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
-                <button
-                  type="button"
-                  onClick={() => setShowAddResourceModal(false)}
-                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold uppercase tracking-wider"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-[#E31E24] hover:bg-black text-white font-bold uppercase tracking-wider"
-                >
-                  Upload Filing
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================== */}
-      {/* MODAL: SCHEDULE STATE CONFERENCE                               */}
-      {/* ============================================================== */}
-      {showAddEventModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 sm:p-8 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
-              <h4 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
-                Schedule State Legal Conference
-              </h4>
-              <button onClick={() => setShowAddEventModal(false)} className="p-1 hover:bg-neutral-100 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateEvent} className="space-y-3.5 text-xs font-english">
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Conference Title *</label>
-                <input
-                  type="text"
-                  required
-                  value={newEventTitleEn}
-                  onChange={(e) => setNewEventTitleEn(e.target.value)}
-                  placeholder="e.g. State Plenary on Federalism & Judicial Autonomy"
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Category</label>
-                  <select
-                    value={newEventCategory}
-                    onChange={(e) => setNewEventCategory(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
-                  >
-                    <option value="Conference">State Conference</option>
-                    <option value="Seminar">Constitutional Seminar</option>
-                    <option value="Legal Awareness">Advocate Workshop</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={newEventDate}
-                    onChange={(e) => setNewEventDate(e.target.value)}
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Venue / Complex</label>
-                <input
-                  type="text"
-                  value={newEventVenueEn}
-                  onChange={(e) => setNewEventVenueEn(e.target.value)}
-                  placeholder="e.g. Kalaignar Arangam, Anna Arivalayam, Chennai"
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Agenda / Description</label>
-                <textarea
-                  rows={3}
-                  value={newEventDescEn}
-                  onChange={(e) => setNewEventDescEn(e.target.value)}
-                  placeholder="Conference proceedings and legal discussion topics..."
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
-                <button
-                  type="button"
-                  onClick={() => setShowAddEventModal(false)}
-                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold uppercase tracking-wider"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-[#E31E24] hover:bg-black text-white font-bold uppercase tracking-wider"
-                >
-                  Schedule Event
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================== */}
-      {/* MODAL: ARCHIVE PRESS PHOTOGRAPH                                */}
-      {/* ============================================================== */}
+      {/* --------------------------------------------------------------------- */}
+      {/* SIMPLE CREATION MODALS FOR GALLERY, EVENTS, RESOURCES */}
+      {/* --------------------------------------------------------------------- */}
       {showAddGalleryModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white border-2 border-neutral-900 max-w-lg w-full p-6 sm:p-8 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
-              <h4 className="text-lg font-black text-neutral-950 font-dmk-headline uppercase">
-                Archive Press Documentation Photo
-              </h4>
-              <button onClick={() => setShowAddGalleryModal(false)} className="p-1 hover:bg-neutral-100 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <form onSubmit={handleCreateGallery} className="bg-white border-2 border-[#111111] max-w-md w-full p-6 rounded-[2px] space-y-4 text-xs font-mono">
+            <h3 className="font-bold text-sm text-[#111111] uppercase border-b pb-2">Add Press Gallery Photo</h3>
+            <div>
+              <label className="block mb-1 font-bold">Headline (English) *</label>
+              <input required value={newGalTitleEn} onChange={(e) => setNewGalTitleEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
             </div>
+            <div>
+              <label className="block mb-1 font-bold">Headline (Tamil)</label>
+              <input value={newGalTitleTa} onChange={(e) => setNewGalTitleTa(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+            <div>
+              <label className="block mb-1 font-bold">Image URL</label>
+              <input value={newGalImage} onChange={(e) => setNewGalImage(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setShowAddGalleryModal(false)} className="px-3 py-1.5 border">Cancel</button>
+              <button type="submit" className="px-4 py-1.5 bg-[#E31E24] text-white font-bold">Save</button>
+            </div>
+          </form>
+        </div>
+      )}
 
-            <form onSubmit={handleCreateGallery} className="space-y-3.5 text-xs font-english">
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Photograph Event Title *</label>
-                <input
-                  type="text"
-                  required
-                  value={newGalTitleEn}
-                  onChange={(e) => setNewGalTitleEn(e.target.value)}
-                  placeholder="e.g. Legal Wing State Executive Briefing"
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                />
-              </div>
+      {showAddEventModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <form onSubmit={handleCreateEvent} className="bg-white border-2 border-[#111111] max-w-md w-full p-6 rounded-[2px] space-y-4 text-xs font-mono">
+            <h3 className="font-bold text-sm text-[#111111] uppercase border-b pb-2">Add Court Hearing / Legal Event</h3>
+            <div>
+              <label className="block mb-1 font-bold">Event Title (English) *</label>
+              <input required value={newEventTitleEn} onChange={(e) => setNewEventTitleEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+            <div>
+              <label className="block mb-1 font-bold">Court / Venue (English)</label>
+              <input value={newEventVenueEn} onChange={(e) => setNewEventVenueEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+            <div>
+              <label className="block mb-1 font-bold">Date</label>
+              <input type="date" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setShowAddEventModal(false)} className="px-3 py-1.5 border">Cancel</button>
+              <button type="submit" className="px-4 py-1.5 bg-[#E31E24] text-white font-bold">Save</button>
+            </div>
+          </form>
+        </div>
+      )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Archive Album</label>
-                  <select
-                    value={newGalCategory}
-                    onChange={(e) => setNewGalCategory(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
-                  >
-                    <option value="Press Conferences">Press Conferences</option>
-                    <option value="Legal Wing Events">Legal Wing Events</option>
-                    <option value="Advocates Meetings">Advocates Meetings</option>
-                    <option value="Official Programmes">Official Programmes</option>
-                    <option value="Historical Archive">Historical Archive</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="font-bold text-neutral-800 uppercase block mb-1">Location</label>
-                  <input
-                    type="text"
-                    value={newGalLocationEn}
-                    onChange={(e) => setNewGalLocationEn(e.target.value)}
-                    placeholder="e.g. High Court Campus, Chennai"
-                    className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Image URL / Path</label>
-                <input
-                  type="text"
-                  value={newGalImage}
-                  onChange={(e) => setNewGalImage(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-neutral-800 uppercase block mb-1">Documentary Caption</label>
-                <textarea
-                  rows={2}
-                  value={newGalCaptionEn}
-                  onChange={(e) => setNewGalCaptionEn(e.target.value)}
-                  placeholder="Official archival event description..."
-                  className="w-full bg-[#FAF8F5] border border-neutral-300 p-2 text-xs focus:outline-none focus:border-black focus:bg-white"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
-                <button
-                  type="button"
-                  onClick={() => setShowAddGalleryModal(false)}
-                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold uppercase tracking-wider"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-[#E31E24] hover:bg-black text-white font-bold uppercase tracking-wider"
-                >
-                  Save Photo
-                </button>
-              </div>
-            </form>
-          </div>
+      {showAddResourceModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <form onSubmit={handleCreateResource} className="bg-white border-2 border-[#111111] max-w-md w-full p-6 rounded-[2px] space-y-4 text-xs font-mono">
+            <h3 className="font-bold text-sm text-[#111111] uppercase border-b pb-2">Upload Legal Resource Compendium</h3>
+            <div>
+              <label className="block mb-1 font-bold">Volume Title (English) *</label>
+              <input required value={newResTitleEn} onChange={(e) => setNewResTitleEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+            <div>
+              <label className="block mb-1 font-bold">Citation / Docket</label>
+              <input value={newResCitation} onChange={(e) => setNewResCitation(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+            <div>
+              <label className="block mb-1 font-bold">Summary (English)</label>
+              <textarea rows={3} value={newResSummaryEn} onChange={(e) => setNewResSummaryEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setShowAddResourceModal(false)} className="px-3 py-1.5 border">Cancel</button>
+              <button type="submit" className="px-4 py-1.5 bg-[#E31E24] text-white font-bold">Save</button>
+            </div>
+          </form>
         </div>
       )}
 

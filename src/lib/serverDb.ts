@@ -7,7 +7,8 @@ import {
   EventItem, 
   LegalResource, 
   PressGalleryItem,
-  DistrictInfo
+  DistrictInfo,
+  AuditLogItem
 } from '@/types';
 import { 
   NEWS_ITEMS, 
@@ -180,6 +181,22 @@ export async function setLeadStory(id: string): Promise<boolean> {
   return true;
 }
 
+export async function updateNews(id: string, updates: Partial<NewsItem>): Promise<NewsItem | null> {
+  const list = await getNews();
+  const index = list.findIndex((n) => n.id === id);
+  if (index === -1) return null;
+
+  let updatedList = list;
+  if (updates.isLeadStory) {
+    updatedList = list.map((item) => ({ ...item, isLeadStory: false }));
+  }
+
+  const updatedRecord = { ...updatedList[index], ...updates };
+  updatedList[index] = updatedRecord;
+  await writeTable('news.json', updatedList);
+  return updatedRecord;
+}
+
 export async function deleteNews(id: string): Promise<boolean> {
   const list = await getNews();
   const filtered = list.filter((n) => n.id !== id);
@@ -280,4 +297,22 @@ export async function updateDistrict(id: string, updates: Partial<DistrictInfo>)
   list[index] = { ...list[index], ...updates };
   await writeTable('districts.json', list);
   return list[index];
+}
+
+// ==========================================
+// 8. AUDIT LOG (Activity Logging)
+// ==========================================
+export async function getAuditLogs(): Promise<AuditLogItem[]> {
+  return readTable<AuditLogItem[]>('audit.json', () => []);
+}
+
+export async function addAuditLog(entry: Omit<AuditLogItem, 'id'>): Promise<AuditLogItem> {
+  const list = await getAuditLogs();
+  const newLog: AuditLogItem = {
+    ...entry,
+    id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+  };
+  const updated = [newLog, ...list];
+  await writeTable('audit.json', updated);
+  return newLog;
 }

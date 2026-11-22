@@ -41,10 +41,15 @@ export default function NewsPage() {
     return itemCategory === selected;
   };
 
-  // Filter news articles based on category and search query
+  // Filter news articles based on publication status, category and search query
   const filteredNews = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
+
     return news.filter((item) => {
+      // 1. Only Published stories (server /api/news filters out scheduled future dates)
+      if (item.status && item.status.toLowerCase() !== 'published') return false;
+
+      // 2. Category & Search
       const matchesCat = matchesCategoryFilter(item.category, activeCategory);
       const matchesSearch =
         !q ||

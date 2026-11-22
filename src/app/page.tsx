@@ -17,14 +17,22 @@ export default function HomePage() {
   const { language, t } = useLanguage();
   const { news, events } = useData();
 
-  // 1. Identify Lead Story and Secondary Stories from /api/news
-  const leadStory = useMemo(() => {
-    return news.find((n) => n.isLeadStory) || news.find((n) => n.featured) || news[0];
+  // Filter only Published stories (API route already filters by arrival date)
+  const publishedNews = useMemo(() => {
+    return news.filter((n) => {
+      if (n.status && n.status.toLowerCase() !== 'published') return false;
+      return true;
+    });
   }, [news]);
 
+  // 1. Identify Lead Story and Secondary Stories from /api/news
+  const leadStory = useMemo(() => {
+    return publishedNews.find((n) => n.isLeadStory) || publishedNews.find((n) => n.featured) || publishedNews[0];
+  }, [publishedNews]);
+
   const secondaryStories = useMemo(() => {
-    return news.filter((n) => n.id !== leadStory?.id).slice(0, 3);
-  }, [news, leadStory]);
+    return publishedNews.filter((n) => n.id !== leadStory?.id).slice(0, 3);
+  }, [publishedNews, leadStory]);
 
   // 2. Deduplicate images across the entire page: "Never show the same image twice on one page"
   const displayedImages = new Set<string>();

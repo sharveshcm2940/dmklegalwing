@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getRegistrations, createRegistration } from '@/lib/serverDb';
+import { requireRole } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Requires Legal Desk or Super Admin to view advocate registration dossiers
+    const auth = await requireRole(request, ['legal_desk']);
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     const list = await getRegistrations();
     return NextResponse.json({ success: true, count: list.length, registrations: list });
   } catch (error: any) {
@@ -12,6 +19,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    // PUBLIC INGESTION ENDPOINT: Advocates submit their own enrolment via /enrol
     const body = await request.json();
     const { 
       fullName, 

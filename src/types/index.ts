@@ -108,7 +108,25 @@ export interface NewsItem {
   court?: string;
   caseNumber?: string;
   documentUrl?: string;
-  status?: 'published' | 'draft' | 'scheduled';
+  status?: 'Draft' | 'Scheduled' | 'Published' | 'draft' | 'scheduled' | 'published';
+  publishDate?: string;
+  publishTime?: string;
+  imageCrop?: {
+    zoom?: number;
+    position?: 'center' | 'top' | 'bottom' | 'custom';
+    x?: number;
+    y?: number;
+  };
+}
+
+export interface AuditLogItem {
+  id: string;
+  who: string;
+  role: string;
+  what: string;
+  when: string;
+  targetId?: string;
+  details?: Record<string, any>;
 }
 
 export interface LegalDevelopmentItem {

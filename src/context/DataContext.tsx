@@ -89,8 +89,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // 3. Fetch News
-      const newsRes = await fetch('/api/news');
+      // 3. Fetch News (returns all for authenticated admin, published-only for public)
+      const newsRes = await fetch('/api/news?admin=true');
       if (newsRes.ok) {
         const newsData = await newsRes.json();
         if (newsData.success && Array.isArray(newsData.news) && newsData.news.length > 0) {

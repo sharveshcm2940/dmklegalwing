@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getEnquiries, createEnquiry } from '@/lib/serverDb';
+import { requireRole } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Requires Legal Desk or Super Admin to view confidential citizen legal grievances
+    const auth = await requireRole(request, ['legal_desk']);
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     const list = await getEnquiries();
     return NextResponse.json({ success: true, count: list.length, enquiries: list });
   } catch (error: any) {
@@ -12,6 +19,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    // PUBLIC INGESTION ENDPOINT: Citizens file pro-bono aid / custody grievances via /citizen-desk
     const body = await request.json();
     const { name, phone, email, district, subject, message, category } = body;
 

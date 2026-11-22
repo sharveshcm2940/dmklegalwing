@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getGallery, createGalleryItem } from '@/lib/serverDb';
+import { requireRole } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -12,6 +13,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireRole(request, ['editorial'], 'Added new press gallery photo');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     const body = await request.json();
     const newRecord = await createGalleryItem(body);
     return NextResponse.json({ success: true, galleryItem: newRecord }, { status: 201 });
