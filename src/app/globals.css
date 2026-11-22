@@ -285,7 +285,7 @@ label {
 /* ============================================================== */
 /* MOTION & KEYFRAMES                                             */
 /* ============================================================== */
-/* 1s left-to-right draw line for inner page title bands */
+/* 1s horizontal draw line for inner page title bands */
 @keyframes draw-line {
   0% {
     width: 0%;
