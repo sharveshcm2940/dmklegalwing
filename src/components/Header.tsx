@@ -30,28 +30,28 @@ export const Header: React.FC = () => {
     <header className="w-full bg-[#111111] border-b border-[#3d3633] sticky top-0 z-50 text-[#FAF8F5]">
       {/* Signature DMK Flag Top Strip: Top Black, Bottom Red */}
       <div className="w-full h-[4px] dmk-flag-strip" aria-hidden="true" />
-      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] h-20 flex items-center justify-between gap-4">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 min-h-[68px] sm:min-h-[74px] flex items-center justify-between gap-3">
         
-        {/* Brand identity: Official Rising Sun & DMK Flag Logo + "திமுக வழக்கறிஞர் அணி" (Catamaran 800, 22px) + "DMK Legal Wing" (14px, #d8cfc2) */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 focus-visible:outline-2 focus-visible:outline-[#E31E24]">
+        {/* Brand identity: Official Rising Sun & DMK Flag Logo + "திமுக வழக்கறிஞர் அணி" */}
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 focus-visible:outline-2 focus-visible:outline-[#E31E24]">
           <img
             src="/images/dmk-official-logo.png"
             alt="DMK Rising Sun & Flag Emblem"
-            className="h-12 w-auto object-contain shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+            className="h-10 sm:h-11 md:h-12 w-auto object-contain shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
           />
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
-            <span className="font-catamaran font-bold text-[21px] leading-snug text-[#FAF8F5] tracking-normal">
+          <div className="flex flex-col justify-center">
+            <span className="font-catamaran font-bold text-[16px] sm:text-[18px] lg:text-[19px] leading-tight text-[#FAF8F5] tracking-normal whitespace-nowrap">
               திமுக வழக்கறிஞர் அணி
             </span>
-            <span className="font-catamaran font-medium text-[13px] text-[#d8cfc2] sm:border-l sm:border-[#3d3633] sm:pl-3 leading-none">
+            <span className="font-catamaran font-medium text-[11px] sm:text-[12px] text-[#d8cfc2] leading-tight tracking-wider uppercase mt-0.5">
               DMK Legal Wing
             </span>
           </div>
         </Link>
 
         {/* Desktop Navigation Links + Language Toggle */}
-        <div className="hidden xl:flex items-center gap-7">
-          <nav className="flex items-center gap-5" aria-label="Main Navigation">
+        <div className="hidden xl:flex items-center gap-3.5 2xl:gap-5">
+          <nav className="flex items-center gap-1.5 2xl:gap-3" aria-label="Main Navigation">
             {navLinks.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               const label = language === 'ta' ? item.labelTa : item.labelEn;
@@ -59,13 +59,13 @@ export const Header: React.FC = () => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative py-2 text-[15px] font-semibold text-[#FAF8F5] hover:text-white transition-colors duration-200 group"
+                  className="relative py-1.5 px-2 text-[13px] 2xl:text-[14px] font-semibold text-[#FAF8F5] hover:text-white transition-colors duration-200 group whitespace-nowrap flex items-center"
                 >
-                  <span>{label}</span>
+                  <span className="leading-tight">{label}</span>
                   {/* 2px red underline grows from 0 to full width on hover, active page keeps it */}
                   <span
-                    className={`absolute bottom-0 left-0 h-[2px] bg-[#E31E24] transition-all duration-200 ${
-                      isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                    className={`absolute bottom-0 left-1 right-1 h-[2px] bg-[#E31E24] transition-all duration-200 ${
+                      isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                     }`}
                     aria-hidden="true"
                   />
@@ -75,11 +75,11 @@ export const Header: React.FC = () => {
           </nav>
 
           {/* Language Toggle: 1px #6d625a border, active language on red */}
-          <div className="inline-flex items-center border border-[#6d625a] bg-transparent text-xs font-bold shrink-0">
+          <div className="inline-flex items-center border border-[#6d625a] bg-transparent text-xs font-bold shrink-0 ml-1">
             <button
               type="button"
               onClick={() => setLanguage('ta')}
-              className={`px-3 py-1.5 transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 transition-colors cursor-pointer whitespace-nowrap ${
                 language === 'ta'
                   ? 'bg-[#E31E24] text-white font-extrabold'
                   : 'text-[#d8cfc2] hover:text-white'
@@ -91,7 +91,7 @@ export const Header: React.FC = () => {
             <button
               type="button"
               onClick={() => setLanguage('en')}
-              className={`px-3 py-1.5 transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 transition-colors cursor-pointer whitespace-nowrap ${
                 language === 'en'
                   ? 'bg-[#E31E24] text-white font-extrabold'
                   : 'text-[#d8cfc2] hover:text-white'
@@ -104,13 +104,13 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Mobile / Tablet Controls */}
-        <div className="flex xl:hidden items-center gap-3">
+        <div className="flex xl:hidden items-center gap-2.5 shrink-0">
           {/* Compact Language Toggle */}
-          <div className="inline-flex items-center border border-[#6d625a] text-xs font-bold">
+          <div className="inline-flex items-center border border-[#6d625a] text-xs font-bold shrink-0">
             <button
               type="button"
               onClick={() => setLanguage('ta')}
-              className={`px-2.5 py-1 ${
+              className={`px-2 py-1 whitespace-nowrap ${
                 language === 'ta' ? 'bg-[#E31E24] text-white' : 'text-[#d8cfc2]'
               }`}
             >
@@ -119,7 +119,7 @@ export const Header: React.FC = () => {
             <button
               type="button"
               onClick={() => setLanguage('en')}
-              className={`px-2.5 py-1 ${
+              className={`px-2 py-1 whitespace-nowrap ${
                 language === 'en' ? 'bg-[#E31E24] text-white' : 'text-[#d8cfc2]'
               }`}
             >
@@ -131,16 +131,16 @@ export const Header: React.FC = () => {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 border border-[#3d3633] text-[#FAF8F5] hover:bg-[#1a1a1a] transition-colors"
+            className="p-1.5 border border-[#3d3633] text-[#FAF8F5] hover:bg-[#1a1a1a] transition-colors shrink-0"
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
@@ -160,11 +160,11 @@ export const Header: React.FC = () => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-base font-semibold py-2 px-3 transition-colors ${
+                  className={`text-[15px] font-semibold py-2.5 px-3 transition-colors leading-normal whitespace-nowrap block ${
                     isActive ? 'bg-[#E31E24] text-white' : 'text-[#FAF8F5] hover:bg-[#1f1d1b]'
                   }`}
                 >
-                  {label}
+                  <span>{label}</span>
                 </Link>
               );
             })}

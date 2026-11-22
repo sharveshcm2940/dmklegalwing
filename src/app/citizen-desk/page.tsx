@@ -116,7 +116,7 @@ export default function CitizenDeskPage() {
       if (res.ok && data.success && data.enquiry?.id) {
         try {
           localStorage.removeItem(STORAGE_KEY);
-        } catch {}
+        } catch { }
         router.push(`/citizen-desk/done?id=${encodeURIComponent(data.enquiry.id)}`);
       } else {
         setErrors({
@@ -146,7 +146,7 @@ export default function CitizenDeskPage() {
 
       {/* The form in one 720 px column */}
       <div className="max-w-[720px] mx-auto px-4 sm:px-6 pt-12 space-y-6">
-        
+
         {/* 1. Boxed custody notice first: 2 px red border */}
         <div className="border-2 border-[#E31E24] bg-white p-5 text-[16px] font-bold text-[#111111] leading-relaxed">
           {language === 'ta'
@@ -173,7 +173,7 @@ export default function CitizenDeskPage() {
           )}
 
           <form onSubmit={handleSubmit} noValidate className="space-y-8">
-            
+
             {/* Petitioner Details */}
             <div className="space-y-5">
               <h2 className="text-[#111111] border-b-2 border-[#111111] pb-2">
@@ -274,11 +274,10 @@ export default function CitizenDeskPage() {
                       type="button"
                       tabIndex={5 + idx}
                       onClick={() => setCategory(cat.id)}
-                      className={`h-full min-h-[52px] p-2.5 text-[14px] font-bold border-2 border-[#111111] cursor-pointer transition-colors flex items-center justify-center text-center leading-snug ${
-                        isSelected
+                      className={`h-full min-h-[52px] p-2.5 text-[14px] font-bold border-2 border-[#111111] cursor-pointer transition-colors flex items-center justify-center text-center leading-snug ${isSelected
                           ? 'bg-[#111111] text-white'
                           : 'bg-[#FAF8F5] hover:bg-[#f1ece2] text-[#111111]'
-                      }`}
+                        }`}
                     >
                       {language === 'ta' ? cat.ta : cat.en}
                     </button>
@@ -300,13 +299,12 @@ export default function CitizenDeskPage() {
                   return (
                     <label
                       key={lvl.id}
-                      className={`h-full min-h-[64px] p-3.5 border-2 border-[#111111] flex items-start gap-3 cursor-pointer transition-colors ${
-                        isSelected
+                      className={`h-full min-h-[64px] p-3.5 border-2 border-[#111111] flex items-start gap-3 cursor-pointer transition-colors ${isSelected
                           ? isCritical
                             ? 'bg-[#E31E24] text-white border-[#E31E24]'
                             : 'bg-[#111111] text-white border-[#111111]'
                           : 'bg-[#FAF8F5] hover:bg-[#f1ece2] text-[#111111]'
-                      }`}
+                        }`}
                     >
                       <input
                         type="radio"

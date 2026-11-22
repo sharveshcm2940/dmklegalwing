@@ -80,6 +80,17 @@ html[lang="ta"] *,
   line-height: 1.65;
 }
 
+/* Navigation & Header elements must remain strictly compact and aligned inside navbar */
+header,
+header nav,
+header a,
+header span,
+header button,
+nav a,
+nav span {
+  line-height: 1.25 !important;
+}
+
 /* Headings in Tamil need at least 1.25 to prevent top kombu & pulli clipping */
 :lang(ta) h1,
 :lang(ta) h2,
