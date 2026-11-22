@@ -485,7 +485,7 @@ export default function ResourcesPage() {
                 {/* Desktop/Tablet Panel (45% width, sticky) */}
                 <aside
                   aria-label={language === 'ta' ? 'ஆவணக் காட்சி' : 'Document Preview'}
-                  className="hidden lg:block lg:w-[45%] sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto bg-[#FAF8F5] border-2 border-[#111111] p-6 space-y-6 shrink-0 shadow-lg"
+                  className="hidden lg:block lg:w-[45%] sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto bg-[#FAF8F5] border-2 border-[#111111] p-6 space-y-6 shrink-0"
                 >
                   {/* Signature DMK Flag Bar: Top Black, Bottom Red */}
                   <div className="h-[6px] dmk-flag-strip -mt-6 -mx-6 mb-4" />
@@ -563,7 +563,7 @@ export default function ResourcesPage() {
                       <a
                         href={previewResource.downloadUrl || '#'}
                         download
-                        className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+                        className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer btn-lift"
                       >
                         {language === 'ta' ? 'முழு ஆவணத்தைப் பதிவிறக்குக (PDF)' : 'Download Full Document (PDF)'}
                       </a>
