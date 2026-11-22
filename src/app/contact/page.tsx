@@ -32,7 +32,7 @@ export default function ContactGatewayPage() {
           <div className="w-full h-[5px] dmk-flag-strip mb-8" aria-hidden="true" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-            
+
             {/* 1. Red Block (white text): Advocate enrolment */}
             <div className="bg-[#E31E24] text-white border-2 border-[#111111] p-8 sm:p-12 flex flex-col justify-between space-y-8">
               <div className="space-y-4">
@@ -41,8 +41,10 @@ export default function ContactGatewayPage() {
                 </span>
                 <h2
                   className={`${
-                    language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                  } font-extrabold text-[32px] sm:text-[38px] leading-tight text-white`}
+                    language === 'ta'
+                      ? 'font-kavivanar font-normal text-[34px] sm:text-[40px] leading-[1.25]'
+                      : 'font-helvetica font-extrabold text-[32px] sm:text-[38px] leading-tight'
+                  } text-white`}
                 >
                   {language === 'ta' ? 'வழக்கறிஞர் உறுப்பினர் சேர்க்கை' : 'Advocate enrolment'}
                 </h2>
@@ -72,8 +74,10 @@ export default function ContactGatewayPage() {
                   </span>
                   <h2
                     className={`${
-                      language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                    } font-extrabold text-[32px] sm:text-[38px] leading-tight text-white`}
+                      language === 'ta'
+                        ? 'font-kavivanar font-normal text-[34px] sm:text-[40px] leading-[1.25]'
+                        : 'font-helvetica font-extrabold text-[32px] sm:text-[38px] leading-tight'
+                    } text-white`}
                   >
                     {language === 'ta' ? 'பொது மக்கள் சட்ட உதவி மையம்' : 'Citizen legal desk'}
                   </h2>

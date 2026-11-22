@@ -8,14 +8,22 @@ interface PageTitleBandProps {
 }
 
 export const PageTitleBand: React.FC<PageTitleBandProps> = ({ title, description }) => {
+  const isTamil = /[\u0B80-\u0BFF]/.test(title);
+
   return (
     <div className="w-full bg-[#111111] text-[#FAF8F5] pt-12 pb-14 border-b border-[#3d3633] relative overflow-hidden">
       <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
         <div className="space-y-3 max-w-4xl">
-          <h1 className="font-kavivanar font-normal text-[clamp(44px,6vw,84px)] text-[#FAF8F5] leading-[1.12]">
+          <h1
+            className={`${
+              isTamil
+                ? 'font-kavivanar font-normal text-[clamp(38px,5.5vw,76px)] leading-[1.25]'
+                : 'font-helvetica font-extrabold text-[clamp(44px,6vw,84px)] leading-[1.08]'
+            } text-[#FAF8F5] tracking-normal`}
+          >
             {title}
           </h1>
-          <p className="text-[20px] text-[#d8cfc2] font-normal leading-relaxed">
+          <p className="text-[19px] md:text-[20px] text-[#d8cfc2] font-normal leading-[1.65]">
             {description}
           </p>
         </div>

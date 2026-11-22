@@ -39,11 +39,11 @@ export const Header: React.FC = () => {
             alt="DMK Rising Sun & Flag Emblem"
             className="h-12 w-auto object-contain shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
           />
-          <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-            <span className="font-catamaran font-extrabold text-[22px] leading-tight text-[#FAF8F5] tracking-tight">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
+            <span className="font-catamaran font-bold text-[21px] leading-snug text-[#FAF8F5] tracking-normal">
               திமுக வழக்கறிஞர் அணி
             </span>
-            <span className="font-catamaran font-medium text-[14px] text-[#d8cfc2]">
+            <span className="font-catamaran font-medium text-[13px] text-[#d8cfc2] sm:border-l sm:border-[#3d3633] sm:pl-3 leading-none">
               DMK Legal Wing
             </span>
           </div>

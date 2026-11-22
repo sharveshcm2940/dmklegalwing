@@ -202,7 +202,7 @@ export default function HomePage() {
               </div>
 
               {/* Slogan in Kavivanar */}
-              <h1 className="font-kavivanar font-normal text-white text-[clamp(44px,6.5vw,88px)] leading-[1.08] tracking-normal">
+              <h1 className="font-kavivanar font-normal text-white text-[clamp(44px,6.5vw,88px)] leading-[1.2] tracking-normal">
                 தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!
               </h1>
 
@@ -391,7 +391,7 @@ export default function HomePage() {
               <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
                 {language === 'ta' ? 'கோட்பாட்டுத் தூண்கள்' : 'IDEOLOGICAL ANCHORS'}
               </span>
-              <h2 className="font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] text-[#111111] leading-tight mt-1">
+              <h2 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] leading-[1.28]' : 'font-helvetica font-extrabold text-[clamp(30px,4.2vw,48px)] leading-tight'} text-[#111111] mt-1`}>
                 {language === 'ta' ? 'திராவிடச் சட்டவியலின் மூல விழுமியங்கள்' : 'Foundations of Dravidian Jurisprudence'}
               </h2>
             </div>
@@ -459,7 +459,7 @@ export default function HomePage() {
               <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
                 {language === 'ta' ? '74 கழக மாவட்டங்கள்' : '74 DISTRICT LEGAL REGISTRY'}
               </span>
-              <h2 className="font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] text-[#111111] leading-tight mt-1">
+              <h2 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] leading-[1.28]' : 'font-helvetica font-extrabold text-[clamp(30px,4.2vw,48px)] leading-tight'} text-[#111111] mt-1`}>
                 {language === 'ta' ? 'உங்கள் மாவட்ட வழக்கறிஞர் அணித் தொடர்புகள்' : 'Find Your Local Legal Secretariat'}
               </h2>
             </div>
@@ -546,7 +546,7 @@ export default function HomePage() {
                       <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
                         [{activeDistrict.zone} ZONE · DISTRICT REGISTRY]
                       </span>
-                      <h3 className="font-helvetica font-extrabold text-[32px] text-[#111111] leading-tight mt-0.5">
+                      <h3 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[34px] leading-[1.25]' : 'font-helvetica font-extrabold text-[32px] leading-tight'} text-[#111111] mt-0.5`}>
                         {activeDistrict.name[language]}
                       </h3>
                     </div>
@@ -647,7 +647,7 @@ export default function HomePage() {
               <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
                 {language === 'ta' ? 'அமைப்பு மற்றும் தலைமை' : 'STATE EXECUTIVE SECRETARIAT'}
               </span>
-              <h2 className="font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] text-[#111111] leading-tight mt-1">
+              <h2 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] leading-[1.28]' : 'font-helvetica font-extrabold text-[clamp(30px,4.2vw,48px)] leading-tight'} text-[#111111] mt-1`}>
                 {language === 'ta' ? 'கழக வழக்கறிஞர் அணித் தலைமைப் பொறுப்பாளர்கள்' : 'Legal Leadership and Executive Council'}
               </h2>
             </div>
@@ -665,7 +665,7 @@ export default function HomePage() {
               <span className="px-3 py-1 bg-[#E31E24] text-white font-helvetica font-extrabold text-[12px] uppercase tracking-normal inline-block">
                 STATE SECRETARY · தலைமைச் செயலாளர்
               </span>
-              <h3 className="font-helvetica font-extrabold text-[32px] md:text-[40px] text-[#111111] leading-tight">
+              <h3 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[36px] md:text-[44px] leading-[1.25]' : 'font-helvetica font-extrabold text-[32px] md:text-[40px] leading-tight'} text-[#111111]`}>
                 {OFFICIAL_HIERARCHY_CHART.secretary.name[language]}
               </h3>
               <p className="text-[17px] font-bold text-[#C41A1F]">
@@ -772,7 +772,7 @@ export default function HomePage() {
               <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
                 {language === 'ta' ? 'அதிகாரப்பூர்வ ஊடகம்' : 'PRESS BUREAU & MEDIA WIRE'}
               </span>
-              <h2 className="font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] text-[#111111] leading-tight mt-1">
+              <h2 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] leading-[1.28]' : 'font-helvetica font-extrabold text-[clamp(30px,4.2vw,48px)] leading-tight'} text-[#111111] mt-1`}>
                 {language === 'ta' ? 'செய்திகள் மற்றும் அறிக்கைகள்' : 'Latest Legal Dispatches & Orders'}
               </h2>
             </div>
@@ -866,7 +866,7 @@ export default function HomePage() {
                 <span className="text-[12px] font-extrabold uppercase text-white/90">
                   ADVOCATE CADRE REGISTRATION
                 </span>
-                <h3 className="font-helvetica font-extrabold text-[32px] md:text-[38px] text-white leading-tight">
+                <h3 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[34px] md:text-[40px] leading-[1.25]' : 'font-helvetica font-extrabold text-[32px] md:text-[38px] leading-tight'} text-white`}>
                   {language === 'ta' ? 'வழக்கறிஞர் அணி உறுப்பினர் பதிவு' : 'Advocate Enrolment Drive'}
                 </h3>
                 <p className="text-[18px] text-white/95 leading-relaxed">
@@ -890,7 +890,7 @@ export default function HomePage() {
                 <span className="text-[12px] font-extrabold uppercase text-[#ff8a85]">
                   PRO-BONO LEGAL AID & DESK
                 </span>
-                <h3 className="font-helvetica font-extrabold text-[32px] md:text-[38px] text-white leading-tight">
+                <h3 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[34px] md:text-[40px] leading-[1.25]' : 'font-helvetica font-extrabold text-[32px] md:text-[38px] leading-tight'} text-white`}>
                   {language === 'ta' ? 'பொதுமக்கள் இலவச சட்ட உதவி மையம்' : 'Citizen Legal Desk'}
                 </h3>
                 <p className="text-[18px] text-[#d8cfc2] leading-relaxed">

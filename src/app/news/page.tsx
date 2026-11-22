@@ -116,9 +116,9 @@ export default function NewsPage() {
             <span>Vol. LIV · Issue 1971</span>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4 pb-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
             {/* Title: Kavivanar at clamp(56px, 9vw, 120px) in ink */}
-            <h1 className="font-kavivanar font-normal text-[clamp(56px,9vw,120px)] text-[#111111] leading-none tracking-normal">
+            <h1 className="font-kavivanar font-normal text-[clamp(56px,9vw,120px)] text-[#111111] leading-[1.18] tracking-normal">
               செய்திகள்
             </h1>
 

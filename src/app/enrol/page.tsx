@@ -195,17 +195,16 @@ export default function EnrolPage() {
             
             {/* Section 1: Identity */}
             <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
-              <h2
-                className={`${
-                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                } font-extrabold text-[24px] text-[#111111]`}
-              >
-                {language === 'ta' ? '1. சுய விவரங்கள்' : '1 Identity'}
+              <h2 className="text-[#111111] flex items-center gap-2">
+                <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">1.</span>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[24px]'}>
+                  {language === 'ta' ? 'சுய விவரங்கள்' : 'Identity'}
+                </span>
               </h2>
 
               {/* Full Name */}
               <div className="space-y-1">
-                <label htmlFor="fullName" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="fullName" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? 'முழுப் பெயர் (ஆங்கிலத்தில்) *' : 'Full name (as registered in Bar Council) *'}
                 </label>
                 <input
@@ -218,7 +217,7 @@ export default function EnrolPage() {
                     if (errors.fullName) setErrors({ ...errors, fullName: '' });
                   }}
                   placeholder={language === 'ta' ? 'எ.கா: R. Viduthalai' : 'e.g. R. Viduthalai'}
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none"
                 />
                 {errors.fullName && (
                   <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.fullName}</p>
@@ -227,7 +226,7 @@ export default function EnrolPage() {
 
               {/* Tamil Name */}
               <div className="space-y-1">
-                <label htmlFor="tamilName" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="tamilName" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? 'பெயர் (தமிழில்)' : 'Tamil name'}
                 </label>
                 <input
@@ -237,24 +236,23 @@ export default function EnrolPage() {
                   value={tamilName}
                   onChange={(e) => setTamilName(e.target.value)}
                   placeholder={language === 'ta' ? 'எ.கா: இரா. விடுதலை' : 'e.g. இரா. விடுதலை'}
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none"
                 />
               </div>
             </div>
 
             {/* Section 2: Practice */}
             <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
-              <h2
-                className={`${
-                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                } font-extrabold text-[24px] text-[#111111]`}
-              >
-                {language === 'ta' ? '2. தொழில் விவரங்கள்' : '2 Practice'}
+              <h2 className="text-[#111111] flex items-center gap-2">
+                <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">2.</span>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[24px]'}>
+                  {language === 'ta' ? 'தொழில் விவரங்கள்' : 'Practice'}
+                </span>
               </h2>
 
               {/* Bar Council enrolment number */}
               <div className="space-y-1">
-                <label htmlFor="barCouncilNumber" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="barCouncilNumber" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? 'பார் கவுன்சில் பதிவு எண் *' : 'Bar Council enrolment number *'}
                 </label>
                 <input
@@ -267,9 +265,9 @@ export default function EnrolPage() {
                     if (errors.barCouncilNumber) setErrors({ ...errors, barCouncilNumber: '' });
                   }}
                   placeholder="MS/1234/2018"
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] font-mono text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] font-mono text-[#111111] leading-normal focus:bg-white outline-none"
                 />
-                <p className="text-[13px] text-[#5B5348]">
+                <p className="text-[13px] text-[#5B5348] leading-normal">
                   {language === 'ta' ? 'உதாரண வடிவம்: MS/1234/2018' : 'Example format: MS/1234/2018'}
                 </p>
                 {errors.barCouncilNumber && (
@@ -279,7 +277,7 @@ export default function EnrolPage() {
 
               {/* Practice domain */}
               <div className="space-y-1">
-                <label htmlFor="practiceDomain" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="practiceDomain" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? 'முதன்மை பயிற்சிப் பிரிவு *' : 'Practice domain *'}
                 </label>
                 <select
@@ -287,7 +285,7 @@ export default function EnrolPage() {
                   tabIndex={4}
                   value={practiceDomain}
                   onChange={(e) => setPracticeDomain(e.target.value)}
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none cursor-pointer"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none cursor-pointer"
                 >
                   {PRACTICE_DOMAINS.map((dom) => (
                     <option key={dom.id} value={dom.id}>
@@ -299,16 +297,17 @@ export default function EnrolPage() {
 
               {/* Experience tier */}
               <div className="space-y-2">
-                <span className="block text-[15px] font-extrabold text-[#111111]">
-                  {language === 'ta' ? 'அனுபவ அடுக்கு *' : 'Experience tier *'}
+                <span className="block text-[15px] font-bold text-[#111111] leading-normal">
+                  {language === 'ta' ? 'அனுபவ அடுக்கு' : 'Experience tier'}{' '}
+                  <span className="text-[#C41A1F] font-bold">*</span>
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
                   {EXPERIENCE_TIERS.map((tier, idx) => {
                     const isSelected = experienceTier === tier.id;
                     return (
                       <label
                         key={tier.id}
-                        className={`min-h-[48px] px-4 py-3 border-2 border-[#111111] flex items-center gap-3 cursor-pointer transition-colors ${
+                        className={`h-full min-h-[56px] px-3.5 py-3 border-2 border-[#111111] flex items-start gap-2.5 cursor-pointer transition-colors ${
                           isSelected ? 'bg-[#111111] text-white' : 'bg-[#FAF8F5] hover:bg-[#f1ece2] text-[#111111]'
                         }`}
                       >
@@ -319,9 +318,9 @@ export default function EnrolPage() {
                           value={tier.id}
                           checked={isSelected}
                           onChange={() => setExperienceTier(tier.id)}
-                          className="w-4 h-4 rounded-none accent-[#E31E24] cursor-pointer"
+                          className="w-4 h-4 rounded-none accent-[#E31E24] cursor-pointer shrink-0 mt-1"
                         />
-                        <span className="text-[14px] font-extrabold leading-tight">
+                        <span className="text-[14px] font-bold leading-snug">
                           {language === 'ta' ? tier.ta : tier.en}
                         </span>
                       </label>
@@ -333,17 +332,16 @@ export default function EnrolPage() {
 
             {/* Section 3: Unit */}
             <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
-              <h2
-                className={`${
-                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                } font-extrabold text-[24px] text-[#111111]`}
-              >
-                {language === 'ta' ? '3. அமைப்பு மாவட்டம்' : '3 Unit'}
+              <h2 className="text-[#111111] flex items-center gap-2">
+                <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">3.</span>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[24px]'}>
+                  {language === 'ta' ? 'அமைப்பு மாவட்டம்' : 'Unit'}
+                </span>
               </h2>
 
               {/* Dropdown of all 74 party districts */}
               <div className="space-y-1">
-                <label htmlFor="districtUnit" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="districtUnit" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? '74 கழக அமைப்பு மாவட்டம் *' : 'Party district unit (74 districts) *'}
                 </label>
                 <select
@@ -354,7 +352,7 @@ export default function EnrolPage() {
                     setDistrict(e.target.value);
                     if (errors.district) setErrors({ ...errors, district: '' });
                   }}
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none cursor-pointer"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none cursor-pointer"
                 >
                   {districts.map((d) => (
                     <option key={d.id} value={d.name.en}>
@@ -370,17 +368,16 @@ export default function EnrolPage() {
 
             {/* Section 4: Contact */}
             <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
-              <h2
-                className={`${
-                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                } font-extrabold text-[24px] text-[#111111]`}
-              >
-                {language === 'ta' ? '4. தொடர்பு விவரங்கள்' : '4 Contact'}
+              <h2 className="text-[#111111] flex items-center gap-2">
+                <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">4.</span>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[24px]'}>
+                  {language === 'ta' ? 'தொடர்பு விவரங்கள்' : 'Contact'}
+                </span>
               </h2>
 
               {/* Phone */}
               <div className="space-y-1">
-                <label htmlFor="mobileNumber" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="mobileNumber" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? 'தொலைபேசி எண் *' : 'Phone number *'}
                 </label>
                 <input
@@ -393,7 +390,7 @@ export default function EnrolPage() {
                     if (errors.mobileNumber) setErrors({ ...errors, mobileNumber: '' });
                   }}
                   placeholder="+91 98400 12345"
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none"
                 />
                 {errors.mobileNumber && (
                   <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.mobileNumber}</p>
@@ -402,7 +399,7 @@ export default function EnrolPage() {
 
               {/* Email */}
               <div className="space-y-1">
-                <label htmlFor="emailAddress" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="emailAddress" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? 'மின்னஞ்சல் முகவரி *' : 'Email address *'}
                 </label>
                 <input
@@ -415,7 +412,7 @@ export default function EnrolPage() {
                     if (errors.emailAddress) setErrors({ ...errors, emailAddress: '' });
                   }}
                   placeholder="advocate@example.com"
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none"
                 />
                 {errors.emailAddress && (
                   <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.emailAddress}</p>
@@ -429,7 +426,7 @@ export default function EnrolPage() {
                 type="submit"
                 tabIndex={11}
                 disabled={isSubmitting}
-                className="w-full min-h-[52px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] disabled:opacity-50 text-white font-extrabold text-[16px] flex items-center justify-center cursor-pointer btn-lift transition-colors"
+                className="w-full min-h-[52px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] disabled:opacity-50 text-white font-bold text-[16px] flex items-center justify-center text-center leading-normal cursor-pointer btn-lift transition-colors"
               >
                 {isSubmitting
                   ? (language === 'ta' ? 'பதிவாகிறது...' : 'Submitting enrolment...')

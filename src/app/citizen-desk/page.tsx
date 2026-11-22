@@ -149,11 +149,13 @@ export default function CitizenDeskPage() {
         
         {/* 1. Boxed custody notice first: 2 px red border */}
         <div className="border-2 border-[#E31E24] bg-white p-5 text-[16px] font-bold text-[#111111] leading-relaxed">
-          If you or someone you know is in police custody, call [HELPLINE NUMBER] now.
+          {language === 'ta'
+            ? 'நீங்களோ அல்லது உங்களுக்குத் தெரிந்தவர்களோ காவல்துறை காவலில் வைக்கப்பட்டிருந்தால், உடனடியாக [HELPLINE NUMBER] என்ற எண்ணை அழைக்கவும்.'
+            : 'If you or someone you know is in police custody, call [HELPLINE NUMBER] now.'}
         </div>
 
         {/* 2. One-line privacy notice */}
-        <p className="text-[14px] text-[#5B5348] italic border-b border-[#d7d0c3] pb-4">
+        <p className="text-[14px] text-[#5B5348] border-b border-[#d7d0c3] pb-4 leading-relaxed">
           {language === 'ta'
             ? 'திமுக வழக்கறிஞர் அணியால் உங்கள் மனுக்கள் மற்றும் விவரங்கள் முழுமையான சட்டப் பாதுகாப்புடன் இரகசியமாக வைக்கப்படும்.'
             : 'All submissions are treated with strict legal confidentiality by DMK Legal Wing advocates.'}
@@ -174,18 +176,16 @@ export default function CitizenDeskPage() {
             
             {/* Petitioner Details */}
             <div className="space-y-5">
-              <h2
-                className={`${
-                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                } font-extrabold text-[22px] text-[#111111] border-b-2 border-[#111111] pb-2`}
-              >
-                {language === 'ta' ? 'மனுதாரர் விவரங்கள்' : 'Petitioner details'}
+              <h2 className="text-[#111111] border-b-2 border-[#111111] pb-2">
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[22px]'}>
+                  {language === 'ta' ? 'மனுதாரர் விவரங்கள்' : 'Petitioner details'}
+                </span>
               </h2>
 
               {/* Name */}
               <div className="space-y-1">
-                <label htmlFor="petitionerName" className="block text-[15px] font-extrabold text-[#111111]">
-                  {language === 'ta' ? 'முழுப் பெயர் *' : 'Full name *'}
+                <label htmlFor="petitionerName" className="block text-[15px] font-bold text-[#111111] leading-normal">
+                  {language === 'ta' ? 'முழுப் பெயர்' : 'Full name'} <span className="text-[#C41A1F] font-bold">*</span>
                 </label>
                 <input
                   id="petitionerName"
@@ -197,7 +197,7 @@ export default function CitizenDeskPage() {
                     if (errors.name) setErrors({ ...errors, name: '' });
                   }}
                   placeholder={language === 'ta' ? 'உங்கள் பெயர்' : 'Your name'}
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none"
                 />
                 {errors.name && (
                   <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.name}</p>
@@ -206,8 +206,8 @@ export default function CitizenDeskPage() {
 
               {/* Phone */}
               <div className="space-y-1">
-                <label htmlFor="petitionerPhone" className="block text-[15px] font-extrabold text-[#111111]">
-                  {language === 'ta' ? 'தொலைபேசி எண் *' : 'Phone number *'}
+                <label htmlFor="petitionerPhone" className="block text-[15px] font-bold text-[#111111] leading-normal">
+                  {language === 'ta' ? 'தொலைபேசி எண்' : 'Phone number'} <span className="text-[#C41A1F] font-bold">*</span>
                 </label>
                 <input
                   id="petitionerPhone"
@@ -219,7 +219,7 @@ export default function CitizenDeskPage() {
                     if (errors.phone) setErrors({ ...errors, phone: '' });
                   }}
                   placeholder="+91 98400 12345"
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none"
                 />
                 {errors.phone && (
                   <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.phone}</p>
@@ -228,7 +228,7 @@ export default function CitizenDeskPage() {
 
               {/* Email */}
               <div className="space-y-1">
-                <label htmlFor="petitionerEmail" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="petitionerEmail" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? 'மின்னஞ்சல் முகவரி' : 'Email address'}
                 </label>
                 <input
@@ -238,13 +238,13 @@ export default function CitizenDeskPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none"
                 />
               </div>
 
               {/* Address */}
               <div className="space-y-1">
-                <label htmlFor="petitionerAddress" className="block text-[15px] font-extrabold text-[#111111]">
+                <label htmlFor="petitionerAddress" className="block text-[15px] font-bold text-[#111111] leading-normal">
                   {language === 'ta' ? 'முகவரி / மாவட்டம்' : 'Address / District'}
                 </label>
                 <input
@@ -254,17 +254,18 @@ export default function CitizenDeskPage() {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder={language === 'ta' ? 'முகவரி, ஊர், மாவட்டம்' : 'Street address, town, district'}
-                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none"
                 />
               </div>
             </div>
 
             {/* Grievance Category */}
             <div className="space-y-3 pt-4 border-t-2 border-[#111111]">
-              <label htmlFor="grievanceCategory" className="block text-[15px] font-extrabold text-[#111111]">
-                {language === 'ta' ? 'மனுவின் வகைப்பாடு *' : 'Grievance category *'}
+              <label htmlFor="grievanceCategory" className="block text-[15px] font-bold text-[#111111] leading-normal">
+                {language === 'ta' ? 'மனுவின் வகைப்பாடு' : 'Grievance category'}{' '}
+                <span className="text-[#C41A1F] font-bold">*</span>
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 items-stretch">
                 {GRIEVANCE_CATEGORIES.map((cat, idx) => {
                   const isSelected = category === cat.id;
                   return (
@@ -273,7 +274,7 @@ export default function CitizenDeskPage() {
                       type="button"
                       tabIndex={5 + idx}
                       onClick={() => setCategory(cat.id)}
-                      className={`min-h-[48px] px-3 py-2 text-[14px] font-extrabold border-2 border-[#111111] cursor-pointer transition-colors ${
+                      className={`h-full min-h-[52px] p-2.5 text-[14px] font-bold border-2 border-[#111111] cursor-pointer transition-colors flex items-center justify-center text-center leading-snug ${
                         isSelected
                           ? 'bg-[#111111] text-white'
                           : 'bg-[#FAF8F5] hover:bg-[#f1ece2] text-[#111111]'
@@ -288,17 +289,18 @@ export default function CitizenDeskPage() {
 
             {/* Urgency: as three large square radio buttons */}
             <div className="space-y-3 pt-4 border-t-2 border-[#111111]">
-              <span className="block text-[15px] font-extrabold text-[#111111]">
-                {language === 'ta' ? 'அவசர நிலை *' : 'Urgency *'}
+              <span className="block text-[15px] font-bold text-[#111111] leading-normal">
+                {language === 'ta' ? 'அவசர நிலை' : 'Urgency'}{' '}
+                <span className="text-[#C41A1F] font-bold">*</span>
               </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
                 {URGENCY_LEVELS.map((lvl, idx) => {
                   const isSelected = urgency === lvl.id;
                   const isCritical = lvl.id.includes('Critical');
                   return (
                     <label
                       key={lvl.id}
-                      className={`min-h-[56px] p-4 border-2 border-[#111111] flex items-center gap-3 cursor-pointer transition-colors ${
+                      className={`h-full min-h-[64px] p-3.5 border-2 border-[#111111] flex items-start gap-3 cursor-pointer transition-colors ${
                         isSelected
                           ? isCritical
                             ? 'bg-[#E31E24] text-white border-[#E31E24]'
@@ -313,9 +315,9 @@ export default function CitizenDeskPage() {
                         value={lvl.id}
                         checked={isSelected}
                         onChange={() => setUrgency(lvl.id)}
-                        className="w-5 h-5 rounded-none accent-[#111111] cursor-pointer shrink-0"
+                        className="w-5 h-5 rounded-none accent-[#111111] cursor-pointer shrink-0 mt-0.5"
                       />
-                      <span className="text-[14px] font-extrabold leading-tight">
+                      <span className="text-[14px] font-bold leading-snug">
                         {language === 'ta' ? lvl.ta : lvl.en}
                       </span>
                     </label>
@@ -326,8 +328,9 @@ export default function CitizenDeskPage() {
 
             {/* Description */}
             <div className="space-y-1 pt-4 border-t-2 border-[#111111]">
-              <label htmlFor="grievanceMessage" className="block text-[15px] font-extrabold text-[#111111]">
-                {language === 'ta' ? 'கோரிக்கையின் முழு விவரம் *' : 'Description of legal grievance *'}
+              <label htmlFor="grievanceMessage" className="block text-[15px] font-bold text-[#111111] leading-normal">
+                {language === 'ta' ? 'கோரிக்கையின் முழு விவரம்' : 'Description of legal grievance'}{' '}
+                <span className="text-[#C41A1F] font-bold">*</span>
               </label>
               <textarea
                 id="grievanceMessage"
@@ -343,7 +346,7 @@ export default function CitizenDeskPage() {
                     ? 'நிகழ்ந்த இடம், தேதி, சம்பந்தப்பட்ட நபர்கள் மற்றும் சட்ட ரீதியான கோரிக்கையை விரிவாக உள்ளிடவும்...'
                     : 'Detail the facts, parties involved, dates, police station / court involved, and relief sought...'
                 }
-                className="w-full p-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none font-catamaran"
+                className="w-full p-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none font-catamaran"
               />
               {errors.message && (
                 <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.message}</p>
@@ -356,7 +359,7 @@ export default function CitizenDeskPage() {
                 type="submit"
                 tabIndex={13}
                 disabled={isSubmitting}
-                className="w-full min-h-[52px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] disabled:opacity-50 text-white font-extrabold text-[16px] flex items-center justify-center cursor-pointer btn-lift transition-colors"
+                className="w-full min-h-[52px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] disabled:opacity-50 text-white font-bold text-[16px] flex items-center justify-center text-center leading-normal cursor-pointer btn-lift transition-colors"
               >
                 {isSubmitting
                   ? (language === 'ta' ? 'பதிவாகிறது...' : 'Submitting request...')

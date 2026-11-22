@@ -20,12 +20,23 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const saved = localStorage.getItem('dmk_legal_lang') as Language;
     if (saved === 'en' || saved === 'ta') {
       setLanguageState(saved);
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = saved;
+        document.documentElement.setAttribute('data-lang', saved);
+      }
+    } else if (typeof document !== 'undefined') {
+      document.documentElement.lang = 'en';
+      document.documentElement.setAttribute('data-lang', 'en');
     }
   }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('dmk_legal_lang', lang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+      document.documentElement.setAttribute('data-lang', lang);
+    }
   };
 
   const toggleLanguage = () => {

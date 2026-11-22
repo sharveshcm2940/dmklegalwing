@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Kavivanar&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kavivanar&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Serif+Tamil:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -12,8 +12,8 @@
   --color-ink-line: #3D3633;
   --color-ink-text: #D8CFC2;
 
-  /* Typography Variables */
-  --font-body: var(--font-catamaran), 'Catamaran', sans-serif;
+  /* Typography Variables: Fallbacks include Noto Sans Tamil & Noto Serif Tamil for robust cross-browser alignment */
+  --font-body: var(--font-catamaran), 'Catamaran', 'Noto Sans Tamil', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-kavivanar: 'Kavivanar', var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
   --font-helvetica: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
@@ -40,23 +40,76 @@
   --dmk-ink-text: #D8CFC2;
 }
 
-/* Base Body Styles: Catamaran at 17px, line height 1.65 */
+/* Base Body Styles: Catamaran + Noto Sans Tamil at 17px, comfortable line height 1.65 */
 body {
   background-color: #FAF8F5;
   color: #111111;
-  font-family: var(--font-catamaran), 'Catamaran', sans-serif;
+  font-family: var(--font-catamaran), 'Catamaran', 'Noto Sans Tamil', sans-serif;
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* ============================================================== */
-/* TAMIL TYPOGRAPHIC RULE: NEVER SPACED, NEVER UPPERCASED        */
+/* TAMIL TYPOGRAPHIC RULES: NEVER SPACED, NEVER UPPERCASED        */
 /* ============================================================== */
 :lang(ta),
 [lang="ta"],
 html[lang="ta"] *,
-[data-lang="ta"] * {
+[data-lang="ta"] *,
+.font-kavivanar,
+.font-tamil {
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  font-feature-settings: normal;
+  text-rendering: optimizeLegibility;
+}
+
+/* Proper line-height and vertical clearance for Tamil vowel diacritics */
+:lang(ta) p,
+:lang(ta) span,
+:lang(ta) label,
+:lang(ta) a,
+:lang(ta) li,
+[data-lang="ta"] p,
+[data-lang="ta"] span,
+[data-lang="ta"] label,
+[data-lang="ta"] a,
+[data-lang="ta"] li {
+  line-height: 1.65;
+}
+
+/* Headings in Tamil need at least 1.25 to prevent top kombu & pulli clipping */
+:lang(ta) h1,
+:lang(ta) h2,
+:lang(ta) h3,
+:lang(ta) h4,
+[data-lang="ta"] h1,
+[data-lang="ta"] h2,
+[data-lang="ta"] h3,
+[data-lang="ta"] h4,
+.font-kavivanar {
+  line-height: 1.25 !important;
+}
+
+/* Tamil script does not use italic/oblique styling - ensure upright glyphs */
+:lang(ta) em,
+:lang(ta) i,
+[data-lang="ta"] em,
+[data-lang="ta"] i {
+  font-style: normal !important;
+}
+
+/* Form controls optical alignment for Tamil */
+:lang(ta) input,
+:lang(ta) select,
+:lang(ta) textarea,
+:lang(ta) button,
+[data-lang="ta"] input,
+[data-lang="ta"] select,
+[data-lang="ta"] textarea,
+[data-lang="ta"] button {
   letter-spacing: 0 !important;
   text-transform: none !important;
 }
