@@ -222,7 +222,7 @@ export default function HomePage() {
                 <img
                   src="/images/dmk-official-logo.png"
                   alt="DMK Rising Sun & Flag Official Emblem"
-                  className="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_4px_rgba(227,30,36,0.4)]"
+                  className="h-10 sm:h-12 w-auto object-contain"
                 />
                 <span className="text-[#ff8a85] font-helvetica font-extrabold text-[14px] sm:text-[15px] uppercase tracking-normal">
                   {language === 'ta'
@@ -1084,15 +1084,8 @@ export default function HomePage() {
                 </p>
 
                 {/* 2 px Red border custody notice */}
-                <div className="p-4 bg-[#1a1715] border-2 border-[#E31E24] text-[14px] text-[#FAF8F5] space-y-1">
-                  <div className="font-bold text-[#ff8a85] uppercase">
-                    {language === 'ta' ? 'அவசர காவல் காவல்/கைது அறிவிப்பு:' : 'Emergency Custody / Detention Notice:'}
-                  </div>
-                  <p className="text-[13px] text-[#d8cfc2]">
-                    {language === 'ta'
-                      ? 'அண்ணா அறிவாலயம் 24/7 சட்ட அவசர உதவி எண்: 044-2434 4455'
-                      : 'Anna Arivalayam 24/7 Legal Emergency Custody Hotline: 044-2434 4455'}
-                  </p>
+                <div className="p-4 bg-[#1a1715] border-2 border-[#E31E24] text-[15px] font-bold text-white leading-relaxed">
+                  If you or someone you know is in police custody, call [HELPLINE NUMBER] now.
                 </div>
               </div>
 

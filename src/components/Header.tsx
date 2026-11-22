@@ -28,13 +28,13 @@ export const Header: React.FC = () => {
 
   return (
     <header className="w-full bg-[#111111] border-b border-[#3d3633] sticky top-0 z-50 text-[#FAF8F5] overflow-x-clip">
-      {/* Signature DMK Flag Top Strip: Top Black, Bottom Red */}
+      {/* 4 px Top DMK Flag Strip */}
       <div className="w-full h-[4px] dmk-flag-strip" aria-hidden="true" />
       
-      {/* Tier 1: Main Masthead Bar */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between gap-3">
+      {/* Masthead Bar */}
+      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] h-16 sm:h-[72px] flex items-center justify-between gap-4">
         
-        {/* Brand identity: Official Rising Sun & Flag Logo + 16px Red Square + "திமுக வழக்கறிஞர் அணி" */}
+        {/* Brand: 16 px red square, "திமுக வழக்கறிஞர் அணி" (Catamaran 800, 22 px) and "DMK Legal Wing" */}
         <Link 
           href="/" 
           className="flex items-center gap-3 shrink-0 focus-visible:outline-2 focus-visible:outline-[#E31E24]"
@@ -44,29 +44,28 @@ export const Header: React.FC = () => {
           <img
             src="/images/dmk-official-logo.png"
             alt="DMK Rising Sun & Flag Emblem"
-            className="h-10 sm:h-12 w-auto object-contain shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+            className="h-10 sm:h-12 w-auto object-contain shrink-0"
           />
 
           {/* 16 px Red Square */}
           <span className="w-4 h-4 bg-[#E31E24] inline-block shrink-0" aria-hidden="true" />
 
-          {/* Brand Titles */}
+          {/* Typography */}
           <div className="flex flex-col justify-center">
             <span className="font-catamaran font-extrabold text-[17px] sm:text-[20px] md:text-[22px] leading-tight text-[#FAF8F5] tracking-normal whitespace-nowrap">
               திமுக வழக்கறிஞர் அணி
             </span>
-            <span className="font-catamaran font-bold text-[11px] sm:text-[12px] text-[#d8cfc2] leading-tight tracking-wider uppercase mt-0.5 whitespace-nowrap">
+            <span className="font-helvetica font-extrabold text-[11px] sm:text-[12px] text-[#d8cfc2] leading-tight mt-0.5 whitespace-nowrap">
               DMK Legal Wing
             </span>
           </div>
         </Link>
 
-        {/* Right Controls: Enrol CTA + Visible தமிழ்/EN Toggle + Mobile Hamburger */}
-        <div className="flex items-center gap-3 shrink-0">
-          {/* Quick Enrol CTA */}
+        {/* Right Controls: Enrol Link + தமிழ் / EN Toggle + Mobile Hamburger */}
+        <div className="flex items-center gap-4 shrink-0">
           <Link
             href="/enrol"
-            className="hidden sm:inline-flex items-center justify-center min-h-[38px] px-4 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-[13px] font-bold transition-colors btn-lift whitespace-nowrap"
+            className="hidden sm:inline-flex items-center justify-center min-h-[44px] px-5 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-[14px] font-extrabold transition-transform duration-250 hover:-translate-y-[3px] whitespace-nowrap"
           >
             {language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'Enrol as Advocate'}
           </Link>
@@ -99,11 +98,11 @@ export const Header: React.FC = () => {
             </button>
           </div>
 
-          {/* Hamburger Button for Viewports < 1024px */}
+          {/* Mobile menu trigger */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 border border-[#3d3633] text-[#FAF8F5] hover:bg-[#1e1b19] transition-colors shrink-0"
+            className="lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center border border-[#3d3633] text-[#FAF8F5] hover:bg-[#1e1b19] transition-colors shrink-0 cursor-pointer"
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -121,10 +120,9 @@ export const Header: React.FC = () => {
 
       </div>
 
-      {/* Tier 2: Dedicated Desktop Navigation Ribbon (1024px+) */}
-      {/* Dedicating the full 1280px width ensures Tamil link names never crowd, wrap, or overflow */}
+      {/* Desktop Ribbon: Dedicated Full-Width Container for 9 Links */}
       <div className="hidden lg:block w-full bg-[#161413] border-t border-[#2e2724]">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
           <nav className="flex items-center justify-between gap-1 py-1" aria-label="Main Navigation">
             {navLinks.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
@@ -133,12 +131,12 @@ export const Header: React.FC = () => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative py-2.5 px-3 text-[14px] xl:text-[15px] font-semibold transition-colors duration-150 group whitespace-nowrap flex items-center ${
-                    isActive ? 'text-white' : 'text-[#d8cfc2] hover:text-white'
+                  className={`relative py-3 px-3 text-[14px] xl:text-[15px] font-semibold transition-colors duration-250 group whitespace-nowrap flex items-center ${
+                    isActive ? 'text-white font-bold' : 'text-[#d8cfc2] hover:text-white'
                   }`}
                 >
                   <span className="leading-normal">{label}</span>
-                  {/* 2 px red underline grows from the left on hover */}
+                  {/* 2 px red underline grows from the left on hover and stays on active page */}
                   <span
                     className={`absolute bottom-0 left-0 h-[2px] bg-[#E31E24] transition-all duration-300 ease-out ${
                       isActive ? 'w-full' : 'w-0 group-hover:w-full'
@@ -152,7 +150,7 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu (< 1024px) */}
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-[#161413] border-t border-[#2e2724] px-4 py-4 space-y-2">
           <nav className="flex flex-col space-y-1" aria-label="Mobile Navigation">
@@ -174,7 +172,7 @@ export const Header: React.FC = () => {
             <div className="pt-3 border-t border-[#2e2724] sm:hidden">
               <Link
                 href="/enrol"
-                className="w-full flex items-center justify-center py-3 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-[14px] font-bold"
+                className="w-full flex items-center justify-center min-h-[44px] bg-[#E31E24] hover:bg-[#C41A1F] text-white text-[14px] font-extrabold"
               >
                 {language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'Enrol as Advocate'}
               </Link>

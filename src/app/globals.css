@@ -463,6 +463,20 @@ label {
   animation: stamp-drop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* 6px red rule along bottom that draws left to right in 1 s */
+@keyframes draw-rule-1s {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-draw-rule-1s {
+  animation: draw-rule-1s 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* ============================================================== */
 /* PREFERS-REDUCED-MOTION                                         */
 /* ============================================================== */

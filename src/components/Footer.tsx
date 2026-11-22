@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 
 export const Footer: React.FC = () => {
@@ -9,7 +8,7 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="w-full bg-[#111111] text-[#FAF8F5] border-t border-[#3d3633]">
-      {/* Signature DMK Flag Top Strip: Top Black, Bottom Red */}
+      {/* Signature DMK Flag Top Strip */}
       <div className="w-full h-[6px] dmk-flag-strip" aria-hidden="true" />
       <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] py-12 space-y-8">
         
@@ -20,7 +19,7 @@ export const Footer: React.FC = () => {
             <img
               src="/images/dmk-official-logo.png"
               alt="DMK Official Emblem"
-              className="h-14 w-auto object-contain shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+              className="h-14 w-auto object-contain shrink-0"
             />
             <div>
               <div className="font-catamaran font-extrabold text-[20px] text-[#FAF8F5] leading-tight">
@@ -40,7 +39,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & OneSash branding */}
+        {/* Bottom Bar: Copyright & OneSash */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-[#d8cfc2]">
           <div>
             &copy; 2026 DMK Legal Wing. All rights reserved.
