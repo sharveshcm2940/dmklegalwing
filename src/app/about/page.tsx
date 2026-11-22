@@ -163,7 +163,7 @@ export default function AboutPage() {
             </div>
             <div className="p-6 bg-[#180A04] text-white space-y-2 border-t border-amber-950">
               <h3 className="text-xl sm:text-2xl font-dmk-slogan text-[#FFE8A3] leading-snug">
-                "கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!"
+                &ldquo;கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!&rdquo;
               </h3>
               <p className="text-xs text-neutral-300 font-dmk-body leading-relaxed">
                 {language === 'ta'

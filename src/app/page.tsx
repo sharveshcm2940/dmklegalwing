@@ -152,7 +152,7 @@ export default function HomePage() {
 
             <div className="p-5 bg-[#FAF7F2] border-l-4 border-[#E31E24] space-y-3">
               <p className="text-lg sm:text-xl font-dmk-slogan text-neutral-900 leading-snug">
-                "கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!"
+                &ldquo;கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!&rdquo;
               </p>
               
               <div className="pt-2 border-t border-neutral-300 flex items-center justify-between text-xs font-english">

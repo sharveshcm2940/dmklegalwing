@@ -113,7 +113,7 @@ export default function IdeologyPage() {
                   {language === 'ta' ? 'அடிப்படை வழிகாட்டுதல்' : 'GUIDING PRINCIPLE'}
                 </span>
                 <h2 className="text-xl sm:text-3xl lg:text-4xl font-dmk-slogan text-[#FFE8A3] leading-tight">
-                  "கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!"
+                  &ldquo;கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!&rdquo;
                 </h2>
               </div>
               <span className="text-xs font-dmk-headline text-neutral-200 font-bold bg-black/85 px-3.5 py-1.5 border border-white/20 shrink-0">
