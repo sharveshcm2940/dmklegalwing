@@ -20,11 +20,11 @@ export default function StructurePage() {
       
       {/* Universal Page Title Band */}
       <PageTitleBand
-        title={language === 'ta' ? 'அமைப்பு கட்டமைப்பு & பொறுப்பாளர்கள்' : 'Organisational Directory & Cadre'}
+        title={language === 'ta' ? 'அமைப்பு' : 'Organisational structure'}
         description={
           language === 'ta'
             ? 'மாநில தலைமைச் செயலகம் முதல் 74 அமைப்பு மாவட்ட நீதிமன்ற வழக்கறிஞர் பிரிவுகள் வரை இயங்கும் முழுமையான ஜனநாயகப் படிநிலை அமைப்பு.'
-            : 'A structured constitutional vanguard operating from the Apex State Secretariat to 74 District Court units across Tamil Nadu.'
+            : 'Executive command hierarchy and leadership cadre of the DMK Legal Wing from the Apex Secretariat across Tamil Nadu.'
         }
       />
 

@@ -1,439 +1,453 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { useLanguage } from '../context/LanguageContext';
-import { OFFICIAL_HIERARCHY_CHART } from '../data/content';
-import { FlowchartOfficer } from '../types';
-import { 
-  IconSearch as Search, 
-  IconMapPin as MapPin, 
-  IconScale as Scale, 
-  IconShield as Award, 
-  IconChevronRight as ChevronRight, 
-  IconClose as X, 
-  IconShield as Shield, 
-  IconBuilding as Building, 
-  IconMail as Mail, 
-  IconPhone as Phone, 
-  IconCheck as CheckCircle2, 
-  IconUsers as Users, 
-  IconBuilding as Layers 
-} from './Icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
+import { OFFICIAL_HIERARCHY_CHART } from '@/data/content';
+import { FlowchartOfficer } from '@/types';
 
 export const OrgChart: React.FC = () => {
   const { language } = useLanguage();
   const [selectedOfficer, setSelectedOfficer] = useState<FlowchartOfficer | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCityFilter, setSelectedCityFilter] = useState<string>('all');
+
+  // Line drawing animation trigger on scroll into view
+  const chartRef = useRef<HTMLDivElement>(null);
+  const [linesDrawn, setLinesDrawn] = useState(false);
+
+  // Accessibility / Focus management
+  const lastTriggerRef = useRef<HTMLElement | null>(null);
+  const modalCloseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const { president, secretary, jointSecretaries, deputySecretaries, headOfficeAdvocates } = OFFICIAL_HIERARCHY_CHART;
 
-  const allOfficers: FlowchartOfficer[] = useMemo(() => [
-    president,
-    secretary,
-    ...jointSecretaries,
-    ...deputySecretaries,
-    ...headOfficeAdvocates
-  ], [president, secretary, jointSecretaries, deputySecretaries, headOfficeAdvocates]);
+  useEffect(() => {
+    const el = chartRef.current;
+    if (!el) return;
 
-  const isMatched = (officer: FlowchartOfficer): boolean => {
-    const q = searchQuery.trim().toLowerCase();
-    const matchesSearch =
-      !q ||
-      officer.name[language].toLowerCase().includes(q) ||
-      officer.district[language].toLowerCase().includes(q) ||
-      officer.designation[language].toLowerCase().includes(q) ||
-      officer.role[language].toLowerCase().includes(q);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setLinesDrawn(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-    const matchesCity =
-      selectedCityFilter === 'all' ||
-      officer.district[language].toLowerCase() === selectedCityFilter.toLowerCase();
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
-    return matchesSearch && matchesCity;
+  const handleOpenOfficer = (
+    officer: FlowchartOfficer,
+    e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>
+  ) => {
+    lastTriggerRef.current = e.currentTarget as HTMLElement;
+    setSelectedOfficer(officer);
   };
 
-  const hasFilter = searchQuery.trim() !== '' || selectedCityFilter !== 'all';
+  const handleCloseModal = () => {
+    setSelectedOfficer(null);
+    setTimeout(() => {
+      lastTriggerRef.current?.focus();
+    }, 10);
+  };
+
+  // Keyboard navigation for modal (Escape key) and initial focus
+  useEffect(() => {
+    if (!selectedOfficer) return;
+
+    // Focus close button inside modal
+    setTimeout(() => {
+      modalCloseButtonRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedOfficer]);
 
   return (
-    <div className="w-full space-y-6 font-dmk-body text-[#111111]">
+    <div ref={chartRef} className="w-full text-[#111111] font-catamaran">
+      
+      {/* Flowchart container */}
+      <div className="w-full space-y-4">
 
-      {/* Top Filter and Search Bar */}
-      <div className="bg-white border-2 border-[#111111] p-5 sm:p-6 shadow-xs rounded-[2px]">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
-              {language === 'ta' ? 'திமுக வழக்கறிஞர் அணி தலைமைப் படிநிலை' : 'DMK Legal Wing Organisational Chart'}
+        {/* ========================================================== */}
+        {/* TIER 1: PRESIDENT                                          */}
+        {/* ========================================================== */}
+        <div className="flex flex-col items-center">
+          <button
+            type="button"
+            onClick={(e) => handleOpenOfficer(president, e)}
+            className="w-full max-w-md bg-white border-2 border-[#111111] p-6 text-center cursor-pointer relative group btn-lift focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#E31E24]"
+          >
+            {/* 6px red top bar */}
+            <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#E31E24]" />
+
+            <span className="font-extrabold text-[13px] md:text-[14px] text-[#C41A1F] uppercase tracking-normal block mb-1">
+              {language === 'ta' ? 'தலைவர்' : 'President'}
+            </span>
+            <h3 className="font-helvetica font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight group-hover:text-[#E31E24] transition-colors">
+              {president.name[language]}
             </h3>
-            <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body mt-0.5">
-              {language === 'ta' ? 'தலைமை நிர்வாகிகள் & பொறுப்பாளர்கள் பட்டியல்' : 'Executive leadership & designated portfolio officers'}
+            <p className="text-[14px] text-[#5B5348] mt-1">
+              {president.role[language]} • <span className="font-bold text-[#111111]">{president.district[language]}</span>
             </p>
-          </div>
+          </button>
+        </div>
 
-          {/* Search box */}
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 text-[#5B5348] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={language === 'ta' ? 'பொறுப்பாளர் அல்லது ஊர் தேடுக...' : 'Search officer or station...'}
-              className="w-full min-h-[44px] bg-[#FAF8F5] border border-[#D8D3CB] pl-9 pr-8 py-2 text-xs text-[#111111] focus:outline-none focus:border-[#111111] rounded-[2px]"
+        {/* 2px ink line joining President to Secretary (Stroke animation 0.8s) */}
+        <div className="flex justify-center my-0 select-none">
+          <svg width="2" height="40" className="overflow-visible" aria-hidden="true">
+            <line
+              x1="1"
+              y1="0"
+              x2="1"
+              y2="40"
+              stroke="#111111"
+              strokeWidth="2"
+              strokeDasharray="40"
+              strokeDashoffset={linesDrawn ? 0 : 40}
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
             />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#5B5348] hover:text-[#111111] rounded-[2px] cursor-pointer p-1"
-                aria-label="Clear search"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+          </svg>
         </div>
-      </div>
 
-      {/* Main Flowchart Canvas */}
-      <div className="bg-[#FAF8F5] border-2 border-[#111111] p-6 sm:p-12 relative overflow-x-auto shadow-xs rounded-[2px]">
+        {/* ========================================================== */}
+        {/* TIER 2: SECRETARY                                          */}
+        {/* ========================================================== */}
+        <div className="flex flex-col items-center">
+          <button
+            type="button"
+            onClick={(e) => handleOpenOfficer(secretary, e)}
+            className="w-full max-w-md bg-white border-2 border-[#111111] p-6 text-center cursor-pointer relative group btn-lift focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#E31E24]"
+          >
+            {/* 6px ink top bar */}
+            <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#111111]" />
+
+            <span className="font-extrabold text-[13px] md:text-[14px] text-[#111111] uppercase tracking-normal block mb-1">
+              {language === 'ta' ? 'செயலாளர்' : 'Secretary'}
+            </span>
+            <h3 className="font-helvetica font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight group-hover:text-[#E31E24] transition-colors">
+              {secretary.name[language]}
+            </h3>
+            <p className="text-[14px] text-[#5B5348] mt-1">
+              {secretary.role[language]} • <span className="font-bold text-[#111111]">{secretary.district[language]}</span>
+            </p>
+          </button>
+        </div>
+
+        {/* ========================================================== */}
+        {/* CONNECTING LINES FROM SECRETARY TO THREE COLUMNS           */}
+        {/* ========================================================== */}
         
-        <div className="min-w-[760px] flex flex-col items-center">
+        {/* Desktop Line Drawing: Spans across 3 columns (0.8s stroke animation) */}
+        <div className="hidden lg:block w-full max-w-6xl mx-auto my-0 select-none">
+          <svg viewBox="0 0 1000 50" preserveAspectRatio="none" className="w-full h-12 overflow-visible" aria-hidden="true">
+            {/* Center vertical stem down from Secretary */}
+            <line
+              x1="500"
+              y1="0"
+              x2="500"
+              y2="25"
+              stroke="#111111"
+              strokeWidth="2"
+              strokeDasharray="25"
+              strokeDashoffset={linesDrawn ? 0 : 25}
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+            />
+            {/* Horizontal line spanning between column 1 center (166) and column 3 center (834) */}
+            <line
+              x1="166"
+              y1="25"
+              x2="834"
+              y2="25"
+              stroke="#111111"
+              strokeWidth="2"
+              strokeDasharray="668"
+              strokeDashoffset={linesDrawn ? 0 : 668}
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+            />
+            {/* Drop into Column 1 */}
+            <line
+              x1="166"
+              y1="25"
+              x2="166"
+              y2="50"
+              stroke="#111111"
+              strokeWidth="2"
+              strokeDasharray="25"
+              strokeDashoffset={linesDrawn ? 0 : 25}
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+            />
+            {/* Drop into Column 2 */}
+            <line
+              x1="500"
+              y1="25"
+              x2="500"
+              y2="50"
+              stroke="#111111"
+              strokeWidth="2"
+              strokeDasharray="25"
+              strokeDashoffset={linesDrawn ? 0 : 25}
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+            />
+            {/* Drop into Column 3 */}
+            <line
+              x1="834"
+              y1="25"
+              x2="834"
+              y2="50"
+              stroke="#111111"
+              strokeWidth="2"
+              strokeDasharray="25"
+              strokeDashoffset={linesDrawn ? 0 : 25}
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+            />
+          </svg>
+        </div>
+
+        {/* Mobile Line Drawing: Single vertical connector down to stacked columns */}
+        <div className="lg:hidden flex justify-center my-0 select-none">
+          <svg width="2" height="32" className="overflow-visible" aria-hidden="true">
+            <line
+              x1="1"
+              y1="0"
+              x2="1"
+              y2="32"
+              stroke="#111111"
+              strokeWidth="2"
+              strokeDasharray="32"
+              strokeDashoffset={linesDrawn ? 0 : 32}
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+            />
+          </svg>
+        </div>
+
+        {/* ========================================================== */}
+        {/* TIER 3: THREE COLUMNS UNDER SECRETARY                      */}
+        {/* (Stacks on phones, all names visible at once)              */}
+        {/* ========================================================== */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto w-full pt-1">
           
-          {/* ========================================================== */}
-          {/* LEVEL 1: PRESIDENT                                         */}
-          {/* ========================================================== */}
-          <div className="flex flex-col items-center relative z-10 w-full max-w-md">
-            
-            <div
-              onClick={() => setSelectedOfficer(president)}
-              className={`w-full bg-white border-2 transition-all p-4 text-center cursor-pointer relative shadow-xs group hover:border-[#E31E24] rounded-[2px] ${
-                isMatched(president)
-                  ? 'border-[#111111] ring-2 ring-[#E31E24]'
-                  : hasFilter
-                  ? 'border-[#D8D3CB] opacity-40'
-                  : 'border-[#111111]'
-              }`}
-            >
-              {/* Top Accent Header Stripe */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-[#111111]" />
-
-              <span className="text-xs font-dmk-body text-[#C41A1F] block mb-0.5">
-                {president.designation[language]}
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline group-hover:text-[#C41A1F] transition-colors">
-                {president.name[language]}
-              </h2>
-              <p className="text-xs text-[#5B5348] font-dmk-body mt-0.5">
-                {president.role[language]} • <span className="font-semibold text-[#111111]">{president.district[language]}</span>
-              </p>
+          {/* COLUMN 1: JOINT SECRETARIES (9) */}
+          <div className="border-2 border-[#111111] bg-white flex flex-col">
+            {/* Ink header with title and count */}
+            <div className="bg-[#111111] text-[#FAF8F5] p-4 text-center">
+              <h4 className="font-helvetica font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
+                {language === 'ta' ? 'இணைச் செயலாளர்கள் (9)' : 'Joint Secretaries (9)'}
+              </h4>
             </div>
 
-            {/* Connecting Vertical Line with Downward Arrow */}
-            <div className="flex flex-col items-center my-0.5 select-none">
-              <div className="w-[2px] h-8 bg-[#111111]" />
-              <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[7px] border-t-[#111111]" />
+            {/* List of members: 1px #d7d0c3 line between rows, min-h-[48px] on mobile */}
+            <div className="divide-y divide-[#d7d0c3]">
+              {jointSecretaries.map((officer) => (
+                <button
+                  key={officer.id}
+                  type="button"
+                  onClick={(e) => handleOpenOfficer(officer, e)}
+                  className="w-full min-h-[48px] px-4 py-3 flex items-center justify-between gap-3 text-left group hover:bg-[#FAF8F5] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#E31E24]"
+                >
+                  <span className="font-helvetica font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
+                    {officer.name[language]}
+                  </span>
+                  <span className="text-[13px] md:text-[14px] text-[#5B5348] shrink-0 font-normal">
+                    {officer.district[language]}
+                  </span>
+                </button>
+              ))}
             </div>
-
           </div>
 
-          {/* ========================================================== */}
-          {/* LEVEL 2: SECRETARY                                         */}
-          {/* ========================================================== */}
-          <div className="flex flex-col items-center relative z-10 w-full max-w-md">
-            
-            <div
-              onClick={() => setSelectedOfficer(secretary)}
-              className={`w-full bg-white border-2 transition-all p-4 text-center cursor-pointer relative shadow-xs group hover:border-[#E31E24] rounded-[2px] ${
-                isMatched(secretary)
-                  ? 'border-[#111111] ring-2 ring-[#E31E24]'
-                  : hasFilter
-                  ? 'border-[#D8D3CB] opacity-40'
-                  : 'border-[#111111]'
-              }`}
-            >
-              {/* Dual Red / Black Header Stripe */}
-              <div className="absolute top-0 left-0 right-0 h-1 flex">
-                <div className="w-1/2 bg-black" />
-                <div className="w-1/2 bg-[#E31E24]" />
-              </div>
-
-              <span className="text-xs font-dmk-body text-[#C41A1F] block mb-0.5">
-                {secretary.designation[language]}
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline group-hover:text-[#C41A1F] transition-colors">
-                {secretary.name[language]}
-              </h2>
-              <p className="text-xs text-[#5B5348] font-dmk-body mt-0.5">
-                {secretary.role[language]} • <span className="font-semibold text-[#111111]">{secretary.district[language]}</span>
-              </p>
+          {/* COLUMN 2: DEPUTY SECRETARIES (5) */}
+          <div className="border-2 border-[#111111] bg-white flex flex-col">
+            {/* Ink header with title and count */}
+            <div className="bg-[#111111] text-[#FAF8F5] p-4 text-center">
+              <h4 className="font-helvetica font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
+                {language === 'ta' ? 'துணைச் செயலாளர்கள் (5)' : 'Deputy Secretaries (5)'}
+              </h4>
             </div>
 
-            {/* Tree Branching Stem to 3 Columns */}
-            <div className="w-full flex flex-col items-center select-none">
-              <div className="w-[2px] h-8 bg-[#111111]" />
+            {/* List of members: 1px #d7d0c3 line between rows, min-h-[48px] on mobile */}
+            <div className="divide-y divide-[#d7d0c3]">
+              {deputySecretaries.map((officer) => (
+                <button
+                  key={officer.id}
+                  type="button"
+                  onClick={(e) => handleOpenOfficer(officer, e)}
+                  className="w-full min-h-[48px] px-4 py-3 flex items-center justify-between gap-3 text-left group hover:bg-[#FAF8F5] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#E31E24]"
+                >
+                  <span className="font-helvetica font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
+                    {officer.name[language]}
+                  </span>
+                  <span className="text-[13px] md:text-[14px] text-[#5B5348] shrink-0 font-normal">
+                    {officer.district[language]}
+                  </span>
+                </button>
+              ))}
             </div>
-
           </div>
 
-          {/* ========================================================== */}
-          {/* LEVEL 3: THREE PARALLEL BRANCHES                           */}
-          {/* ========================================================== */}
-          <div className="w-full max-w-5xl">
-            
-            {/* Horizontal Busbar connecting the 3 columns */}
-            <div className="w-full relative h-[2px] bg-[#111111]">
-              <div className="absolute left-[16.6%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#E31E24] rounded-[2px]" />
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#E31E24] rounded-[2px]" />
-              <div className="absolute left-[83.3%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#E31E24] rounded-[2px]" />
+          {/* COLUMN 3: HEAD OFFICE ADVOCATES (9) */}
+          <div className="border-2 border-[#111111] bg-white flex flex-col">
+            {/* Ink header with title and count */}
+            <div className="bg-[#111111] text-[#FAF8F5] p-4 text-center">
+              <h4 className="font-helvetica font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
+                {language === 'ta' ? 'தலைமையக வழக்கறிஞர்கள் (9)' : 'Head Office Advocates (9)'}
+              </h4>
             </div>
 
-            {/* Three Drop Arrows */}
-            <div className="grid grid-cols-3 w-full">
-              <div className="flex flex-col items-center">
-                <div className="w-[2px] h-6 bg-[#111111]" />
-                <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[7px] border-t-[#111111]" />
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-[2px] h-6 bg-[#111111]" />
-                <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[7px] border-t-[#111111]" />
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-[2px] h-6 bg-[#111111]" />
-                <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[7px] border-t-[#111111]" />
-              </div>
+            {/* List of members: 1px #d7d0c3 line between rows, min-h-[48px] on mobile */}
+            <div className="divide-y divide-[#d7d0c3]">
+              {headOfficeAdvocates.map((officer) => (
+                <button
+                  key={officer.id}
+                  type="button"
+                  onClick={(e) => handleOpenOfficer(officer, e)}
+                  className="w-full min-h-[48px] px-4 py-3 flex items-center justify-between gap-3 text-left group hover:bg-[#FAF8F5] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#E31E24]"
+                >
+                  <span className="font-helvetica font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
+                    {officer.name[language]}
+                  </span>
+                  <span className="text-[13px] md:text-[14px] text-[#5B5348] shrink-0 font-normal">
+                    {officer.district[language]}
+                  </span>
+                </button>
+              ))}
             </div>
-
-            {/* Three Parallel Content Containers */}
-            <div className="grid grid-cols-3 gap-5 mt-2">
-              
-              {/* ---------------------------------------------------- */}
-              {/* BRANCH 1: JOINT SECRETARIES (9)                      */}
-              {/* ---------------------------------------------------- */}
-              <div className="bg-white border-2 border-[#111111] p-4 shadow-xs flex flex-col justify-between rounded-[2px]">
-                <div>
-                  <div className="border-b-2 border-[#111111] pb-2 mb-3">
-                    <h4 className="text-base font-black text-[#111111] font-dmk-headline">
-                      {language === 'ta' ? 'இணைச் செயலாளர்கள் (9)' : 'Joint Secretaries (9)'}
-                    </h4>
-                    <span className="text-xs font-dmk-body text-[#C41A1F] block mt-0.5">
-                      Zonal Coordination & Bar Liaison
-                    </span>
-                  </div>
-
-                  <ul className="space-y-2 text-xs font-dmk-body">
-                    {jointSecretaries.map((officer) => (
-                      <li
-                        key={officer.id}
-                        onClick={() => setSelectedOfficer(officer)}
-                        className={`p-2 border border-[#D8D3CB] hover:border-[#111111] hover:bg-[#FAF8F5] transition-colors cursor-pointer group flex items-center justify-between gap-2 rounded-[2px] ${
-                          isMatched(officer)
-                            ? 'bg-[#FAF8F5] border-[#111111] font-bold'
-                            : hasFilter
-                            ? 'opacity-30'
-                            : ''
-                        }`}
-                      >
-                        <span className="font-bold text-[#111111] group-hover:text-[#C41A1F] transition-colors truncate">
-                          {officer.name[language]}
-                        </span>
-                        <span className="text-[11px] font-english text-[#5B5348] shrink-0">
-                          • {officer.district[language]}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-4 pt-2 border-t border-[#D8D3CB] text-center">
-                  <span className="text-xs font-dmk-body text-[#5B5348]">
-                    9 Advocates • Apex Secretariat
-                  </span>
-                </div>
-              </div>
-
-              {/* ---------------------------------------------------- */}
-              {/* BRANCH 2: DEPUTY SECRETARIES (5)                     */}
-              {/* ---------------------------------------------------- */}
-              <div className="bg-white border-2 border-[#111111] p-4 shadow-xs flex flex-col justify-between rounded-[2px]">
-                <div>
-                  <div className="border-b-2 border-[#111111] pb-2 mb-3">
-                    <h4 className="text-base font-black text-[#111111] font-dmk-headline">
-                      {language === 'ta' ? 'துணைச் செயலாளர்கள் (5)' : 'Deputy Secretaries (5)'}
-                    </h4>
-                    <span className="text-xs font-dmk-body text-[#C41A1F] block mt-0.5">
-                      Secretariat Administration & Training
-                    </span>
-                  </div>
-
-                  <ul className="space-y-2 text-xs font-dmk-body">
-                    {deputySecretaries.map((officer) => (
-                      <li
-                        key={officer.id}
-                        onClick={() => setSelectedOfficer(officer)}
-                        className={`p-2 border border-[#D8D3CB] hover:border-[#111111] hover:bg-[#FAF8F5] transition-colors cursor-pointer group flex items-center justify-between gap-2 rounded-[2px] ${
-                          isMatched(officer)
-                            ? 'bg-[#FAF8F5] border-[#111111] font-bold'
-                            : hasFilter
-                            ? 'opacity-30'
-                            : ''
-                        }`}
-                      >
-                        <span className="font-bold text-[#111111] group-hover:text-[#C41A1F] transition-colors truncate">
-                          {officer.name[language]}
-                        </span>
-                        <span className="text-[11px] font-english text-[#5B5348] shrink-0">
-                          • {officer.district[language]}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-4 pt-2 border-t border-[#D8D3CB] text-center">
-                  <span className="text-xs font-dmk-body text-[#5B5348]">
-                    5 Advocates • State Operations
-                  </span>
-                </div>
-              </div>
-
-              {/* ---------------------------------------------------- */}
-              {/* BRANCH 3: HEAD OFFICE ADVOCATES (9)                  */}
-              {/* ---------------------------------------------------- */}
-              <div className="bg-white border-2 border-[#111111] p-4 shadow-xs flex flex-col justify-between rounded-[2px]">
-                <div>
-                  <div className="border-b-2 border-[#111111] pb-2 mb-3">
-                    <h4 className="text-base font-black text-[#111111] font-dmk-headline">
-                      {language === 'ta' ? 'தலைமையக வழக்கறிஞர்கள் (9)' : 'Head Office Advocates (9)'}
-                    </h4>
-                    <span className="text-xs font-dmk-body text-[#C41A1F] block mt-0.5">
-                      Arivalayam HQ Legal Chamber
-                    </span>
-                  </div>
-
-                  <ul className="space-y-2 text-xs font-dmk-body">
-                    {headOfficeAdvocates.map((officer) => (
-                      <li
-                        key={officer.id}
-                        onClick={() => setSelectedOfficer(officer)}
-                        className={`p-2 border border-[#D8D3CB] hover:border-[#111111] hover:bg-[#FAF8F5] transition-colors cursor-pointer group flex items-center justify-between gap-2 rounded-[2px] ${
-                          isMatched(officer)
-                            ? 'bg-[#FAF8F5] border-[#111111] font-bold'
-                            : hasFilter
-                            ? 'opacity-30'
-                            : ''
-                        }`}
-                      >
-                        <span className="font-bold text-[#111111] group-hover:text-[#C41A1F] transition-colors truncate">
-                          {officer.name[language]}
-                        </span>
-                        <span className="text-[11px] font-english text-[#5B5348] shrink-0">
-                          • {officer.district[language]}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-4 pt-2 border-t border-[#D8D3CB] text-center">
-                  <span className="text-xs font-dmk-body text-[#5B5348]">
-                    9 Advocates • Headquarters Liaison
-                  </span>
-                </div>
-              </div>
-
-            </div>
-
           </div>
 
         </div>
 
       </div>
 
-      {/* Officer Bio Dossier Modal */}
+      {/* ========================================================== */}
+      {/* DOSSIER MODAL                                              */}
+      {/* (Square parchment panel, 2px ink border, 6px red top bar)  */}
+      {/* ========================================================== */}
       {selectedOfficer && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-[#FAF8F5] text-[#111111] max-w-lg w-full border-2 border-[#111111] p-6 sm:p-8 shadow-2xl relative font-dmk-body rounded-[2px]">
-            
-            {/* Header */}
-            <div className="flex items-start justify-between border-b-2 border-[#111111] pb-4 mb-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-officer-name"
+          onClick={handleCloseModal}
+          className="fixed inset-0 z-50 bg-[#111111]/80 flex items-center justify-center p-4"
+        >
+          {/* Modal Panel: clicking inside stops propagation */}
+          <div
+            ref={modalRef}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#FAF8F5] text-[#111111] max-w-xl w-full border-2 border-[#111111] p-6 md:p-8 relative shadow-2xl space-y-6"
+          >
+            {/* 6px red top bar */}
+            <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#E31E24]" />
+
+            {/* Header: Name and Close button */}
+            <div className="flex items-start justify-between gap-4 border-b-2 border-[#111111] pb-4">
               <div>
-                <span className="text-xs font-dmk-body text-[#C41A1F] block mb-1">
-                  {language === 'ta' ? 'அதிகாரப்பூர்வ பொறுப்பாளர் விவரக்குறிப்பு' : 'Official cadre dossier'}
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
-                  {selectedOfficer.name[language]}
-                </h3>
-                <span className="text-xs font-bold text-[#5B5348] font-dmk-body">
+                <span className="font-extrabold text-[13px] text-[#C41A1F] uppercase tracking-normal block mb-1">
                   {selectedOfficer.designation[language]}
                 </span>
+                <h3 id="modal-officer-name" className="font-helvetica font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight">
+                  {selectedOfficer.name[language]}
+                </h3>
+                <span className="text-[14px] text-[#5B5348] font-bold block mt-0.5">
+                  {language === 'ta' ? selectedOfficer.name.en : selectedOfficer.name.ta}
+                </span>
               </div>
+
+              {/* Close button */}
               <button
-                onClick={() => setSelectedOfficer(null)}
-                className="p-1.5 text-[#5B5348] hover:text-[#111111] transition-colors rounded-[2px] cursor-pointer"
-                aria-label="Close"
+                ref={modalCloseButtonRef}
+                type="button"
+                onClick={handleCloseModal}
+                className="min-h-[44px] h-[44px] px-4 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase tracking-normal transition-colors cursor-pointer btn-lift"
               >
-                <X className="w-5 h-5" />
+                {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
             </div>
 
-            {/* Details */}
-            <div className="space-y-4 text-xs sm:text-sm">
-              <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
-                  {language === 'ta' ? 'பொறுப்பு & துறை' : 'Portfolio & Jurisdiction'}
+            {/* Dossier Details */}
+            <div className="space-y-4 text-[15px]">
+              
+              {/* Portfolio & Role in Tamil and English */}
+              <div className="p-4 bg-white border border-[#111111] space-y-1">
+                <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block">
+                  {language === 'ta' ? 'பொறுப்பு & துறை (Portfolio)' : 'Portfolio & Role'}
                 </span>
-                <p className="font-semibold text-[#111111]">
-                  {selectedOfficer.role[language]}
+                <p className="font-bold text-[#111111]">
+                  {selectedOfficer.role.ta}
+                </p>
+                <p className="text-[13px] text-[#5B5348]">
+                  {selectedOfficer.role.en}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'தளம் / ஊர்' : 'Station'}
+              {/* Station & Court Affiliation */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-white border border-[#111111] space-y-1">
+                  <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block">
+                    {language === 'ta' ? 'தளம் / மாவட்டம் (Station)' : 'Station / District'}
                   </span>
-                  <span className="font-bold text-[#111111]">
-                    {selectedOfficer.district[language]}
-                  </span>
+                  <p className="font-bold text-[#111111]">
+                    {selectedOfficer.district.ta} / {selectedOfficer.district.en}
+                  </p>
                 </div>
-                <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'நீதிமன்றப் பிரிவு' : 'Court Affiliation'}
+
+                <div className="p-4 bg-white border border-[#111111] space-y-1">
+                  <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block">
+                    {language === 'ta' ? 'நீதிமன்றப் பிரிவு (Court)' : 'Court Affiliation'}
                   </span>
-                  <span className="font-bold text-[#111111]">
-                    {selectedOfficer.court}
-                  </span>
+                  <p className="font-bold text-[#111111]">
+                    {selectedOfficer.court || (language === 'ta' ? 'சென்னை உயர்நீதிமன்றம்' : 'Madras High Court')}
+                  </p>
                 </div>
               </div>
 
+              {/* Bar Council Number: ONLY if it exists in data */}
               {selectedOfficer.barCouncilNo && (
-                <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'பார் கவுன்சில் எண்' : 'Bar Enrollment'}
+                <div className="p-4 bg-white border border-[#111111]">
+                  <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block mb-0.5">
+                    {language === 'ta' ? 'பார் கவுன்சில் பதிவு எண்' : 'Bar Council Enrollment'}
                   </span>
-                  <span className="font-mono font-bold text-[#C41A1F]">
+                  <span className="font-helvetica font-extrabold text-[16px] text-[#C41A1F]">
                     {selectedOfficer.barCouncilNo}
                   </span>
                 </div>
               )}
 
+              {/* Biography: ONLY show what the data has. Never invent biography text. */}
               {selectedOfficer.bio && (
-                <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-xs font-dmk-body text-[#5B5348] block mb-1">
-                    {language === 'ta' ? 'குறிப்பு' : 'Official Dispatch'}
+                <div className="p-4 bg-white border border-[#111111] space-y-2">
+                  <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block">
+                    {language === 'ta' ? 'அதிகாரப்பூர்வ குறிப்பு' : 'Official Cadre Biography'}
                   </span>
-                  <p className="text-[#5B5348] leading-relaxed font-dmk-body text-xs">
+                  <p className="text-[14px] text-[#111111] leading-relaxed">
                     {selectedOfficer.bio[language]}
                   </p>
+                  {selectedOfficer.bio[language === 'ta' ? 'en' : 'ta'] && (
+                    <p className="text-[13px] text-[#5B5348] leading-relaxed italic pt-2 border-t border-[#d7d0c3]">
+                      {selectedOfficer.bio[language === 'ta' ? 'en' : 'ta']}
+                    </p>
+                  )}
                 </div>
               )}
+
             </div>
 
-            {/* Footer */}
-            <div className="mt-6 pt-4 border-t border-[#D8D3CB] flex justify-end">
+            {/* Footer Close Button */}
+            <div className="pt-2 flex justify-end">
               <button
-                onClick={() => setSelectedOfficer(null)}
-                className="min-h-[44px] px-5 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-dmk-body font-bold uppercase tracking-wider transition-colors rounded-[2px] cursor-pointer"
+                type="button"
+                onClick={handleCloseModal}
+                className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[14px] uppercase tracking-normal transition-colors cursor-pointer btn-lift"
               >
-                {language === 'ta' ? 'மூடுக' : 'Close Dossier'}
+                {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
             </div>
 
