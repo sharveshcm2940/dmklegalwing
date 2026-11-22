@@ -230,7 +230,7 @@ export default function DistrictsPage() {
             <div className="lg:col-span-7">
               {selectedDistrict ? (
                 <div
-                  className={`bg-[#FAF8F5] text-[#111111] p-6 sm:p-8 border-2 border-[#111111] border-t-8 border-t-[#E31E24] shadow-md space-y-6 transition-opacity duration-400 ease-in-out ${
+                  className={`bg-[#FAF8F5] text-[#111111] p-6 sm:p-8 border-2 border-[#111111] border-t-8 border-t-[#E31E24] space-y-6 transition-opacity duration-400 ease-in-out ${
                     panelFade ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
@@ -358,7 +358,7 @@ export default function DistrictsPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#FAF8F5] text-[#111111] max-w-lg w-full border-2 border-[#111111] p-6 sm:p-8 relative shadow-2xl space-y-6"
+            className="bg-[#FAF8F5] text-[#111111] max-w-lg w-full border-2 border-[#111111] p-6 sm:p-8 relative space-y-6"
           >
             {/* 6px red top bar */}
             <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#E31E24]" />

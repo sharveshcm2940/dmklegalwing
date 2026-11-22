@@ -59,8 +59,8 @@ export const TamilNaduMap: React.FC<TamilNaduMapProps> = ({
       <div className="mb-6 border-b border-[#3d3633] pb-4">
         <p className="text-[15px] font-semibold text-[#5B5348] leading-relaxed">
           {language === 'ta'
-            ? '74 கழக அமைப்புப் பிரிவுகளுக்கு 38 வருவாய் மாவட்டங்கள் வரைபடத்தில் காட்டப்பட்டுள்ளன; எனவே ஒரு மாவட்டம் இரண்டு அமைப்பாளர்களைக் காட்டலாம்.'
-            : '38 administrative districts are shown on the map for 74 party units, so a district can show two organisers.'}
+            ? '38 வருவாய் நிர்வாக மாவட்டங்கள் மற்றும் 74 கழக அமைப்பு மாவட்டங்கள் வரைபடத்தில் இணைக்கப்பட்டுள்ளன; ஒரு நிர்வாக மாவட்டத்தில் ஒன்றுக்கும் மேற்பட்ட கழக அமைப்பாளர்கள் செயல்படுகின்றனர்.'
+            : '38 administrative districts and 74 party units: multiple party organisational units function across the state\'s revenue jurisdictions.'}
         </p>
       </div>
 
