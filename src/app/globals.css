@@ -222,3 +222,62 @@ html[lang="ta"] .broadsheet-dropcap::first-letter,
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* ============================================================== */
+/* CLEAN EDITORIAL PRINT STYLESHEET                               */
+/* ============================================================== */
+@media print {
+  /* Hide all non-editorial navigation, headers, footers and interactive controls */
+  header,
+  footer,
+  nav,
+  .no-print,
+  #reading-progress-bar {
+    display: none !important;
+  }
+
+  /* Force pure white background and crisp black text */
+  body, html {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Unbox article container, strip shadows, borders and fixed widths */
+  article,
+  .print-article {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    background: transparent !important;
+  }
+
+  /* Ensure headings, paragraphs, and metadata render in solid black */
+  h1, h2, h3, h4, h5, h6, p, span, div, figcaption, time, label {
+    color: #000000 !important;
+    text-shadow: none !important;
+  }
+
+  /* Strip anchor underlines and red colors in print */
+  a {
+    color: #000000 !important;
+    text-decoration: none !important;
+  }
+
+  /* Print-only URL & Date Stamp Footer */
+  .print-footer {
+    display: block !important;
+    margin-top: 2rem !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid #000000 !important;
+    font-size: 8.5pt !important;
+    font-family: monospace !important;
+    color: #000000 !important;
+  }
+}
+

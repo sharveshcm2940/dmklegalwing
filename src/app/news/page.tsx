@@ -71,17 +71,25 @@ export default function NewsPage() {
     return filteredNews.filter((n) => n.id !== leadStory.id);
   }, [filteredNews, leadStory]);
 
-  // Latest ticker dispatches
-  const latestDispatches = useMemo(() => {
-    return news.slice(0, 5);
-  }, [news]);
+  // Court ticker items: Keep ONLY if there are real hearing dates in the data
+  const courtHearingItems = useMemo(() => {
+    return legalDevelopments
+      .filter((item: any) => Boolean(item.nextHearing || item.nextHearingDate))
+      .map((item: any) => ({
+        id: item.id,
+        court: item.court,
+        caseNumber: item.caseNumber,
+        caseTitle: item.caseTitle,
+        nextHearing: item.nextHearing || item.nextHearingDate,
+      }));
+  }, [legalDevelopments]);
 
   const handleSelectArticle = (article: NewsItem) => {
     router.push(`/news/${article.id}`);
   };
 
   return (
-    <div className="w-full flex flex-col space-y-12 pb-16 bg-[#FAF7F2] text-[#111111] font-dmk-body">
+    <div className="w-full flex flex-col space-y-12 pb-16 bg-[#FAF8F5] text-[#111111] font-dmk-body">
       
       {/* SECTION A: EDITORIAL NEWSROOM MASTHEAD */}
       <NewsroomMasthead
@@ -90,7 +98,7 @@ export default function NewsPage() {
         onSelectCategory={setActiveCategory}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        latestDispatches={latestDispatches}
+        courtHearingItems={courtHearingItems}
         onSelectArticle={handleSelectArticle}
       />
 

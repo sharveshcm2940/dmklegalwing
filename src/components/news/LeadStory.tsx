@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { NewsItem } from '@/types';
-import { ArrowRight, Clock, MapPin, Shield, Calendar, ExternalLink } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 
 interface LeadStoryProps {
   story: NewsItem;
@@ -16,120 +16,129 @@ export const LeadStory: React.FC<LeadStoryProps> = ({ story, onReadMore }) => {
 
   if (!story) return null;
 
+  const sourceName = story.issuingAuthority 
+    ? story.issuingAuthority[language] 
+    : (story.author ? story.author[language] : (language === 'ta' ? 'திமுக வழக்கறிஞர் அணித் தலைமைச் செயலகம்' : 'DMK Legal Wing Secretariat'));
+
   return (
-    <article className="w-full bg-white border-2 border-neutral-900 shadow-sm overflow-hidden font-dmk-body">
+    <article className="w-full bg-white border border-[#D8D3CB] rounded-[2px] overflow-hidden font-dmk-body">
       
       {/* Top Editorial Label Bar */}
-      <div className="bg-[#FAF7F2] border-b border-neutral-300 px-4 sm:px-6 py-2 flex items-center justify-between text-[11px] font-english">
+      <div className="bg-[#FAF8F5] border-b border-[#D8D3CB] px-4 sm:px-6 py-2.5 flex items-center justify-between text-xs font-dmk-body">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-[#E31E24]" />
-          <span className="font-bold text-[#C41A1F] uppercase tracking-widest">
-            {language === 'ta' ? 'முக்கியச் செய்தி • முதன்மை அறிக்கை' : 'LEAD EDITORIAL DISPATCH'}
+          <span className="font-english text-[10px] font-bold uppercase tracking-wider text-[#C41A1F]">
+            [{story.category}]
+          </span>
+          <span className="text-[#D8D3CB]">•</span>
+          <span className="text-xs text-[#5B5348] font-bold">
+            {language === 'ta' ? 'முக்கிய தலையங்க அறிக்கை' : 'Lead Editorial Dispatch'}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 text-neutral-600">
-          <Calendar className="w-3 h-3 text-neutral-400" />
-          <time className="font-medium">{story.date}</time>
-          {story.time && <span>• {story.time}</span>}
-          {story.readTime && (
-            <span className="hidden sm:inline bg-white px-2 py-0.5 border border-neutral-200 text-neutral-700">
-              {story.readTime}
-            </span>
-          )}
+        <div className="flex items-center gap-2 text-[#5B5348]">
+          <Calendar className="w-3.5 h-3.5 text-[#C41A1F]" />
+          <time className="font-english text-xs">{story.date}</time>
+          {story.time && <span className="font-english text-xs">• {story.time}</span>}
         </div>
       </div>
 
-      {/* Asymmetrical Split Composition: 60% Left Photo / 40% Right Copy */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x-2 divide-neutral-900">
+      {/* Asymmetrical Split Composition: 60% Left / 40% Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x border-[#D8D3CB]">
         
         {/* Left Side: 60% Width (7 of 12 cols on lg) */}
-        <div className="lg:col-span-7 flex flex-col justify-between bg-neutral-950 text-white relative group overflow-hidden">
+        <div className="lg:col-span-7 flex flex-col justify-between bg-[#FAF8F5]">
           
-          <div className="relative aspect-[16/10] sm:aspect-[16/9] lg:aspect-auto lg:h-[460px] w-full overflow-hidden bg-neutral-900">
-            <img
-              src={story.image || '/images/dmk-slider-official.jpg'}
-              alt={story.title[language]}
-              className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 opacity-95 group-hover:opacity-100"
-            />
-
-            {/* Overlaid Category Badge */}
-            <div className="absolute top-4 left-4 z-10">
-              <span className="bg-[#E31E24] text-white px-3 py-1 text-xs font-english font-bold uppercase tracking-widest shadow-md">
-                {story.category}
-              </span>
-            </div>
-
-            {/* Overlaid Court or Jurisdiction Tag if present */}
-            {story.court && (
-              <div className="absolute top-4 right-4 z-10 hidden sm:block">
-                <span className="bg-neutral-900/90 text-white border border-neutral-700 px-2.5 py-1 text-[11px] font-english font-semibold">
-                  {story.court}
-                </span>
+          {story.image ? (
+            <div>
+              <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden bg-[#111111]">
+                <img
+                  src={story.image}
+                  alt={story.title[language]}
+                  className="w-full h-full object-cover object-center"
+                />
               </div>
-            )}
-          </div>
 
-          {/* Authentic Photo Credit and Caption Strip */}
-          <div className="bg-[#151515] text-neutral-300 px-4 py-2.5 border-t border-neutral-800 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1 font-english">
-            <p className="line-clamp-1 italic text-neutral-300 text-[11px]">
-              {story.caption ? story.caption[language] : (story.title[language])}
-            </p>
-            {story.photoCredit && (
-              <span className="text-[10px] text-neutral-400 shrink-0 uppercase tracking-wider">
-                Photo: {story.photoCredit}
+              {/* Photo Caption & Credit Strip */}
+              {(story.caption?.[language] || story.photoCredit) && (
+                <figcaption className="bg-[#FAF8F5] text-[#5B5348] px-4 py-2 border-t border-[#D8D3CB] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1 font-dmk-body">
+                  <p className="italic text-xs">
+                    {story.caption ? story.caption[language] : story.title[language]}
+                  </p>
+                  {story.photoCredit && (
+                    <span className="font-english text-[10px] text-[#5B5348]/80 shrink-0">
+                      Photo: {story.photoCredit}
+                    </span>
+                  )}
+                </figcaption>
+              )}
+            </div>
+          ) : (
+            /* Typographic block when no image is present - No placeholder picture! */
+            <div className="p-8 sm:p-12 flex flex-col justify-center h-full bg-white border-l-4 border-[#E31E24]">
+              <span className="font-english text-[10px] font-bold uppercase tracking-wider text-[#C41A1F] block mb-2">
+                [{story.category}]
               </span>
-            )}
-          </div>
+              <blockquote className="font-dmk-headline text-2xl sm:text-3xl font-black text-[#111111] leading-tight italic">
+                &ldquo;{story.title[language]}&rdquo;
+              </blockquote>
+            </div>
+          )}
 
         </div>
 
         {/* Right Side: 40% Width (5 of 12 cols on lg) */}
-        <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-white">
+        <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-white space-y-4">
           
           <div className="space-y-4">
             
-            <div className="flex items-center justify-between text-xs text-neutral-500 font-english border-b border-neutral-200 pb-2">
-              <span className="font-bold text-[#C41A1F] uppercase tracking-wider">
-                {story.issuingAuthority ? story.issuingAuthority[language] : (language === 'ta' ? 'திமுக வழக்கறிஞர் அணித் தலைமை' : 'DMK Legal Wing Secretariat')}
+            {/* Source & Authority: NEVER CUT OFF, wraps to 2 lines if needed */}
+            <div className="border-b border-[#D8D3CB] pb-2 text-xs font-dmk-body">
+              <span className="text-[#5B5348] block text-[11px] mb-0.5">
+                {language === 'ta' ? 'அதிகாரப்பூர்வ வெளியீடு:' : 'Official Dispatch Source:'}
+              </span>
+              <span className="font-bold text-[#111111] block leading-tight break-words whitespace-normal">
+                {sourceName}
               </span>
               {story.caseNumber && (
-                <span className="font-mono text-[10px] text-neutral-600 bg-[#FAF7F2] px-2 py-0.5 border border-neutral-300">
-                  {story.caseNumber}
+                <span className="font-mono text-[11px] text-[#5B5348] block mt-1">
+                  Docket: {story.caseNumber}
                 </span>
               )}
             </div>
 
-            <h2 className="text-2xl sm:text-3xl lg:text-3xl font-black text-neutral-900 font-dmk-headline leading-[1.15] tracking-tight group-hover:text-[#E31E24] transition-colors">
+            {/* Main Headline */}
+            <h2 className="text-2xl sm:text-3xl font-black text-[#111111] font-dmk-headline leading-[1.15] hover:text-[#C41A1F] transition-colors">
               <Link href={`/news/${story.id}`}>
                 {story.title[language]}
               </Link>
             </h2>
 
-            <p className="text-sm sm:text-base text-neutral-700 leading-relaxed font-dmk-body border-l-2 border-[#E31E24] pl-3.5 py-0.5">
+            {/* Editorial Summary */}
+            <p className="text-sm sm:text-base text-[#5B5348] leading-relaxed font-dmk-body border-l-2 border-[#E31E24] pl-3.5 py-0.5">
               {story.summary[language]}
             </p>
 
-            {story.author && (
-              <div className="pt-2 text-xs font-english text-neutral-600">
-                <span className="text-neutral-400">{language === 'ta' ? 'அறிக்கை வெளியீடு: ' : 'Official Dispatch by: '}</span>
-                <span className="font-bold text-neutral-900">{story.author[language]}</span>
+            {/* Author Attribution: NEVER CUT OFF */}
+            {story.author && story.author[language] !== sourceName && (
+              <div className="pt-1 text-xs font-dmk-body text-[#5B5348]">
+                <span className="text-[#5B5348]">{language === 'ta' ? 'கையெழுத்திட்டவர்: ' : 'Signatory: '}</span>
+                <span className="font-bold text-[#111111] break-words whitespace-normal">{story.author[language]}</span>
               </div>
             )}
 
           </div>
 
-          {/* Action Footer */}
-          <div className="pt-6 mt-6 border-t border-neutral-200 flex items-center justify-between">
+          {/* Action Footer: min-h-[44px] rectangular red button */}
+          <div className="pt-4 border-t border-[#D8D3CB] flex items-center justify-between">
             <Link
               href={`/news/${story.id}`}
-              className="inline-flex items-center gap-2 bg-[#E31E24] hover:bg-neutral-900 text-white px-5 py-2.5 text-xs font-english font-bold uppercase tracking-wider transition-colors"
+              className="min-h-[44px] inline-flex items-center justify-center gap-2 bg-[#E31E24] hover:bg-[#111111] text-white px-5 py-2.5 text-xs font-dmk-body font-bold uppercase tracking-wider rounded-[2px] transition-colors"
             >
               <span>{language === 'ta' ? 'முழு அறிக்கையைப் படிக்க' : 'READ FULL STATEMENT'}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
-            <span className="text-[11px] font-english text-neutral-500">
+            <span className="text-xs font-dmk-body text-[#5B5348]">
               {language === 'ta' ? 'உறுதிப்படுத்தப்பட்ட அறிக்கை' : 'Verified Dispatch'}
             </span>
           </div>

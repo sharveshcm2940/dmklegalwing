@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { NewsItem } from '@/types';
-import { ArrowRight, Calendar, Clock, User, ChevronDown, ChevronRight, Share2, Check } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 interface LatestNewsFeedProps {
   articles: NewsItem[];
@@ -13,150 +13,116 @@ interface LatestNewsFeedProps {
 
 export const LatestNewsFeed: React.FC<LatestNewsFeedProps> = ({ articles, totalCount }) => {
   const { language } = useLanguage();
-  const [visibleCount, setVisibleCount] = useState<number>(6);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState<number>(8);
 
   const displayedArticles = articles.slice(0, visibleCount);
   const hasMore = visibleCount < articles.length;
-
-  const handleShare = (id: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/news/${id}` : '';
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(url);
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2500);
-    }
-  };
 
   return (
     <section className="w-full font-dmk-body">
       
       {/* Section Header */}
-      <div className="flex items-center justify-between border-b-2 border-neutral-900 pb-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b-2 border-[#111111] pb-3 mb-6 gap-2">
         <div>
-          <span className="text-[10px] font-english font-bold uppercase tracking-[0.2em] text-[#C41A1F] block mb-0.5">
-            {language === 'ta' ? 'அனைத்துப் பதிப்புகளின் காலவரிசை' : 'CHRONOLOGICAL DISPATCH ARCHIVE'}
-          </span>
-          <h3 className="text-2xl sm:text-3xl font-black text-neutral-900 font-dmk-headline">
-            {language === 'ta' ? 'தலைமைச் செயலகச் செய்திக் களம்' : 'Latest from the Press Office'}
-          </h3>
+          <h2 className="text-2xl sm:text-3xl font-black text-[#111111] font-dmk-headline">
+            {language === 'ta' ? 'தலைமைச் செயலகச் செய்திக் களம்' : 'Dispatches & Legal Communiqués'}
+          </h2>
+          <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body mt-0.5">
+            {language === 'ta' 
+              ? 'திமுக வழக்கறிஞர் அணி வெளியிடும் அதிகாரப்பூர்வ அறிக்கைகள் மற்றும் செய்திகளின் முழுப் பதிவகம்' 
+              : 'Chronological broadsheet archive of official press statements, resolutions, and gazette notices'}
+          </p>
         </div>
 
-        <div className="text-right text-xs font-english text-neutral-600">
-          <span className="font-bold text-neutral-900">{articles.length}</span>
-          <span> {language === 'ta' ? 'அறிக்கைகள் காட்டப்படுகின்றன' : 'Dispatches Available'}</span>
+        <div className="text-xs font-dmk-body text-[#5B5348]">
+          <span className="font-bold text-[#111111]">{articles.length}</span>
+          <span> {language === 'ta' ? 'அறிக்கைகள் கிடைக்கின்றன' : 'records listed'}</span>
         </div>
       </div>
 
       {/* No Results Fallback */}
       {articles.length === 0 ? (
-        <div className="p-12 text-center bg-white border border-neutral-300">
-          <p className="text-neutral-500 font-dmk-body text-sm">
+        <div className="p-12 text-center bg-white border border-[#D8D3CB] rounded-[2px]">
+          <p className="text-[#5B5348] font-dmk-body text-sm">
             {language === 'ta' 
               ? 'தேடலுக்குரிய செய்திகள் எதுவும் கிடைக்கவில்லை. வேறு சொற்களைக் கொண்டு தேடவும்.'
               : 'No official dispatches match your filter or search query. Please try another category or keyword.'}
           </p>
         </div>
       ) : (
-        /* Newspaper-Inspired Editorial List */
-        <div className="divide-y divide-neutral-300 bg-white border-y border-neutral-300">
-          {displayedArticles.map((item, index) => {
-            const isNewest = index === 0;
+        /* Newspaper Ruled List (Not equal cards) */
+        <div className="divide-y divide-[#D8D3CB] bg-white border-y border-[#D8D3CB] rounded-[2px]">
+          {displayedArticles.map((item) => {
+            const sourceText = item.issuingAuthority 
+              ? item.issuingAuthority[language] 
+              : (item.author ? item.author[language] : (language === 'ta' ? 'திமுக வழக்கறிஞர் அணித் தலைமைச் செயலகம்' : 'DMK Legal Wing Secretariat'));
+
             return (
               <article 
                 key={item.id}
-                className="p-5 sm:p-7 hover:bg-[#FAF7F2] transition-colors relative group"
+                className="p-5 sm:p-6 hover:bg-[#FAF8F5] transition-colors"
               >
-                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                   
-                  {/* Left Column: Metadata & Timing */}
-                  <div className="lg:w-48 shrink-0 space-y-1.5 text-xs font-english">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#C41A1F] uppercase tracking-wider text-[11px]">
-                        {item.category}
-                      </span>
-                      {isNewest && (
-                        <span className="bg-[#E31E24] text-white text-[9px] font-bold px-1.5 py-0.2 uppercase tracking-widest animate-pulse">
-                          LATEST
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex lg:flex-col items-center lg:items-start gap-2 lg:gap-0 text-neutral-600">
-                      <time className="font-bold text-neutral-900">{item.date}</time>
-                      {item.time && <span className="text-neutral-500 text-[11px]">{item.time}</span>}
-                    </div>
-
-                    {item.readTime && (
-                      <span className="text-[10px] text-neutral-400 block pt-0.5">
-                        {item.readTime}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Center Column: Headline, Summary & Authority */}
+                  {/* Left Column: Ruled Entry Details */}
                   <div className="flex-1 space-y-2">
-                    <h4 className="text-lg sm:text-xl font-bold text-neutral-900 font-dmk-headline leading-snug group-hover:text-[#C41A1F] transition-colors">
-                      <Link href={`/news/${item.id}`} className="block">
-                        {item.title[language]}
-                      </Link>
-                    </h4>
-
-                    <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-dmk-body line-clamp-2">
-                      {item.summary[language]}
-                    </p>
-
-                    <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] font-english text-neutral-500">
-                      {item.author && (
-                        <span className="flex items-center gap-1 font-semibold text-neutral-800">
-                          <User className="w-3 h-3 text-[#C41A1F]" />
-                          {item.author[language]}
-                        </span>
-                      )}
+                    
+                    {/* 1. Type Tag & Date */}
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <span className="font-english text-[10px] font-bold uppercase tracking-wider text-[#C41A1F]">
+                        [{item.category}]
+                      </span>
+                      <span className="text-[#D8D3CB]">•</span>
+                      <time className="font-english text-xs text-[#5B5348]">
+                        {item.date}
+                      </time>
                       {item.court && (
                         <>
-                          <span>•</span>
-                          <span className="text-neutral-700 font-medium">{item.court}</span>
+                          <span className="text-[#D8D3CB]">•</span>
+                          <span className="text-xs text-[#5B5348] font-dmk-body">
+                            {item.court}
+                          </span>
                         </>
                       )}
                       {item.caseNumber && (
                         <>
-                          <span>•</span>
-                          <span className="font-mono text-neutral-600">{item.caseNumber}</span>
+                          <span className="text-[#D8D3CB]">•</span>
+                          <span className="font-mono text-[11px] text-[#5B5348]">
+                            {item.caseNumber}
+                          </span>
                         </>
                       )}
                     </div>
+
+                    {/* 2. Headline */}
+                    <h3 className="text-base sm:text-lg font-bold text-[#111111] font-dmk-headline hover:text-[#C41A1F] transition-colors leading-snug">
+                      <Link href={`/news/${item.id}`} className="block">
+                        {item.title[language]}
+                      </Link>
+                    </h3>
+
+                    {/* 3. One-Line Summary */}
+                    <p className="line-clamp-1 text-xs sm:text-sm text-[#5B5348] font-dmk-body leading-relaxed">
+                      {item.summary[language]}
+                    </p>
+
+                    {/* 4. Source / Author Line: NEVER CUT OFF, wraps to two lines if needed */}
+                    <div className="pt-1 text-xs font-dmk-body text-[#5B5348] leading-snug break-words whitespace-normal">
+                      <span className="text-[#5B5348]">{language === 'ta' ? 'வெளியீடு: ' : 'Source: '}</span>
+                      <span className="font-semibold text-[#111111]">{sourceText}</span>
+                    </div>
+
                   </div>
 
-                  {/* Right Column: Actions (Read Statement, Share) */}
-                  <div className="lg:w-44 shrink-0 flex items-center lg:flex-col lg:items-end justify-between lg:justify-start gap-3 pt-2 lg:pt-0">
+                  {/* Right Column: Secondary Action Link (Plain Underlined Text Link, min 44px) */}
+                  <div className="shrink-0 flex items-center md:items-end justify-between md:justify-start pt-2 md:pt-0">
                     <Link
                       href={`/news/${item.id}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-english font-bold uppercase tracking-wider text-neutral-900 group-hover:text-[#C41A1F] transition-colors border-b border-transparent group-hover:border-[#E31E24] pb-0.5"
+                      className="min-h-[44px] inline-flex items-center gap-1.5 text-xs font-dmk-body font-bold text-[#111111] hover:text-[#C41A1F] underline underline-offset-4 transition-colors"
                     >
-                      <span>{language === 'ta' ? 'முழு அறிக்கை' : 'Read Dispatch'}</span>
+                      <span>{language === 'ta' ? 'முழு அறிக்கை' : 'Read statement'}</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </Link>
-
-                    <button
-                      onClick={(e) => handleShare(item.id, e)}
-                      className="inline-flex items-center gap-1 text-[11px] font-english text-neutral-500 hover:text-neutral-900 transition-colors"
-                      title="Share Dispatch URL"
-                    >
-                      {copiedId === item.id ? (
-                        <>
-                          <Check className="w-3 h-3 text-emerald-600" />
-                          <span className="text-emerald-700 font-bold">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Share2 className="w-3 h-3" />
-                          <span>Share</span>
-                        </>
-                      )}
-                    </button>
                   </div>
 
                 </div>
@@ -166,15 +132,15 @@ export const LatestNewsFeed: React.FC<LatestNewsFeedProps> = ({ articles, totalC
         </div>
       )}
 
-      {/* Load More Button */}
+      {/* Load More Button: Rectangular, min-h-[44px] */}
       {hasMore && (
-        <div className="mt-8 text-center">
+        <div className="pt-6 text-center">
           <button
+            type="button"
             onClick={() => setVisibleCount((prev) => prev + 6)}
-            className="px-6 py-3 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white border-2 border-neutral-900 text-xs font-english font-bold uppercase tracking-widest transition-all inline-flex items-center gap-2 shadow-2xs"
+            className="min-h-[44px] px-6 py-2.5 bg-[#FAF8F5] hover:bg-[#111111] hover:text-white border border-[#D8D3CB] text-[#111111] font-dmk-body font-bold text-xs uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
           >
-            <span>{language === 'ta' ? 'மேலும் அறிக்கைகளைக் காட்டுக' : 'LOAD PREVIOUS DISPATCHES'}</span>
-            <ChevronDown className="w-4 h-4" />
+            {language === 'ta' ? 'மேலும் அறிக்கைகளைக் காட்டுக' : 'Load More Dispatches'}
           </button>
         </div>
       )}

@@ -22,7 +22,7 @@ export const ReadingProgress: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-neutral-200">
+    <div id="reading-progress-bar" className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-neutral-200 no-print print:hidden">
       <div 
         className="h-full bg-[#E31E24] transition-all duration-150 ease-out" 
         style={{ width: `${progress}%` }} 
