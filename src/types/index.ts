@@ -196,5 +196,6 @@ export interface FlowchartOfficer {
   bio?: { en: string; ta: string };
   court?: string;
   barCouncilNo?: string;
+  image?: string;
   isSenior?: boolean;
 }

@@ -325,6 +325,7 @@ export const OFFICIAL_HIERARCHY_CHART: {
     honorific: { en: 'Senior Advocate', ta: 'மூத்த வழக்கறிஞர்' },
     court: 'Supreme Court of India & Madras High Court',
     barCouncilNo: 'MS/318/1979',
+    image: '/images/r-viduthalai.jpg',
     bio: {
       en: 'Distinguished Senior Advocate and former Advocate General of Tamil Nadu. Widely regarded for masterminding monumental social justice, 69% reservation protection, and federal autonomy jurisprudence before constitutional benches.',
       ta: 'தமிழ்நாட்டின் முன்னாள் தலைமை வழக்கறிஞர் (Advocate General) மற்றும் புகழ்பெற்ற மூத்த வழக்கறிஞர். அரசமைப்பு அமர்வுகளில் சமூக நீதி, 69% இடஒதுக்கீடு பாதுகாப்பு மற்றும் மாநில சுயாட்சிக்கான வழக்குகளை முன்நின்று நடத்திய பெருமைக்குரியவர்.'
@@ -341,6 +342,7 @@ export const OFFICIAL_HIERARCHY_CHART: {
     honorific: { en: 'Senior Advocate & M.P.', ta: 'மூத்த வழக்கறிஞர் & எம்.பி.' },
     court: 'Supreme Court of India & Madras High Court',
     barCouncilNo: 'MS/651/1985',
+    image: '/images/nr-elango.jpg',
     bio: {
       en: 'Senior Advocate of four decades standing and Member of Parliament (Rajya Sabha). Stalwart voice defending constitutional democracy, civil liberties, and criminal justice reforms both on the floor of Parliament and in the highest courts.',
       ta: 'நாடாளுமன்ற மாநிலங்களவை உறுப்பினர் மற்றும் நான்கு தசாப்தங்களுக்கும் மேலான அனுபவம் கொண்ட மூத்த வழக்கறிஞர். மனித உரிமைப் பாதுகாப்பு, குற்றவியல் சட்டவியல் மற்றும் ஜனநாயக விழுமியங்களை நிலைநிறுத்துவதில் முன்னணிப் பங்காற்றுபவர்.'
@@ -667,7 +669,7 @@ export const LEADERSHIP_PROFILES: Leader[] = [
       en: 'Senior Advocate and former Advocate General of Tamil Nadu. Foremost constitutional authority who has represented the state government and the Dravidian movement in epochal Supreme Court and High Court litigations protecting 69% reservation and state rights.',
       ta: 'தமிழ்நாட்டின் முன்னாள் அட்வகேட் ஜெனரல் மற்றும் மூத்த வழக்கறிஞர். சமூக நீதி, 69% இடஒதுக்கீடு பாதுகாப்பு மற்றும் மாநில சுயாட்சி தொடர்பான வரலாற்று சிறப்புமிக்க வழக்குகளை உச்ச நீதிமன்றத்தில் வாதாடிய பெருமைக்குரியவர்.'
     },
-    image: '/images/dmk-flag-sun.jpg',
+    image: '/images/r-viduthalai.jpg',
     email: 'viduthalai.office@dmk.org.in',
     phone: '+91 44 2434 4455',
     court: 'Supreme Court of India & Madras High Court',
@@ -685,7 +687,7 @@ export const LEADERSHIP_PROFILES: Leader[] = [
       en: 'Senior Advocate with four decades of trial and appellate experience, and Member of Parliament (Rajya Sabha). Stalwart voice defending civil liberties, criminal justice reforms, and federalism.',
       ta: 'நாடாளுமன்ற மாநிலங்களவை உறுப்பினர் மற்றும் நான்கு தசாப்தங்களுக்கும் மேலான அனுபவம் கொண்ட மூத்த வழக்கறிஞர். மனித உரிமைப் பாதுகாப்பு, குற்றவியல் சட்டவியல் மற்றும் ஜனநாயக விழுமியங்களை நிலைநிறுத்துவதில் முன்னணிப் பங்காற்றுபவர்.'
     },
-    image: '/images/dmk-flag-sun.jpg',
+    image: '/images/nr-elango.jpg',
     email: 'nrelango.office@dmk.org.in',
     phone: '+91 44 2811 3322',
     court: 'Supreme Court of India & Madras High Court',

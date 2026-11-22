@@ -498,9 +498,9 @@ export default function HomePage() {
 
                 <div className="aspect-[4/5] w-full bg-[#f1ece2] overflow-hidden border border-[#d7d0c3] relative">
                   <img
-                    src="/images/dmk-legal-conference.jpg"
+                    src="/images/r-viduthalai.jpg"
                     alt="R. Viduthalai Senior Advocate"
-                    className="w-full h-full object-cover object-center filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    className="w-full h-full object-cover object-[center_15%] filter grayscale group-hover:grayscale-0 transition-all duration-300"
                   />
                   <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#111111]/90 text-white text-[12px] font-bold">
                     PRESIDENT · SENIOR ADVOCATE
@@ -531,9 +531,9 @@ export default function HomePage() {
 
                 <div className="aspect-[4/5] w-full bg-[#f1ece2] overflow-hidden border border-[#d7d0c3] relative">
                   <img
-                    src="/images/dmk-press-meet.jpg"
+                    src="/images/nr-elango.jpg"
                     alt="N.R. Elango Senior Advocate & MP"
-                    className="w-full h-full object-cover object-center filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    className="w-full h-full object-cover object-top filter grayscale group-hover:grayscale-0 transition-all duration-300"
                   />
                   <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#111111]/90 text-white text-[12px] font-bold">
                     SECRETARY · SENIOR ADVOCATE & MP
