@@ -17,9 +17,9 @@ export const PageTitleBand: React.FC<PageTitleBandProps> = ({ title, description
           <h1
             className={`${
               isTamil
-                ? 'font-kavivanar font-normal text-[clamp(38px,5.5vw,76px)] leading-[1.25]'
-                : 'font-helvetica font-extrabold text-[clamp(44px,6vw,84px)] leading-[1.08]'
-            } text-[#FAF8F5] tracking-normal`}
+                ? 'font-kavivanar font-normal text-[clamp(28px,4.8vw,72px)] leading-[1.25]'
+                : 'font-helvetica font-extrabold text-[clamp(32px,5.5vw,80px)] leading-[1.08]'
+            } text-[#FAF8F5] tracking-normal break-words max-w-full`}
           >
             {title}
           </h1>
