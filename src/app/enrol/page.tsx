@@ -2,23 +2,26 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { PageTitleBand } from '@/components/PageTitleBand';
 import { useReveal } from '@/hooks/useReveal';
-import { IconCheck, IconChevronRight } from '@/components/Icons';
 
 const STORAGE_KEY = 'dmk_draft_enrol';
 
-const SPECIALIZATIONS = [
-  'Constitutional Law',
-  'Criminal Jurisprudence',
-  'Civil & Property Law',
-  'Labour & Industrial Law',
-  'Service & Employment Law',
-  'Human Rights & PIL',
-  'Women & Family Welfare'
+const EXPERIENCE_TIERS = [
+  { id: 'Junior 0-5 years', en: 'Junior (0-5 years)', ta: 'இளநிலை (0-5 ஆண்டுகள்)' },
+  { id: 'Mid 5-15 years', en: 'Mid (5-15 years)', ta: 'நடுத்தர நிலை (5-15 ஆண்டுகள்)' },
+  { id: 'Senior 15+ years', en: 'Senior (15+ years)', ta: 'மூத்த நிலை (15+ ஆண்டுகள்)' }
+];
+
+const PRACTICE_DOMAINS = [
+  { id: 'Constitutional Law', en: 'Constitutional Law', ta: 'அரசமைப்புச் சட்டம்' },
+  { id: 'Criminal Jurisprudence', en: 'Criminal Jurisprudence', ta: 'குற்றவியல் சட்டம்' },
+  { id: 'Civil & Property Law', en: 'Civil & Property Law', ta: 'உரிமையியல் & சொத்துரிமை சட்டம்' },
+  { id: 'Labour & Industrial Law', en: 'Labour & Industrial Law', ta: 'தொழிலாளர் & தொழிற்சாலை சட்டம்' },
+  { id: 'Human Rights & PIL', en: 'Human Rights & PIL', ta: 'மனித உரிமைகள் & பொதுநல வழக்குகள்' },
+  { id: 'Service & Administrative Law', en: 'Service & Administrative Law', ta: 'பணி மற்றும் நிர்வாக சட்டம்' }
 ];
 
 export default function EnrolPage() {
@@ -26,364 +29,416 @@ export default function EnrolPage() {
   const { districts } = useData();
   const router = useRouter();
 
+  // Form states
   const [fullName, setFullName] = useState('');
+  const [tamilName, setTamilName] = useState('');
   const [barCouncilNumber, setBarCouncilNumber] = useState('');
-  const [yearOfEnrollment, setYearOfEnrollment] = useState('');
+  const [practiceDomain, setPracticeDomain] = useState('Constitutional Law');
+  const [experienceTier, setExperienceTier] = useState('Junior 0-5 years');
   const [district, setDistrict] = useState('');
-  const [courtOfPractice, setCourtOfPractice] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
-  const [address, setAddress] = useState('');
-  const [areasOfSpecialization, setAreasOfSpecialization] = useState<string[]>(['Constitutional Law']);
 
-  const [formError, setFormError] = useState('');
+  // Error states
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDraftRestored, setIsDraftRestored] = useState(false);
 
   const mainSection = useReveal();
 
+  // Restore draft from browser storage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data = JSON.parse(saved);
         if (data.fullName) setFullName(data.fullName);
+        if (data.tamilName) setTamilName(data.tamilName);
         if (data.barCouncilNumber) setBarCouncilNumber(data.barCouncilNumber);
-        if (data.yearOfEnrollment) setYearOfEnrollment(data.yearOfEnrollment);
+        if (data.practiceDomain) setPracticeDomain(data.practiceDomain);
+        if (data.experienceTier) setExperienceTier(data.experienceTier);
         if (data.district) setDistrict(data.district);
-        if (data.courtOfPractice) setCourtOfPractice(data.courtOfPractice);
         if (data.mobileNumber) setMobileNumber(data.mobileNumber);
         if (data.emailAddress) setEmailAddress(data.emailAddress);
-        if (data.address) setAddress(data.address);
-        if (Array.isArray(data.areasOfSpecialization) && data.areasOfSpecialization.length > 0) {
-          setAreasOfSpecialization(data.areasOfSpecialization);
-        }
-        setIsDraftRestored(true);
       }
     } catch {
       // Ignore storage errors
     }
   }, []);
 
+  // Set default district if none selected
   useEffect(() => {
     if (!district && districts.length > 0) {
       setDistrict(districts[0].name.en);
     }
   }, [districts, district]);
 
+  // Save half-finished form in browser storage
   useEffect(() => {
     const draft = {
       fullName,
+      tamilName,
       barCouncilNumber,
-      yearOfEnrollment,
+      practiceDomain,
+      experienceTier,
       district,
-      courtOfPractice,
       mobileNumber,
-      emailAddress,
-      address,
-      areasOfSpecialization,
+      emailAddress
     };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
     } catch {
       // Ignore
     }
-  }, [fullName, barCouncilNumber, yearOfEnrollment, district, courtOfPractice, mobileNumber, emailAddress, address, areasOfSpecialization]);
+  }, [fullName, tamilName, barCouncilNumber, practiceDomain, experienceTier, district, mobileNumber, emailAddress]);
 
-  const toggleSpecialization = (spec: string) => {
-    if (areasOfSpecialization.includes(spec)) {
-      if (areasOfSpecialization.length > 1) {
-        setAreasOfSpecialization(areasOfSpecialization.filter((s) => s !== spec));
-      }
-    } else {
-      setAreasOfSpecialization([...areasOfSpecialization, spec]);
+  const validate = () => {
+    const errs: { [key: string]: string } = {};
+
+    if (!fullName.trim()) {
+      errs.fullName = language === 'ta' ? 'முழுப் பெயரை உள்ளிடவும்.' : 'Full name is required.';
     }
+    if (!barCouncilNumber.trim()) {
+      errs.barCouncilNumber =
+        language === 'ta'
+          ? 'பார் கவுன்சில் பதிவு எண்ணை உள்ளிடவும் (எ.கா: MS/1234/2018).'
+          : 'Bar Council enrolment number is required (e.g. MS/1234/2018).';
+    }
+    if (!district.trim()) {
+      errs.district = language === 'ta' ? 'கழக அமைப்பு மாவட்டத்தைத் தேர்ந்தெடுக்கவும்.' : 'Party district unit is required.';
+    }
+    if (!mobileNumber.trim()) {
+      errs.mobileNumber = language === 'ta' ? 'தொலைபேசி எண்ணை உள்ளிடவும்.' : 'Phone number is required.';
+    } else if (!/^\+?[\d\s-]{7,15}$/.test(mobileNumber.trim())) {
+      errs.mobileNumber = language === 'ta' ? 'சரியான தொலைபேசி எண்ணை உள்ளிடவும்.' : 'Please enter a valid phone number.';
+    }
+    if (!emailAddress.trim()) {
+      errs.emailAddress = language === 'ta' ? 'மின்னஞ்சல் முகவரியை உள்ளிடவும்.' : 'Email address is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress.trim())) {
+      errs.emailAddress = language === 'ta' ? 'சரியான மின்னஞ்சலை உள்ளிடவும்.' : 'Please enter a valid email address.';
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormError('');
-
-    if (!fullName.trim()) {
-      setFormError(language === 'ta' ? 'முழுப் பெயரை உள்ளிடவும்.' : 'Full name is required.');
-      return;
-    }
-    if (!barCouncilNumber.trim()) {
-      setFormError(language === 'ta' ? 'பார் கவுன்சில் பதிவு எண்ணை உள்ளிடவும்.' : 'Bar Council enrolment number is required.');
-      return;
-    }
-    if (!mobileNumber.trim()) {
-      setFormError(language === 'ta' ? 'அலைபேசி எண்ணை உள்ளிடவும்.' : 'Mobile number is required.');
-      return;
-    }
-    if (!emailAddress.trim()) {
-      setFormError(language === 'ta' ? 'மின்னஞ்சல் முகவரியை உள்ளிடவும்.' : 'Email address is required.');
-      return;
-    }
+    if (!validate()) return;
 
     setIsSubmitting(true);
 
     try {
       const payload = {
         fullName: fullName.trim(),
-        barCouncilNumber: barCouncilNumber.trim().toUpperCase(),
-        yearOfEnrollment: yearOfEnrollment.trim() || new Date().getFullYear().toString(),
-        district: district || (districts[0]?.name.en ?? 'Chennai'),
-        courtOfPractice: courtOfPractice.trim() || 'District Court',
+        barCouncilNumber: barCouncilNumber.trim(),
         mobileNumber: mobileNumber.trim(),
         emailAddress: emailAddress.trim(),
-        address: address.trim(),
-        areasOfSpecialization,
+        district: district.trim(),
+        courtOfPractice: experienceTier,
+        yearOfEnrollment: new Date().getFullYear().toString(),
+        address: tamilName.trim(),
+        areasOfSpecialization: [practiceDomain.trim()]
       };
 
-      const res = await fetch('/api/enrol', {
+      const res = await fetch('/api/registrations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
 
-      if (res.ok && data.success) {
+      if (res.ok && data.success && data.registration?.id) {
         try {
           localStorage.removeItem(STORAGE_KEY);
         } catch {}
-        router.push(`/confirmation?id=${encodeURIComponent(data.trackingId)}&type=enrol`);
+        router.push(`/enrol/done?id=${encodeURIComponent(data.registration.id)}`);
       } else {
-        setFormError(data.error || (language === 'ta' ? 'விண்ணப்பத்தைச் சமர்ப்பிப்பதில் பிழை ஏற்பட்டது.' : 'Failed to submit registration.'));
+        setErrors({
+          form: data.error || (language === 'ta' ? 'விண்ணப்பத்தைப் பதிவு செய்வதில் பிழை ஏற்பட்டது.' : 'Failed to submit enrolment.')
+        });
+        setIsSubmitting(false);
       }
     } catch {
-      setFormError(language === 'ta' ? 'சர்வர் இணைப்பு தோல்வியடைந்தது.' : 'Network connection failed.');
-    } finally {
+      setErrors({
+        form: language === 'ta' ? 'சர்வர் தொடர்பு பிழை. மீண்டும் முயற்சிக்கவும்.' : 'Network error. Please try again.'
+      });
       setIsSubmitting(false);
     }
   };
 
   return (
     <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
-      
-      {/* Universal Page Title Band */}
+      {/* Title band: "Advocate enrolment" / "வழக்கறிஞர் உறுப்பினர் சேர்க்கை" */}
       <PageTitleBand
-        title={language === 'ta' ? 'வழக்கறிஞர் உறுப்பினர் சேர்க்கை' : 'Advocate Membership Enrolment'}
+        title={language === 'ta' ? 'வழக்கறிஞர் உறுப்பினர் சேர்க்கை' : 'Advocate enrolment'}
         description={
           language === 'ta'
-            ? 'திராவிட இயக்கத்தின் சட்டப் போர்ப்படையில் இணையுங்கள். பார் கவுன்சில் பதிவுபெற்ற வழக்கறிஞர்களுக்கான அதிகாரப்பூர்வ தளம்.'
-            : 'Join the constitutional vanguard of the Dravidian movement. Official enrolment for Bar Council registered advocates.'
+            ? 'திமுக வழக்கறிஞர் அணியின் 74 அமைப்பு மாவட்டங்கள் மற்றும் நீதிமன்றப் பிரிவுகளில் இணைய அதிகாரப்பூர்வ விண்ணப்பம்.'
+            : 'Official enrolment application for advocates joining the DMK Legal Wing across 74 party district units.'
         }
       />
 
-      <div className="max-w-[960px] mx-auto px-[clamp(20px,4vw,56px)] pt-12">
-        
-        <section 
+      {/* The form in one 720 px column */}
+      <div className="max-w-[720px] mx-auto px-4 sm:px-6 pt-12">
+        <section
           ref={mainSection.ref}
-          className={`fade-rise ${mainSection.revealed ? 'revealed' : ''}`}
+          className={`fade-rise ${mainSection.revealed ? 'revealed' : ''} bg-white border-2 border-[#111111] p-6 sm:p-10`}
         >
-          {isDraftRestored && (
-            <div className="p-4 bg-[#f1ece2] border-2 border-[#111111] mb-8 flex items-center justify-between text-[14px]">
-              <span>
-                {language === 'ta'
-                  ? 'நீங்கள் முன்பு சேமித்த வரைவு விவரங்கள் மீட்டமைக்கப்பட்டுள்ளன.'
-                  : 'Your previously saved application draft has been restored.'}
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.removeItem(STORAGE_KEY);
-                  setIsDraftRestored(false);
-                  setFullName('');
-                  setBarCouncilNumber('');
-                  setMobileNumber('');
-                  setEmailAddress('');
-                }}
-                className="text-[#C41A1F] hover:underline font-bold cursor-pointer"
-              >
-                {language === 'ta' ? 'அழிக்க' : 'Discard Draft'}
-              </button>
+          {errors.form && (
+            <div className="mb-6 p-4 bg-[#f1ece2] border-l-4 border-[#C41A1F] text-[#C41A1F] font-bold text-[15px]">
+              {errors.form}
             </div>
           )}
 
-          {formError && (
-            <div className="p-4 bg-[#FCE8E8] border-2 border-[#C41A1F] text-[#C41A1F] font-bold text-[15px] mb-8">
-              {formError}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="bg-white border-2 border-[#111111] p-8 sm:p-12 space-y-8">
+          <form onSubmit={handleSubmit} noValidate className="space-y-10">
             
-            <div className="border-b-2 border-[#111111] pb-4">
-              <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
-                {language === 'ta' ? 'படிவம் A-1' : 'FORM A-1'}
-              </span>
-              <h2 className="font-kavivanar font-normal text-[28px] text-[#111111]">
-                {language === 'ta' ? 'உறுப்பினர் சேர்க்கை விண்ணப்பப் படிவம்' : 'Enrolment Application Form'}
+            {/* Section 1: Identity */}
+            <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
+              <h2
+                className={`${
+                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
+                } font-extrabold text-[24px] text-[#111111]`}
+              >
+                {language === 'ta' ? '1. சுய விவரங்கள்' : '1 Identity'}
               </h2>
-            </div>
 
-            {/* Grid 1: Name & Bar Council Number */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="fullName" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'முழுப் பெயர் (வழக்கறிஞர்)' : 'Full Name (Advocate)'} *
+              {/* Full Name */}
+              <div className="space-y-1">
+                <label htmlFor="fullName" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'முழுப் பெயர் (ஆங்கிலத்தில்) *' : 'Full name (as registered in Bar Council) *'}
                 </label>
                 <input
                   id="fullName"
                   type="text"
-                  required
+                  tabIndex={1}
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder={language === 'ta' ? 'எ.கா. மு. க. அன்புச்செல்வன்' : 'e.g. M. K. Anbuselvan'}
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111]"
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    if (errors.fullName) setErrors({ ...errors, fullName: '' });
+                  }}
+                  placeholder={language === 'ta' ? 'எ.கா: R. Viduthalai' : 'e.g. R. Viduthalai'}
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
                 />
+                {errors.fullName && (
+                  <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.fullName}</p>
+                )}
               </div>
 
-              <div>
-                <label htmlFor="barCouncilNumber" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'பார் கவுன்சில் பதிவு எண்' : 'Bar Council Enrolment No.'} *
+              {/* Tamil Name */}
+              <div className="space-y-1">
+                <label htmlFor="tamilName" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'பெயர் (தமிழில்)' : 'Tamil name'}
                 </label>
                 <input
-                  id="barCouncilNumber"
+                  id="tamilName"
                   type="text"
-                  required
-                  value={barCouncilNumber}
-                  onChange={(e) => setBarCouncilNumber(e.target.value)}
-                  placeholder="e.g. MS/1245/2012"
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111] font-mono"
+                  tabIndex={2}
+                  value={tamilName}
+                  onChange={(e) => setTamilName(e.target.value)}
+                  placeholder={language === 'ta' ? 'எ.கா: இரா. விடுதலை' : 'e.g. இரா. விடுதலை'}
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
                 />
               </div>
             </div>
 
-            {/* Grid 2: District & Court of Practice */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="district" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'கழக அமைப்பு மாவட்டம்' : 'DMK Party District Unit'} *
+            {/* Section 2: Practice */}
+            <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
+              <h2
+                className={`${
+                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
+                } font-extrabold text-[24px] text-[#111111]`}
+              >
+                {language === 'ta' ? '2. தொழில் விவரங்கள்' : '2 Practice'}
+              </h2>
+
+              {/* Bar Council enrolment number */}
+              <div className="space-y-1">
+                <label htmlFor="barCouncilNumber" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'பார் கவுன்சில் பதிவு எண் *' : 'Bar Council enrolment number *'}
+                </label>
+                <input
+                  id="barCouncilNumber"
+                  type="text"
+                  tabIndex={3}
+                  value={barCouncilNumber}
+                  onChange={(e) => {
+                    setBarCouncilNumber(e.target.value);
+                    if (errors.barCouncilNumber) setErrors({ ...errors, barCouncilNumber: '' });
+                  }}
+                  placeholder="MS/1234/2018"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] font-mono text-[#111111] focus:bg-white outline-none"
+                />
+                <p className="text-[13px] text-[#5B5348]">
+                  {language === 'ta' ? 'உதாரண வடிவம்: MS/1234/2018' : 'Example format: MS/1234/2018'}
+                </p>
+                {errors.barCouncilNumber && (
+                  <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.barCouncilNumber}</p>
+                )}
+              </div>
+
+              {/* Practice domain */}
+              <div className="space-y-1">
+                <label htmlFor="practiceDomain" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'முதன்மை பயிற்சிப் பிரிவு *' : 'Practice domain *'}
                 </label>
                 <select
-                  id="district"
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111] cursor-pointer"
+                  id="practiceDomain"
+                  tabIndex={4}
+                  value={practiceDomain}
+                  onChange={(e) => setPracticeDomain(e.target.value)}
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none cursor-pointer"
                 >
-                  {districts.map((d) => (
-                    <option key={d.id} value={d.name.en}>
-                      {d.name[language]} ({d.zone})
+                  {PRACTICE_DOMAINS.map((dom) => (
+                    <option key={dom.id} value={dom.id}>
+                      {language === 'ta' ? dom.ta : dom.en}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label htmlFor="courtOfPractice" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'பயிற்சி செய்யும் நீதிமன்றம்' : 'Primary Court of Practice'} *
-                </label>
-                <input
-                  id="courtOfPractice"
-                  type="text"
-                  value={courtOfPractice}
-                  onChange={(e) => setCourtOfPractice(e.target.value)}
-                  placeholder={language === 'ta' ? 'எ.கா. சென்னை உயர்நீதிமன்றம்' : 'e.g. Madras High Court'}
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111]"
-                />
+              {/* Experience tier */}
+              <div className="space-y-2">
+                <span className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'அனுபவ அடுக்கு *' : 'Experience tier *'}
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {EXPERIENCE_TIERS.map((tier, idx) => {
+                    const isSelected = experienceTier === tier.id;
+                    return (
+                      <label
+                        key={tier.id}
+                        className={`min-h-[48px] px-4 py-3 border-2 border-[#111111] flex items-center gap-3 cursor-pointer transition-colors ${
+                          isSelected ? 'bg-[#111111] text-white' : 'bg-[#FAF8F5] hover:bg-[#f1ece2] text-[#111111]'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="experienceTier"
+                          tabIndex={5 + idx}
+                          value={tier.id}
+                          checked={isSelected}
+                          onChange={() => setExperienceTier(tier.id)}
+                          className="w-4 h-4 rounded-none accent-[#E31E24] cursor-pointer"
+                        />
+                        <span className="text-[14px] font-extrabold leading-tight">
+                          {language === 'ta' ? tier.ta : tier.en}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Grid 3: Mobile & Email */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="mobileNumber" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'அலைபேசி எண் (வாட்ஸ்அப்)' : 'Mobile Phone (WhatsApp)'} *
+            {/* Section 3: Unit */}
+            <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
+              <h2
+                className={`${
+                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
+                } font-extrabold text-[24px] text-[#111111]`}
+              >
+                {language === 'ta' ? '3. அமைப்பு மாவட்டம்' : '3 Unit'}
+              </h2>
+
+              {/* Dropdown of all 74 party districts */}
+              <div className="space-y-1">
+                <label htmlFor="districtUnit" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? '74 கழக அமைப்பு மாவட்டம் *' : 'Party district unit (74 districts) *'}
+                </label>
+                <select
+                  id="districtUnit"
+                  tabIndex={8}
+                  value={district}
+                  onChange={(e) => {
+                    setDistrict(e.target.value);
+                    if (errors.district) setErrors({ ...errors, district: '' });
+                  }}
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none cursor-pointer"
+                >
+                  {districts.map((d) => (
+                    <option key={d.id} value={d.name.en}>
+                      {language === 'ta' ? `${d.name.ta} (${d.zone || ''})` : `${d.name.en} (${d.zone || ''})`}
+                    </option>
+                  ))}
+                </select>
+                {errors.district && (
+                  <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.district}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Section 4: Contact */}
+            <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
+              <h2
+                className={`${
+                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
+                } font-extrabold text-[24px] text-[#111111]`}
+              >
+                {language === 'ta' ? '4. தொடர்பு விவரங்கள்' : '4 Contact'}
+              </h2>
+
+              {/* Phone */}
+              <div className="space-y-1">
+                <label htmlFor="mobileNumber" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'தொலைபேசி எண் *' : 'Phone number *'}
                 </label>
                 <input
                   id="mobileNumber"
                   type="tel"
-                  required
+                  tabIndex={9}
                   value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                  placeholder="9876543210"
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111] font-mono"
+                  onChange={(e) => {
+                    setMobileNumber(e.target.value);
+                    if (errors.mobileNumber) setErrors({ ...errors, mobileNumber: '' });
+                  }}
+                  placeholder="+91 98400 12345"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
                 />
+                {errors.mobileNumber && (
+                  <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.mobileNumber}</p>
+                )}
               </div>
 
-              <div>
-                <label htmlFor="emailAddress" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'மின்னஞ்சல் முகவரி' : 'Email Address'} *
+              {/* Email */}
+              <div className="space-y-1">
+                <label htmlFor="emailAddress" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'மின்னஞ்சல் முகவரி *' : 'Email address *'}
                 </label>
                 <input
                   id="emailAddress"
                   type="email"
-                  required
+                  tabIndex={10}
                   value={emailAddress}
-                  onChange={(e) => setEmailAddress(e.target.value)}
+                  onChange={(e) => {
+                    setEmailAddress(e.target.value);
+                    if (errors.emailAddress) setErrors({ ...errors, emailAddress: '' });
+                  }}
                   placeholder="advocate@example.com"
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111]"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
                 />
+                {errors.emailAddress && (
+                  <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.emailAddress}</p>
+                )}
               </div>
             </div>
 
-            {/* Specialization Checkboxes */}
-            <div className="space-y-3 pt-2">
-              <label className="font-semibold text-[15px] text-[#111111] block">
-                {language === 'ta' ? 'சட்டப் பயிற்சிப் பிரிவுகள் (தேர்ந்தெடுக்கவும்)' : 'Practice Specialisations (Select all that apply)'}
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {SPECIALIZATIONS.map((spec) => {
-                  const isChecked = areasOfSpecialization.includes(spec);
-                  return (
-                    <button
-                      key={spec}
-                      type="button"
-                      onClick={() => toggleSpecialization(spec)}
-                      className={`p-3 text-left border-2 flex items-center justify-between transition-colors cursor-pointer ${
-                        isChecked 
-                          ? 'border-[#E31E24] bg-[#f1ece2] text-[#111111] font-bold' 
-                          : 'border-[#111111] bg-white text-[#5B5348]'
-                      }`}
-                    >
-                      <span className="text-[14px]">{spec}</span>
-                      {isChecked && <IconCheck className="w-4 h-4 text-[#C41A1F]" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Address */}
-            <div>
-              <label htmlFor="address" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                {language === 'ta' ? 'வழக்கறிஞர் அலுவலக முகவரி' : 'Chambers / Office Address'}
-              </label>
-              <textarea
-                id="address"
-                rows={3}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder={language === 'ta' ? 'அலுவலக முகவரி...' : 'Enter chambers address...'}
-                className="w-full bg-[#FAF8F5] border-2 border-[#111111] p-3 text-[15px] text-[#111111]"
-              />
-            </div>
-
-            {/* Submit Action */}
-            <div className="pt-4 border-t-2 border-[#111111] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <p className="text-[13px] text-[#5B5348]">
-                {language === 'ta'
-                  ? 'மனுவை சமர்ப்பித்தவுடன் உங்கள் மாவட்ட அமைப்பாளருக்கு தகவல் அனுப்பப்படும்.'
-                  : 'Upon submission, your application will be routed to your district organiser.'}
-              </p>
-
+            {/* Submit enrolment button */}
+            <div className="pt-4 border-t-2 border-[#111111]">
               <button
                 type="submit"
+                tabIndex={11}
                 disabled={isSubmitting}
-                className="min-h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[15px] inline-flex items-center justify-center gap-2 cursor-pointer btn-lift disabled:opacity-50 shrink-0"
+                className="w-full min-h-[52px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] disabled:opacity-50 text-white font-extrabold text-[16px] flex items-center justify-center cursor-pointer btn-lift transition-colors"
               >
-                <span>{isSubmitting ? (language === 'ta' ? 'சமர்ப்பிக்கப்படுகிறது...' : 'Submitting...') : (language === 'ta' ? 'மனுவை சமர்ப்பிக்க' : 'Submit Enrolment')}</span>
-                <IconChevronRight className="w-4 h-4" />
+                {isSubmitting
+                  ? (language === 'ta' ? 'பதிவாகிறது...' : 'Submitting enrolment...')
+                  : (language === 'ta' ? 'சேர்க்கை மனுவை சமர்ப்பிக்க' : 'Submit enrolment')}
               </button>
             </div>
 
           </form>
-
         </section>
-
       </div>
     </div>
   );

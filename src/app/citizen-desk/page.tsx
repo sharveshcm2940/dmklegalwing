@@ -2,34 +2,45 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
-import { useData } from '@/context/DataContext';
 import { PageTitleBand } from '@/components/PageTitleBand';
 import { useReveal } from '@/hooks/useReveal';
-import { IconChevronRight } from '@/components/Icons';
 
 const STORAGE_KEY = 'dmk_draft_citizen_desk';
 
+const GRIEVANCE_CATEGORIES = [
+  { id: 'Land rights', en: 'Land rights', ta: 'நில உரிமைகள்' },
+  { id: 'Police excesses', en: 'Police excesses', ta: 'காவல்துறை அத்துமீறல்' },
+  { id: 'Civil rights', en: 'Civil rights', ta: 'குடிமை உரிமைகள்' },
+  { id: 'Labor', en: 'Labor', ta: 'தொழிலாளர் நலன்' }
+];
+
+const URGENCY_LEVELS = [
+  { id: 'Normal', en: 'Normal', ta: 'சாதாரண' },
+  { id: 'High', en: 'High', ta: 'அவசரம்' },
+  { id: 'Critical / Urgent Habeas Corpus', en: 'Critical / Urgent Habeas Corpus', ta: 'மிக அவசரம் / ஆட்கொணர்வு மனு' }
+];
+
 export default function CitizenDeskPage() {
   const { language } = useLanguage();
-  const { districts } = useData();
   const router = useRouter();
 
+  // Form states
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [district, setDistrict] = useState('');
-  const [category, setCategory] = useState<'Legal Aid' | 'General Query' | 'High Court Wing' | 'Press / Media'>('Legal Aid');
-  const [subject, setSubject] = useState('');
+  const [address, setAddress] = useState('');
+  const [category, setCategory] = useState('Land rights');
+  const [urgency, setUrgency] = useState('Normal');
   const [message, setMessage] = useState('');
 
-  const [formError, setFormError] = useState('');
+  // Error states
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDraftRestored, setIsDraftRestored] = useState(false);
 
   const mainSection = useReveal();
 
+  // Restore draft from browser storage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -38,48 +49,48 @@ export default function CitizenDeskPage() {
         if (data.name) setName(data.name);
         if (data.phone) setPhone(data.phone);
         if (data.email) setEmail(data.email);
-        if (data.district) setDistrict(data.district);
+        if (data.address) setAddress(data.address);
         if (data.category) setCategory(data.category);
-        if (data.subject) setSubject(data.subject);
+        if (data.urgency) setUrgency(data.urgency);
         if (data.message) setMessage(data.message);
-        setIsDraftRestored(true);
       }
     } catch {
       // Ignore
     }
   }, []);
 
+  // Save half-finished form in browser storage
   useEffect(() => {
-    if (!district && districts.length > 0) {
-      setDistrict(districts[0].name.en);
-    }
-  }, [districts, district]);
-
-  useEffect(() => {
-    const draft = { name, phone, email, district, category, subject, message };
+    const draft = { name, phone, email, address, category, urgency, message };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
     } catch {
       // Ignore
     }
-  }, [name, phone, email, district, category, subject, message]);
+  }, [name, phone, email, address, category, urgency, message]);
+
+  const validate = () => {
+    const errs: { [key: string]: string } = {};
+
+    if (!name.trim()) {
+      errs.name = language === 'ta' ? 'பெயரை உள்ளிடவும்.' : 'Name is required.';
+    }
+    if (!phone.trim()) {
+      errs.phone = language === 'ta' ? 'தொலைபேசி எண்ணை உள்ளிடவும்.' : 'Phone number is required.';
+    } else if (!/^\+?[\d\s-]{7,15}$/.test(phone.trim())) {
+      errs.phone = language === 'ta' ? 'சரியான தொலைபேசி எண்ணை உள்ளிடவும்.' : 'Please enter a valid phone number.';
+    }
+    if (!message.trim()) {
+      errs.message = language === 'ta' ? 'உங்கள் கோரிக்கை விவரத்தை உள்ளிடவும்.' : 'Grievance description is required.';
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormError('');
-
-    if (!name.trim()) {
-      setFormError(language === 'ta' ? 'பெயரை உள்ளிடவும்.' : 'Name is required.');
-      return;
-    }
-    if (!phone.trim()) {
-      setFormError(language === 'ta' ? 'தொடர்பு தொலைபேசி எண்ணை உள்ளிடவும்.' : 'Phone number is required.');
-      return;
-    }
-    if (!message.trim()) {
-      setFormError(language === 'ta' ? 'உங்கள் கோரிக்கை அல்லது புகாரை விரிவாக உள்ளிடவும்.' : 'Grievance description / message is required.');
-      return;
-    }
+    if (!validate()) return;
 
     setIsSubmitting(true);
 
@@ -88,232 +99,273 @@ export default function CitizenDeskPage() {
         name: name.trim(),
         phone: phone.trim(),
         email: email.trim(),
-        district: district || (districts[0]?.name.en ?? 'Chennai'),
-        category,
-        subject: subject.trim() || 'General Public Legal Aid Request',
-        message: message.trim(),
+        district: address.trim() || 'Chennai',
+        subject: `${category} - ${urgency}`,
+        message: `${address ? `Address: ${address.trim()}\n\n` : ''}${message.trim()}`,
+        category
       };
 
-      const res = await fetch('/api/citizen-desk', {
+      const res = await fetch('/api/enquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
 
-      if (res.ok && data.success) {
+      if (res.ok && data.success && data.enquiry?.id) {
         try {
           localStorage.removeItem(STORAGE_KEY);
         } catch {}
-        router.push(`/confirmation?id=${encodeURIComponent(data.trackingId)}&type=citizen`);
+        router.push(`/citizen-desk/done?id=${encodeURIComponent(data.enquiry.id)}`);
       } else {
-        setFormError(data.error || (language === 'ta' ? 'மனுவை சமர்ப்பிப்பதில் பிழை ஏற்பட்டது.' : 'Failed to submit grievance.'));
+        setErrors({
+          form: data.error || (language === 'ta' ? 'மனுவை சமர்ப்பிப்பதில் பிழை ஏற்பட்டது.' : 'Failed to submit request.')
+        });
+        setIsSubmitting(false);
       }
     } catch {
-      setFormError(language === 'ta' ? 'சர்வர் இணைப்பு தோல்வியடைந்தது.' : 'Network error. Please try again.');
-    } finally {
+      setErrors({
+        form: language === 'ta' ? 'சர்வர் தொடர்பு பிழை. மீண்டும் முயற்சிக்கவும்.' : 'Network error. Please try again.'
+      });
       setIsSubmitting(false);
     }
   };
 
   return (
     <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
-      
-      {/* Universal Page Title Band */}
+      {/* Title band: "Citizen legal desk" / "பொது மக்கள் சட்ட உதவி மையம்" */}
       <PageTitleBand
-        title={language === 'ta' ? 'மக்கள் சட்ட உதவி மையம்' : 'Citizen Legal Grievance Portal'}
+        title={language === 'ta' ? 'பொது மக்கள் சட்ட உதவி மையம்' : 'Citizen legal desk'}
         description={
           language === 'ta'
-            ? 'அடிப்படை மனித உரிமைகள் பாதுகாப்பு, காவல் தடுப்புக் காவல் உதவி மற்றும் மாவட்ட இலவச சட்ட உதவி.'
-            : 'Official portal for citizen constitutional grievances, police custody defense, and pro-bono representation.'
+            ? 'சாமானிய மக்களுக்கான இலவச சட்ட ஆலோசனை, ஆட்கொணர்வு மனுக்கள் மற்றும் குடிமை உரிமைப் பாதுகாப்பு மையம்.'
+            : 'Confidential pro-bono legal consultation, civil liberties defense and emergency habeas corpus assistance.'
         }
       />
 
-      <div className="max-w-[960px] mx-auto px-[clamp(20px,4vw,56px)] pt-12 space-y-8">
+      {/* The form in one 720 px column */}
+      <div className="max-w-[720px] mx-auto px-4 sm:px-6 pt-12 space-y-6">
         
-        {/* MANDATORY BOXED NOTICE AT THE TOP */}
-        <div className="border-4 border-[#E31E24] bg-[#111111] text-white p-5 sm:p-6 text-center font-bold text-[16px] sm:text-[18px]">
+        {/* 1. Boxed custody notice first: 2 px red border */}
+        <div className="border-2 border-[#E31E24] bg-white p-5 text-[16px] font-bold text-[#111111] leading-relaxed">
           If you or someone you know is in police custody, call [HELPLINE NUMBER] now.
         </div>
 
-        <section 
+        {/* 2. One-line privacy notice */}
+        <p className="text-[14px] text-[#5B5348] italic border-b border-[#d7d0c3] pb-4">
+          {language === 'ta'
+            ? 'திமுக வழக்கறிஞர் அணியால் உங்கள் மனுக்கள் மற்றும் விவரங்கள் முழுமையான சட்டப் பாதுகாப்புடன் இரகசியமாக வைக்கப்படும்.'
+            : 'All submissions are treated with strict legal confidentiality by DMK Legal Wing advocates.'}
+        </p>
+
+        {/* 3. The Form */}
+        <section
           ref={mainSection.ref}
-          className={`fade-rise ${mainSection.revealed ? 'revealed' : ''}`}
+          className={`fade-rise ${mainSection.revealed ? 'revealed' : ''} bg-white border-2 border-[#111111] p-6 sm:p-10`}
         >
-          {isDraftRestored && (
-            <div className="p-4 bg-[#f1ece2] border-2 border-[#111111] mb-8 flex items-center justify-between text-[14px]">
-              <span>
-                {language === 'ta'
-                  ? 'நீங்கள் முன்பு சேமித்த வரைவு விவரங்கள் மீட்டமைக்கப்பட்டுள்ளன.'
-                  : 'Your previously saved grievance draft has been restored.'}
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.removeItem(STORAGE_KEY);
-                  setIsDraftRestored(false);
-                  setName('');
-                  setPhone('');
-                  setEmail('');
-                  setMessage('');
-                }}
-                className="text-[#C41A1F] hover:underline font-bold cursor-pointer"
-              >
-                {language === 'ta' ? 'அழிக்க' : 'Discard Draft'}
-              </button>
+          {errors.form && (
+            <div className="mb-6 p-4 bg-[#f1ece2] border-l-4 border-[#C41A1F] text-[#C41A1F] font-bold text-[15px]">
+              {errors.form}
             </div>
           )}
 
-          {formError && (
-            <div className="p-4 bg-[#FCE8E8] border-2 border-[#C41A1F] text-[#C41A1F] font-bold text-[15px] mb-8">
-              {formError}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="bg-white border-2 border-[#111111] p-8 sm:p-12 space-y-8">
+          <form onSubmit={handleSubmit} noValidate className="space-y-8">
             
-            <div className="border-b-2 border-[#111111] pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-              <div>
-                <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
-                  {language === 'ta' ? 'மனுப் படிவம்' : 'LEGAL AID PETITION'}
-                </span>
-                <h2 className="font-kavivanar font-normal text-[28px] text-[#111111]">
-                  {language === 'ta' ? 'மக்கள் சட்ட உதவி விண்ணப்பம்' : 'Submit Legal Grievance Request'}
-                </h2>
-              </div>
-              <Link 
-                href="/track"
-                className="text-[14px] font-extrabold text-[#C41A1F] hover:underline"
+            {/* Petitioner Details */}
+            <div className="space-y-5">
+              <h2
+                className={`${
+                  language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
+                } font-extrabold text-[22px] text-[#111111] border-b-2 border-[#111111] pb-2`}
               >
-                {language === 'ta' ? 'ஏற்கனவே உள்ள மனுவைக் கண்காணிக்க →' : 'Track Existing Grievance →'}
-              </Link>
-            </div>
+                {language === 'ta' ? 'மனுதாரர் விவரங்கள்' : 'Petitioner details'}
+              </h2>
 
-            {/* Grid 1: Name & Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="name" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'உங்கள் பெயர்' : 'Petitioner Name'} *
+              {/* Name */}
+              <div className="space-y-1">
+                <label htmlFor="petitionerName" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'முழுப் பெயர் *' : 'Full name *'}
                 </label>
                 <input
-                  id="name"
+                  id="petitionerName"
                   type="text"
-                  required
+                  tabIndex={1}
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={language === 'ta' ? 'எ.கா. க. பாண்டியன்' : 'e.g. K. Pandian'}
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111]"
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (errors.name) setErrors({ ...errors, name: '' });
+                  }}
+                  placeholder={language === 'ta' ? 'உங்கள் பெயர்' : 'Your name'}
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
                 />
+                {errors.name && (
+                  <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.name}</p>
+                )}
               </div>
 
-              <div>
-                <label htmlFor="phone" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'அலைபேசி எண் (தொடர்புக்கு)' : 'Mobile Phone Number'} *
+              {/* Phone */}
+              <div className="space-y-1">
+                <label htmlFor="petitionerPhone" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'தொலைபேசி எண் *' : 'Phone number *'}
                 </label>
                 <input
-                  id="phone"
+                  id="petitionerPhone"
                   type="tel"
-                  required
+                  tabIndex={2}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="9876543210"
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111] font-mono"
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    if (errors.phone) setErrors({ ...errors, phone: '' });
+                  }}
+                  placeholder="+91 98400 12345"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                />
+                {errors.phone && (
+                  <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.phone}</p>
+                )}
+              </div>
+
+              {/* Email */}
+              <div className="space-y-1">
+                <label htmlFor="petitionerEmail" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'மின்னஞ்சல் முகவரி' : 'Email address'}
+                </label>
+                <input
+                  id="petitionerEmail"
+                  type="email"
+                  tabIndex={3}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
+                />
+              </div>
+
+              {/* Address */}
+              <div className="space-y-1">
+                <label htmlFor="petitionerAddress" className="block text-[15px] font-extrabold text-[#111111]">
+                  {language === 'ta' ? 'முகவரி / மாவட்டம்' : 'Address / District'}
+                </label>
+                <input
+                  id="petitionerAddress"
+                  type="text"
+                  tabIndex={4}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder={language === 'ta' ? 'முகவரி, ஊர், மாவட்டம்' : 'Street address, town, district'}
+                  className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none"
                 />
               </div>
             </div>
 
-            {/* Grid 2: District & Category */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="district" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'மாவட்டம்' : 'District'} *
-                </label>
-                <select
-                  id="district"
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111] cursor-pointer"
-                >
-                  {districts.map((d) => (
-                    <option key={d.id} value={d.name.en}>
-                      {d.name[language]} ({d.zone})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="category" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                  {language === 'ta' ? 'கோரிக்கைப் பிரிவு' : 'Grievance Nature'} *
-                </label>
-                <select
-                  id="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as any)}
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111] cursor-pointer"
-                >
-                  <option value="Legal Aid">{language === 'ta' ? 'இலவச சட்ட உதவி / காவல்துறை புகார்' : 'Legal Aid / Police Action'}</option>
-                  <option value="General Query">{language === 'ta' ? 'பொது அரசமைப்பு வழிகாட்டல்' : 'Constitutional Guidance'}</option>
-                  <option value="High Court Wing">{language === 'ta' ? 'உயர்நீதிமன்ற வழக்கு ஆதரவு' : 'High Court Legal Support'}</option>
-                  <option value="Press / Media">{language === 'ta' ? 'பத்திரிகை & ஊடக வினவல்' : 'Press & Media Inquiry'}</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Subject */}
-            <div>
-              <label htmlFor="subject" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                {language === 'ta' ? 'கோரிக்கையின் தலைப்பு' : 'Subject of Petition'}
+            {/* Grievance Category */}
+            <div className="space-y-3 pt-4 border-t-2 border-[#111111]">
+              <label htmlFor="grievanceCategory" className="block text-[15px] font-extrabold text-[#111111]">
+                {language === 'ta' ? 'மனுவின் வகைப்பாடு *' : 'Grievance category *'}
               </label>
-              <input
-                id="subject"
-                type="text"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder={language === 'ta' ? 'சுருக்கமான தலைப்பு...' : 'Brief summary of the issue...'}
-                className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] px-4 text-[15px] text-[#111111]"
-              />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {GRIEVANCE_CATEGORIES.map((cat, idx) => {
+                  const isSelected = category === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      tabIndex={5 + idx}
+                      onClick={() => setCategory(cat.id)}
+                      className={`min-h-[48px] px-3 py-2 text-[14px] font-extrabold border-2 border-[#111111] cursor-pointer transition-colors ${
+                        isSelected
+                          ? 'bg-[#111111] text-white'
+                          : 'bg-[#FAF8F5] hover:bg-[#f1ece2] text-[#111111]'
+                      }`}
+                    >
+                      {language === 'ta' ? cat.ta : cat.en}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Message */}
-            <div>
-              <label htmlFor="message" className="font-semibold text-[15px] text-[#111111] mb-2 block">
-                {language === 'ta' ? 'முழு விவரம் அல்லது புகார்' : 'Detailed Narrative & Grievance'} *
+            {/* Urgency: as three large square radio buttons */}
+            <div className="space-y-3 pt-4 border-t-2 border-[#111111]">
+              <span className="block text-[15px] font-extrabold text-[#111111]">
+                {language === 'ta' ? 'அவசர நிலை *' : 'Urgency *'}
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {URGENCY_LEVELS.map((lvl, idx) => {
+                  const isSelected = urgency === lvl.id;
+                  const isCritical = lvl.id.includes('Critical');
+                  return (
+                    <label
+                      key={lvl.id}
+                      className={`min-h-[56px] p-4 border-2 border-[#111111] flex items-center gap-3 cursor-pointer transition-colors ${
+                        isSelected
+                          ? isCritical
+                            ? 'bg-[#E31E24] text-white border-[#E31E24]'
+                            : 'bg-[#111111] text-white border-[#111111]'
+                          : 'bg-[#FAF8F5] hover:bg-[#f1ece2] text-[#111111]'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="urgency"
+                        tabIndex={9 + idx}
+                        value={lvl.id}
+                        checked={isSelected}
+                        onChange={() => setUrgency(lvl.id)}
+                        className="w-5 h-5 rounded-none accent-[#111111] cursor-pointer shrink-0"
+                      />
+                      <span className="text-[14px] font-extrabold leading-tight">
+                        {language === 'ta' ? lvl.ta : lvl.en}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-1 pt-4 border-t-2 border-[#111111]">
+              <label htmlFor="grievanceMessage" className="block text-[15px] font-extrabold text-[#111111]">
+                {language === 'ta' ? 'கோரிக்கையின் முழு விவரம் *' : 'Description of legal grievance *'}
               </label>
               <textarea
-                id="message"
-                required
+                id="grievanceMessage"
                 rows={5}
+                tabIndex={12}
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={language === 'ta' ? 'உங்கள் சட்டச் சிக்கல் மற்றும் தேவையான உதவி குறித்து விரிவாக எழுதவும்...' : 'Explain your legal predicament and the assistance required...'}
-                className="w-full bg-[#FAF8F5] border-2 border-[#111111] p-3 text-[15px] text-[#111111]"
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                  if (errors.message) setErrors({ ...errors, message: '' });
+                }}
+                placeholder={
+                  language === 'ta'
+                    ? 'நிகழ்ந்த இடம், தேதி, சம்பந்தப்பட்ட நபர்கள் மற்றும் சட்ட ரீதியான கோரிக்கையை விரிவாக உள்ளிடவும்...'
+                    : 'Detail the facts, parties involved, dates, police station / court involved, and relief sought...'
+                }
+                className="w-full p-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] focus:bg-white outline-none font-catamaran"
               />
+              {errors.message && (
+                <p className="text-[14px] font-bold text-[#C41A1F] pt-1">{errors.message}</p>
+              )}
             </div>
 
-            {/* Submit Bar */}
-            <div className="pt-4 border-t-2 border-[#111111] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <p className="text-[13px] text-[#5B5348]">
-                {language === 'ta'
-                  ? 'மனுவை சமர்ப்பித்ததும் உங்கள் அலைபேசிக்கு கண்காணிப்பு எண் (Tracking ID) வழங்கப்படும்.'
-                  : 'You will receive a unique tracking ID to monitor grievance assignment.'}
-              </p>
-
+            {/* Submit request button */}
+            <div className="pt-4 border-t-2 border-[#111111]">
               <button
                 type="submit"
+                tabIndex={13}
                 disabled={isSubmitting}
-                className="min-h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[15px] inline-flex items-center justify-center gap-2 cursor-pointer btn-lift disabled:opacity-50 shrink-0"
+                className="w-full min-h-[52px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] disabled:opacity-50 text-white font-extrabold text-[16px] flex items-center justify-center cursor-pointer btn-lift transition-colors"
               >
-                <span>{isSubmitting ? (language === 'ta' ? 'சமர்ப்பிக்கப்படுகிறது...' : 'Submitting...') : (language === 'ta' ? 'மனுவை சமர்ப்பிக்க' : 'Submit Request')}</span>
-                <IconChevronRight className="w-4 h-4" />
+                {isSubmitting
+                  ? (language === 'ta' ? 'பதிவாகிறது...' : 'Submitting request...')
+                  : (language === 'ta' ? 'மனுவை சமர்ப்பிக்க' : 'Submit request')}
               </button>
             </div>
 
           </form>
-
         </section>
-
       </div>
     </div>
   );

@@ -23,13 +23,14 @@ export async function GET(request: Request) {
       else if (enquiry.status === 'reviewed') publicStatus = 'In progress';
       else if (enquiry.status === 'resolved') publicStatus = 'Resolved';
 
-      // STRICT PRIVACY: Return ONLY the status and tracking ID
+      // STRICT PRIVACY: Return ONLY the status and tracking ID and lastUpdated
       return NextResponse.json({
         success: true,
         found: true,
         trackingId: enquiry.id,
         status: publicStatus,
-        type: 'citizen-desk'
+        type: 'citizen-desk',
+        lastUpdated: enquiry.submittedAt ? enquiry.submittedAt.split('T')[0] : ''
       });
     }
 
@@ -43,13 +44,14 @@ export async function GET(request: Request) {
       else if (registration.status === 'verified') publicStatus = 'In progress';
       else if (registration.status === 'approved' || registration.status === 'rejected') publicStatus = 'Resolved';
 
-      // STRICT PRIVACY: Return ONLY the status and tracking ID
+      // STRICT PRIVACY: Return ONLY the status and tracking ID and lastUpdated
       return NextResponse.json({
         success: true,
         found: true,
         trackingId: registration.id,
         status: publicStatus,
-        type: 'enrol'
+        type: 'enrol',
+        lastUpdated: registration.submittedAt ? registration.submittedAt.split('T')[0] : ''
       });
     }
 
