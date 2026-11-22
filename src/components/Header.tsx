@@ -31,29 +31,39 @@ export const Header: React.FC = () => {
       {/* Signature DMK Flag Top Strip: Top Black, Bottom Red */}
       <div className="w-full h-[4px] dmk-flag-strip" aria-hidden="true" />
       
-      {/* Tier 1: Masthead Bar (Logo, Brand Title, Quick Enrol CTA, Language Toggle, Mobile Toggle) */}
+      {/* Tier 1: Main Masthead Bar */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between gap-3">
         
-        {/* Brand identity: Official Rising Sun & DMK Flag Logo + "திமுக வழக்கறிஞர் அணி" */}
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3.5 shrink-0 focus-visible:outline-2 focus-visible:outline-[#E31E24]">
+        {/* Brand identity: Official Rising Sun & Flag Logo + 16px Red Square + "திமுக வழக்கறிஞர் அணி" */}
+        <Link 
+          href="/" 
+          className="flex items-center gap-3 shrink-0 focus-visible:outline-2 focus-visible:outline-[#E31E24]"
+          aria-label="DMK Legal Wing Home"
+        >
+          {/* Official Emblem */}
           <img
             src="/images/dmk-official-logo.png"
             alt="DMK Rising Sun & Flag Emblem"
             className="h-10 sm:h-12 w-auto object-contain shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
           />
+
+          {/* 16 px Red Square */}
+          <span className="w-4 h-4 bg-[#E31E24] inline-block shrink-0" aria-hidden="true" />
+
+          {/* Brand Titles */}
           <div className="flex flex-col justify-center">
-            <span className="font-catamaran font-bold text-[16px] sm:text-[19px] md:text-[21px] leading-tight text-[#FAF8F5] tracking-normal whitespace-nowrap">
+            <span className="font-catamaran font-extrabold text-[17px] sm:text-[20px] md:text-[22px] leading-tight text-[#FAF8F5] tracking-normal whitespace-nowrap">
               திமுக வழக்கறிஞர் அணி
             </span>
-            <span className="font-catamaran font-medium text-[11px] sm:text-[12px] text-[#d8cfc2] leading-tight tracking-wider uppercase mt-0.5">
+            <span className="font-catamaran font-bold text-[11px] sm:text-[12px] text-[#d8cfc2] leading-tight tracking-wider uppercase mt-0.5 whitespace-nowrap">
               DMK Legal Wing
             </span>
           </div>
         </Link>
 
-        {/* Right Controls: Desktop Enrol CTA + Language Toggle + Mobile Hamburger */}
+        {/* Right Controls: Enrol CTA + Visible தமிழ்/EN Toggle + Mobile Hamburger */}
         <div className="flex items-center gap-3 shrink-0">
-          {/* Quick Enrol CTA (Hidden on tiny phones, visible on tablet/desktop) */}
+          {/* Quick Enrol CTA */}
           <Link
             href="/enrol"
             className="hidden sm:inline-flex items-center justify-center min-h-[38px] px-4 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-[13px] font-bold transition-colors btn-lift whitespace-nowrap"
@@ -61,12 +71,12 @@ export const Header: React.FC = () => {
             {language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'Enrol as Advocate'}
           </Link>
 
-          {/* Language Toggle: 1px #6d625a border, active language on red */}
+          {/* Visible தமிழ் / EN Language Toggle */}
           <div className="inline-flex items-center border border-[#6d625a] bg-transparent text-xs font-bold shrink-0">
             <button
               type="button"
               onClick={() => setLanguage('ta')}
-              className={`px-2.5 py-1.5 transition-colors cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                 language === 'ta'
                   ? 'bg-[#E31E24] text-white font-extrabold'
                   : 'text-[#d8cfc2] hover:text-white'
@@ -78,7 +88,7 @@ export const Header: React.FC = () => {
             <button
               type="button"
               onClick={() => setLanguage('en')}
-              className={`px-2.5 py-1.5 transition-colors cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                 language === 'en'
                   ? 'bg-[#E31E24] text-white font-extrabold'
                   : 'text-[#d8cfc2] hover:text-white'
@@ -89,11 +99,11 @@ export const Header: React.FC = () => {
             </button>
           </div>
 
-          {/* Hamburger Button for Mobile / Tablet (< 1024px) */}
+          {/* Hamburger Button for Viewports < 1024px */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-1.5 border border-[#3d3633] text-[#FAF8F5] hover:bg-[#1a1a1a] transition-colors shrink-0"
+            className="lg:hidden p-2 border border-[#3d3633] text-[#FAF8F5] hover:bg-[#1e1b19] transition-colors shrink-0"
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -112,7 +122,8 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Tier 2: Dedicated Desktop Navigation Ribbon (1024px+) */}
-      <div className="hidden lg:block w-full bg-[#181514] border-t border-[#2e2724]">
+      {/* Dedicating the full 1280px width ensures Tamil link names never crowd, wrap, or overflow */}
+      <div className="hidden lg:block w-full bg-[#161413] border-t border-[#2e2724]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center justify-between gap-1 py-1" aria-label="Main Navigation">
             {navLinks.map((item) => {
@@ -122,15 +133,15 @@ export const Header: React.FC = () => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative py-2 px-2.5 text-[14px] font-semibold transition-colors duration-150 group whitespace-nowrap flex items-center ${
+                  className={`relative py-2.5 px-3 text-[14px] xl:text-[15px] font-semibold transition-colors duration-150 group whitespace-nowrap flex items-center ${
                     isActive ? 'text-white' : 'text-[#d8cfc2] hover:text-white'
                   }`}
                 >
-                  <span className="leading-tight">{label}</span>
-                  {/* Active 2px red underline */}
+                  <span className="leading-normal">{label}</span>
+                  {/* 2 px red underline grows from the left on hover */}
                   <span
-                    className={`absolute bottom-0 left-2 right-2 h-[2px] bg-[#E31E24] transition-all duration-150 ${
-                      isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                    className={`absolute bottom-0 left-0 h-[2px] bg-[#E31E24] transition-all duration-300 ease-out ${
+                      isActive ? 'w-full' : 'w-0 group-hover:w-full'
                     }`}
                     aria-hidden="true"
                   />
@@ -141,9 +152,9 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown (< 1024px) */}
+      {/* Mobile Drawer Menu (< 1024px) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#181514] border-t border-[#2e2724] px-4 py-4 space-y-2">
+        <div className="lg:hidden bg-[#161413] border-t border-[#2e2724] px-4 py-4 space-y-2">
           <nav className="flex flex-col space-y-1" aria-label="Mobile Navigation">
             {navLinks.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
@@ -152,18 +163,18 @@ export const Header: React.FC = () => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-[15px] font-semibold py-2.5 px-3 transition-colors leading-normal whitespace-nowrap block ${
-                    isActive ? 'bg-[#E31E24] text-white' : 'text-[#FAF8F5] hover:bg-[#25201d]'
+                  className={`text-[15px] font-semibold py-3 px-3 transition-colors leading-normal whitespace-nowrap block ${
+                    isActive ? 'bg-[#E31E24] text-white font-bold' : 'text-[#FAF8F5] hover:bg-[#25201d]'
                   }`}
                 >
                   <span>{label}</span>
                 </Link>
               );
             })}
-            <div className="pt-2 border-t border-[#2e2724] sm:hidden">
+            <div className="pt-3 border-t border-[#2e2724] sm:hidden">
               <Link
                 href="/enrol"
-                className="w-full flex items-center justify-center py-2.5 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-[14px] font-bold"
+                className="w-full flex items-center justify-center py-3 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-[14px] font-bold"
               >
                 {language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'Enrol as Advocate'}
               </Link>

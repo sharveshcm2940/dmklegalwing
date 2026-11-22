@@ -42,7 +42,7 @@
 
 /* Base Body & HTML Styles: Prevent horizontal scroll & overflow strictly */
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
 }
 
@@ -54,9 +54,14 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
   position: relative;
+}
+
+main {
+  overflow-x: clip;
+  max-width: 100vw;
 }
 
 /* ============================================================== */
@@ -85,18 +90,13 @@ html[lang="ta"] *,
 [data-lang="ta"] label,
 [data-lang="ta"] a,
 [data-lang="ta"] li {
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
-/* Navigation & Header elements must remain strictly compact and aligned inside navbar */
-header,
-header nav,
-header a,
-header span,
-header button,
-nav a,
-nav span {
-  line-height: 1.25 !important;
+/* Navigation & Header elements optical vertical alignment */
+header nav a,
+header nav span {
+  line-height: 1.4;
 }
 
 /* Headings in Tamil need at least 1.25 to prevent top kombu & pulli clipping */
@@ -343,6 +343,124 @@ label {
 .fade-rise.revealed {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Hero Staggered Rise (28px over 0.9s) */
+.hero-stagger-1 {
+  opacity: 0;
+  transform: translateY(28px);
+  animation: hero-fade-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+}
+
+.hero-stagger-2 {
+  opacity: 0;
+  transform: translateY(28px);
+  animation: hero-fade-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+.hero-stagger-3 {
+  opacity: 0;
+  transform: translateY(28px);
+  animation: hero-fade-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+}
+
+.hero-stagger-4 {
+  opacity: 0;
+  transform: translateY(28px);
+  animation: hero-fade-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+}
+
+@keyframes hero-fade-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero clipping entrance: rises from 40px lower at +3deg and settles at -1.6deg after 0.6s over 1s */
+@keyframes clipping-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) rotate(3deg);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px) rotate(-1.6deg);
+  }
+}
+
+.animate-clipping-rise {
+  animation: clipping-rise 1s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+}
+
+/* 4px red underline draw across slogan's last word at 1.4s */
+@keyframes draw-underline {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-draw-underline {
+  animation: draw-underline 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.4s forwards;
+}
+
+/* 50s ticker */
+@keyframes ticker-50s {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker-50s {
+  display: inline-flex;
+  animation: ticker-50s 50s linear infinite;
+}
+
+.animate-ticker-50s:hover {
+  animation-play-state: paused;
+}
+
+/* Sun-ray sweep from -14 to 0 deg in 1.6s */
+@keyframes ray-sweep {
+  0% {
+    transform: rotate(-14deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-ray-sweep {
+  animation: ray-sweep 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Date stamp drop in (scale 1.7 to 1, rotate to -7 deg, 0.6s) */
+@keyframes stamp-drop {
+  0% {
+    transform: scale(1.7) rotate(0deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(-7deg);
+    opacity: 1;
+  }
+}
+
+.animate-stamp-drop {
+  animation: stamp-drop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ============================================================== */

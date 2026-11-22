@@ -4,11 +4,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import { SITE_STATS } from '@/data/siteStats';
-import { OFFICIAL_HIERARCHY_CHART, IDEOLOGY_PILLARS } from '@/data/content';
-import { TamilNaduMap } from '@/components/TamilNaduMap';
-import { useReveal } from '@/hooks/useReveal';
-import { Leader } from '@/types';
+import { OFFICIAL_HIERARCHY_CHART } from '@/data/content';
 
 export default function HomePage() {
   const { language } = useLanguage();
@@ -20,39 +16,59 @@ export default function HomePage() {
   }, [news]);
 
   const leadStory = useMemo(() => {
-    return publishedNews.find((n) => n.featured || n.isLeadStory) || publishedNews[0] || {
-      id: 'supreme-court-governor-ruling',
-      category: 'Resolution',
-      date: '2026-11-18',
-      title: {
-        en: 'Supreme Court upholds Tamil Nadu stand: Governors cannot delay assent to Assembly Bills indefinitely',
-        ta: 'மாநில சட்டமன்ற மசோதாக்களுக்கு ஆளுநர்கள் ஒப்புதல் அளிக்காமல் காலவரையின்றி தாமதிக்க முடியாது: உச்சநீதிமன்றம் தீர்ப்பு'
-      },
-      summary: {
-        en: 'Landmark constitutional ruling mandates that Governors must act within a reasonable time and cannot pocket-veto state legislation passed by the elected assembly.',
-        ta: 'மக்களால் தேர்ந்தெடுக்கப்பட்ட சட்டமன்றம் நிறைவேற்றிய மசோதாக்களை ஆளுநர்கள் காலவரையின்றி கிடப்பில் போட முடியாது என வரலாற்றுச் சிறப்புமிக்க அரசமைப்பு அமர்வு தீர்ப்பு.'
+    return (
+      publishedNews.find((n) => n.featured || n.isLeadStory) ||
+      publishedNews[0] || {
+        id: 'supreme-court-governor-ruling',
+        category: 'Resolution',
+        date: '2026-11-18',
+        title: {
+          en: 'Supreme Court upholds Tamil Nadu stand: Governors cannot delay assent to Assembly Bills indefinitely',
+          ta: 'மாநில சட்டமன்ற மசோதாக்களுக்கு ஆளுநர்கள் ஒப்புதல் அளிக்காமல் காலவரையின்றி தாமதிக்க முடியாது: உச்சநீதிமன்றம் தீர்ப்பு',
+        },
+        summary: {
+          en: 'Landmark constitutional ruling mandates that Governors must act within a reasonable time and cannot pocket-veto state legislation passed by the elected assembly.',
+          ta: 'மக்களால் தேர்ந்தெடுக்கப்பட்ட சட்டமன்றம் நிறைவேற்றிய மசோதாக்களை ஆளுநர்கள் காலவரையின்றி கிடப்பில் போட முடியாது என வரலாற்றுச் சிறப்புமிக்க அரசமைப்பு அமர்வு தீர்ப்பு.',
+        },
       }
-    };
+    );
   }, [publishedNews]);
 
-  // 2. METRICS BAND COUNT UP (50 steps of 30ms, ease-out cubic, threshold 0.3)
+  // Mouse Parallax for Hero Sun-Ray Graphic (shifts up to 14 px opposite mouse)
+  const heroRef = useRef<HTMLElement>(null);
+  const [parallaxOffset, setParallaxOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+    const relY = (e.clientY - rect.top) / rect.height - 0.5;
+    setParallaxOffset({
+      x: Math.round(-relX * 28), // up to 14px in either direction
+      y: Math.round(-relY * 28),
+    });
+  };
+
+  const handleHeroMouseLeave = () => {
+    setParallaxOffset({ x: 0, y: 0 });
+  };
+
+  // 2. RED METRICS BAND COUNT UP (50 steps of 30 ms, ease-out cubic, 30% visibility)
   const metricsRef = useRef<HTMLDivElement>(null);
-  const [metricsTriggered, setMetricsTriggered] = useState(false);
+  const [metricsVisible, setMetricsVisible] = useState(false);
   const [counts, setCounts] = useState<number[]>([0, 0, 0, 0]);
-  const [countingDone, setCountingDone] = useState(false);
 
   useEffect(() => {
     if (!metricsRef.current) return;
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setCounts([3500, 74, 50, 69]);
-      setCountingDone(true);
       return;
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setMetricsTriggered(true);
+          setMetricsVisible(true);
           observer.disconnect();
         }
       },
@@ -63,7 +79,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (!metricsTriggered) return;
+    if (!metricsVisible) return;
     const targets = [3500, 74, 50, 69];
     let step = 0;
     const totalSteps = 50;
@@ -78,54 +94,89 @@ export default function HomePage() {
       if (step >= totalSteps) {
         clearInterval(timer);
         setCounts(targets);
-        setCountingDone(true);
       }
     }, intervalMs);
 
     return () => clearInterval(timer);
-  }, [metricsTriggered]);
+  }, [metricsVisible]);
 
-  // 3. NEWS FILTER & PRESS BUREAU
+  // 3. SECTIONS 4-8 INTERSECTION OBSERVER (Fade & Rise 28px over 0.8s at 12% visibility)
+  const leadersRef = useRef<HTMLElement>(null);
+  const newsRef = useRef<HTMLElement>(null);
+  const districtsRef = useRef<HTMLElement>(null);
+  const structureRef = useRef<HTMLElement>(null);
+  const joinRef = useRef<HTMLElement>(null);
+
+  const [revealed, setRevealed] = useState<{ [key: string]: boolean }>({});
+
+  useEffect(() => {
+    const refs = [
+      { id: 'leaders', el: leadersRef.current },
+      { id: 'news', el: newsRef.current },
+      { id: 'districts', el: districtsRef.current },
+      { id: 'structure', el: structureRef.current },
+      { id: 'join', el: joinRef.current },
+    ];
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setRevealed({ leaders: true, news: true, districts: true, structure: true, join: true });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('data-section-id');
+            if (id) {
+              setRevealed((prev) => ({ ...prev, [id]: true }));
+            }
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    refs.forEach(({ el }) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // 4. NEWS SECTION FILTER TABS
   const [newsFilter, setNewsFilter] = useState<'All' | 'Press release' | 'Statement' | 'Resolution'>('All');
 
   const filteredNews = useMemo(() => {
-    if (newsFilter === 'All') return publishedNews.slice(0, 6);
-    return publishedNews
-      .filter((n) => n.category.toLowerCase().includes(newsFilter.toLowerCase()))
-      .slice(0, 6);
+    if (newsFilter === 'All') return publishedNews;
+    return publishedNews.filter((n) => n.category.toLowerCase().includes(newsFilter.toLowerCase()));
   }, [publishedNews, newsFilter]);
 
-  // 4. DISTRICTS SEARCH & SELECT
+  const newsLeadStory = filteredNews[0] || leadStory;
+  const wireStories = filteredNews.slice(1, 5);
+
+  // 5. DISTRICTS SECTION SEARCH & DOCKET
   const [districtQuery, setDistrictQuery] = useState('');
   const [selectedDistrictId, setSelectedDistrictId] = useState<string>('chennai-north');
-  const [districtPanelFading, setDistrictPanelFading] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
 
   const filteredDistricts = useMemo(() => {
     const q = districtQuery.toLowerCase().trim();
     if (!q) return districts;
-    return districts.filter((d) => 
-      d.name.en.toLowerCase().includes(q) ||
-      d.name.ta?.toLowerCase().includes(q) ||
-      d.organizer.en.toLowerCase().includes(q) ||
-      d.organizer.ta?.toLowerCase().includes(q) ||
-      d.headquarters.en.toLowerCase().includes(q) ||
-      d.headquarters.ta?.toLowerCase().includes(q)
+    return districts.filter(
+      (d) =>
+        d.name.en.toLowerCase().includes(q) ||
+        d.name.ta?.toLowerCase().includes(q) ||
+        d.organizer.en.toLowerCase().includes(q) ||
+        d.organizer.ta?.toLowerCase().includes(q) ||
+        d.headquarters.en.toLowerCase().includes(q) ||
+        d.headquarters.ta?.toLowerCase().includes(q)
     );
   }, [districts, districtQuery]);
 
   const activeDistrict = useMemo(() => {
     return districts.find((d) => d.id === selectedDistrictId) || filteredDistricts[0] || districts[0];
   }, [districts, selectedDistrictId, filteredDistricts]);
-
-  const handleSelectDistrict = (id: string) => {
-    if (id === selectedDistrictId) return;
-    setDistrictPanelFading(true);
-    setSelectedDistrictId(id);
-    setTimeout(() => {
-      setDistrictPanelFading(false);
-    }, 200);
-  };
 
   const handleCopyPhone = (phone: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -135,86 +186,73 @@ export default function HomePage() {
     }
   };
 
-  // 5. STRUCTURE: THREE BRANCHES UNDER THE SECRETARY
-  const [selectedBranch, setSelectedBranch] = useState<'joint' | 'deputy' | 'headoffice'>('joint');
-  const [selectedLeaderModal, setSelectedLeaderModal] = useState<any | null>(null);
+  // 6. STRUCTURE SECTION: 3 EQUAL BLOCKS
+  const [activeBranch, setActiveBranch] = useState<'joint' | 'deputy' | 'headoffice'>('joint');
 
-  // Branch roster definitions ensuring: Joint Secretaries 9, Deputy Secretaries 5, Head Office Advocates 9
   const branchRoster = useMemo(() => {
-    if (selectedBranch === 'joint') {
+    if (activeBranch === 'joint') {
       return OFFICIAL_HIERARCHY_CHART.jointSecretaries.slice(0, 9);
     }
-    if (selectedBranch === 'deputy') {
+    if (activeBranch === 'deputy') {
       return OFFICIAL_HIERARCHY_CHART.deputySecretaries.slice(0, 5);
     }
     return OFFICIAL_HIERARCHY_CHART.headOfficeAdvocates.slice(0, 9);
-  }, [selectedBranch]);
-
-  // Section Reveal Hooks
-  const tickerSection = useReveal();
-  const metricsSection = useReveal();
-  const ideologySection = useReveal();
-  const districtsSection = useReveal();
-  const structureSection = useReveal();
-  const newsSection = useReveal();
-  const ctaSection = useReveal();
+  }, [activeBranch]);
 
   return (
-    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[18px] leading-[1.75] antialiased">
+    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran antialiased overflow-x-clip selection:bg-[#E31E24] selection:text-white">
       
       {/* ===================================================================== */}
-      {/* 1. HERO (Ink Background #111111, Parchment Text, Editorial Layout)    */}
+      {/* 1. HERO SECTION (Ink #111111, Parallax Sun-Rays, Tactile Lead Clipping)*/}
       {/* ===================================================================== */}
-      <section className="w-full bg-[#111111] text-[#FAF8F5] overflow-hidden relative border-b border-[#111111]">
-        {/* Subtle top masthead strip */}
-        <div className="border-b border-[#2b2522] bg-[#161413] px-[clamp(20px,4vw,56px)] py-2.5 text-[14px] text-[#FAF8F5]/80 flex flex-wrap items-center justify-between gap-4 font-helvetica">
-          <div className="flex items-center gap-3">
-            <span className="w-2 h-2 bg-[#E31E24] inline-block animate-pulse" />
-            <span className="font-extrabold uppercase tracking-normal text-white">
-              {language === 'ta' ? 'திமுக வழக்கறிஞர் அணி' : 'DMK Legal Wing'}
-            </span>
-            <span className="text-[#5B5348] select-none">·</span>
-            <span>{language === 'ta' ? 'தலைமைச் செயலகம், அண்ணா அறிவாலயம்' : 'State Legal Secretariat, Anna Arivalayam'}</span>
-          </div>
-          <div className="flex items-center gap-4 text-[#d8cfc2]">
-            <span>Chennai Edition</span>
-            <span className="text-[#5B5348] select-none">·</span>
-            <span>Est. 1971</span>
-          </div>
-        </div>
-
-        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-14 pb-20 sm:pt-20 sm:pb-24 relative z-10">
+      <section
+        ref={heroRef}
+        onMouseMove={handleHeroMouseMove}
+        onMouseLeave={handleHeroMouseLeave}
+        className="w-full bg-[#111111] text-[#FAF8F5] overflow-hidden relative border-b border-[#111111]"
+      >
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12 pb-24 sm:pt-16 sm:pb-32 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             
-            {/* LEFT COLUMN: Main Typography */}
-            <div className="lg:col-span-7 max-w-[560px] space-y-6">
+            {/* LEFT COLUMN: Main Editorial Typography */}
+            <div className="lg:col-span-7 max-w-[620px] space-y-6">
               
-              {/* Official Emblem & Kicker */}
-              <div className="flex items-center gap-4">
+              {/* Kicker in #ff8a85 */}
+              <div className="hero-stagger-1 flex items-center gap-3">
                 <img
                   src="/images/dmk-official-logo.png"
                   alt="DMK Rising Sun & Flag Official Emblem"
-                  className="h-16 w-auto object-contain filter drop-shadow-[0_4px_10px_rgba(227,30,36,0.3)]"
+                  className="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_4px_rgba(227,30,36,0.4)]"
                 />
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1e1b19] border border-[#3d3633] text-[13px] font-extrabold text-[#ff8a85] uppercase tracking-normal">
-                  <span>CONSTITUTIONAL ADVOCACY & SOCIAL JUSTICE</span>
-                </div>
+                <span className="text-[#ff8a85] font-helvetica font-extrabold text-[14px] sm:text-[15px] uppercase tracking-normal">
+                  {language === 'ta'
+                    ? 'மாநில தலைமைச் செயலகம் · அண்ணா அறிவாலயம், சென்னை'
+                    : 'State Legal Secretariat · Anna Arivalayam, Chennai'}
+                </span>
               </div>
 
-              {/* Slogan in Kavivanar */}
-              <h1 className="font-kavivanar font-normal text-white text-[clamp(44px,6.5vw,88px)] leading-[1.2] tracking-normal">
-                தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!
+              {/* Slogan in Kavivanar at clamp(46px, 6.6vw, 92px), line height 1.12 */}
+              <h1 className="hero-stagger-2 font-kavivanar font-normal text-white text-[clamp(46px,6.6vw,92px)] leading-[1.12] tracking-normal">
+                தமிழ்நாட்டைத் தலைகுனிய{' '}
+                <span className="relative inline-block whitespace-nowrap">
+                  விடமாட்டேன்!
+                  {/* 4px red line draws across last word at 1.4s */}
+                  <span
+                    className="absolute bottom-1 left-0 h-[4px] bg-[#E31E24] animate-draw-underline"
+                    aria-hidden="true"
+                  />
+                </span>
               </h1>
 
-              {/* Paragraph */}
-              <p className="text-[20px] text-[#d8cfc2] leading-[1.6] font-normal">
+              {/* 21 px Line */}
+              <p className="hero-stagger-3 text-[21px] text-[#d8cfc2] leading-[1.65] font-normal">
                 {language === 'ta'
-                  ? 'சமூக நீதி, மாநில சுயாட்சி மற்றும் 69% இடஒதுக்கீட்டை உச்ச நீதிமன்றம் மற்றும் உயர் நீதிமன்றங்களில் சமரசமின்றி நிலைநிறுத்தும் திராவிட இயக்க வழக்கறிஞர்கள்.'
-                  : 'Advocates of the Dravidian movement, relentlessly defending state autonomy, 69% affirmative action, and mother-tongue judicial rights before Constitutional Benches.'}
+                  ? 'சமூக நீதி, கூட்டாட்சி தத்துவம் மற்றும் 69% இடஒதுக்கீட்டை நீதிமன்றங்களில் சமரசமின்றி நிலைநிறுத்தும் திராவிட இயக்க வழக்கறிஞர்கள்.'
+                  : 'Advocates of the Dravidian movement, defending social justice, federalism and the 69% reservation in the courts.'}
               </p>
 
-              {/* Action Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              {/* Two Rectangular 48 px Buttons */}
+              <div className="hero-stagger-4 pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                 <a
                   href="#districts"
                   className="min-h-[48px] h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center cursor-pointer transition-colors duration-150 btn-lift"
@@ -222,33 +260,34 @@ export default function HomePage() {
                   {language === 'ta' ? 'மாவட்ட அணியைக் கண்டறிக' : 'Find your district unit'}
                 </a>
 
-                <Link
-                  href="/enrol"
+                <a
+                  href="#join"
                   className="min-h-[48px] h-[48px] px-8 bg-transparent hover:bg-[#FAF8F5] hover:text-[#111111] text-[#FAF8F5] font-helvetica font-extrabold text-[15px] uppercase tracking-normal border-2 border-[#FAF8F5] flex items-center justify-center cursor-pointer transition-colors duration-150 btn-lift"
                 >
                   {language === 'ta' ? 'அணியில் இணைக' : 'Join the Legal Wing'}
-                </Link>
+                </a>
               </div>
 
             </div>
 
-            {/* RIGHT COLUMN: Tactile Lead Story Dispatch Clipping */}
+            {/* RIGHT COLUMN: Parchment Clipping (340 to 440 px wide, tilted -1.6 deg, shadow 10px 12px 0 #8f1118) */}
             <div className="lg:col-span-5 relative flex justify-center lg:justify-end">
-              <article 
-                className="w-full max-w-[420px] bg-[#FAF8F5] text-[#111111] p-8 border-2 border-[#111111] shadow-[10px_12px_0px_#8f1118] space-y-4 relative z-10 transition-transform duration-200 hover:-translate-y-1"
+              <article
+                className="w-full max-w-[440px] sm:w-[410px] bg-[#FAF8F5] text-[#111111] p-[26px_28px] border-2 border-[#111111] shadow-[10px_12px_0_#8f1118] space-y-4 relative z-10 animate-clipping-rise"
+                style={{ transform: 'rotate(-1.6deg)' }}
               >
-                {/* Tag & Date */}
+                {/* Ink tag with type & date */}
                 <div className="flex items-center justify-between border-b border-[#d7d0c3] pb-3">
-                  <span className="text-[13px] font-extrabold text-[#C41A1F] uppercase tracking-normal">
-                    [{leadStory.category || 'Constitutional Ruling'}]
+                  <span className="px-2.5 py-1 bg-[#111111] text-white text-[12px] font-extrabold uppercase tracking-normal">
+                    {leadStory.category || 'Resolution'}
                   </span>
                   <span className="text-[13px] font-helvetica font-bold text-[#5B5348]">
-                    {leadStory.date || '2026-11-18'}
+                    {leadStory.date}
                   </span>
                 </div>
 
-                {/* Headline */}
-                <h2 className="font-helvetica font-extrabold text-[24px] leading-[1.2] text-[#111111]">
+                {/* Headline in Helvetica Now Display 800 at 27 px */}
+                <h2 className="font-helvetica font-extrabold text-[27px] leading-[1.15] text-[#111111]">
                   <Link href={`/news/${leadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
                     {leadStory.title[language]}
                   </Link>
@@ -259,18 +298,15 @@ export default function HomePage() {
                   {leadStory.summary[language]}
                 </p>
 
-                {/* Link */}
+                {/* "Read the full statement →" in #C41A1F */}
                 <div className="pt-2 border-t border-[#d7d0c3] flex items-center justify-between">
-                  <Link 
+                  <Link
                     href={`/news/${leadStory.id}`}
                     className="inline-flex items-center gap-1.5 text-[#C41A1F] hover:text-[#111111] font-helvetica font-extrabold text-[15px] transition-colors cursor-pointer"
                   >
-                    <span>{language === 'ta' ? 'முழு அறிக்கையைப் படிக்க' : 'Read full dispatch'}</span>
+                    <span>{language === 'ta' ? 'முழு அறிக்கையைப் படிக்க' : 'Read the full statement'}</span>
                     <span>&rarr;</span>
                   </Link>
-                  <span className="text-[12px] font-bold text-[#5B5348] uppercase">
-                    Supreme Court
-                  </span>
                 </div>
               </article>
             </div>
@@ -278,165 +314,62 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Signature DMK Flag Ribbon: Top Black, Bottom Red */}
+        {/* 760 px Sun-Ray Graphic: right -140px, bottom -380px so only upper half shows */}
+        {/* Turns once per 160s. Parallax mouse tracking shifts rays up to 14px opposite mouse */}
+        <div
+          className="absolute pointer-events-none select-none z-0 overflow-hidden"
+          style={{
+            right: -140,
+            bottom: -380,
+            width: 760,
+            height: 760,
+            transform: `translate(${parallaxOffset.x}px, ${parallaxOffset.y}px)`,
+            transition: 'transform 0.15s ease-out',
+          }}
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="-380 -380 760 760"
+            className="w-[760px] h-[760px] animate-spin-160s origin-center"
+          >
+            {/* 12 polygons points="-22,-110 22,-110 64,-380 -64,-380" rotated at i * 30 deg */}
+            {Array.from({ length: 12 }).map((_, i) => (
+              <polygon
+                key={i}
+                points="-22,-110 22,-110 64,-380 -64,-380"
+                transform={`rotate(${i * 30})`}
+                fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
+              />
+            ))}
+            {/* Center circle r=96 filled #111111 with stroke #E31E24 4px */}
+            <circle cx="0" cy="0" r="96" fill="#111111" stroke="#E31E24" strokeWidth="4" />
+          </svg>
+        </div>
+
+        {/* Signature DMK Flag Ribbon at bottom of Hero */}
         <div className="w-full h-[4px] dmk-flag-strip" aria-hidden="true" />
-
-        {/* Live News Ticker Strip across bottom of Hero */}
-        <div className="bg-[#0c0b0a] py-3 overflow-hidden select-none">
-          <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] flex items-center gap-4">
-            <span className="shrink-0 bg-[#E31E24] text-white text-[12px] font-extrabold px-2.5 py-0.5 uppercase tracking-normal">
-              {language === 'ta' ? 'முக்கிய அறிவிப்புகள்' : 'DISPATCH WIRE'}
-            </span>
-            <div className="overflow-hidden whitespace-nowrap flex-1">
-              <div className="animate-ticker inline-block">
-                {publishedNews.map((item, idx) => (
-                  <Link
-                    key={item.id}
-                    href={`/news/${item.id}`}
-                    className="inline-flex items-center text-[15px] text-[#d8cfc2] hover:text-[#ff8a85] mx-6 transition-colors"
-                  >
-                    <span className="text-[#E31E24] mr-2">✦</span>
-                    <span className="font-bold mr-2">[{item.category}]:</span>
-                    <span>{item.title[language]}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* ===================================================================== */}
-      {/* 2. METRICS BAND (Animated Counter with Strict Editorial Grid)         */}
+      {/* 2. TICKER STRIP (Parchment #FAF8F5, 3 px Ink Bottom Border, 50s Loop) */}
       {/* ===================================================================== */}
-      <section 
-        ref={metricsRef}
-        className="w-full bg-[#FAF8F5] border-b border-[#111111] py-16"
-      >
-        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 divide-y md:divide-y-0 md:divide-x divide-[#d7d0c3]">
-            
-            {/* Metric 01: Enrolled Advocates */}
-            <div className="space-y-2 pt-4 md:pt-0">
-              <div className="font-helvetica font-extrabold text-[clamp(44px,5vw,68px)] text-[#111111] leading-none">
-                {counts[0].toLocaleString()}+
-              </div>
-              <div className="w-12 h-1 bg-[#E31E24]" />
-              <p className="text-[17px] font-bold text-[#111111]">
-                {language === 'ta' ? 'பதிவுபெற்ற வழக்கறிஞர்கள்' : 'Enrolled Advocates'}
-              </p>
-              <p className="text-[14px] text-[#5B5348]">
-                {language === 'ta' ? 'மாநிலம் முழுவதும் கழகப் பணிபுரியும் சட்டப் படை.' : 'Active bar practitioners defending cadre and constitutional rights.'}
-              </p>
-            </div>
-
-            {/* Metric 02: Party District Units */}
-            <div className="space-y-2 pt-4 md:pt-0 md:pl-10">
-              <div className="font-helvetica font-extrabold text-[clamp(44px,5vw,68px)] text-[#111111] leading-none">
-                {counts[1]}
-              </div>
-              <div className="w-12 h-1 bg-[#111111]" />
-              <p className="text-[17px] font-bold text-[#111111]">
-                {language === 'ta' ? 'கழக மாவட்ட வழக்கறிஞர் அணிகள்' : 'Party District Units'}
-              </p>
-              <p className="text-[14px] text-[#5B5348]">
-                {language === 'ta' ? '74 கழக மாவட்டங்களிலும் நேரடி சட்டக் களப்பணி.' : 'Complete jurisdictional coverage across all 74 administrative units.'}
-              </p>
-            </div>
-
-            {/* Metric 03: Constitutional Victories */}
-            <div className="space-y-2 pt-4 md:pt-0 md:pl-10">
-              <div className="font-helvetica font-extrabold text-[clamp(44px,5vw,68px)] text-[#111111] leading-none">
-                {counts[2]}+
-              </div>
-              <div className="w-12 h-1 bg-[#E31E24]" />
-              <p className="text-[17px] font-bold text-[#111111]">
-                {language === 'ta' ? 'அரசமைப்பு வரலாற்றுத் தீர்ப்புகள்' : 'Landmark Bench Victories'}
-              </p>
-              <p className="text-[14px] text-[#5B5348]">
-                {language === 'ta' ? 'உச்ச நீதிமன்றம் மற்றும் உயர் நீதிமன்றங்களில் நிலைநாட்டிய தீர்ப்புகள்.' : 'Precedents won on federalism, legislative sovereignty and rights.'}
-              </p>
-            </div>
-
-            {/* Metric 04: 69% Reservation Shield */}
-            <div className="space-y-2 pt-4 md:pt-0 md:pl-10">
-              <div className="font-helvetica font-extrabold text-[clamp(44px,5vw,68px)] text-[#C41A1F] leading-none">
-                {counts[3]}%
-              </div>
-              <div className="w-12 h-1 bg-[#C41A1F]" />
-              <p className="text-[17px] font-bold text-[#111111]">
-                {language === 'ta' ? 'இடஒதுக்கீட்டுப் பாதுகாப்பு' : 'Affirmative Action Shield'}
-              </p>
-              <p className="text-[14px] text-[#5B5348]">
-                {language === 'ta' ? 'தமிழ்நாடு சட்டம் 45/1994-ன் கீழ் உறுதிசெய்யப்பட்ட சமூக நீதி.' : 'Safeguarded under the 9th Schedule through landmark litigation.'}
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ===================================================================== */}
-      {/* 3. SIX DOCTRINES OF DRAVIDIAN JURISPRUDENCE (Interactive Preview)     */}
-      {/* ===================================================================== */}
-      <section 
-        ref={ideologySection.ref}
-        className={`w-full py-20 border-b border-[#111111] bg-[#FAF8F5] fade-rise ${
-          ideologySection.revealed ? 'revealed' : ''
-        }`}
-      >
-        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#111111] pb-6 mb-12">
-            <div>
-              <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
-                {language === 'ta' ? 'கோட்பாட்டுத் தூண்கள்' : 'IDEOLOGICAL ANCHORS'}
-              </span>
-              <h2 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] leading-[1.28]' : 'font-helvetica font-extrabold text-[clamp(30px,4.2vw,48px)] leading-tight'} text-[#111111] mt-1`}>
-                {language === 'ta' ? 'திராவிடச் சட்டவியலின் மூல விழுமியங்கள்' : 'Foundations of Dravidian Jurisprudence'}
-              </h2>
-            </div>
-            <Link
-              href="/ideology"
-              className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors shrink-0"
-            >
-              <span>{language === 'ta' ? 'முழு கொள்கைப் பிரகடனம் →' : 'Explore all six doctrines →'}</span>
-            </Link>
-          </div>
-
-          {/* Six Pillar Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {IDEOLOGY_PILLARS.map((pillar) => (
+      <section className="w-full bg-[#FAF8F5] border-b-[3px] border-[#111111] py-3.5 overflow-hidden select-none">
+        <div className="overflow-hidden whitespace-nowrap">
+          <div className="animate-ticker-50s inline-flex items-center">
+            {/* Repeat items to create an uninterrupted 50s marquee */}
+            {[...publishedNews, ...publishedNews].map((item, idx) => (
               <div
-                key={pillar.id}
-                className="bg-white border border-[#111111] p-8 flex flex-col justify-between space-y-6 hover:border-[#E31E24] transition-all duration-200 group"
+                key={`${item.id}-${idx}`}
+                className="inline-flex items-center text-[16px] font-helvetica font-extrabold uppercase mr-[56px] shrink-0"
               >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#d7d0c3] pb-3">
-                    <span className="font-helvetica font-extrabold text-[28px] text-[#C41A1F]">
-                      {pillar.number}
-                    </span>
-                    <span className="text-[12px] font-extrabold uppercase text-[#5B5348]">
-                      DOCTRINE
-                    </span>
-                  </div>
-
-                  <h3 className={`text-[24px] text-[#111111] group-hover:text-[#E31E24] transition-colors leading-snug ${
-                    language === 'ta' ? 'font-kavivanar font-normal' : 'font-helvetica font-extrabold'
-                  }`}>
-                    {pillar.title[language]}
-                  </h3>
-
-                  <p className="text-[16px] text-[#5B5348] leading-relaxed line-clamp-3">
-                    {pillar.description[language]}
-                  </p>
-                </div>
-
-                <div className="pt-2 border-t border-[#d7d0c3]">
-                  <p className="text-[13px] text-[#5B5348] font-bold line-clamp-1">
-                    <span className="text-[#111111] mr-1">{language === 'ta' ? 'நீதிமன்றங்களில்:' : 'In court:'}</span>
-                    {pillar.legalRelevance[language]}
-                  </p>
-                </div>
+                <span className="text-[#C41A1F] mr-2">[{item.category}]</span>
+                <Link
+                  href={`/news/${item.id}`}
+                  className="text-[#111111] hover:text-[#C41A1F] transition-colors"
+                >
+                  {item.title.en || item.title[language]}
+                </Link>
+                <span className="text-[#5B5348] ml-[56px]" aria-hidden="true">✦</span>
               </div>
             ))}
           </div>
@@ -444,60 +377,423 @@ export default function HomePage() {
       </section>
 
       {/* ===================================================================== */}
-      {/* 4. DISTRICT LEGAL UNITS & INTERACTIVE REGISTRY                        */}
+      {/* 3. RED METRICS BAND (#E31E24, 48 px Padding, 4 Columns, Top 4px Rule) */}
       {/* ===================================================================== */}
-      <section 
-        id="districts"
-        ref={districtsSection.ref}
-        className={`w-full py-20 border-b border-[#111111] bg-[#FAF8F5] fade-rise ${
-          districtsSection.revealed ? 'revealed' : ''
+      <section
+        ref={metricsRef}
+        className="w-full bg-[#E31E24] text-white py-12 px-[clamp(20px,4vw,56px)] border-b border-[#111111]"
+      >
+        <div className="max-w-[1280px] mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
+            
+            {/* Col 1: 3,500+ Registered Advocates */}
+            <div className="space-y-3">
+              <div
+                className="w-full h-[4px] bg-white transition-all duration-700 ease-out"
+                style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.1s' }}
+              />
+              <div className="font-helvetica font-extrabold text-[clamp(48px,6.4vw,84px)] leading-none">
+                {counts[0].toLocaleString()}+
+              </div>
+              <p className="font-catamaran font-extrabold text-[17px] text-white leading-snug">
+                {language === 'ta' ? 'பதிவுபெற்ற வழக்கறிஞர்கள்' : 'Registered Advocates'}
+              </p>
+            </div>
+
+            {/* Col 2: 74 District Units */}
+            <div className="space-y-3">
+              <div
+                className="w-full h-[4px] bg-white transition-all duration-700 ease-out"
+                style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.2s' }}
+              />
+              <div className="font-helvetica font-extrabold text-[clamp(48px,6.4vw,84px)] leading-none">
+                {counts[1]}
+              </div>
+              <p className="font-catamaran font-extrabold text-[17px] text-white leading-snug">
+                {language === 'ta' ? 'கழக மாவட்ட வழக்கறிஞர் அணிகள்' : 'District Units'}
+              </p>
+            </div>
+
+            {/* Col 3: 50+ Years of Jurisprudence */}
+            <div className="space-y-3">
+              <div
+                className="w-full h-[4px] bg-white transition-all duration-700 ease-out"
+                style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.3s' }}
+              />
+              <div className="font-helvetica font-extrabold text-[clamp(48px,6.4vw,84px)] leading-none">
+                {counts[2]}+
+              </div>
+              <p className="font-catamaran font-extrabold text-[17px] text-white leading-snug">
+                {language === 'ta' ? 'சட்டவியல் வரலாற்றுப் பாரம்பரியம்' : 'Years of Jurisprudence'}
+              </p>
+            </div>
+
+            {/* Col 4: 69% Reservation Defended */}
+            <div className="space-y-3">
+              <div
+                className="w-full h-[4px] bg-white transition-all duration-700 ease-out"
+                style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.4s' }}
+              />
+              <div className="font-helvetica font-extrabold text-[clamp(48px,6.4vw,84px)] leading-none">
+                {counts[3]}%
+              </div>
+              <p className="font-catamaran font-extrabold text-[17px] text-white leading-snug">
+                {language === 'ta' ? 'இடஒதுக்கீட்டுப் பாதுகாப்பு' : 'Reservation Defended'}
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================================== */}
+      {/* 4. LEADERS SECTION (80 px Padding, Kavivanar #C41A1F Title, 4:5 Cards) */}
+      {/* ===================================================================== */}
+      <section
+        ref={leadersRef}
+        data-section-id="leaders"
+        className={`w-full py-20 bg-[#FAF8F5] border-b border-[#111111] transition-all duration-800 ease-out ${
+          revealed.leaders ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-7'
         }`}
       >
         <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left: Kavivanar #C41A1F Title clamp(36px, 4.4vw, 56px) + 20 px Paragraph */}
+            <div className="lg:col-span-5 space-y-6">
+              <span className="text-[13px] font-extrabold uppercase text-[#5B5348] tracking-normal block">
+                {language === 'ta' ? 'அணித் தலைமை' : 'LEGAL WING LEADERSHIP'}
+              </span>
+
+              <h2 className="font-kavivanar font-normal text-[#C41A1F] text-[clamp(36px,4.4vw,56px)] leading-[1.2]">
+                {language === 'ta'
+                  ? 'அரசமைப்பு அமர்வுகளில் அறப்போர் நடத்தும் தலைமை'
+                  : 'Guardians of Constitutional Law and Social Equity'}
+              </h2>
+
+              <p className="text-[20px] text-[#111111] leading-[1.7] font-normal">
+                {language === 'ta'
+                  ? 'பேரறிஞர் அண்ணா மற்றும் முத்தமிழறிஞர் கலைஞர் வகுத்தளித்த கொள்கைப் பாதையில், மாண்புமிகு முதலமைச்சர் மு.க. ஸ்டாலின் வழிகாட்டுதலில் உச்ச நீதிமன்றம் மற்றும் உயர் நீதிமன்றங்களில் சமூக நீதியை சமரசமின்றிப் பாதுகாக்கும் தலைமை வழக்கறிஞர் பெருமக்கள்.'
+                  : 'Led by senior members of the Bar dedicated to advancing federal autonomy, linguistic equality, and affirmative action across India’s constitutional courts.'}
+              </p>
+
+              <div className="pt-2">
+                <Link
+                  href="/structure"
+                  className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors"
+                >
+                  <span>{language === 'ta' ? 'முழு கட்டமைப்பு வரைபடம்' : 'Full structural chart'}</span>
+                  <span>&rarr;</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: Two 4:5 Portraits with 2 px Ink Border, 6 px Top Rule expanding to 10 px */}
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8">
+              
+              {/* Leader 1: R. Viduthalai (Red Top Rule) */}
+              <div className="group bg-white border-2 border-[#111111] p-6 space-y-4 hover:-translate-y-1.5 transition-transform duration-200">
+                {/* 6 px Red top rule expanding to 10 px */}
+                <div className="w-full h-[6px] bg-[#E31E24] group-hover:h-[10px] transition-all duration-200" />
+
+                <div className="aspect-[4/5] w-full bg-[#f1ece2] overflow-hidden border border-[#d7d0c3] relative">
+                  <img
+                    src="/images/dmk-legal-conference.jpg"
+                    alt="R. Viduthalai Senior Advocate"
+                    className="w-full h-full object-cover object-center filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#111111]/90 text-white text-[12px] font-bold">
+                    PRESIDENT · SENIOR ADVOCATE
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-tight">
+                    {language === 'ta' ? 'ஆர். விடுதலை' : 'R. Viduthalai'}
+                  </h3>
+                  <p className="text-[14px] text-[#C41A1F] font-bold">
+                    {language === 'ta'
+                      ? 'தலைவர், வழக்கறிஞர் அணி · மூத்த வழக்கறிஞர்'
+                      : 'President, DMK Legal Wing · Senior Advocate'}
+                  </p>
+                  <p className="text-[13px] text-[#5B5348] line-clamp-2">
+                    {language === 'ta'
+                      ? 'முன்னாள் தலைமை வழக்கறிஞர் (Advocate General of Tamil Nadu).'
+                      : 'Former Advocate General of Tamil Nadu & Senior Counsel before Supreme Court.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Leader 2: N.R. Elango (Ink Top Rule) */}
+              <div className="group bg-white border-2 border-[#111111] p-6 space-y-4 hover:-translate-y-1.5 transition-transform duration-200">
+                {/* 6 px Ink top rule expanding to 10 px */}
+                <div className="w-full h-[6px] bg-[#111111] group-hover:h-[10px] transition-all duration-200" />
+
+                <div className="aspect-[4/5] w-full bg-[#f1ece2] overflow-hidden border border-[#d7d0c3] relative">
+                  <img
+                    src="/images/dmk-press-meet.jpg"
+                    alt="N.R. Elango Senior Advocate & MP"
+                    className="w-full h-full object-cover object-center filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#111111]/90 text-white text-[12px] font-bold">
+                    SECRETARY · SENIOR ADVOCATE & MP
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-tight">
+                    {language === 'ta' ? 'என்.ஆர். இளங்கோ' : 'N.R. Elango'}
+                  </h3>
+                  <p className="text-[14px] text-[#111111] font-bold">
+                    {language === 'ta'
+                      ? 'செயலாளர், வழக்கறிஞர் அணி · மூத்த வழக்கறிஞர் & எம்.பி.'
+                      : 'Secretary, DMK Legal Wing · Senior Advocate & MP'}
+                  </p>
+                  <p className="text-[13px] text-[#5B5348] line-clamp-2">
+                    {language === 'ta'
+                      ? 'நாடாளுமன்ற மாநிலங்களவை உறுப்பினர் மற்றும் மூத்த வழக்கறிஞர்.'
+                      : 'Member of Parliament (Rajya Sabha) & Senior Advocate, Madras High Court.'}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================================== */}
+      {/* 5. NEWS SECTION (#f1ece2, 3 px Ink Top Border, id="news")             */}
+      {/* ===================================================================== */}
+      <section
+        id="news"
+        ref={newsRef}
+        data-section-id="news"
+        className={`w-full py-20 bg-[#f1ece2] border-t-[3px] border-b border-[#111111] transition-all duration-800 ease-out ${
+          revealed.news ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-7'
+        }`}
+      >
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
+          
+          {/* Header Row: Kavivanar Title + Sliding 3 px Underline Filter Tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#111111] pb-6 mb-12">
             <div>
               <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
-                {language === 'ta' ? '74 கழக மாவட்டங்கள்' : '74 DISTRICT LEGAL REGISTRY'}
+                {language === 'ta' ? 'செய்திப் பிரிவு' : 'PRESS BUREAU & MEDIA WIRE'}
               </span>
-              <h2 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] leading-[1.28]' : 'font-helvetica font-extrabold text-[clamp(30px,4.2vw,48px)] leading-tight'} text-[#111111] mt-1`}>
-                {language === 'ta' ? 'உங்கள் மாவட்ட வழக்கறிஞர் அணித் தொடர்புகள்' : 'Find Your Local Legal Secretariat'}
+              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(36px,4.5vw,56px)] leading-[1.2] mt-1">
+                {language === 'ta' ? 'அறிக்கைகள் மற்றும் நீதிமன்ற உத்தரவுகள்' : 'Official Statements & Court Rulings'}
+              </h2>
+            </div>
+
+            {/* Sliding 3 px Underline Filter Tabs: All / Press release / Statement / Resolution */}
+            <div className="flex items-center gap-6 overflow-x-auto pb-1">
+              {(['All', 'Press release', 'Statement', 'Resolution'] as const).map((tab) => {
+                const isActive = newsFilter === tab;
+                const tabLabelTa =
+                  tab === 'All'
+                    ? 'அனைத்தும்'
+                    : tab === 'Press release'
+                    ? 'செய்திக்குறிப்பு'
+                    : tab === 'Statement'
+                    ? 'அறிக்கை'
+                    : 'தீர்மானம்';
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setNewsFilter(tab)}
+                    className={`relative py-1 font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
+                      isActive ? 'text-[#111111]' : 'text-[#5B5348] hover:text-[#111111]'
+                    }`}
+                  >
+                    <span>{language === 'ta' ? tabLabelTa : tab}</span>
+                    <span
+                      className={`absolute bottom-0 left-0 right-0 h-[3px] bg-[#E31E24] transition-all duration-200 ${
+                        isActive ? 'opacity-100' : 'opacity-0'
+                      }`}
+                      aria-hidden="true"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Large Lead Block */}
+          <div className="bg-white border-2 border-[#111111] p-8 md:p-12 mb-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            {/* Left 420 px Ink Panel: Sweeping Rays -14° to 0°, Dropping Date Stamp, Kavivanar Slogan */}
+            <div className="lg:col-span-5 h-[340px] bg-[#111111] text-[#FAF8F5] p-6 relative overflow-hidden flex flex-col justify-between border-2 border-[#111111]">
+              
+              {/* Sweeping Rays Graphic behind */}
+              <div
+                className="absolute -right-20 -bottom-20 w-[360px] h-[360px] opacity-40 pointer-events-none select-none animate-ray-sweep"
+                aria-hidden="true"
+              >
+                <svg viewBox="-180 -180 360 360" className="w-full h-full">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <polygon
+                      key={i}
+                      points="-11,-55 11,-55 32,-190 -32,-190"
+                      transform={`rotate(${i * 30})`}
+                      fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
+                    />
+                  ))}
+                  <circle cx="0" cy="0" r="48" fill="#111111" stroke="#E31E24" strokeWidth="2" />
+                </svg>
+              </div>
+
+              {/* Dropping Date Stamp (scale 1.7 to 1, rotate -7°) */}
+              <div className="relative z-10 self-start">
+                <div className="animate-stamp-drop inline-block px-3 py-1 bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase border border-white">
+                  {newsLeadStory.date} · {newsLeadStory.category}
+                </div>
+              </div>
+
+              {/* Kavivanar Slogan */}
+              <div className="relative z-10 space-y-1">
+                <span className="text-[12px] font-bold text-[#ff8a85] uppercase tracking-normal">
+                  SPECIAL DISPATCH
+                </span>
+                <p className="font-kavivanar font-normal text-[26px] leading-tight text-white">
+                  {language === 'ta'
+                    ? 'நீதிமன்றங்களில் சமரசமற்ற சமூக நீதி!'
+                    : 'Uncompromising Social Justice in the Courts!'}
+                </p>
+              </div>
+            </div>
+
+            {/* Right Text + Ink Button */}
+            <div className="lg:col-span-7 space-y-4">
+              <span className="text-[13px] font-extrabold uppercase text-[#C41A1F]">
+                {newsLeadStory.court || 'Supreme Court of India'}
+              </span>
+
+              <h3 className="font-helvetica font-extrabold text-[clamp(26px,3.5vw,36px)] leading-[1.2] text-[#111111]">
+                <Link href={`/news/${newsLeadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
+                  {newsLeadStory.title[language]}
+                </Link>
+              </h3>
+
+              <p className="text-[18px] text-[#3a322d] leading-relaxed">
+                {newsLeadStory.summary[language]}
+              </p>
+
+              <div className="pt-2">
+                <Link
+                  href={`/news/${newsLeadStory.id}`}
+                  className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
+                >
+                  {language === 'ta' ? 'முழு அறிக்கையைப் படிக்க' : 'Read full statement →'}
+                </Link>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Ruled Story Rows (108 px Date Block, Red Hover Bar 0 to 6 px, 22 px Slide Right) */}
+          <div className="space-y-0 divide-y divide-[#111111] border-t border-b border-[#111111] bg-white">
+            {wireStories.map((story) => (
+              <article
+                key={story.id}
+                className="group relative flex flex-col md:flex-row md:items-center justify-between p-6 transition-all duration-200 hover:bg-[#FAF8F5] hover:pl-10 cursor-pointer"
+              >
+                {/* Red hover bar 0 to 6 px */}
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-[6px] bg-[#E31E24] transition-all duration-200"
+                  aria-hidden="true"
+                />
+
+                <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 flex-1">
+                  {/* 108 px Date Block */}
+                  <div className="w-[108px] shrink-0 font-helvetica font-bold text-[14px] text-[#5B5348]">
+                    <div>{story.date}</div>
+                    <span className="text-[12px] text-[#C41A1F] font-extrabold uppercase">
+                      {story.category}
+                    </span>
+                  </div>
+
+                  {/* Title & Summary */}
+                  <div className="space-y-1 flex-1">
+                    <h4 className="font-helvetica font-extrabold text-[20px] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-snug">
+                      <Link href={`/news/${story.id}`}>
+                        {story.title[language]}
+                      </Link>
+                    </h4>
+                    <p className="text-[15px] text-[#5B5348] line-clamp-1">
+                      {story.summary[language]}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 md:mt-0 shrink-0 font-helvetica font-bold text-[14px] text-[#C41A1F] uppercase md:pl-4">
+                  <span>{language === 'ta' ? 'விவரம் →' : 'Read →'}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ===================================================================== */}
+      {/* 6. DISTRICTS SECTION (Ink #111111, 80 px Padding, Search & Docket)    */}
+      {/* ===================================================================== */}
+      <section
+        id="districts"
+        ref={districtsRef}
+        data-section-id="districts"
+        className={`w-full py-20 bg-[#111111] text-[#FAF8F5] border-b border-[#3d3633] transition-all duration-800 ease-out ${
+          revealed.districts ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-7'
+        }`}
+      >
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#3d3633] pb-6 mb-12">
+            <div>
+              <span className="text-[13px] font-extrabold uppercase text-[#ff8a85] tracking-normal block">
+                {language === 'ta' ? '74 கழக மாவட்டங்கள்' : '74 DISTRICT ADMINISTRATIVE UNITS'}
+              </span>
+              <h2 className="font-kavivanar font-normal text-white text-[clamp(36px,4.5vw,56px)] leading-[1.2] mt-1">
+                {language === 'ta' ? 'மாவட்ட வழக்கறிஞர் அணிகள்' : 'Find Your District Legal Secretariat'}
               </h2>
             </div>
             <Link
               href="/districts"
-              className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors shrink-0"
+              className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#FAF8F5] hover:text-[#ff8a85] uppercase tracking-normal border-b-2 border-[#FAF8F5] pb-0.5 hover:border-[#ff8a85] transition-colors shrink-0"
             >
-              <span>{language === 'ta' ? 'முழு மாவட்டக் கோப்பகம் →' : 'View all 74 districts →'}</span>
+              <span>{language === 'ta' ? 'முழு மாவட்டக் கோப்பகம் →' : 'View full 74 directory →'}</span>
             </Link>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {/* Left: District List & Search */}
-            <div className="lg:col-span-5 bg-white border border-[#111111] p-6 space-y-4">
+            {/* Left: Search Box with SVG Magnifier + 380 px Scroll List with 1 px #3d3633 Rules */}
+            <div className="lg:col-span-5 bg-[#1a1715] border border-[#3d3633] p-6 space-y-4">
+              
+              {/* Search box with SVG magnifier */}
               <div className="relative">
+                <span className="absolute left-3.5 top-3.5 text-[#d8cfc2]" aria-hidden="true">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </span>
                 <input
                   type="text"
                   value={districtQuery}
                   onChange={(e) => setDistrictQuery(e.target.value)}
                   placeholder={language === 'ta' ? 'மாவட்டப் பெயர் அல்லது அமைப்பாளர்...' : 'Search by district or organizer...'}
-                  className="w-full bg-[#FAF8F5] border-2 border-[#111111] px-4 py-2.5 text-[16px] placeholder-[#5B5348] focus:outline-none focus:border-[#E31E24]"
+                  className="w-full bg-[#111111] border border-[#3d3633] pl-11 pr-4 py-3 text-[15px] text-white placeholder-[#8a7f78] focus:outline-none focus:border-[#E31E24]"
                 />
-                {districtQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setDistrictQuery('')}
-                    className="absolute right-3 top-3 text-[13px] font-bold text-[#C41A1F] hover:underline cursor-pointer"
-                  >
-                    Clear
-                  </button>
-                )}
               </div>
 
-              <div className="max-h-[460px] overflow-y-auto divide-y divide-[#d7d0c3] border-t border-b border-[#d7d0c3] pr-1">
+              {/* 380 px Scroll List */}
+              <div className="max-h-[380px] overflow-y-auto divide-y divide-[#3d3633] border-t border-b border-[#3d3633]">
                 {filteredDistricts.length === 0 ? (
-                  <p className="py-8 text-center text-[#5B5348] text-[15px]">
-                    {language === 'ta' ? 'மாவட்டங்கள் கிடைக்கவில்லை.' : 'No matching districts found.'}
+                  <p className="py-8 text-center text-[#d8cfc2] text-[15px]">
+                    {language === 'ta' ? 'மாவட்டங்கள் கிடைக்கவில்லை.' : 'No matching units found.'}
                   </p>
                 ) : (
                   filteredDistricts.map((d) => {
@@ -506,24 +802,22 @@ export default function HomePage() {
                       <button
                         key={d.id}
                         type="button"
-                        onClick={() => handleSelectDistrict(d.id)}
+                        onClick={() => setSelectedDistrictId(d.id)}
                         className={`w-full text-left p-3.5 flex items-center justify-between transition-colors cursor-pointer ${
                           isSelected
-                            ? 'bg-[#111111] text-[#FAF8F5]'
-                            : 'hover:bg-[#f1ece2] text-[#111111]'
+                            ? 'bg-[#E31E24] text-white font-bold'
+                            : 'hover:bg-[#25201d] text-[#FAF8F5]'
                         }`}
                       >
                         <div>
                           <div className="font-helvetica font-extrabold text-[16px]">
                             {d.name[language]}
                           </div>
-                          <div className={`text-[13px] line-clamp-1 ${isSelected ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
+                          <div className={`text-[13px] line-clamp-1 ${isSelected ? 'text-white/90' : 'text-[#d8cfc2]'}`}>
                             {d.organizer[language]} · {d.headquarters[language]}
                           </div>
                         </div>
-                        <span className={`text-[12px] font-bold px-2 py-0.5 ${
-                          isSelected ? 'bg-[#E31E24] text-white' : 'bg-[#FAF8F5] text-[#111111] border border-[#d7d0c3]'
-                        }`}>
+                        <span className="text-[12px] uppercase tracking-normal px-2 py-0.5 bg-black/40 border border-white/20">
                           {d.zone}
                         </span>
                       </button>
@@ -533,99 +827,70 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right: Active District Docket Panel */}
-            <div className="lg:col-span-7 bg-white border border-[#111111] p-8 md:p-10 space-y-6">
-              {activeDistrict && (
-                <div
-                  className={`space-y-6 transition-opacity duration-200 ${
-                    districtPanelFading ? 'opacity-0' : 'opacity-100'
-                  }`}
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-[#111111] pb-4">
-                    <div>
-                      <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
-                        [{activeDistrict.zone} ZONE · DISTRICT REGISTRY]
-                      </span>
-                      <h3 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[34px] leading-[1.25]' : 'font-helvetica font-extrabold text-[32px] leading-tight'} text-[#111111] mt-0.5`}>
-                        {activeDistrict.name[language]}
-                      </h3>
-                    </div>
-                    <span className="px-3 py-1 bg-[#111111] text-white font-helvetica font-extrabold text-[13px] uppercase">
-                      HQ: {activeDistrict.headquarters[language]}
+            {/* Right: Parchment Panel (#FAF8F5) with 8 px Red Top Border and Full-width Red Tel: Button */}
+            <div className="lg:col-span-7 bg-[#FAF8F5] text-[#111111] border-2 border-[#111111] p-8 md:p-10 space-y-6">
+              {/* 8 px Red top border */}
+              <div className="w-full h-[8px] bg-[#E31E24]" />
+
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#d7d0c3] pb-4">
+                  <div>
+                    <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
+                      [{activeDistrict.zone} ZONE · DISTRICT REGISTRY]
                     </span>
+                    <h3 className="font-helvetica font-extrabold text-[32px] leading-tight text-[#111111] mt-0.5">
+                      {activeDistrict.name[language]}
+                    </h3>
+                  </div>
+                  <span className="px-3 py-1 bg-[#111111] text-white font-helvetica font-extrabold text-[13px] uppercase">
+                    HQ: {activeDistrict.headquarters[language]}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-white border border-[#d7d0c3] space-y-1">
+                    <span className="text-[12px] font-bold text-[#5B5348] uppercase">
+                      {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'District Organizer'}
+                    </span>
+                    <p className="font-helvetica font-extrabold text-[18px] text-[#111111]">
+                      {activeDistrict.organizer[language]}
+                    </p>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="p-4 bg-[#FAF8F5] border border-[#d7d0c3] space-y-1">
-                      <span className="text-[12px] font-bold text-[#5B5348] uppercase">
-                        {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'District Organizer'}
-                      </span>
-                      <p className="font-helvetica font-extrabold text-[18px] text-[#111111]">
-                        {activeDistrict.organizer[language]}
-                      </p>
-                    </div>
-
-                    <div className="p-4 bg-[#FAF8F5] border border-[#d7d0c3] space-y-1">
-                      <span className="text-[12px] font-bold text-[#5B5348] uppercase">
-                        {language === 'ta' ? 'நீதிமன்ற வளாகம்' : 'Court Complex'}
-                      </span>
-                      <p className="font-helvetica font-extrabold text-[18px] text-[#111111]">
-                        {activeDistrict.courtComplex[language]}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Joint Organizers */}
-                  {activeDistrict.jointOrganizers && activeDistrict.jointOrganizers.length > 0 && (
-                    <div className="space-y-2">
-                      <span className="text-[13px] font-bold text-[#5B5348] uppercase">
-                        {language === 'ta' ? 'இணை அமைப்பாளர்கள்:' : 'Joint Organizers:'}
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {activeDistrict.jointOrganizers.map((jo, idx) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-1 bg-[#f1ece2] border border-[#d7d0c3] text-[14px] font-semibold text-[#111111]"
-                          >
-                            {jo[language]}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Contact Phone & Actions */}
-                  <div className="pt-4 border-t border-[#d7d0c3] flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <span className="text-[12px] font-bold text-[#5B5348] uppercase block">
-                        {language === 'ta' ? 'தொடர்பு தொலைபேசி' : 'Official Phone'}
-                      </span>
-                      <span className="font-helvetica font-extrabold text-[20px] text-[#111111]">
-                        {activeDistrict.contactPhone || 'State Legal Desk: 044-24344444'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      {activeDistrict.contactPhone && (
-                        <button
-                          type="button"
-                          onClick={() => handleCopyPhone(activeDistrict.contactPhone)}
-                          className="min-h-[44px] h-[44px] px-5 bg-white hover:bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[14px] uppercase border border-[#111111] transition-colors cursor-pointer"
-                        >
-                          {copiedPhone ? (language === 'ta' ? 'நகலெடுக்கப்பட்டது!' : 'Copied!') : (language === 'ta' ? 'எண்ணை நகலெடு' : 'Copy Number')}
-                        </button>
-                      )}
-
-                      <a
-                        href={`tel:${activeDistrict.contactPhone?.split(/[,/]/)[0]?.trim() || '04424344444'}`}
-                        className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase inline-flex items-center justify-center transition-colors cursor-pointer"
-                      >
-                        {language === 'ta' ? 'அழைக்க' : 'Call Unit'}
-                      </a>
-                    </div>
+                  <div className="p-4 bg-white border border-[#d7d0c3] space-y-1">
+                    <span className="text-[12px] font-bold text-[#5B5348] uppercase">
+                      {language === 'ta' ? 'நீதிமன்ற வளாகம்' : 'Court Complex'}
+                    </span>
+                    <p className="font-helvetica font-extrabold text-[18px] text-[#111111]">
+                      {activeDistrict.courtComplex[language]}
+                    </p>
                   </div>
                 </div>
-              )}
+
+                {/* Full-width Red tel: button */}
+                <div className="pt-2">
+                  <a
+                    href={`tel:${activeDistrict.contactPhone}`}
+                    className="w-full min-h-[48px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center gap-3 transition-colors cursor-pointer"
+                  >
+                    <span>{language === 'ta' ? 'நேரடித் தொலைபேசி அழைப்பு:' : 'Call District Secretariat:'}</span>
+                    <span>{activeDistrict.contactPhone}</span>
+                  </a>
+                </div>
+
+                {/* Copy phone link */}
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleCopyPhone(activeDistrict.contactPhone)}
+                    className="text-[13px] font-bold text-[#5B5348] hover:text-[#111111] underline cursor-pointer"
+                  >
+                    {copiedPhone
+                      ? (language === 'ta' ? 'எண் நகலெடுக்கப்பட்டது!' : 'Phone copied!')
+                      : (language === 'ta' ? 'தொலைபேசி எண்ணை நகலெடு' : 'Copy phone number')}
+                  </button>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -633,123 +898,125 @@ export default function HomePage() {
       </section>
 
       {/* ===================================================================== */}
-      {/* 5. EXECUTIVE SECRETARIAT LEADERSHIP                                   */}
+      {/* 7. STRUCTURE SECTION (80 px Padding, 3 Equal Blocks, 64 px Count)     */}
       {/* ===================================================================== */}
-      <section 
-        ref={structureSection.ref}
-        className={`w-full py-20 border-b border-[#111111] bg-[#FAF8F5] fade-rise ${
-          structureSection.revealed ? 'revealed' : ''
+      <section
+        ref={structureRef}
+        data-section-id="structure"
+        className={`w-full py-20 bg-[#FAF8F5] border-b border-[#111111] transition-all duration-800 ease-out ${
+          revealed.structure ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-7'
         }`}
       >
         <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
+          
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#111111] pb-6 mb-12">
             <div>
               <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
-                {language === 'ta' ? 'அமைப்பு மற்றும் தலைமை' : 'STATE EXECUTIVE SECRETARIAT'}
+                {language === 'ta' ? 'அமைப்புச் சட்டம்' : 'ORGANIZATIONAL APPARATUS'}
               </span>
-              <h2 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] leading-[1.28]' : 'font-helvetica font-extrabold text-[clamp(30px,4.2vw,48px)] leading-tight'} text-[#111111] mt-1`}>
-                {language === 'ta' ? 'கழக வழக்கறிஞர் அணித் தலைமைப் பொறுப்பாளர்கள்' : 'Legal Leadership and Executive Council'}
+              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(36px,4.5vw,56px)] leading-[1.2] mt-1">
+                {language === 'ta' ? 'செயலாளரின் கீழ் மூன்று நிர்வாகப் பிரிவுகள்' : 'Three Wings Under the Secretary'}
               </h2>
             </div>
             <Link
               href="/structure"
               className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors shrink-0"
             >
-              <span>{language === 'ta' ? 'முழு கட்டமைப்பு வரைபடம் →' : 'View full organizational tree →'}</span>
+              <span>{language === 'ta' ? 'முழு நிர்வாகிகள் பட்டியல் →' : 'View full roster →'}</span>
             </Link>
           </div>
 
-          {/* Secretary Dossier Highlight */}
-          <div className="bg-white border-2 border-[#111111] p-8 md:p-12 mb-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-8 space-y-4">
-              <span className="px-3 py-1 bg-[#E31E24] text-white font-helvetica font-extrabold text-[12px] uppercase tracking-normal inline-block">
-                STATE SECRETARY · தலைமைச் செயலாளர்
-              </span>
-              <h3 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[36px] md:text-[44px] leading-[1.25]' : 'font-helvetica font-extrabold text-[32px] md:text-[40px] leading-tight'} text-[#111111]`}>
-                {OFFICIAL_HIERARCHY_CHART.secretary.name[language]}
+          {/* 3 Equal Blocks: Joint Secretaries (9), Deputy Secretaries (5), Head Office Advocates (9) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            
+            {/* Block 1: Joint Secretaries 9 */}
+            <button
+              type="button"
+              onClick={() => setActiveBranch('joint')}
+              className={`p-8 border-2 border-[#111111] text-left transition-colors cursor-pointer ${
+                activeBranch === 'joint'
+                  ? 'bg-[#111111] text-white'
+                  : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
+              }`}
+            >
+              <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
+                09
+              </div>
+              <h3 className="font-helvetica font-extrabold text-[22px] leading-tight mb-2">
+                {language === 'ta' ? 'இணைச் செயலாளர்கள்' : 'Joint Secretaries'}
               </h3>
-              <p className="text-[17px] font-bold text-[#C41A1F]">
-                {OFFICIAL_HIERARCHY_CHART.secretary.role[language]} · {OFFICIAL_HIERARCHY_CHART.secretary.court}
+              <p className={`text-[14px] leading-normal ${activeBranch === 'joint' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
+                {language === 'ta'
+                  ? 'மண்டல ஒருங்கிணைப்பு மற்றும் அரசமைப்பு வழக்குகளுக்கான தலைமைக் குழு.'
+                  : 'Zone-level administrative coordinators and constitutional bench counsels.'}
               </p>
-              <p className="text-[18px] text-[#3a322d] leading-relaxed">
-                {OFFICIAL_HIERARCHY_CHART.secretary.bio?.[language] || ''}
+            </button>
+
+            {/* Block 2: Deputy Secretaries 5 */}
+            <button
+              type="button"
+              onClick={() => setActiveBranch('deputy')}
+              className={`p-8 border-2 border-[#111111] text-left transition-colors cursor-pointer ${
+                activeBranch === 'deputy'
+                  ? 'bg-[#111111] text-white'
+                  : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
+              }`}
+            >
+              <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
+                05
+              </div>
+              <h3 className="font-helvetica font-extrabold text-[22px] leading-tight mb-2">
+                {language === 'ta' ? 'துணைச் செயலாளர்கள்' : 'Deputy Secretaries'}
+              </h3>
+              <p className={`text-[14px] leading-normal ${activeBranch === 'deputy' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
+                {language === 'ta'
+                  ? 'களப்பணி, பயிற்சி முகாம்கள் மற்றும் ஆவணக் காப்பகப் பொறுப்பாளர்கள்.'
+                  : 'Field operations, training academies, and legal documentation registry.'}
               </p>
-            </div>
-            <div className="lg:col-span-4 p-6 bg-[#FAF8F5] border border-[#d7d0c3] space-y-3">
-              <div className="text-[13px] text-[#5B5348] font-bold">
-                BAR ENROLMENT: <span className="text-[#111111]">{OFFICIAL_HIERARCHY_CHART.secretary.barCouncilNo}</span>
+            </button>
+
+            {/* Block 3: Head Office Advocates 9 */}
+            <button
+              type="button"
+              onClick={() => setActiveBranch('headoffice')}
+              className={`p-8 border-2 border-[#111111] text-left transition-colors cursor-pointer ${
+                activeBranch === 'headoffice'
+                  ? 'bg-[#111111] text-white'
+                  : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
+              }`}
+            >
+              <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
+                09
               </div>
-              <div className="text-[13px] text-[#5B5348] font-bold">
-                JURISDICTION: <span className="text-[#111111]">Supreme Court & Madras High Court</span>
-              </div>
-              <div className="text-[13px] text-[#5B5348] font-bold">
-                KEY PRECEDENTS: <span className="text-[#111111]">Governor Assent Ruling (2024), 69% Reservation Bench</span>
-              </div>
-            </div>
+              <h3 className="font-helvetica font-extrabold text-[22px] leading-tight mb-2">
+                {language === 'ta' ? 'தலைமை நிலைய வழக்கறிஞர்கள்' : 'Head Office Advocates'}
+              </h3>
+              <p className={`text-[14px] leading-normal ${activeBranch === 'headoffice' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
+                {language === 'ta'
+                  ? 'அண்ணா அறிவாலயத்தில் நேரடி சட்ட ஆலோசனை மற்றும் வழக்காடல் குழு.'
+                  : 'Permanent advisory counsel and urgent litigation desk at Anna Arivalayam.'}
+              </p>
+            </button>
+
           </div>
 
-          {/* Branch Switcher Tabs */}
-          <div className="flex items-center gap-4 border-b border-[#d7d0c3] pb-2 mb-8 overflow-x-auto">
-            <button
-              type="button"
-              onClick={() => setSelectedBranch('joint')}
-              className={`min-h-[44px] px-2 font-helvetica font-extrabold text-[16px] cursor-pointer transition-colors ${
-                selectedBranch === 'joint'
-                  ? 'text-[#111111] border-b-2 border-[#E31E24]'
-                  : 'text-[#5B5348] hover:text-[#111111]'
-              }`}
-            >
-              {language === 'ta' ? 'இணைச் செயலாளர்கள் (9)' : 'Joint Secretaries (9)'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedBranch('deputy')}
-              className={`min-h-[44px] px-2 font-helvetica font-extrabold text-[16px] cursor-pointer transition-colors ${
-                selectedBranch === 'deputy'
-                  ? 'text-[#111111] border-b-2 border-[#E31E24]'
-                  : 'text-[#5B5348] hover:text-[#111111]'
-              }`}
-            >
-              {language === 'ta' ? 'துணைச் செயலாளர்கள் (5)' : 'Deputy Secretaries (5)'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedBranch('headoffice')}
-              className={`min-h-[44px] px-2 font-helvetica font-extrabold text-[16px] cursor-pointer transition-colors ${
-                selectedBranch === 'headoffice'
-                  ? 'text-[#111111] border-b-2 border-[#E31E24]'
-                  : 'text-[#5B5348] hover:text-[#111111]'
-              }`}
-            >
-              {language === 'ta' ? 'தலைமை நிலைய வழக்கறிஞர்கள் (9)' : 'Head Office Advocates (9)'}
-            </button>
-          </div>
-
-          {/* Branch Roster Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {branchRoster.map((leader) => (
+          {/* Roster below fades in staggered 40 ms */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {branchRoster.map((officer, idx) => (
               <div
-                key={leader.id}
-                onClick={() => setSelectedLeaderModal(leader)}
-                className="bg-white border border-[#111111] p-6 space-y-3 cursor-pointer hover:border-[#E31E24] hover:bg-[#FAF8F5] transition-colors group"
+                key={officer.id || idx}
+                className="p-5 bg-white border border-[#d7d0c3] space-y-1 transition-all duration-300 hover:border-[#111111]"
+                style={{ animationDelay: `${idx * 40}ms` }}
               >
-                <div className="flex items-center justify-between border-b border-[#d7d0c3] pb-2">
-                  <span className="text-[12px] font-extrabold uppercase text-[#C41A1F]">
-                    {leader.designation[language]}
-                  </span>
-                  <span className="text-[12px] font-bold text-[#5B5348]">
-                    {leader.court || 'High Court'}
-                  </span>
-                </div>
-                <h4 className="font-helvetica font-extrabold text-[20px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
-                  {leader.name[language]}
+                <span className="text-[12px] font-extrabold text-[#C41A1F] uppercase">
+                  {officer.district[language]}
+                </span>
+                <h4 className="font-helvetica font-extrabold text-[18px] text-[#111111]">
+                  {officer.name[language]}
                 </h4>
-                <p className="text-[15px] text-[#5B5348] line-clamp-2">
-                  {leader.bio?.[language] || ''}
+                <p className="text-[13px] text-[#5B5348]">
+                  {officer.role[language]}
                 </p>
-                <span className="text-[13px] font-bold text-[#111111] underline decoration-1 inline-block pt-1">
-                  {language === 'ta' ? 'விவரங்களைப் பார்க்க →' : 'View dossier →'}
-                </span>
               </div>
             ))}
           </div>
@@ -758,224 +1025,90 @@ export default function HomePage() {
       </section>
 
       {/* ===================================================================== */}
-      {/* 6. NEWS SECTION & OFFICIAL STATEMENTS WIRE                            */}
+      {/* 8. JOIN SECTION (Two Equal Blocks: Red Advocate Enrolment + Ink Citizen) */}
       {/* ===================================================================== */}
-      <section 
-        ref={newsSection.ref}
-        className={`w-full py-20 border-b border-[#111111] bg-[#FAF8F5] fade-rise ${
-          newsSection.revealed ? 'revealed' : ''
+      <section
+        id="join"
+        ref={joinRef}
+        data-section-id="join"
+        className={`w-full py-20 bg-[#FAF8F5] border-b border-[#111111] transition-all duration-800 ease-out ${
+          revealed.join ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-7'
         }`}
       >
         <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#111111] pb-6 mb-8">
-            <div>
-              <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
-                {language === 'ta' ? 'அதிகாரப்பூர்வ ஊடகம்' : 'PRESS BUREAU & MEDIA WIRE'}
-              </span>
-              <h2 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[clamp(32px,4.5vw,52px)] leading-[1.28]' : 'font-helvetica font-extrabold text-[clamp(30px,4.2vw,48px)] leading-tight'} text-[#111111] mt-1`}>
-                {language === 'ta' ? 'செய்திகள் மற்றும் அறிக்கைகள்' : 'Latest Legal Dispatches & Orders'}
-              </h2>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-4 overflow-x-auto pb-1">
-              {(['All', 'Press release', 'Statement', 'Resolution'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setNewsFilter(tab)}
-                  className={`min-h-[44px] px-1 font-helvetica font-extrabold text-[15px] cursor-pointer transition-colors ${
-                    newsFilter === tab
-                      ? 'text-[#111111] border-b-2 border-[#E31E24]'
-                      : 'text-[#5B5348] hover:text-[#111111]'
-                  }`}
+            {/* Block 1: Red Advocate Enrolment with Ink Button */}
+            <div className="bg-[#E31E24] text-white p-8 md:p-12 space-y-6 flex flex-col justify-between">
+              <div className="space-y-4">
+                <span className="px-3 py-1 bg-white text-[#E31E24] font-helvetica font-extrabold text-[12px] uppercase">
+                  {language === 'ta' ? 'வழக்கறிஞர்களுக்கான தளம்' : 'FOR LICENSED ADVOCATES'}
+                </span>
+                <h3 className="font-helvetica font-extrabold text-[32px] sm:text-[38px] leading-tight text-white">
+                  {language === 'ta'
+                    ? 'திமுக வழக்கறிஞர் அணியில் உறுப்பினராகப் பதிவு செய்க'
+                    : 'Enrol in the DMK Legal Wing Registry'}
+                </h3>
+                <p className="text-[17px] text-white/90 leading-relaxed font-normal">
+                  {language === 'ta'
+                    ? 'பார் கவுன்சில் பதிவுபெற்ற அனைத்து வழக்கறிஞர்களும் கழகத்தின் சட்டப் பிரிவில் இணைந்து சமூக நீதி மற்றும் அரசமைப்பு மாண்புகளைக் காக்க முன்வாருங்கள்.'
+                    : 'Join thousands of bar practitioners defending constitutional democracy, federalism, and the reservation architecture across all 74 districts.'}
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <Link
+                  href="/enrol"
+                  className="w-full min-h-[48px] px-8 bg-[#111111] hover:bg-[#333333] text-white font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  {tab === 'All' && language === 'ta' ? 'அனைத்தும்' : tab}
-                </button>
-              ))}
+                  {language === 'ta' ? 'வழக்கறிஞர் சேர்க்கைப் படிவம்' : 'Enrol as Advocate →'}
+                </Link>
+              </div>
             </div>
-          </div>
 
-          {/* Wire Story Rows */}
-          <div className="border-t border-b border-[#111111] divide-y divide-[#111111] bg-white">
-            {filteredNews.map((item) => (
-              <article key={item.id} className="p-6 md:p-8 hover:bg-[#FAF8F5] transition-colors group">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-3 text-[14px]">
-                      <span className="font-bold text-[#C41A1F] uppercase">
-                        [{item.category}]
-                      </span>
-                      <span className="text-[#5B5348] font-helvetica">
-                        {item.date}
-                      </span>
-                      <span className="text-[#d7d0c3]">·</span>
-                      <span className="text-[#5B5348] text-[13px]">
-                        {item.court || 'Anna Arivalayam'}
-                      </span>
-                    </div>
+            {/* Block 2: Ink Citizen Legal Desk with 2 px Red Border Custody Notice & Parchment Button */}
+            <div className="bg-[#111111] text-[#FAF8F5] p-8 md:p-12 space-y-6 flex flex-col justify-between">
+              <div className="space-y-4">
+                <span className="px-3 py-1 bg-[#25201d] text-[#ff8a85] border border-[#3d3633] font-helvetica font-extrabold text-[12px] uppercase">
+                  {language === 'ta' ? 'பொதுமக்கள் சட்ட உதவி' : 'CITIZEN LEGAL ASSISTANCE'}
+                </span>
+                <h3 className="font-helvetica font-extrabold text-[32px] sm:text-[38px] leading-tight text-white">
+                  {language === 'ta'
+                    ? 'கழகத் தோழர்கள் & பொதுமக்கள் சட்ட உதவி மையம்'
+                    : 'Cadre & Citizen Legal Aid Desk'}
+                </h3>
+                <p className="text-[17px] text-[#d8cfc2] leading-relaxed font-normal">
+                  {language === 'ta'
+                    ? 'அரசியல் உள்நோக்கக் கைதுகள், அவசர வழக்காடல் மற்றும் அடிப்படை உரிமை மீறல்களுக்கு மாநிலம் முழுவதும் உடனடி இலவச சட்ட உதவி.'
+                    : 'Urgent legal representation against unlawful detentions, political harassment, and civil rights violations through verified district panels.'}
+                </p>
 
-                    <h3 className="font-helvetica font-extrabold text-[22px] md:text-[26px] text-[#111111] group-hover:text-[#E31E24] transition-colors leading-snug">
-                      <Link href={`/news/${item.id}`}>
-                        {item.title[language]}
-                      </Link>
-                    </h3>
-
-                    <p className="text-[16px] text-[#3a322d] leading-relaxed line-clamp-2 max-w-4xl">
-                      {item.summary[language]}
-                    </p>
+                {/* 2 px Red border custody notice */}
+                <div className="p-4 bg-[#1a1715] border-2 border-[#E31E24] text-[14px] text-[#FAF8F5] space-y-1">
+                  <div className="font-bold text-[#ff8a85] uppercase">
+                    {language === 'ta' ? 'அவசர காவல் காவல்/கைது அறிவிப்பு:' : 'Emergency Custody / Detention Notice:'}
                   </div>
-
-                  <Link
-                    href={`/news/${item.id}`}
-                    className="min-h-[44px] px-6 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase tracking-normal inline-flex items-center justify-center transition-colors shrink-0 self-start md:self-center"
-                  >
-                    <span>{language === 'ta' ? 'அறிக்கை →' : 'Read dispatch →'}</span>
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="pt-8 text-center">
-            <Link
-              href="/news"
-              className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[16px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-1 hover:border-[#E31E24] transition-colors"
-            >
-              <span>{language === 'ta' ? 'அனைத்து செய்திக் காப்பகத்தையும் திறக்க →' : 'Open the complete newsroom & court watch →'}</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================================================================== */}
-      {/* 7. ACTION GATEWAY: ENROLMENT & CITIZEN DESK                          */}
-      {/* ===================================================================== */}
-      <section 
-        ref={ctaSection.ref}
-        className={`w-full py-20 bg-[#FAF8F5] fade-rise ${
-          ctaSection.revealed ? 'revealed' : ''
-        }`}
-      >
-        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-            
-            {/* Red Block: Advocate Enrolment */}
-            <div className="bg-[#E31E24] text-white p-8 md:p-12 border-2 border-[#111111] flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <span className="text-[12px] font-extrabold uppercase text-white/90">
-                  ADVOCATE CADRE REGISTRATION
-                </span>
-                <h3 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[34px] md:text-[40px] leading-[1.25]' : 'font-helvetica font-extrabold text-[32px] md:text-[38px] leading-tight'} text-white`}>
-                  {language === 'ta' ? 'வழக்கறிஞர் அணி உறுப்பினர் பதிவு' : 'Advocate Enrolment Drive'}
-                </h3>
-                <p className="text-[18px] text-white/95 leading-relaxed">
-                  {language === 'ta'
-                    ? 'தமிழ்நாடு மற்றும் புதுச்சேரி வழக்கறிஞர்கள் கழகக் கொள்கைப் பயணத்தில் இணைந்து மக்கள் நலப் பணிகளில் பங்கேற்க உடனே பதிவு செய்யுங்கள்.'
-                    : 'Join over 3,500 active advocate members defending fundamental constitutional rights and social justice across Tamil Nadu.'}
-                </p>
-              </div>
-
-              <Link
-                href="/enrol"
-                className="min-h-[48px] h-[48px] px-8 bg-[#111111] hover:bg-black text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal inline-flex items-center justify-center transition-colors self-start btn-lift"
-              >
-                {language === 'ta' ? 'உறுப்பினர் விண்ணப்பம் →' : 'Enrol as Advocate →'}
-              </Link>
-            </div>
-
-            {/* Ink Block: Citizen Legal Desk */}
-            <div className="bg-[#111111] text-[#FAF8F5] p-8 md:p-12 border-2 border-[#111111] flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <span className="text-[12px] font-extrabold uppercase text-[#ff8a85]">
-                  PRO-BONO LEGAL AID & DESK
-                </span>
-                <h3 className={`${language === 'ta' ? 'font-kavivanar font-normal text-[34px] md:text-[40px] leading-[1.25]' : 'font-helvetica font-extrabold text-[32px] md:text-[38px] leading-tight'} text-white`}>
-                  {language === 'ta' ? 'பொதுமக்கள் இலவச சட்ட உதவி மையம்' : 'Citizen Legal Desk'}
-                </h3>
-                <p className="text-[18px] text-[#d8cfc2] leading-relaxed">
-                  {language === 'ta'
-                    ? 'அடிப்படை மனித உரிமைகள் மீறல், நில விவகாரங்கள், மற்றும் சட்ட உதவி தேவைப்படும் பொதுமக்கள் தங்களது மனுக்களைப் பதிவு செய்யலாம்.'
-                    : 'File pro-bono legal grievances, seek bail protection assistance, and receive constitutional guidance from our legal aid panel.'}
-                </p>
-
-                {/* Notice Box */}
-                <div className="border border-[#E31E24] bg-[#1a1817] p-3 text-[14px] text-[#ff8a85] font-bold">
-                  {language === 'ta' 
-                    ? 'காவல்துறை விசாரணைக் காவலில் அநீதி இழைக்கப்பட்டால் உடனே அழைக்கவும்: 044-24344444' 
-                    : 'If you or someone you know is in police custody, call 044-24344444 now.'}
+                  <p className="text-[13px] text-[#d8cfc2]">
+                    {language === 'ta'
+                      ? 'அண்ணா அறிவாலயம் 24/7 சட்ட அவசர உதவி எண்: 044-2434 4455'
+                      : 'Anna Arivalayam 24/7 Legal Emergency Custody Hotline: 044-2434 4455'}
+                  </p>
                 </div>
               </div>
 
-              <Link
-                href="/citizen-desk"
-                className="min-h-[48px] h-[48px] px-8 bg-[#FAF8F5] hover:bg-white text-[#111111] font-helvetica font-extrabold text-[15px] uppercase tracking-normal inline-flex items-center justify-center transition-colors self-start btn-lift"
-              >
-                {language === 'ta' ? 'மனு தாக்கல் செய்க →' : 'Submit Legal Grievance →'}
-              </Link>
+              <div className="pt-4">
+                <Link
+                  href="/citizen-desk"
+                  className="w-full min-h-[48px] px-8 bg-[#FAF8F5] hover:bg-white text-[#111111] font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  {language === 'ta' ? 'சட்ட உதவி கோரிக்கை வைக்க' : 'Submit Assistance Request →'}
+                </Link>
+              </div>
             </div>
 
           </div>
         </div>
       </section>
-
-      {/* Leader Dossier Modal */}
-      {selectedLeaderModal && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setSelectedLeaderModal(null)}
-          className="fixed inset-0 z-50 bg-[#111111]/80 flex items-center justify-center p-4"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-[#FAF8F5] text-[#111111] max-w-xl w-full border-2 border-[#111111] p-8 space-y-6 shadow-2xl relative"
-          >
-            <div className="flex items-start justify-between border-b-2 border-[#111111] pb-4">
-              <div>
-                <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
-                  [{selectedLeaderModal.designation[language]}]
-                </span>
-                <h3 className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-tight">
-                  {selectedLeaderModal.name[language]}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedLeaderModal(null)}
-                className="min-h-[44px] h-[44px] px-4 font-helvetica font-extrabold text-[14px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
-              >
-                CLOSE [✕]
-              </button>
-            </div>
-
-            <p className="text-[17px] text-[#3a322d] leading-relaxed">
-              {selectedLeaderModal.bio?.[language] || ''}
-            </p>
-
-            <div className="p-4 bg-white border border-[#d7d0c3] space-y-2 text-[14px]">
-              <div>
-                <strong className="text-[#5B5348] uppercase">Court of Practice: </strong>
-                <span className="font-bold text-[#111111]">{selectedLeaderModal.court || 'Madras High Court'}</span>
-              </div>
-              <div>
-                <strong className="text-[#5B5348] uppercase">Responsibility: </strong>
-                <span className="font-bold text-[#111111]">{selectedLeaderModal.role[language]}</span>
-              </div>
-            </div>
-
-            <div className="pt-2 text-right">
-              <button
-                type="button"
-                onClick={() => setSelectedLeaderModal(null)}
-                className="min-h-[44px] h-[44px] px-6 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase cursor-pointer transition-colors"
-              >
-                Close Dossier
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );
