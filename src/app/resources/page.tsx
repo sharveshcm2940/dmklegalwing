@@ -180,9 +180,8 @@ export default function ResourcesPage() {
   }, [resources, activeCategory, searchQuery, matchesCategory]);
 
   return (
-    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
-      
-      {/* Title band: "Legal document vault" / "சட்ட ஆவண கல்விற்கூடம்" */}
+    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[18px] leading-[1.75] pb-24">
+      {/* Universal Page Title Band */}
       <PageTitleBand
         title={language === 'ta' ? 'சட்ட ஆவண கல்விற்கூடம்' : 'Legal document vault'}
         description={
@@ -193,14 +192,12 @@ export default function ResourcesPage() {
       />
 
       <div className="max-w-[1400px] mx-auto px-[clamp(20px,4vw,56px)] pt-10 space-y-8">
-        
         <section
           ref={mainSection.ref}
           className={`fade-rise ${mainSection.revealed ? 'revealed' : ''} space-y-6`}
         >
           {/* 1. Search Box & Category Tabs Toolbar */}
           <div className="space-y-4">
-            
             {/* Search Box: 2 px ink border, inline-SVG magnifier */}
             <div className="relative border-2 border-[#111111] bg-white flex items-center px-4 min-h-[48px]">
               <svg
@@ -260,14 +257,15 @@ export default function ResourcesPage() {
                 );
               })}
             </div>
-
           </div>
 
           {/* Catalogue count bar */}
           <div className="flex items-center justify-between text-[14px] text-[#5B5348] border-b border-[#d7d0c3] pb-2">
             <span>
               {language === 'ta' ? 'மொத்தப் பதிவுகள்: ' : 'Catalogue entries: '}
-              <strong className="text-[#111111] font-helvetica font-extrabold">{filteredResources.length}</strong>
+              <strong className="text-[#111111] font-helvetica font-extrabold">
+                {filteredResources.length}
+              </strong>
             </span>
             {activeCategory !== 'All' && (
               <button
@@ -282,10 +280,12 @@ export default function ResourcesPage() {
 
           {/* Main Content Layout: Table on left, PDF viewer panel on right when active */}
           <div className="flex flex-col lg:flex-row items-start gap-8">
-            
             {/* Table Area (Wide Screens: table stays visible even when preview is open) */}
-            <div className={`w-full transition-all duration-300 ${previewResource ? 'lg:w-[55%]' : 'lg:w-full'}`}>
-              
+            <div
+              className={`w-full transition-all duration-300 ${
+                previewResource ? 'lg:w-[55%]' : 'lg:w-full'
+              }`}
+            >
               {filteredResources.length === 0 ? (
                 <div className="py-12 text-center text-[#5B5348] text-[17px]">
                   {language === 'ta'
@@ -348,7 +348,7 @@ export default function ResourcesPage() {
                                 {item.category || ''}
                               </td>
 
-                              {/* Year: Leave cell empty when no value; never invent a year */}
+                              {/* Year: Leave cell empty when no value */}
                               <td className="py-3 px-4 align-middle font-helvetica font-extrabold text-[16px] text-[#111111] whitespace-nowrap">
                                 {yearValue}
                               </td>
@@ -410,7 +410,6 @@ export default function ResourcesPage() {
                             isSelected ? 'bg-[#f1ece2]' : 'hover:bg-[#f1ece2]'
                           }`}
                         >
-                          {/* Title first */}
                           <div>
                             <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
                               [{item.category}]
@@ -429,7 +428,6 @@ export default function ResourcesPage() {
                             )}
                           </div>
 
-                          {/* Metadata row */}
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px] text-[#5B5348] pt-2 border-t border-[#d7d0c3]">
                             {yearValue && (
                               <span>
@@ -457,7 +455,6 @@ export default function ResourcesPage() {
                             )}
                           </div>
 
-                          {/* Two actions at the bottom, each at least 44 px tall */}
                           <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#d7d0c3]">
                             <button
                               type="button"
@@ -480,7 +477,6 @@ export default function ResourcesPage() {
                   </div>
                 </>
               )}
-
             </div>
 
             {/* 3. PDF Viewer Panel on Right (about 45% width on wide screens, full screen on phones) */}
@@ -489,7 +485,7 @@ export default function ResourcesPage() {
                 {/* Desktop/Tablet Panel (45% width, sticky) */}
                 <aside
                   aria-label={language === 'ta' ? 'ஆவணக் காட்சி' : 'Document Preview'}
-                  className="hidden lg:block lg:w-[45%] sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto bg-[#FAF8F5] border-2 border-[#111111] p-6 space-y-6 shrink-0"
+                  className="hidden lg:block lg:w-[45%] sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto bg-[#FAF8F5] border-2 border-[#111111] p-6 space-y-6 shrink-0 shadow-lg"
                 >
                   <div className="border-t-[6px] border-[#E31E24] -mt-6 -mx-6 mb-4" />
 
@@ -561,133 +557,74 @@ export default function ResourcesPage() {
                         </div>
                       )}
 
-                    {/* Viewer Actions */}
-                    <div className="pt-4 flex flex-col sm:flex-row items-stretch gap-3 border-t-2 border-[#111111]">
+                    {/* Download button */}
+                    <div className="pt-4 border-t border-[#d7d0c3]">
                       <a
                         href={previewResource.downloadUrl || '#'}
                         download
-                        className="min-h-[44px] flex-1 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[14px] flex items-center justify-center cursor-pointer btn-lift transition-colors"
+                        className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                       >
-                        {language === 'ta' ? 'ஆவணத்தைப் பதிவிறக்கு' : 'Download Document'}
+                        {language === 'ta' ? 'முழு ஆவணத்தைப் பதிவிறக்குக (PDF)' : 'Download Full Document (PDF)'}
                       </a>
-                      <button
-                        type="button"
-                        onClick={() => window.print()}
-                        className="min-h-[44px] px-4 bg-white border-2 border-[#111111] hover:bg-[#111111] hover:text-white font-extrabold text-[14px] cursor-pointer transition-colors"
-                      >
-                        {language === 'ta' ? 'அச்சிடு' : 'Print'}
-                      </button>
                     </div>
                   </div>
-
                 </aside>
 
-                {/* Mobile Full Screen Viewer Modal */}
+                {/* Mobile Fullscreen Panel */}
                 <div
                   role="dialog"
                   aria-modal="true"
-                  className="fixed inset-0 z-50 bg-[#FAF8F5] p-4 sm:p-6 overflow-y-auto block lg:hidden"
+                  className="lg:hidden fixed inset-0 z-50 bg-[#FAF8F5] p-6 overflow-y-auto space-y-6"
                 >
-                  <div className="max-w-xl mx-auto space-y-6">
-                    <div className="border-t-[6px] border-[#E31E24] -mt-4 sm:-mt-6 -mx-4 sm:-mx-6 mb-4" />
+                  <div className="border-t-[6px] border-[#E31E24] -mt-6 -mx-6 mb-4" />
 
-                    {/* Header: Document Title & Close Button */}
-                    <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#111111]">
-                      <div className="space-y-1">
-                        <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
-                          [{previewResource.category}]
-                        </span>
-                        <h2
-                          className={`${
-                            language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                          } font-extrabold text-[22px] text-[#111111] leading-tight`}
-                        >
-                          {previewResource.title[language] || previewResource.title.en}
-                        </h2>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setPreviewResource(null)}
-                        className="min-h-[44px] px-4 py-2 border-2 border-[#111111] bg-white hover:bg-[#111111] hover:text-white text-[#111111] font-extrabold text-[14px] cursor-pointer shrink-0 transition-colors"
+                  <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#111111]">
+                    <div className="space-y-1">
+                      <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
+                        [{previewResource.category}]
+                      </span>
+                      <h2
+                        className={`${
+                          language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
+                        } font-extrabold text-[22px] text-[#111111] leading-tight`}
                       >
-                        {language === 'ta' ? 'மூடுக' : 'Close'}
-                      </button>
+                        {previewResource.title[language] || previewResource.title.en}
+                      </h2>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewResource(null)}
+                      className="min-h-[44px] px-4 py-2 border-2 border-[#111111] bg-white text-[#111111] font-extrabold text-[14px] cursor-pointer"
+                    >
+                      {language === 'ta' ? 'மூடுக' : 'Close'}
+                    </button>
+                  </div>
 
-                    {/* PDF Viewer Sheet */}
-                    <div className="bg-white border-2 border-[#111111] p-5 space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-[#d7d0c3] text-[13px] text-[#5B5348]">
-                        <span>{language === 'ta' ? 'அதிகாரப்பூர்வ ஆவணக் குறிப்பு' : 'Official Legal Docket'}</span>
-                        <span className="font-helvetica font-extrabold text-[#111111]">
-                          {previewResource.fileSize || 'PDF'}
-                        </span>
-                      </div>
+                  <p className="text-[16px] text-[#111111] leading-relaxed">
+                    {previewResource.summary[language] || previewResource.summary.en}
+                  </p>
 
-                      <p className="text-[16px] text-[#111111] leading-relaxed">
-                        {previewResource.summary[language] || previewResource.summary.en}
-                      </p>
-
-                      {previewResource.court && (
-                        <div className="p-3 bg-[#f1ece2] border-l-4 border-[#111111] text-[14px] text-[#111111]">
-                          <strong className="block text-xs text-[#5B5348]">
-                            {language === 'ta' ? 'நீதிமன்றம்:' : 'Court / Tribunal:'}
-                          </strong>
-                          <span className="font-bold">{previewResource.court}</span>
-                        </div>
-                      )}
-
-                      {previewResource.citation && (
-                        <div className="p-3 bg-[#f1ece2] border-l-4 border-[#E31E24] text-[14px] text-[#111111]">
-                          <strong className="block text-xs text-[#5B5348]">
-                            {language === 'ta' ? 'வழக்கு குறிப்புரை:' : 'Official Citation:'}
-                          </strong>
-                          <span className="font-bold">{previewResource.citation}</span>
-                        </div>
-                      )}
-
-                      {previewResource.keyHighlights &&
-                        previewResource.keyHighlights[language]?.length > 0 && (
-                          <div className="space-y-2 pt-2 border-t border-[#d7d0c3]">
-                            <strong className="text-[13px] uppercase tracking-normal text-[#C41A1F] block">
-                              {language === 'ta' ? 'முக்கிய சட்ட வாதங்கள்:' : 'Ratio & Key Submissions:'}
-                            </strong>
-                            <ul className="space-y-1.5 text-[15px] list-disc list-inside text-[#333333]">
-                              {previewResource.keyHighlights[language].map((pt, i) => (
-                                <li key={i} className="leading-snug">{pt}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                      {/* Mobile Actions */}
-                      <div className="pt-4 flex flex-col gap-3 border-t-2 border-[#111111]">
-                        <a
-                          href={previewResource.downloadUrl || '#'}
-                          download
-                          className="min-h-[44px] w-full bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[14px] flex items-center justify-center cursor-pointer btn-lift transition-colors"
-                        >
-                          {language === 'ta' ? 'ஆவணத்தைப் பதிவிறக்கு' : 'Download Document'}
-                        </a>
-                        <button
-                          type="button"
-                          onClick={() => setPreviewResource(null)}
-                          className="min-h-[44px] w-full bg-[#111111] hover:bg-black text-white font-extrabold text-[14px] cursor-pointer transition-colors"
-                        >
-                          {language === 'ta' ? 'மூடுக' : 'Close'}
-                        </button>
-                      </div>
+                  {previewResource.citation && (
+                    <div className="p-3 bg-[#f1ece2] border-l-4 border-[#E31E24] text-[14px] text-[#111111]">
+                      <span className="font-bold">{previewResource.citation}</span>
                     </div>
+                  )}
+
+                  <div className="pt-4">
+                    <a
+                      href={previewResource.downloadUrl || '#'}
+                      download
+                      className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+                    >
+                      {language === 'ta' ? 'பதிவிறக்குக (PDF)' : 'Download (PDF)'}
+                    </a>
                   </div>
                 </div>
               </>
             )}
-
           </div>
-
         </section>
-
       </div>
-
     </div>
   );
 }
