@@ -5,7 +5,17 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { DistrictInfo } from '@/types';
 import { TamilNaduMap } from '@/components/TamilNaduMap';
-import { Phone, Search, Eye, X, Building2, MapPin, Scale } from 'lucide-react';
+import { PageTitleBand } from '@/components/PageTitleBand';
+import { useReveal } from '@/hooks/useReveal';
+import { 
+  IconPhone, 
+  IconSearch, 
+  IconEye, 
+  IconClose, 
+  IconBuilding, 
+  IconMapPin, 
+  IconScale 
+} from '@/components/Icons';
 
 export default function DistrictsPage() {
   const { language } = useLanguage();
@@ -13,6 +23,8 @@ export default function DistrictsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState('All');
   const [selectedDossier, setSelectedDossier] = useState<DistrictInfo | null>(null);
+
+  const mainSection = useReveal();
 
   const zones = ['All', 'Chennai', 'North', 'West', 'Central', 'South'];
 
@@ -34,263 +46,240 @@ export default function DistrictsPage() {
   }, [districts, selectedZone, searchQuery, language]);
 
   return (
-    <div className="w-full bg-[#FAF8F5] text-[#111111] font-dmk-body py-8">
+    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
       
-      {/* 1. MASTHEAD BANNER */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 mb-8">
-        <div className="border-b-2 border-[#111111] pb-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs font-dmk-body font-bold text-[#C41A1F] block mb-1">
-                {language === 'ta' ? 'அமைப்பு மாவட்டக் கட்டமைப்பு' : '74 DISTRICT PARTY CADRE DIRECTORY'}
-              </span>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#111111] font-dmk-headline tracking-tight leading-tight">
-                {language === 'ta'
-                  ? '74 மாவட்ட வழக்கறிஞர் அணிகள்'
-                  : '74 District Legal Units & Cadre Directory'}
-              </h1>
-              <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body mt-2 max-w-3xl leading-relaxed">
-                {language === 'ta'
-                  ? 'சென்னை உயர் நீதிமன்றம், மதுரை கிளை, புதுச்சேரி மற்றும் அனைத்து மாவட்ட அமர்வு நீதிமன்றங்களையும் உள்ளடக்கிய 74 அமைப்பு மாவட்ட வழக்கறிஞர் அணிகளின் அதிகாரப்பூர்வ பட்டியல்.'
-                  : 'Official directory of 74 party organizational legal units across Tamil Nadu and Puducherry, connecting subordinate trial court secretariats and district organizers.'}
-              </p>
-            </div>
+      {/* Universal Page Title Band */}
+      <PageTitleBand
+        title={language === 'ta' ? '74 அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள்' : '74 District Legal Units & Cadre'}
+        description={
+          language === 'ta'
+            ? 'சென்னை உயர் நீதிமன்றம், மதுரை கிளை மற்றும் அனைத்து மாவட்ட அமர்வு நீதிமன்றங்களின் அதிகாரப்பூர்வ பட்டியல்.'
+            : 'Official directory of 74 party organisational legal units connecting subordinate trial court secretariats and organisers.'
+        }
+      />
 
-            <div className="text-xs text-[#5B5348] font-dmk-body shrink-0">
-              <span className="font-bold text-[#111111]">{districts.length}</span> {language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'Party Units Registered'}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. MAIN LAYOUT: LIST FIRST, MAP SECOND (Beside list on wide screens, below list on phones) */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* ============================================================== */}
-          {/* COLUMN 1: THE LIST (Comes FIRST on phones & left side on desktop) */}
-          {/* ============================================================== */}
-          <div className="lg:col-span-7 space-y-6 order-1">
+      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12 space-y-12">
+        
+        <section 
+          ref={mainSection.ref}
+          className={`fade-rise ${mainSection.revealed ? 'revealed' : ''}`}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {/* Search Box & Zone Filter as Square Tabs */}
-            <div className="bg-white border border-[#D8D3CB] p-4 sm:p-5 rounded-[2px] space-y-4">
+            {/* COLUMN 1: THE LIST */}
+            <div className="lg:col-span-7 space-y-6 order-1">
               
-              {/* Search Box: district name or organiser */}
-              <div className="relative w-full">
-                <Search className="w-4 h-4 text-[#5B5348] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  id="districtSearchInput"
-                  aria-label={language === 'ta' ? 'மாவட்டப் பெயர் அல்லது அமைப்பாளர் பெயரைத் தேடுக' : 'Search by district name or organiser'}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={language === 'ta' ? 'மாவட்டப் பெயர் அல்லது அமைப்பாளர் பெயரைத் தேடுக...' : 'Search by district name or organiser...'}
-                  className="w-full min-h-[44px] bg-[#FAF8F5] border border-[#D8D3CB] pl-10 pr-4 py-2 text-xs font-dmk-body text-[#111111] placeholder-[#5B5348] focus:outline-none focus:border-[#111111] rounded-[2px]"
-                />
-              </div>
+              {/* Search Box & Zone Filter as Square Tabs */}
+              <div className="bg-white border-2 border-[#111111] p-5 space-y-4">
+                
+                {/* Search Box with label above in 600 weight */}
+                <div>
+                  <label htmlFor="districtSearchInput" className="font-semibold text-[15px] text-[#111111] mb-1.5 block">
+                    {language === 'ta' ? 'மாவட்டப் பெயர் அல்லது அமைப்பாளர் பெயரைத் தேடுக' : 'Search by district name or organiser'}
+                  </label>
+                  <div className="relative w-full">
+                    <IconSearch className="w-4 h-4 text-[#5B5348] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="districtSearchInput"
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={language === 'ta' ? 'தேடுக (எ.கா. சென்னை, மதுரை)...' : 'Search (e.g. Chennai, Madurai)...'}
+                      className="w-full min-h-[44px] bg-[#FAF8F5] border-2 border-[#111111] pl-10 pr-4 py-2 text-[15px] text-[#111111] placeholder-[#5B5348] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#E31E24]"
+                    />
+                  </div>
+                </div>
 
-              {/* Zone Filter as Square Tabs */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-[#D8D3CB]">
-                {zones.map((zone) => (
-                  <button
-                    key={zone}
-                    type="button"
-                    onClick={() => setSelectedZone(zone)}
-                    className={`min-h-[44px] px-4 py-2 text-xs font-dmk-body font-bold transition-all border-b-[3px] rounded-none shrink-0 cursor-pointer ${
-                      selectedZone === zone
-                        ? 'border-[#E31E24] text-[#111111]'
-                        : 'border-transparent text-[#5B5348] hover:text-[#111111] hover:border-[#D8D3CB]'
-                    }`}
-                  >
-                    {zone === 'All' ? (language === 'ta' ? 'அனைத்து மண்டலங்கள்' : 'All Zones') : `${zone} Zone`}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between text-xs text-[#5B5348]">
-                <span>
-                  {language === 'ta' ? 'காட்டப்படும் மாவட்டங்கள்: ' : 'Displaying units: '}
-                  <strong className="text-[#111111]">{filteredDistricts.length}</strong>
-                </span>
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="text-[#C41A1F] hover:underline cursor-pointer"
-                  >
-                    {language === 'ta' ? 'தேடலை அழிக்க' : 'Clear search'}
-                  </button>
-                )}
-              </div>
-
-            </div>
-
-            {/* Ruled List: One row per party district */}
-            {filteredDistricts.length === 0 ? (
-              <div className="bg-white border border-[#D8D3CB] p-8 text-center rounded-[2px]">
-                <p className="text-xs text-[#5B5348] font-dmk-body">
-                  {language === 'ta' 
-                    ? 'தேடலுக்குரிய மாவட்டங்கள் அல்லது அமைப்பாளர்கள் எதுவும் கிடைக்கவில்லை.' 
-                    : 'No district units match your search query or zone filter.'}
-                </p>
-              </div>
-            ) : (
-              <div className="divide-y divide-[#D8D3CB] border border-[#D8D3CB] bg-white rounded-[2px]">
-                {filteredDistricts.map((d) => {
-                  const isPhonePublic = d.showPhonePublicly !== false;
-                  
-                  // Split multiple phone numbers if an organiser has two numbers
-                  const phoneNumbers = isPhonePublic && d.contactPhone
-                    ? d.contactPhone.split(/[,;/]/).map((p) => p.trim()).filter(Boolean)
-                    : [];
-
-                  return (
-                    <article
-                      key={d.id}
-                      className="p-4 sm:p-5 hover:bg-[#FAF8F5] transition-colors"
+                {/* Zone Filter as Square Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b-2 border-[#111111]">
+                  {zones.map((zone) => (
+                    <button
+                      key={zone}
+                      type="button"
+                      onClick={() => setSelectedZone(zone)}
+                      className={`min-h-[44px] px-4 py-2 text-[14px] font-extrabold transition-colors border-b-[3px] rounded-none shrink-0 cursor-pointer ${
+                        selectedZone === zone
+                          ? 'border-[#E31E24] text-[#C41A1F] bg-[#f1ece2]'
+                          : 'border-transparent text-[#5B5348] hover:text-[#111111]'
+                      }`}
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        
-                        {/* District & Organiser Info */}
-                        <div className="space-y-1.5 flex-1">
+                      {zone === 'All' ? (language === 'ta' ? 'அனைத்தும்' : 'All Zones') : `${zone}`}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between text-[14px] text-[#5B5348]">
+                  <span>
+                    {language === 'ta' ? 'காட்டப்படும் மாவட்டங்கள்: ' : 'Displaying units: '}
+                    <strong className="text-[#111111] font-helvetica">{filteredDistricts.length}</strong>
+                  </span>
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="text-[#C41A1F] hover:underline font-bold cursor-pointer"
+                    >
+                      {language === 'ta' ? 'தேடலை அழிக்க' : 'Clear search'}
+                    </button>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Ruled List */}
+              {filteredDistricts.length === 0 ? (
+                <div className="bg-white border-2 border-[#111111] p-8 text-center">
+                  <p className="text-[16px] text-[#5B5348]">
+                    {language === 'ta' 
+                      ? 'தேடலுக்குரிய மாவட்டங்கள் அல்லது அமைப்பாளர்கள் எதுவும் கிடைக்கவில்லை.' 
+                      : 'No district units match your search query or zone filter.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y-2 divide-[#111111] border-2 border-[#111111] bg-white">
+                  {filteredDistricts.map((d) => {
+                    const isPhonePublic = d.showPhonePublicly !== false;
+                    const phoneNumbers = isPhonePublic && d.contactPhone
+                      ? d.contactPhone.split(/[,;/]/).map((p) => p.trim()).filter(Boolean)
+                      : [];
+
+                    return (
+                      <article
+                        key={d.id}
+                        className="p-5 hover:bg-[#f1ece2] transition-colors"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           
-                          <div className="flex flex-wrap items-center gap-2 text-xs">
-                            {d.number && (
-                              <span className="font-mono font-bold text-[#C41A1F]">
-                                #{d.number}
+                          <div className="space-y-1.5 flex-1">
+                            <div className="flex flex-wrap items-center gap-2 text-[13px]">
+                              {d.number && (
+                                <span className="font-helvetica font-extrabold text-[#C41A1F]">
+                                  #{d.number}
+                                </span>
+                              )}
+                              <span>•</span>
+                              <span className="px-2 py-0.5 bg-[#FAF8F5] border border-[#111111] text-[11px] font-extrabold uppercase text-[#5B5348]">
+                                {d.zone} Zone
+                              </span>
+                              <span>•</span>
+                              <span className="text-[14px] text-[#5B5348]">
+                                {d.headquarters[language]}
+                              </span>
+                            </div>
+
+                            <h2 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-snug">
+                              {d.name[language]}
+                            </h2>
+
+                            <div className="text-[15px] text-[#5B5348]">
+                              <span>{language === 'ta' ? 'அமைப்பாளர்: ' : 'Organiser: '}</span>
+                              <strong className="text-[#111111]">{d.organizer[language]}</strong>
+                            </div>
+
+                            <p className="line-clamp-1 text-[13px] text-[#5B5348]">
+                              {d.courtComplex[language]}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 sm:self-center shrink-0">
+                            {isPhonePublic && phoneNumbers.length > 0 ? (
+                              phoneNumbers.map((phone, idx) => (
+                                <a
+                                  key={idx}
+                                  href={`tel:${phone.replace(/\s+/g, '')}`}
+                                  className="min-h-[44px] px-4 py-2 inline-flex items-center justify-center gap-1.5 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[13px] btn-lift cursor-pointer"
+                                  title={`Call ${phone}`}
+                                >
+                                  <IconPhone className="w-3.5 h-3.5" />
+                                  <span>{phone}</span>
+                                </a>
+                              ))
+                            ) : (
+                              <span className="text-[13px] text-[#5B5348] italic py-2">
+                                {language === 'ta' ? 'மாநிலத் தலைமைச் செயலகம் வாயிலாகத் தொடர்பு கொள்க' : 'Contact via State Secretariat'}
                               </span>
                             )}
-                            <span className="text-[#D8D3CB]">•</span>
-                            <span className="px-2 py-0.5 bg-[#FAF8F5] border border-[#D8D3CB] font-english text-[10px] font-bold uppercase rounded-[2px] text-[#5B5348]">
-                              {d.zone} Zone
-                            </span>
-                            <span className="text-[#D8D3CB]">•</span>
-                            <span className="text-xs text-[#5B5348]">
-                              {d.headquarters[language]}
-                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDossier(d)}
+                              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center border-2 border-[#111111] bg-[#FAF8F5] hover:bg-[#111111] hover:text-white text-[#111111] btn-lift cursor-pointer"
+                              title={language === 'ta' ? 'விவரம் காண்க' : 'Inspect Dossier'}
+                              aria-label={language === 'ta' ? `${d.name[language]} மாவட்ட ஆவணத்தைக் காண்க` : `Inspect dossier for ${d.name[language]}`}
+                            >
+                              <IconEye className="w-4 h-4" />
+                            </button>
                           </div>
 
-                          {/* District Name */}
-                          <h2 className="text-base sm:text-lg font-bold text-[#111111] font-dmk-headline leading-snug">
-                            {d.name[language]}
-                          </h2>
-
-                          {/* Organiser Name */}
-                          <div className="text-xs text-[#5B5348] font-dmk-body">
-                            <span className="text-[#5B5348]">{language === 'ta' ? 'அமைப்பாளர்: ' : 'Organiser: '}</span>
-                            <strong className="text-[#111111]">{d.organizer[language]}</strong>
-                          </div>
-
-                          {/* Court Complex */}
-                          <p className="line-clamp-1 text-[11px] text-[#5B5348] font-dmk-body">
-                            {d.courtComplex[language]}
-                          </p>
-
                         </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
 
-                        {/* Actions: Call Button(s) (>= 44px) + Inspection Icon */}
-                        <div className="flex flex-wrap items-center gap-2 sm:self-center shrink-0">
-                          
-                          {/* If organiser has two numbers, show both as separate call buttons */}
-                          {isPhonePublic && phoneNumbers.length > 0 ? (
-                            phoneNumbers.map((phone, idx) => (
-                              <a
-                                key={idx}
-                                href={`tel:${phone.replace(/\s+/g, '')}`}
-                                className="min-h-[44px] px-3.5 py-2 inline-flex items-center justify-center gap-1.5 bg-[#E31E24] hover:bg-[#111111] text-white font-dmk-body font-bold text-xs rounded-[2px] transition-colors"
-                                title={`Call ${phone}`}
-                              >
-                                <Phone className="w-3.5 h-3.5" />
-                                <span>{phone}</span>
-                              </a>
-                            ))
-                          ) : (
-                            <span className="text-xs font-dmk-body text-[#5B5348] italic py-2">
-                              {language === 'ta' ? 'மாநிலத் தலைமைச் செயலகம் வாயிலாகத் தொடர்பு கொள்ளவும்' : 'Contact through the State Secretariat'}
-                            </span>
-                          )}
+            </div>
 
-                          {/* Inspection Icon that opens the Dossier */}
-                          <button
-                            type="button"
-                            onClick={() => setSelectedDossier(d)}
-                            className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center border border-[#D8D3CB] bg-[#FAF8F5] hover:bg-[#111111] hover:text-white text-[#111111] rounded-[2px] transition-colors cursor-pointer"
-                            title={language === 'ta' ? 'விவரம் காண்க' : 'Inspect Dossier'}
-                            aria-label={language === 'ta' ? `${d.name[language]} மாவட்ட ஆவணத்தைக் காண்க` : `Inspect dossier for ${d.name[language]}`}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-
-                        </div>
-
-                      </div>
-                    </article>
-                  );
-                })}
+            {/* COLUMN 2: THE MAP */}
+            <div className="lg:col-span-5 order-2 lg:sticky lg:top-24">
+              <div className="border-2 border-[#111111] bg-white p-4">
+                <TamilNaduMap />
               </div>
-            )}
+            </div>
 
           </div>
+        </section>
 
-          {/* ============================================================== */}
-          {/* COLUMN 2: THE MAP (Below list on phones, beside it on desktop) */}
-          {/* ============================================================== */}
-          <div className="lg:col-span-5 order-2 lg:sticky lg:top-6">
-            <TamilNaduMap />
-          </div>
+      </div>
 
-        </div>
-      </section>
-
-      {/* 3. DOSSIER MODAL */}
+      {/* DOSSIER MODAL */}
       {selectedDossier && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-[#FAF8F5] text-[#111111] max-w-lg w-full border-2 border-[#111111] p-6 sm:p-8 shadow-2xl relative font-dmk-body rounded-[2px]">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-[#FAF8F5] text-[#111111] max-w-lg w-full border-4 border-[#111111] p-6 sm:p-8 relative">
             
-            {/* Modal Header */}
             <div className="flex items-start justify-between border-b-2 border-[#111111] pb-4 mb-4">
               <div>
-                <span className="text-xs font-dmk-body text-[#C41A1F] block mb-1">
+                <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
                   {language === 'ta' ? 'அதிகாரப்பூர்வ மாவட்ட ஆவணம்' : 'District Legal Dossier'}
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
+                <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111]">
                   {selectedDossier.name[language]}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedDossier(null)}
-                className="p-1.5 text-[#5B5348] hover:text-[#111111] transition-colors rounded-[2px] cursor-pointer"
+                className="p-2 border-2 border-[#111111] bg-white hover:bg-[#111111] hover:text-white transition-colors cursor-pointer"
                 aria-label="Close"
               >
-                <X className="w-5 h-5" />
+                <IconClose className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Dossier Body */}
-            <div className="space-y-4 text-xs font-dmk-body">
-              <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                <span className="text-xs text-[#5B5348] block mb-0.5">
+            <div className="space-y-4 text-[15px]">
+              <div className="p-4 bg-white border-2 border-[#111111]">
+                <span className="text-[13px] text-[#5B5348] block mb-0.5">
                   {language === 'ta' ? 'மாவட்ட அமைப்பாளர்:' : 'District Organiser:'}
                 </span>
-                <p className="text-sm font-bold text-[#111111] font-dmk-headline">
+                <p className="font-extrabold text-[18px] text-[#111111]">
                   {selectedDossier.organizer[language]}
                 </p>
-                <p className="text-xs text-[#5B5348] pt-0.5">
+                <p className="text-[13px] text-[#5B5348] pt-0.5">
                   DMK Legal Wing Secretariat • Advocate Bar Cadre
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-xs text-[#5B5348] block mb-1">
+                <div className="p-3 bg-white border border-[#111111]">
+                  <span className="text-[12px] text-[#5B5348] block mb-1">
                     {language === 'ta' ? 'மண்டலம்' : 'Party Zone'}
                   </span>
                   <span className="font-bold text-[#111111] block">
                     {selectedDossier.zone}
                   </span>
                 </div>
-                <div className="p-3 bg-white border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-xs text-[#5B5348] block mb-1">
+                <div className="p-3 bg-white border border-[#111111]">
+                  <span className="text-[12px] text-[#5B5348] block mb-1">
                     {language === 'ta' ? 'தலைமையகம்' : 'Headquarters'}
                   </span>
                   <span className="font-bold text-[#111111] block">
@@ -299,113 +288,53 @@ export default function DistrictsPage() {
                 </div>
               </div>
 
-              {/* Cadre Metrics & Cases Assisted from backend */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-xs text-[#5B5348] block mb-0.5">
+                <div className="p-3 bg-[#f1ece2] border border-[#111111]">
+                  <span className="text-[12px] text-[#5B5348] block mb-0.5">
                     {language === 'ta' ? 'பதிவுசெய்த வழக்கறிஞர்கள்' : 'Enrolled Advocates'}
                   </span>
-                  <span className="text-base font-bold text-[#111111] font-mono">
+                  <span className="font-helvetica font-extrabold text-[24px] text-[#111111]">
                     {selectedDossier.memberCount || 150}+
                   </span>
                 </div>
-                <div className="p-3 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px]">
-                  <span className="text-xs text-[#5B5348] block mb-0.5">
+                <div className="p-3 bg-[#f1ece2] border border-[#111111]">
+                  <span className="text-[12px] text-[#5B5348] block mb-0.5">
                     {language === 'ta' ? 'கையாண்ட வழக்குகள்' : 'Cases Assisted'}
                   </span>
-                  <span className="text-base font-bold text-[#C41A1F] font-mono">
+                  <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">
                     {selectedDossier.activeCasesAssisted || 35}+
                   </span>
                 </div>
               </div>
 
-              {/* Joint Organisers when present in backend */}
-              {selectedDossier.jointOrganizers && selectedDossier.jointOrganizers.length > 0 && (
-                <div className="p-3 bg-white border border-[#D8D3CB] space-y-1.5 rounded-[2px]">
-                  <span className="text-xs text-[#5B5348] block">
-                    {language === 'ta' ? 'இணை அமைப்பாளர்கள்:' : 'Joint Organisers:'}
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedDossier.jointOrganizers.map((jo, idx) => (
-                      <span key={idx} className="bg-[#FAF8F5] px-2.5 py-1 border border-[#D8D3CB] font-bold text-[#111111] text-xs rounded-[2px]">
-                        {jo[language]}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
-                <span className="text-xs text-[#5B5348] block">
-                  {language === 'ta' ? 'நீதிமன்ற வளாகம்' : 'Attached Court Complex'}
+              <div className="p-4 bg-white border border-[#111111] space-y-1">
+                <span className="text-[12px] font-bold text-[#5B5348] block">
+                  {language === 'ta' ? 'நீதிமன்ற வளாகப் பிரிவு:' : 'Court Complex & Jurisdiction:'}
                 </span>
-                <p className="text-[#111111] font-dmk-body">
+                <p className="text-[14px] text-[#111111]">
                   {selectedDossier.courtComplex[language]}
                 </p>
               </div>
 
-              {/* Direct Phone / Privacy */}
-              <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
-                <span className="text-xs text-[#5B5348] block">
-                  {language === 'ta' ? 'தொடர்பு எண்' : 'Contact Phone'}
-                </span>
-                {selectedDossier.showPhonePublicly !== false ? (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {selectedDossier.contactPhone.split(/[,;/]/).map((p, idx) => (
-                      <a
-                        key={idx}
-                        href={`tel:${p.trim().replace(/\s+/g, '')}`}
-                        className="font-mono font-bold text-[#C41A1F] hover:underline"
-                      >
-                        {p.trim()}
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="italic text-[#5B5348]">
-                    {language === 'ta' ? 'மாநிலத் தலைமைச் செயலகம் வாயிலாகத் தொடர்பு கொள்ளவும்' : 'Contact through the State Secretariat'}
-                  </p>
+              <div className="pt-2 flex gap-3">
+                {selectedDossier.showPhonePublicly !== false && selectedDossier.contactPhone && (
+                  <a
+                    href={`tel:${selectedDossier.contactPhone.replace(/\s+/g, '')}`}
+                    className="flex-1 min-h-[44px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[14px] inline-flex items-center justify-center gap-2 btn-lift"
+                  >
+                    <IconPhone className="w-4 h-4" />
+                    <span>{language === 'ta' ? 'அழைக்க' : 'Call Unit'}</span>
+                  </a>
                 )}
+                <button
+                  type="button"
+                  onClick={() => setSelectedDossier(null)}
+                  className="flex-1 min-h-[44px] bg-white border-2 border-[#111111] hover:bg-[#111111] hover:text-white font-extrabold text-[14px] inline-flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  {language === 'ta' ? 'மூடுக' : 'Close'}
+                </button>
               </div>
 
-              {selectedDossier.contactEmail && (
-                <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
-                  <span className="text-xs text-[#5B5348] block">
-                    {language === 'ta' ? 'மின்னஞ்சல் முகவரி' : 'Official Email'}
-                  </span>
-                  <a
-                    href={`mailto:${selectedDossier.contactEmail}`}
-                    className="text-[#111111] hover:text-[#C41A1F] underline"
-                  >
-                    {selectedDossier.contactEmail}
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="mt-6 pt-4 border-t border-[#D8D3CB] flex items-center justify-between">
-              {selectedDossier.showPhonePublicly !== false ? (
-                <a
-                  href={`tel:${selectedDossier.contactPhone.split(/[,;/]/)[0].trim().replace(/\s+/g, '')}`}
-                  className="min-h-[44px] px-5 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-dmk-body font-bold uppercase tracking-wider flex items-center gap-2 transition-colors rounded-[2px]"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>{language === 'ta' ? 'அழைக்க' : 'Direct Call'}</span>
-                </a>
-              ) : (
-                <span className="text-xs text-[#5B5348] italic font-dmk-body">
-                  {language === 'ta' ? 'மாநிலத் தலைமைச் செயலகம் வாயிலாகத் தொடர்பு கொள்ளவும்' : 'Contact through the State Secretariat'}
-                </span>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setSelectedDossier(null)}
-                className="min-h-[44px] px-4 py-2 text-xs font-dmk-body font-bold text-[#111111] hover:text-[#C41A1F] underline underline-offset-4 transition-colors cursor-pointer"
-              >
-                {language === 'ta' ? 'மூடுக' : 'Close'}
-              </button>
             </div>
 
           </div>

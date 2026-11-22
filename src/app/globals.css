@@ -1,29 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Kavivanar&display=swap');
 @import "tailwindcss";
 
 @theme {
-
   --color-dmk-red: #E31E24;
   --color-dmk-red-dark: #C41A1F;
+  --color-dmk-red-deep: #8F1118;
   --color-ink: #111111;
   --color-parchment: #FAF8F5;
+  --color-parchment-2: #F1ECE2;
   --color-warm-grey: #5B5348;
-  --color-dmk-red-tint: #FCE8E8;
-  --color-border-subtle: #D8D3CB;
-  --color-neutral-900: #111111;
-  --color-neutral-800: #1E1D1B;
-  --color-neutral-700: #3E3830;
-  --color-neutral-600: #5B5348;
-  --color-neutral-500: #5B5348;
-  --color-neutral-400: #7A7267;
-  --color-neutral-300: #D8D3CB;
-  --color-neutral-200: #E2DDD5;
-  --color-neutral-100: #F3EFEA;
-  --color-neutral-50: #FAF8F5;
+  --color-ink-line: #3D3633;
+  --color-ink-text: #D8CFC2;
 
-  /* Typography Variables loaded via next/font */
-  --font-body: var(--font-catamaran), sans-serif;
-  --font-headline-en: var(--font-source-serif), serif;
-  --font-headline-ta: var(--font-noto-serif-tamil), serif;
+  /* Typography Variables */
+  --font-body: var(--font-catamaran), 'Catamaran', sans-serif;
+  --font-kavivanar: 'Kavivanar', var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
+  --font-helvetica: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
   /* Corner Radius: strictly 0px or 2px across all elements */
   --radius-xs: 2px;
@@ -39,11 +31,13 @@
 :root {
   --dmk-red: #E31E24;
   --dmk-red-dark: #C41A1F;
+  --dmk-red-deep: #8F1118;
   --dmk-ink: #111111;
   --dmk-parchment: #FAF8F5;
+  --dmk-parchment-2: #F1ECE2;
   --dmk-warm-grey: #5B5348;
-  --dmk-red-tint: #FCE8E8;
-  --border-light: #D8D3CB;
+  --dmk-line: #3D3633;
+  --dmk-ink-text: #D8CFC2;
 }
 
 /* Base Body Styles: Catamaran at 17px, line height 1.65 */
@@ -67,32 +61,32 @@ html[lang="ta"] *,
   text-transform: none !important;
 }
 
-/* ============================================================== */
-/* TYPOGRAPHY HIERARCHY                                           */
-/* ============================================================== */
-/* Headlines: Source Serif 4 for English, Noto Serif Tamil for Tamil */
-.font-dmk-headline {
-  font-family: var(--font-source-serif), 'Source Serif 4', Georgia, serif;
-  letter-spacing: -0.015em;
-  font-weight: 800;
+/* Headlines & Fonts */
+.font-kavivanar {
+  font-family: 'Kavivanar', var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
+}
+
+.font-helvetica {
+  font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.font-catamaran {
+  font-family: var(--font-catamaran), 'Catamaran', sans-serif;
+}
+
+/* Backward compatibility classes mapped to brand typography */
+.font-dmk-headline,
+.font-editorial,
+.font-serif {
+  font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 html[lang="ta"] .font-dmk-headline,
 :lang(ta) .font-dmk-headline,
-.font-dmk-headline-ta {
-  font-family: var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
-  letter-spacing: 0 !important;
-  text-transform: none !important;
-}
-
-.font-dmk-slogan,
-.font-tamil-serif {
-  font-family: var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
-}
-
-.font-editorial,
-.font-serif {
-  font-family: var(--font-source-serif), 'Source Serif 4', Georgia, serif;
+.font-dmk-headline-ta,
+.font-tamil-serif,
+.font-dmk-slogan {
+  font-family: 'Kavivanar', var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
 }
 
 .font-dmk-body,
@@ -102,19 +96,14 @@ html[lang="ta"] .font-dmk-headline,
   font-family: var(--font-catamaran), 'Catamaran', sans-serif;
 }
 
-.font-mono {
-  font-family: var(--font-catamaran), 'Catamaran', monospace !important;
-}
-
 /* ============================================================== */
-/* CORNER STYLES: STRICTLY 0px OR 2px ON ALL CARDS/BUTTONS/INPUTS */
+/* CORNER STYLES: STRICTLY 0px OR 2px ON ALL ELEMENTS             */
 /* ============================================================== */
 button,
 input,
 select,
 textarea,
 img,
-.card,
 article,
 div[class*="rounded"] {
   border-radius: 2px !important;
@@ -125,155 +114,179 @@ div[class*="rounded"] {
   border-radius: 0px !important;
 }
 
-/* Broadsheet Newspaper & Editorial Print Styling */
-.border-broadsheet-heavy {
-  border-top: 4px solid #111111;
-  border-bottom: 1px solid #111111;
-}
-
-.border-broadsheet-double {
-  border-top: 3px double #111111;
-  border-bottom: 3px double #111111;
-}
-
-.broadsheet-col-divider {
-  border-right: 1px solid #D8D3CB;
-}
-
-.broadsheet-dropcap::first-letter {
-  float: left;
-  font-size: 3.4rem;
-  line-height: 0.85;
-  font-weight: 900;
-  padding-right: 0.6rem;
-  padding-top: 0.15rem;
-  color: #E31E24;
-  font-family: var(--font-source-serif), 'Source Serif 4', Georgia, serif;
-}
-
-html[lang="ta"] .broadsheet-dropcap::first-letter,
-:lang(ta) .broadsheet-dropcap::first-letter {
-  font-family: var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
-}
-
-.newsprint-bg {
-  background-color: #FAF8F5;
-}
-
-.editorial-stamp {
-  border: 1.5px solid #111111;
-  box-shadow: 2px 2px 0px #111111;
-  border-radius: 2px;
-}
-
-.editorial-stamp-red {
-  border: 1.5px solid #E31E24;
-  box-shadow: 2px 2px 0px #E31E24;
-  border-radius: 2px;
-}
-
-/* Authentic Interactive Hover States */
-.dmk-hover-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border-radius: 2px;
-}
-
-.dmk-hover-card:hover {
-  transform: translateY(-2px);
-}
-
-.dmk-btn-primary {
-  transition: all 0.2s ease;
+/* ============================================================== */
+/* BUTTONS & FORMS RULES                                          */
+/* ============================================================== */
+/* Buttons: rectangular, at least 44px tall, 800 weight, lift 3px */
+.btn-primary {
+  min-height: 44px;
   background-color: #E31E24;
   color: #FFFFFF;
-  border-radius: 2px;
+  font-weight: 800;
+  border-radius: 0px !important;
+  transition: transform 0.25s ease-out, background-color 0.25s ease-out;
 }
 
-.dmk-btn-primary:hover {
+.btn-primary:hover {
   background-color: #C41A1F;
+  transform: translateY(-3px);
 }
 
-.dmk-btn-secondary {
-  transition: all 0.2s ease;
-  background-color: #111111;
-  color: #FFFFFF;
-  border-radius: 2px;
+.btn-secondary {
+  min-height: 44px;
+  background-color: transparent;
+  color: #FAF8F5;
+  border: 2px solid #FAF8F5;
+  font-weight: 800;
+  border-radius: 0px !important;
+  transition: transform 0.25s ease-out, background-color 0.25s ease-out;
 }
 
-.dmk-btn-secondary:hover {
-  background-color: #5B5348;
+.btn-secondary:hover {
+  background-color: rgba(250, 248, 245, 0.1);
+  transform: translateY(-3px);
 }
 
-/* Editorial Newsroom Marquee Ticker */
-@keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-50%); }
+.btn-lift {
+  transition: transform 0.25s ease-out;
 }
 
-.animate-marquee {
+.btn-lift:hover {
+  transform: translateY(-3px);
+}
+
+/* Inputs: 2px ink border, square, visible keyboard focus 3px red outline */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+textarea,
+select {
+  border: 2px solid #111111 !important;
+  border-radius: 0px !important;
+  background-color: #FFFFFF;
+  padding: 10px 14px;
+  font-family: var(--font-catamaran), 'Catamaran', sans-serif;
+  color: #111111;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #E31E24 !important;
+  outline-offset: 2px !important;
+}
+
+/* Form labels: 600 weight above input */
+label {
+  font-weight: 600;
+  color: #111111;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ============================================================== */
+/* MOTION & KEYFRAMES                                             */
+/* ============================================================== */
+/* 1s left-to-right draw line for inner page title bands */
+@keyframes draw-line {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-draw-line {
+  animation: draw-line 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 160s slow rotating sun graphic */
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 160s linear infinite;
+}
+
+/* Scrolling headline strip marquee */
+@keyframes ticker {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
   display: inline-flex;
-  animation: marquee 40s linear infinite;
+  animation: ticker 40s linear infinite;
 }
 
-.animate-marquee:hover {
+.animate-ticker:hover {
   animation-play-state: paused;
 }
 
-/* ============================================================== */
-/* CLEAN EDITORIAL PRINT STYLESHEET                               */
-/* ============================================================== */
-@media print {
-  /* Hide all non-editorial navigation, headers, footers and interactive controls */
-  header,
-  footer,
-  nav,
-  .no-print,
-  #reading-progress-bar {
-    display: none !important;
-  }
-
-  /* Force pure white background and crisp black text */
-  body, html {
-    background: #FFFFFF !important;
-    background-color: #FFFFFF !important;
-    color: #000000 !important;
-    font-size: 11pt !important;
-    line-height: 1.6 !important;
-  }
-
-  /* Unbox article container, strip shadows, borders and fixed widths */
-  article,
-  .print-article {
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    background: transparent !important;
-  }
-
-  /* Ensure headings, paragraphs, and metadata render in solid black */
-  h1, h2, h3, h4, h5, h6, p, span, div, figcaption, time, label {
-    color: #000000 !important;
-    text-shadow: none !important;
-  }
-
-  /* Strip anchor underlines and red colors in print */
-  a {
-    color: #000000 !important;
-    text-decoration: none !important;
-  }
-
-  /* Print-only URL & Date Stamp Footer */
-  .print-footer {
-    display: block !important;
-    margin-top: 2rem !important;
-    padding-top: 1rem !important;
-    border-top: 1px solid #000000 !important;
-    font-size: 8.5pt !important;
-    font-family: monospace !important;
-    color: #000000 !important;
-  }
+/* Content blocks fade in and rise 28px over 0.8s */
+.fade-rise {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
+.fade-rise.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================== */
+/* PREFERS-REDUCED-MOTION                                         */
+/* ============================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-draw-line {
+    width: 100% !important;
+    animation: none !important;
+  }
+
+  .animate-spin-slow {
+    animation: none !important;
+  }
+
+  .animate-ticker {
+    animation: none !important;
+  }
+
+  .fade-rise {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .btn-lift:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover {
+    transform: none !important;
+  }
+}

@@ -5,20 +5,20 @@ import { useLanguage } from '../context/LanguageContext';
 import { OFFICIAL_HIERARCHY_CHART } from '../data/content';
 import { FlowchartOfficer } from '../types';
 import { 
-  Search, 
-  MapPin, 
-  Scale, 
-  Award, 
-  ChevronRight, 
-  X, 
-  Shield, 
-  Building,
-  Mail,
-  Phone,
-  CheckCircle2,
-  Users,
-  Layers
-} from 'lucide-react';
+  IconSearch as Search, 
+  IconMapPin as MapPin, 
+  IconScale as Scale, 
+  IconShield as Award, 
+  IconChevronRight as ChevronRight, 
+  IconClose as X, 
+  IconShield as Shield, 
+  IconBuilding as Building, 
+  IconMail as Mail, 
+  IconPhone as Phone, 
+  IconCheck as CheckCircle2, 
+  IconUsers as Users, 
+  IconBuilding as Layers 
+} from './Icons';
 
 export const OrgChart: React.FC = () => {
   const { language } = useLanguage();

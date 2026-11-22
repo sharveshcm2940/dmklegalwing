@@ -1,5 +1,7 @@
 'use client';
 
+import { PageTitleBand } from '@/components/PageTitleBand';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
@@ -884,7 +886,16 @@ export default function AdminConsolePage() {
   // ---------------------------------------------------------------------------
   if (!isAuthenticated && !isCheckingAuth) {
     return (
-      <div className="min-h-[85vh] bg-[#FAF8F5] flex items-center justify-center p-4 font-mono text-[#111111]">
+      <div className="w-full bg-[#FAF8F5] pb-16">
+        <PageTitleBand
+          title={language === 'ta' ? 'நிர்வாக உள்நுழைவு' : 'Secretariat Admin Console'}
+          description={
+            language === 'ta'
+              ? 'அங்கீகரிக்கப்பட்ட திமுக வழக்கறிஞர் அணி மேலாண்மை மற்றும் மனுக்கள் பரிசீலனை தளம்.'
+              : 'Enter security passcode to authenticate your role session. Server strictly validates privileges on all mutations.'
+          }
+        />
+      <div className="min-h-[60vh] flex items-center justify-center p-4 font-mono text-[#111111]">
         <div className="bg-white border-2 border-[#111111] max-w-md w-full p-8 rounded-[2px] shadow-sm space-y-6">
           
           <div className="border-b border-[#D8D3CB] pb-4">
@@ -957,6 +968,7 @@ export default function AdminConsolePage() {
 
         </div>
       </div>
+      </div>
     );
   }
 
@@ -964,7 +976,15 @@ export default function AdminConsolePage() {
   // MAIN WORK-TOOL CONSOLE
   // ---------------------------------------------------------------------------
   return (
-    <div className="w-full min-h-screen bg-[#FAF8F5] text-[#111111] font-sans">
+    <div className="w-full min-h-screen bg-[#FAF8F5] text-[#111111] font-sans pb-16">
+      <PageTitleBand
+        title={language === 'ta' ? 'செயலக நிர்வாக தளம்' : 'Administration Work Console'}
+        description={
+          language === 'ta'
+            ? 'அதிகாரப்பூர்வ திமுக வழக்கறிஞர் அணி மேலாண்மை, செய்திகள் மற்றும் மாவட்டங்கள் வழிகாட்டல்.'
+            : 'Operational dashboard for dispatches, district units, legal resources, and advocate enrolment records.'
+        }
+      />
       
       {/* 1. COMPACT TOP UTILITY BAR */}
       <header className="bg-[#111111] text-white border-b border-neutral-800 px-4 sm:px-6 py-2.5">

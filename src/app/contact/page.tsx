@@ -4,223 +4,211 @@ import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { DMK_ORGANISATION_INFO } from '@/data/content';
+import { PageTitleBand } from '@/components/PageTitleBand';
+import { useReveal } from '@/hooks/useReveal';
 import { 
-  Building2, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  UserPlus, 
-  Scale, 
-  ArrowRight, 
-  Search, 
-  Clock 
-} from 'lucide-react';
+  IconBuilding, 
+  IconMapPin, 
+  IconPhone, 
+  IconMail, 
+  IconScale, 
+  IconChevronRight 
+} from '@/components/Icons';
 
 export default function ContactGatewayPage() {
   const { language } = useLanguage();
 
-  return (
-    <div className="w-full bg-[#FAF8F5] py-8 sm:py-12 text-[#111111]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-10">
-        
-        {/* Page Header */}
-        <div className="border-b-2 border-[#111111] pb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-2.5 h-2.5 bg-[#E31E24] inline-block" />
-            <span className="text-xs font-dmk-body text-[#C41A1F] font-bold uppercase tracking-wider">
-              {language === 'ta' ? 'தலைமைச் செயலகத் தொடர்பு & உதவி மையம்' : 'State Secretariat & Legal Assistance'}
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-[#111111] font-dmk-headline">
-            {language === 'ta' ? 'தொடர்பு & பொது மக்கள் சட்ட உதவி மையம்' : 'Contact & Legal Services Gateway'}
-          </h1>
-          <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body mt-2 max-w-3xl leading-relaxed">
-            {language === 'ta'
-              ? 'வழக்கறிஞர் உறுப்பினர் சேர்க்கை, பொது மக்கள் சட்ட உதவி மற்றும் மாநில தலைமைச் செயலகத் தொடர்புகளுக்கான அதிகாரப்பூர்வ தளம்.'
-              : 'Direct access to advocate membership enrollment, citizen legal grievance assistance, and official State Secretariat communication channels.'}
-          </p>
-        </div>
+  const gatewaysSection = useReveal();
+  const officesSection = useReveal();
 
-        {/* The Two Primary Action Gateways */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Gateway 1: Advocate Membership Enrollment */}
-          <div className="bg-white border-2 border-[#111111] p-6 sm:p-8 rounded-[2px] shadow-xs flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="w-12 h-12 bg-[#FCE8E8] border border-[#C41A1F] flex items-center justify-center rounded-[2px]">
-                <UserPlus className="w-6 h-6 text-[#C41A1F]" />
-              </div>
-              
-              <div>
-                <span className="text-xs font-bold text-[#C41A1F] uppercase tracking-wider block mb-1">
-                  {language === 'ta' ? 'வழக்கறிஞர்களுக்கான தளம்' : 'For Advocates & Jurists'}
-                </span>
-                <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
+  return (
+    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
+      
+      {/* Universal Page Title Band */}
+      <PageTitleBand
+        title={language === 'ta' ? 'தொடர்பு & சட்ட உதவி மையம்' : 'Contact & Legal Services Gateway'}
+        description={
+          language === 'ta'
+            ? 'வழக்கறிஞர் உறுப்பினர் சேர்க்கை, பொது மக்கள் சட்ட உதவி மற்றும் மாநில தலைமைச் செயலகத் தொடர்புகள்.'
+            : 'Direct access to advocate enrolment, citizen legal grievance assistance, and official State Secretariat channels.'
+        }
+      />
+
+      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12 space-y-16">
+
+        {/* 1. The Two Primary Action Gateways */}
+        <section 
+          ref={gatewaysSection.ref}
+          className={`fade-rise ${gatewaysSection.revealed ? 'revealed' : ''}`}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            {/* Gateway 1: Advocate Enrolment (Red Accent) */}
+            <div className="bg-[#FAF8F5] border-2 border-[#111111] p-8 sm:p-10 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b-2 border-[#111111] pb-3">
+                  <span className="text-[12px] font-extrabold uppercase text-[#C41A1F]">
+                    {language === 'ta' ? 'வழக்கறிஞர்களுக்கான தளம்' : 'FOR ADVOCATES & JURISTS'}
+                  </span>
+                  <IconScale className="w-5 h-5 text-[#C41A1F]" />
+                </div>
+
+                <h2 className="font-kavivanar font-normal text-[32px] text-[#111111] leading-tight">
                   {language === 'ta' ? 'வழக்கறிஞர் உறுப்பினர் சேர்க்கை' : 'Advocate Membership Enrolment'}
                 </h2>
+
+                <p className="text-[17px] text-[#3a322d] leading-relaxed">
+                  {language === 'ta'
+                    ? 'பார் கவுன்சிலில் பதிவு செய்த வழக்கறிஞர்கள் திமுக வழக்கறிஞர் அணியில் இணைந்து கட்சி மாவட்ட மற்றும் உயர் நீதிமன்றப் பிரிவுகளில் பணியாற்ற விண்ணப்பிக்கலாம்.'
+                    : 'Enrolled advocates can register with the DMK Legal Wing to participate in party district legal units, state committees, and High Court advocacy panels.'}
+                </p>
+
+                <ul className="space-y-2 text-[15px] text-[#111111] pt-2 border-t border-[#d7d0c3]">
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#E31E24]" />
+                    <span>{language === 'ta' ? '74 கழக அமைப்பு மாவட்டங்கள் & நீதிமன்றப் பிரிவுகள்' : '74 Party District Units & Court Wings'}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#E31E24]" />
+                    <span>{language === 'ta' ? 'அதிகாரப்பூர்வ வழக்கறிஞர் அடையாளச் சான்றிதழ்' : 'Official Legal Wing Membership Credential'}</span>
+                  </li>
+                </ul>
               </div>
 
-              <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body leading-relaxed">
-                {language === 'ta'
-                  ? 'பார் கவுன்சிலில் பதிவு செய்த வழக்கறிஞர்கள் திமுக வழக்கறிஞர் அணியில் இணைந்து கட்சி மாவட்ட மற்றும் உயர் நீதிமன்றப் பிரிவுகளில் பணியாற்ற விண்ணப்பிக்கலாம்.'
-                  : 'Enrolled advocates can register with the DMK Legal Wing to participate in party district legal units, state committees, and High Court advocacy panels.'}
-              </p>
-
-              <ul className="space-y-2 text-xs text-[#111111] pt-2 border-t border-[#D8D3CB]">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#E31E24]" />
-                  <span>{language === 'ta' ? '74 கழக மாவட்டங்கள் & நீதிமன்றப் பிரிவுகள்' : '74 Party District Units & Court Wings'}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#E31E24]" />
-                  <span>{language === 'ta' ? 'அதிகாரப்பூர்வ வழக்கறிஞர் அடையாளச் சான்றிதழ்' : 'Official Legal Wing Membership Credential'}</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-[#D8D3CB]">
-              <Link
-                href="/enrol"
-                className="w-full min-h-[44px] px-6 py-3 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>{language === 'ta' ? 'உறுப்பினர் சேர்க்கை படிவம்' : 'Proceed to Advocate Enrolment'}</span>
-                <ArrowRight className="w-4 h-4 text-white" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Gateway 2: Citizen Legal Aid & Grievance Desk */}
-          <div className="bg-white border-2 border-[#111111] p-6 sm:p-8 rounded-[2px] shadow-xs flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="w-12 h-12 bg-[#FCE8E8] border border-[#C41A1F] flex items-center justify-center rounded-[2px]">
-                <Scale className="w-6 h-6 text-[#C41A1F]" />
+              <div className="pt-2">
+                <Link
+                  href="/enrol"
+                  className="w-full min-h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[15px] inline-flex items-center justify-center gap-2 btn-lift"
+                >
+                  <span>{language === 'ta' ? 'உறுப்பினராக விண்ணப்பிக்க' : 'Enrol as an Advocate'}</span>
+                  <IconChevronRight className="w-4 h-4" />
+                </Link>
               </div>
+            </div>
 
-              <div>
-                <span className="text-xs font-bold text-[#C41A1F] uppercase tracking-wider block mb-1">
-                  {language === 'ta' ? 'பொதுமக்களுக்கான சட்ட உதவி' : 'For Citizens & Public Aid'}
-                </span>
-                <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
-                  {language === 'ta' ? 'பொதுமக்கள் சட்ட உதவி மையம்' : 'Citizen Legal Grievance Desk'}
+            {/* Gateway 2: Citizen Legal Aid Grievance Desk (Ink Accent) */}
+            <div className="bg-[#111111] text-[#FAF8F5] border-2 border-[#111111] p-8 sm:p-10 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-[#3d3633] pb-3">
+                  <span className="text-[12px] font-extrabold uppercase text-[#ff8a85]">
+                    {language === 'ta' ? 'பொது மக்கள் சட்ட உதவி மையம்' : 'PUBLIC LEGAL AID DESK'}
+                  </span>
+                  <span className="w-4 h-4 bg-[#E31E24]" />
+                </div>
+
+                <div className="border border-[#E31E24] p-3 text-[14px] font-bold text-white">
+                  If you or someone you know is in police custody, call [HELPLINE NUMBER] now.
+                </div>
+
+                <h2 className="font-kavivanar font-normal text-[32px] text-white leading-tight">
+                  {language === 'ta' ? 'மக்கள் சட்ட உதவி மையம்' : 'Citizen Legal Grievance Portal'}
                 </h2>
+
+                <p className="text-[17px] text-[#d8cfc2] leading-relaxed">
+                  {language === 'ta'
+                    ? 'பொது மக்கள் தங்களது சட்டப் பிரச்னைகள், நிலுவை வழக்குகள் மற்றும் மனித உரிமை மீறல்கள் தொடர்பாக இலவச சட்ட ஆலோசனை பெற விண்ணப்பிக்கலாம்.'
+                    : 'Submit your legal grievance or seek pro-bono defense from our district legal aid committees and panel counsel.'}
+                </p>
+
+                <ul className="space-y-2 text-[15px] text-[#d8cfc2] pt-2 border-t border-[#3d3633]">
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#E31E24]" />
+                    <span>{language === 'ta' ? 'உடனடி இணைய மனு கண்காணிப்பு எண்' : 'Real-Time Grievance Tracking Number'}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#E31E24]" />
+                    <span>{language === 'ta' ? 'மாவட்ட வழக்கறிஞர் குழு நேரடி உதவி' : 'District Legal Aid Committee Support'}</span>
+                  </li>
+                </ul>
               </div>
 
-              <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body leading-relaxed">
-                {language === 'ta'
-                  ? 'காவல் துறை அத்துமீறல், நில அபகரிப்பு, சட்ட விரோதக் கைது அல்லது அரசு நலத் திட்ட உரிமைகள் தொடர்பான சட்டப் பாதுகாப்பிற்கு நேரடியாக மனு செய்யலாம்.'
-                  : 'Submit legal assistance requests for police overreach, civil disputes, unlawful detention, and constitutional rights protection handled confidentially by designated advocates.'}
-              </p>
+              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/citizen-desk"
+                  className="flex-1 min-h-[48px] bg-[#FAF8F5] hover:bg-white text-[#111111] font-extrabold text-[15px] inline-flex items-center justify-center gap-2 btn-lift"
+                >
+                  <span>{language === 'ta' ? 'மனுவை சமர்ப்பிக்க' : 'Submit Grievance'}</span>
+                  <IconChevronRight className="w-4 h-4" />
+                </Link>
 
-              <div className="p-3 bg-[#FCE8E8] border border-[#C41A1F] text-xs text-[#111111] rounded-[2px]">
-                <span className="font-bold text-[#C41A1F] block mb-0.5">
-                  {language === 'ta' ? 'அவசர காவல் துறை கைது உதவி' : 'Emergency Custody Support'}
-                </span>
-                {language === 'ta'
-                  ? 'நீங்களோ அல்லது உங்களுக்குத் தெரிந்தவரோ காவல் துறையின் பிடியில் இருந்தால் உடனடியாக தொடர்பு கொள்ளலாம்.'
-                  : 'Immediate emergency counsel routing for urgent police detention cases.'}
+                <Link
+                  href="/track"
+                  className="min-h-[48px] px-6 border-2 border-[#FAF8F5] hover:bg-white/10 text-white font-extrabold text-[15px] inline-flex items-center justify-center btn-lift"
+                >
+                  {language === 'ta' ? 'மனு நிலை' : 'Track Status'}
+                </Link>
               </div>
             </div>
 
-            <div className="pt-6 mt-6 border-t border-[#D8D3CB]">
-              <Link
-                href="/citizen-desk"
-                className="w-full min-h-[44px] px-6 py-3 bg-[#111111] hover:bg-[#E31E24] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>{language === 'ta' ? 'சட்ட உதவி மனு அளிக்க' : 'File Legal Aid Request'}</span>
-                <ArrowRight className="w-4 h-4 text-white" />
-              </Link>
-            </div>
           </div>
+        </section>
 
-        </div>
-
-        {/* Tracking ID Callout Banner */}
-        <div className="bg-white border-2 border-[#111111] p-6 rounded-[2px] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px] text-[#111111] shrink-0 mt-0.5">
-              <Search className="w-5 h-5 text-[#C41A1F]" />
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-black text-[#111111] font-dmk-headline">
-                {language === 'ta' ? 'விண்ணப்பத்தின் நிலையை அறிய' : 'Track Existing Submission Status'}
+        {/* 2. Official Secretariat Offices */}
+        <section 
+          ref={officesSection.ref}
+          className={`fade-rise ${officesSection.revealed ? 'revealed' : ''}`}
+        >
+          <div className="border-2 border-[#111111] bg-white p-8 sm:p-12 space-y-8">
+            <div className="border-b-2 border-[#111111] pb-4">
+              <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
+                {language === 'ta' ? 'அதிகாரப்பூர்வ முகவரிகள்' : 'OFFICIAL CONTACT CHANNELS'}
+              </span>
+              <h3 className="font-kavivanar font-normal text-[30px] text-[#111111] leading-tight">
+                {language === 'ta' ? 'கழகத் தலைமைச் செயலகம் & உயர் நீதிமன்ற அலுவலகம்' : 'State Legal Headquarters & High Court Chambers'}
               </h3>
-              <p className="text-xs text-[#5B5348] font-dmk-body mt-0.5">
-                {language === 'ta'
-                  ? 'உறுப்பினர் சேர்க்கை அல்லது சட்ட உதவி மனுவின் கண்காணிப்பு அடையாள எண்ணைக் (Tracking ID) கொண்டு அதன் பரிசீலனை நிலையை அறியலாம்.'
-                  : 'Lookup the current review status of any enrollment or legal aid submission using your Tracking ID.'}
-              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-[16px]">
+              
+              {/* Headquarters */}
+              <div className="p-6 bg-[#f1ece2] border-2 border-[#111111] space-y-4">
+                <div className="flex items-center gap-3 border-b border-[#3d3633] pb-2">
+                  <IconBuilding className="w-5 h-5 text-[#C41A1F]" />
+                  <h4 className="font-extrabold text-[18px] text-[#111111]">
+                    {language === 'ta' ? 'கழகத் தலைமைச் செயலகம்' : 'Party Central Headquarters'}
+                  </h4>
+                </div>
+                <p className="text-[#3a322d] leading-relaxed">
+                  {DMK_ORGANISATION_INFO.headquarters[language]}
+                </p>
+                <div className="space-y-2 pt-2 border-t border-[#d7d0c3] text-[15px]">
+                  <div className="flex items-center gap-2">
+                    <IconPhone className="w-4 h-4 text-[#C41A1F]" />
+                    <span className="font-helvetica font-bold">044-2434 4444 / 044-2434 4455</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <IconMail className="w-4 h-4 text-[#C41A1F]" />
+                    <span className="font-helvetica font-bold">legalwing@dmk.org.in</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* High Court Office */}
+              <div className="p-6 bg-[#f1ece2] border-2 border-[#111111] space-y-4">
+                <div className="flex items-center gap-3 border-b border-[#3d3633] pb-2">
+                  <IconMapPin className="w-5 h-5 text-[#C41A1F]" />
+                  <h4 className="font-extrabold text-[18px] text-[#111111]">
+                    {language === 'ta' ? 'உயர் நீதிமன்ற அலுவலகம்' : 'High Court Legal Chambers'}
+                  </h4>
+                </div>
+                <p className="text-[#3a322d] leading-relaxed">
+                  {DMK_ORGANISATION_INFO.highCourtOffice[language]}
+                </p>
+                <div className="space-y-2 pt-2 border-t border-[#d7d0c3] text-[15px]">
+                  <div className="flex items-center gap-2">
+                    <IconPhone className="w-4 h-4 text-[#C41A1F]" />
+                    <span className="font-helvetica font-bold">044-2534 1122</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <IconMail className="w-4 h-4 text-[#C41A1F]" />
+                    <span className="font-helvetica font-bold">hc.legalwing@dmk.org.in</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
-
-          <Link
-            href="/track"
-            className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 bg-[#FAF8F5] hover:bg-[#111111] hover:text-white border border-[#111111] text-xs font-bold uppercase tracking-wider text-[#111111] rounded-[2px] transition-colors flex items-center justify-center gap-2 shrink-0"
-          >
-            <span>{language === 'ta' ? 'நிலையை அறிய' : 'Check Status'}</span>
-            <span>&rarr;</span>
-          </Link>
-        </div>
-
-        {/* State Secretariat Headquarters Information */}
-        <div className="bg-white border-2 border-[#111111] p-6 sm:p-8 rounded-[2px] shadow-xs">
-          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#D8D3CB]">
-            <Building2 className="w-5 h-5 text-[#C41A1F]" />
-            <h2 className="text-lg sm:text-xl font-black text-[#111111] font-dmk-headline">
-              {language === 'ta' ? 'மாநில தலைமைச் செயலகம்' : 'State Secretariat Headquarters'}
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs sm:text-sm">
-            
-            {/* Postal Address */}
-            <div className="p-4 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px] space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#C41A1F] uppercase tracking-wider">
-                <MapPin className="w-4 h-4 text-[#C41A1F]" />
-                <span>{language === 'ta' ? 'அஞ்சல் முகவரி' : 'Postal Address'}</span>
-              </div>
-              <p className="font-bold text-[#111111]">
-                {language === 'ta' ? 'அண்ணா அறிவாலயம் (தலைமையகம்)' : 'Anna Arivalayam (Headquarters)'}
-              </p>
-              <p className="text-[#5B5348] leading-relaxed">
-                {DMK_ORGANISATION_INFO.headquarters[language]}
-              </p>
-            </div>
-
-            {/* Telephone Lines */}
-            <div className="p-4 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px] space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#C41A1F] uppercase tracking-wider">
-                <Phone className="w-4 h-4 text-[#C41A1F]" />
-                <span>{language === 'ta' ? 'தொலைபேசி' : 'Phone Numbers'}</span>
-              </div>
-              <p className="text-xs text-[#5B5348]">{language === 'ta' ? 'தலைமையக தொலைபேசி:' : 'Secretariat Office:'}</p>
-              <a
-                href={`tel:${DMK_ORGANISATION_INFO.phone.split('/')[0].trim()}`}
-                className="font-mono font-bold text-[#111111] hover:text-[#C41A1F] block min-h-[44px] flex items-center"
-              >
-                {DMK_ORGANISATION_INFO.phone}
-              </a>
-            </div>
-
-            {/* Email & Working Hours */}
-            <div className="p-4 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px] space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#C41A1F] uppercase tracking-wider">
-                <Mail className="w-4 h-4 text-[#C41A1F]" />
-                <span>{language === 'ta' ? 'மின்னஞ்சல்' : 'Email Address'}</span>
-              </div>
-              <a
-                href={`mailto:${DMK_ORGANISATION_INFO.email}`}
-                className="font-mono text-xs font-bold text-[#111111] hover:text-[#C41A1F] block break-all min-h-[44px] flex items-center"
-              >
-                {DMK_ORGANISATION_INFO.email}
-              </a>
-              <div className="pt-2 border-t border-[#D8D3CB] flex items-center gap-1 text-[11px] text-[#5B5348]">
-                <Clock className="w-3.5 h-3.5 text-[#5B5348]" />
-                <span>{language === 'ta' ? 'திங்கள் - சனி: காலை 10 - மாலை 6' : 'Mon - Sat: 10:00 AM - 6:00 PM'}</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
+        </section>
 
       </div>
     </div>

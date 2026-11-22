@@ -10,17 +10,17 @@ import {
   RealDistrictMapMeta 
 } from '../data/tamilNaduMapData';
 import { 
-  Phone, 
-  Search, 
-  Filter, 
-  Eye, 
-  X, 
-  CheckCircle2, 
-  Building2, 
-  Scale, 
-  MapPin, 
-  ShieldCheck 
-} from 'lucide-react';
+  IconPhone as Phone, 
+  IconSearch as Search, 
+  IconFilter as Filter, 
+  IconEye as Eye, 
+  IconClose as X, 
+  IconCheck as CheckCircle2, 
+  IconBuilding as Building2, 
+  IconScale as Scale, 
+  IconMapPin as MapPin, 
+  IconShield as ShieldCheck 
+} from './Icons';
 
 export const TamilNaduMap: React.FC = () => {
   const { language } = useLanguage();

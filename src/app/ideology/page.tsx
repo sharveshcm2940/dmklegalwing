@@ -4,27 +4,23 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { IDEOLOGY_PILLARS } from '@/data/content';
+import { PageTitleBand } from '@/components/PageTitleBand';
+import { useReveal } from '@/hooks/useReveal';
 import { 
-  Quote, 
-  ArrowRight, 
-  ChevronLeft, 
-  ChevronRight,
-  ShieldCheck,
-  Scale,
-  Play,
-  Pause
-} from 'lucide-react';
+  IconCheck, 
+  IconScale, 
+  IconChevronRight, 
+  IconChevronLeft 
+} from '@/components/Icons';
 
 export default function IdeologyPage() {
   const { language } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
 
-  const SLIDE_DURATION = 6500; // 6.5 seconds per slide
-  const PROGRESS_INTERVAL = 50; // update progress every 50ms
+  const heroSection = useReveal();
+  const pillarsSection = useReveal();
+  const quoteSection = useReveal();
 
-  // Sync with URL hash if present (e.g. #federalism)
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.hash) {
       const hashId = window.location.hash.replace('#', '');
@@ -35,323 +31,221 @@ export default function IdeologyPage() {
     }
   }, []);
 
-  // Automatic animation timer
-  useEffect(() => {
-    if (isPaused) return;
-
-    const step = (PROGRESS_INTERVAL / SLIDE_DURATION) * 100;
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          setActiveIndex((curr) => (curr + 1) % IDEOLOGY_PILLARS.length);
-          return 0;
-        }
-        return prev + step;
-      });
-    }, PROGRESS_INTERVAL);
-
-    return () => clearInterval(timer);
-  }, [isPaused, activeIndex]);
-
-  const selectPillar = (idx: number) => {
-    setActiveIndex(idx);
-    setProgress(0);
-  };
-
-  const nextSlide = () => {
-    selectPillar((activeIndex + 1) % IDEOLOGY_PILLARS.length);
-  };
-
-  const prevSlide = () => {
-    selectPillar((activeIndex - 1 + IDEOLOGY_PILLARS.length) % IDEOLOGY_PILLARS.length);
-  };
-
   const currentPillar = IDEOLOGY_PILLARS[activeIndex] || IDEOLOGY_PILLARS[0];
 
   return (
-    <div className="w-full flex flex-col space-y-12 py-8 font-dmk-body bg-[#FAF7F2]">
+    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
       
-      {/* 1. Manifesto Editorial Header */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
-        <div className="border-b-2 border-neutral-900 pb-6 pt-2">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-english font-bold text-[#C41A1F] tracking-[0.2em] uppercase">
-              {language === 'ta' ? 'திராவிட இயக்கக் கொள்கைப் பிரகடனம்' : 'DRAVIDIAN JURISPRUDENCE & FOUNDING DOCTRINE'}
-            </span>
-            <span className="text-neutral-400">•</span>
-            <span className="text-xs font-english text-neutral-500 font-bold">MANIFESTO OF EGALITARIAN JUSTICE</span>
-          </div>
+      {/* Universal Page Title Band */}
+      <PageTitleBand
+        title={language === 'ta' ? 'திராவிட இயக்கக் கொள்கைப் பிரகடனம்' : 'Our Ideological Doctrine'}
+        description={
+          language === 'ta'
+            ? 'சமூக நீதி, சுயமரியாதை, மாநில சுயாட்சி மற்றும் அரசமைப்பு விழுமியங்களை நீதிமன்றங்களில் நிலைநிறுத்தும் அறநெறி.'
+            : 'Defending social justice, affirmative action, state autonomy, and constitutional democracy across Indian jurisprudence.'
+        }
+      />
 
-          <h1 className="text-3xl sm:text-5xl font-black text-neutral-900 font-dmk-headline tracking-tight leading-tight mb-4">
-            {language === 'ta'
-              ? 'நீதிமன்றங்களில் சமூக நீதி: நமது கொள்கை அடித்தளம்'
-              : 'The Ideological Pillars of Dravidian Constitutional Jurisprudence'}
-          </h1>
+      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12 space-y-16">
 
-          <p className="text-sm sm:text-base text-neutral-700 leading-relaxed font-serif italic border-l-4 border-[#E31E24] pl-4 py-1 max-w-4xl bg-[#F3EFE6]">
-            {language === 'ta'
-              ? 'தந்தை பெரியார், பேரறிஞர் அண்ணா, முத்தமிழறிஞர் கலைஞர் வகுத்தளித்த சமூக நீதி, சுயமரியாதை, பகுத்தறிவு மற்றும் மாநில சுயாட்சிக் கொள்கைகளை இந்திய அரசமைப்பின் சட்டப் பாதுகாப்போடு இணைக்கும் வழிகாட்டி நெறிமுறைகள்.'
-              : 'Rooted in the century-long struggle of the Dravidian movement. Our jurisprudence synthesizes egalitarian social reform with rigorous constitutional scholarship to defend human dignity, linguistic pride, and federal autonomy.'}
-          </p>
-        </div>
-      </section>
-
-      {/* 2. Grand Ideological Tribute: The Four Visionary Leaders Banner */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
-        <div className="border border-neutral-900 bg-[#2A1208] overflow-hidden">
-          <div className="relative w-full h-64 sm:h-80 md:h-[400px] overflow-hidden flex items-center justify-center bg-[#2A1208]">
-            <img
-              src="/images/dmk-four-leaders.jpg"
-              alt="கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!"
-              className="w-full h-full object-cover object-center filter saturate-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30 pointer-events-none" />
-            <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-8 sm:right-8 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 text-white">
-              <div className="space-y-1.5 max-w-2xl">
-                <span className="text-[10px] sm:text-xs font-english font-bold tracking-widest text-[#FAF8F5] uppercase bg-black/85 px-3 py-1 border border-white/40 inline-block rounded-[2px]">
-                  {language === 'ta' ? 'அடிப்படை வழிகாட்டுதல்' : 'GUIDING PRINCIPLE'}
-                </span>
-                <h2 className="text-xl sm:text-3xl lg:text-4xl font-dmk-slogan text-[#FAF8F5] leading-tight">
-                  &ldquo;கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்! சமத்துவ சமுதாயம் படைப்போம்!&rdquo;
-                </h2>
-              </div>
-              <span className="text-xs font-dmk-headline text-neutral-200 font-bold bg-black/85 px-3.5 py-1.5 border border-white/20 shrink-0">
-                பெரியார் • அண்ணா • கலைஞர் • ஸ்டாலின்
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. AUTOMATICALLY ANIMATING HUMAN-DESIGNED DOCTRINE CAROUSEL */}
-      <section 
-        className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full space-y-6"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        
-        {/* The Human-Designed Carousel Slide Canvas */}
-        <div className="relative bg-white border border-neutral-300 p-6 sm:p-12 shadow-sm overflow-hidden">
-          
-          {/* Subtle Top Movement Stripe with Live Auto-Advance Progress */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-neutral-200">
-            <div 
-              className="h-full bg-[#E31E24] transition-all duration-75"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-
-          {/* Desktop Left / Right Hover Floating Buttons */}
-          <button
-            onClick={prevSlide}
-            aria-label="Previous Doctrine"
-            className="hidden md:flex absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-white hover:bg-[#E31E24] hover:text-white text-neutral-900 border border-neutral-900 items-center justify-center transition-colors shadow-md cursor-pointer"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={nextSlide}
-            aria-label="Next Doctrine"
-            className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-white hover:bg-[#E31E24] hover:text-white text-neutral-900 border border-neutral-900 items-center justify-center transition-colors shadow-md cursor-pointer"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-
-          {/* Key Identifiers: Kicker & Subtitle */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-neutral-900 pb-5 mb-8">
-            <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-[#E31E24] text-white text-xs font-english font-bold uppercase tracking-widest">
-                {language === 'ta' ? `கோட்பாடு 0${activeIndex + 1}` : `DOCTRINE 0${activeIndex + 1}`}
-              </span>
-              <span className="text-xs sm:text-sm font-english font-bold text-neutral-800 uppercase tracking-wider">
-                {currentPillar.subtitle[language]}
-              </span>
-            </div>
-
-            <div className="text-xs font-english text-neutral-500 font-semibold hidden sm:block">
-              {language === 'ta' ? 'திமுக வழக்கறிஞர் அணி கொள்கைப் பிரகடனம்' : 'DMK Legal Wing Doctrinal Charter'}
-            </div>
-          </div>
-
-          {/* Editorial Double-Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            
-            {/* Left Column: Title, Narrative, Numbered Tenets, & Precedent Benchmark */}
-            <div className="lg:col-span-7 space-y-6">
+        {/* 1. Four Visionary Leaders Banner */}
+        <section 
+          ref={heroSection.ref}
+          className={`fade-rise ${heroSection.revealed ? 'revealed' : ''}`}
+        >
+          <div className="border-2 border-[#111111] bg-[#111111] text-[#FAF8F5] overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
               
-              <div>
-                <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 font-dmk-headline tracking-tight leading-tight">
-                  {currentPillar.title[language]}
+              <div className="lg:col-span-7 h-72 sm:h-96 relative bg-[#111111] overflow-hidden">
+                <img
+                  src="/images/dmk-four-leaders.jpg"
+                  alt="தந்தை பெரியார், பேரறிஞர் அண்ணா, முத்தமிழறிஞர் கலைஞர், மாண்புமிகு முதலமைச்சர் மு.க. ஸ்டாலின்"
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
+
+              <div className="lg:col-span-5 p-8 sm:p-10 space-y-4">
+                <span className="text-[12px] font-extrabold uppercase tracking-normal text-[#ff8a85] block">
+                  {language === 'ta' ? 'அறநெறி வழிகாட்டிகள்' : 'IDEOLOGICAL MENTORS'}
+                </span>
+                <h2 className="font-kavivanar font-normal text-[clamp(28px,3.5vw,40px)] text-white leading-tight">
+                  &ldquo;கொள்கை தலைவர்களின் வழியைப் பின்பற்றுவோம்!&rdquo;
                 </h2>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed font-dmk-body mt-3">
-                  {currentPillar.description[language]}
+                <p className="text-[17px] text-[#d8cfc2] leading-relaxed">
+                  {language === 'ta'
+                    ? 'பெரியார், அண்ணா, கலைஞர், மு.க. ஸ்டாலின் ஆகியோரின் வழிகாட்டுதலில் சமூக மாற்றத்திற்கான சட்டப் போராட்டங்களை முன்னெடுப்போம்.'
+                    : 'Carrying forward the historic struggle of Periyar, Anna, Kalaignar, and Stalin to establish an egalitarian, self-respecting society governed by the rule of law.'}
                 </p>
               </div>
 
-              {/* Core Constitutional Tenets (Dignified Editorial Numbering, No Checklist Boxes) */}
-              <div className="space-y-3 pt-3 border-t border-neutral-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="w-2 h-2 bg-[#E31E24]" />
-                  <h3 className="text-xs font-english font-bold uppercase tracking-widest text-neutral-800">
-                    {language === 'ta' ? 'அடிப்படை அரசமைப்புக் கோட்பாடுகள்' : 'CORE CONSTITUTIONAL TENETS'}
+            </div>
+          </div>
+        </section>
+
+        {/* 2. Interactive Five Pillars of Dravidian Jurisprudence */}
+        <section 
+          ref={pillarsSection.ref}
+          className={`fade-rise ${pillarsSection.revealed ? 'revealed' : ''}`}
+        >
+          <div className="space-y-8">
+            
+            {/* Header */}
+            <div className="border-b-2 border-[#111111] pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] block">
+                  {language === 'ta' ? 'ஐந்து மூலத் தூண்கள்' : 'FIVE CORE PILLARS'}
+                </span>
+                <h2 className="font-kavivanar font-normal text-[clamp(32px,4vw,48px)] text-[#111111] leading-tight">
+                  {language === 'ta' ? 'திராவிடச் சட்டவியலின் மூல விழுமியங்கள்' : 'Pillars of Dravidian Jurisprudence'}
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[14px] text-[#5B5348] font-bold">
+                  {activeIndex + 1} / {IDEOLOGY_PILLARS.length}
+                </span>
+              </div>
+            </div>
+
+            {/* Horizontal Pillar Selector Tabs */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 border-2 border-[#111111] divide-x-2 divide-y-2 lg:divide-y-0 divide-[#111111] bg-white">
+              {IDEOLOGY_PILLARS.map((pillar, idx) => {
+                const isSelected = activeIndex === idx;
+                return (
+                  <button
+                    key={pillar.id}
+                    type="button"
+                    onClick={() => setActiveIndex(idx)}
+                    className={`p-4 text-left transition-colors cursor-pointer min-h-[72px] flex flex-col justify-between focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#E31E24] ${
+                      isSelected 
+                        ? 'bg-[#111111] text-[#FAF8F5]' 
+                        : 'bg-white hover:bg-[#f1ece2] text-[#111111]'
+                    }`}
+                  >
+                    <span className="font-helvetica font-extrabold text-[20px] text-[#C41A1F] block">
+                      {pillar.number}
+                    </span>
+                    <span className="font-bold text-[14px] leading-tight line-clamp-2 mt-1">
+                      {pillar.title[language]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected Pillar Content Box */}
+            <div className="border-2 border-[#111111] bg-[#f1ece2] p-8 sm:p-12 space-y-8">
+              
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b-2 border-[#111111] pb-6">
+                <div>
+                  <span className="font-helvetica font-extrabold text-[48px] text-[#C41A1F] leading-none block mb-1">
+                    {currentPillar.number}
+                  </span>
+                  <h3 className="font-kavivanar font-normal text-[clamp(28px,3.6vw,44px)] text-[#111111] leading-tight">
+                    {currentPillar.title[language]}
                   </h3>
                 </div>
+                <div className="text-[15px] font-extrabold text-[#5B5348] uppercase">
+                  {currentPillar.subtitle[language]}
+                </div>
+              </div>
 
-                <div className="space-y-3">
-                  {currentPillar.keyPrinciples.map((kp, kIdx) => (
-                    <div key={kIdx} className="flex items-start gap-3">
-                      <span className="text-xs font-black font-english text-[#C41A1F] mt-0.5 shrink-0">
-                        0{kIdx + 1}.
-                      </span>
-                      <p className="text-xs sm:text-sm text-neutral-800 font-dmk-body leading-relaxed font-medium">
-                        {kp[language]}
+              {/* Description */}
+              <p className="text-[20px] text-[#111111] leading-relaxed max-w-4xl">
+                {currentPillar.description[language]}
+              </p>
+
+              {/* Core Quote Box */}
+              {currentPillar.quote && (
+                <div className="bg-white border-l-6 border-[#E31E24] border-y border-r border-[#111111] p-6 space-y-3">
+                  <p className="font-kavivanar font-normal text-[22px] text-[#111111] leading-snug">
+                    &ldquo;{currentPillar.quote.text[language]}&rdquo;
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 text-[14px] font-bold text-[#5B5348]">
+                    <span className="text-[#C41A1F]">— {currentPillar.quote.author[language]}</span>
+                    {currentPillar.quote.context?.[language] && (
+                      <>
+                        <span>•</span>
+                        <span className="italic">{currentPillar.quote.context[language]}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Key Principles Checklist */}
+              <div className="space-y-4">
+                <h4 className="font-extrabold text-[18px] text-[#111111] uppercase tracking-normal">
+                  {language === 'ta' ? 'அடிப்படை கொள்கை அம்சங்கள்:' : 'Key Principles & Mandates:'}
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {currentPillar.keyPrinciples.map((item, idx) => (
+                    <div key={idx} className="p-4 bg-white border border-[#111111] space-y-2">
+                      <div className="flex items-center gap-2">
+                        <IconCheck className="w-4 h-4 text-[#C41A1F] shrink-0" />
+                        <span className="font-extrabold text-[13px] text-[#C41A1F]">PRINCIPLE {idx + 1}</span>
+                      </div>
+                      <p className="text-[15px] text-[#111111] leading-snug">
+                        {item[language]}
                       </p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Constitutional Benchmark & Landmark Precedent Callout */}
-              <div className="p-4 bg-[#FAF7F2] border-l-4 border-[#E31E24] border-y border-r border-neutral-200 space-y-1">
-                <span className="font-english font-bold text-[#C41A1F] uppercase tracking-wider block text-xs">
-                  {language === 'ta' ? 'அரசமைப்பு & தீர்ப்பு முக்கியத்துவம்:' : 'CONSTITUTIONAL BENCHMARK & PRECEDENT:'}
-                </span>
-                <p className="text-xs sm:text-sm font-serif italic text-neutral-800 leading-relaxed">
-                  {currentPillar.legalRelevance[language]}
-                </p>
-              </div>
-
-            </div>
-
-            {/* Right Column: Historical Decree Pull-Quote */}
-            <div className="lg:col-span-5 flex flex-col justify-between h-full">
-              <div className="p-6 sm:p-8 bg-[#FAF7F2] border-2 border-neutral-900 shadow-sm relative space-y-5">
-                
-                <div className="flex items-center justify-between border-b border-neutral-300 pb-3">
-                  <span className="text-xs font-english font-bold uppercase tracking-wider text-[#C41A1F]">
-                    {language === 'ta' ? 'வரலாற்றுப் பிரகடனம்' : 'HISTORICAL DECREE'}
-                  </span>
-                  <Quote className="w-6 h-6 text-[#C41A1F]" />
-                </div>
-                
-                <blockquote className="text-base sm:text-xl font-serif italic text-neutral-900 leading-relaxed font-bold">
-                  “{currentPillar.quote.text[language]}”
-                </blockquote>
-
-                <div className="pt-4 border-t border-neutral-300 space-y-1">
-                  <p className="text-base font-black text-neutral-900 font-dmk-headline">
-                    {currentPillar.quote.author[language]}
-                  </p>
-                  <p className="text-xs text-neutral-600 font-english leading-relaxed">
-                    {currentPillar.quote.context[language]}
-                  </p>
-                </div>
-
-              </div>
-
-              {/* Bottom Quick Reference Link */}
-              <div className="mt-6 flex items-center justify-between text-xs font-english">
-                <span className="text-neutral-500 font-medium">
-                  {language === 'ta' ? 'ஆவணக் களஞ்சியத்தில் முழு தீர்ப்புகள் உள்ளன' : 'Complete case briefs available in archive'}
-                </span>
-                <Link
-                  href="/resources"
-                  className="text-[#C41A1F] hover:text-black font-bold uppercase tracking-wider flex items-center gap-1"
+              {/* Navigation Arrows */}
+              <div className="flex items-center justify-between pt-6 border-t-2 border-[#111111]">
+                <button
+                  type="button"
+                  onClick={() => setActiveIndex((prev) => (prev - 1 + IDEOLOGY_PILLARS.length) % IDEOLOGY_PILLARS.length)}
+                  className="min-h-[44px] px-6 py-2 bg-white border-2 border-[#111111] hover:bg-[#111111] hover:text-white font-extrabold text-[14px] transition-colors cursor-pointer btn-lift inline-flex items-center gap-2"
                 >
-                  <span>{language === 'ta' ? 'ஆவணங்கள்' : 'Case Briefs'}</span>
-                  <span>&rarr;</span>
-                </Link>
+                  <IconChevronLeft className="w-4 h-4" />
+                  <span>{language === 'ta' ? 'முந்தைய கோட்பாடு' : 'Previous Pillar'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveIndex((prev) => (prev + 1) % IDEOLOGY_PILLARS.length)}
+                  className="min-h-[44px] px-6 py-2 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[14px] transition-colors cursor-pointer btn-lift inline-flex items-center gap-2"
+                >
+                  <span>{language === 'ta' ? 'அடுத்த கோட்பாடு' : 'Next Pillar'}</span>
+                  <IconChevronRight className="w-4 h-4" />
+                </button>
               </div>
+
             </div>
 
           </div>
+        </section>
 
-          {/* Bottom Carousel Navigation Bar */}
-          <div className="mt-10 pt-6 border-t border-neutral-300 flex flex-col sm:flex-row items-center justify-between gap-4">
-            
-            {/* Step Previous Button */}
-            <button
-              onClick={prevSlide}
-              className="w-full sm:w-auto px-6 py-2.5 bg-white hover:bg-neutral-900 hover:text-white text-neutral-900 border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4 text-[#C41A1F]" />
-              <span>{language === 'ta' ? 'முந்தைய கொள்கை' : 'Previous Doctrine'}</span>
-            </button>
-
-            {/* Slide Indicators & Auto-Play Control */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsPaused(!isPaused)}
-                className="flex items-center gap-1.5 px-3 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-english font-bold uppercase tracking-wider border border-neutral-300 transition-colors cursor-pointer"
-                title={isPaused ? 'Resume auto-play' : 'Pause auto-play'}
-              >
-                {isPaused ? <Play className="w-3.5 h-3.5 text-[#C41A1F]" /> : <Pause className="w-3.5 h-3.5 text-[#C41A1F]" />}
-                <span className="text-[11px] hidden sm:inline">{isPaused ? 'Play' : 'Pause'}</span>
-              </button>
-
-              <div className="flex items-center gap-1.5">
-                {IDEOLOGY_PILLARS.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => selectPillar(idx)}
-                    aria-label={`Go to pillar ${idx + 1}`}
-                    className={`h-2 transition-all cursor-pointer ${
-                      activeIndex === idx
-                        ? 'w-8 bg-[#E31E24]'
-                        : 'w-2 bg-neutral-300 hover:bg-neutral-700'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <span className="text-xs font-english font-bold text-[#C41A1F] ml-1">
-                0{activeIndex + 1} / 06
-              </span>
+        {/* 3. Call to Action */}
+        <section 
+          ref={quoteSection.ref}
+          className={`fade-rise ${quoteSection.revealed ? 'revealed' : ''}`}
+        >
+          <div className="bg-[#111111] text-[#FAF8F5] p-10 sm:p-14 border-2 border-[#111111] flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="space-y-3 max-w-2xl">
+              <h3 className="font-kavivanar font-normal text-[36px] text-white leading-tight">
+                {language === 'ta' ? 'சமூக நீதிப் போர்ப்படையில் இணையுங்கள்' : 'Stand for Constitutional Justice'}
+              </h3>
+              <p className="text-[18px] text-[#d8cfc2]">
+                {language === 'ta'
+                  ? 'தமிழ்நாட்டின் உரிமைகளையும், எளிய மனிதர்களின் அரசமைப்புப் பாதுகாப்பையும் நிலைநிறுத்த வழக்கறிஞர் அணியில் இணைந்திடுங்கள்.'
+                  : 'Join thousands of dedicated advocates defending human dignity, state rights, and egalitarian constitutionalism across Tamil Nadu.'}
+              </p>
             </div>
 
-            {/* Step Next Button */}
-            <button
-              onClick={nextSlide}
-              className="w-full sm:w-auto px-6 py-2.5 bg-[#E31E24] hover:bg-black text-white border border-neutral-900 text-xs font-english font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+            <Link
+              href="/enrol"
+              className="min-h-[48px] h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[15px] inline-flex items-center justify-center shrink-0 btn-lift"
             >
-              <span>{language === 'ta' ? 'அடுத்த கொள்கை' : 'Next Doctrine'}</span>
-              <ChevronRight className="w-4 h-4 text-white" />
-            </button>
-
+              {language === 'ta' ? 'உறுப்பினராகப் பதிவுசெய்க' : 'Enrol as an Advocate'}
+            </Link>
           </div>
+        </section>
 
-        </div>
-
-      </section>
-
-      {/* 4. Bottom Broadsheet Proclamation Call to Action */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full pt-6">
-        <div className="p-6 sm:p-8 bg-[#111111] text-white border-t-4 border-[#E31E24] flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-1">
-            <span className="text-xs font-english font-bold text-[#C41A1F] uppercase tracking-wider">
-              OFFICIAL REPOSITORIES
-            </span>
-            <h3 className="text-xl sm:text-2xl font-black text-white font-dmk-headline">
-              {language === 'ta' ? 'வரலாற்றுத் தீர்ப்புகள் மற்றும் சட்ட ஆவணங்களை வாசிக்க' : 'Access Authoritative Legal Briefs & Dossiers'}
-            </h3>
-            <p className="text-xs sm:text-sm text-neutral-300 font-serif italic">
-              {language === 'ta'
-                ? '69% இடஒதுக்கீடு சட்டம், ராஜமன்னார் குழு அறிக்கை மற்றும் ஆளுநர் அதிகார வரம்புத் தீர்ப்புகள் அடங்கிய களஞ்சியம்.'
-                : 'Explore primary texts including the 69% reservation compendium, Rajamannar report, and landmark Supreme Court rulings.'}
-            </p>
-          </div>
-
-          <Link
-            href="/resources"
-            className="px-6 py-2.5 bg-[#E31E24] hover:bg-white hover:text-black text-white text-xs font-english font-bold uppercase tracking-wider shrink-0 transition-colors border border-white font-dmk-headline"
-          >
-            {language === 'ta' ? 'சட்ட ஆவணக் களஞ்சியம்' : 'Explore Legal Resources'}
-          </Link>
-        </div>
-      </section>
-
+      </div>
     </div>
   );
 }

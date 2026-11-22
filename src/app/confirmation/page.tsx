@@ -4,7 +4,8 @@ import React, { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
-import { CheckCircle2, Copy, Check, ArrowRight, Search, ShieldCheck } from 'lucide-react';
+import { PageTitleBand } from '@/components/PageTitleBand';
+import { IconCheck, IconSearch, IconChevronRight } from '@/components/Icons';
 
 function ConfirmationContent() {
   const { language } = useLanguage();
@@ -19,99 +20,89 @@ function ConfirmationContent() {
       await navigator.clipboard.writeText(trackingId);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
-    } catch {
-      // Fallback
-    }
+    } catch {}
   };
 
   const isEnrol = type === 'enrol';
 
   return (
-    <div className="w-full bg-[#FAF8F5] py-12 sm:py-16 text-[#111111]">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65] pb-24">
+      
+      {/* Universal Page Title Band */}
+      <PageTitleBand
+        title={isEnrol 
+          ? (language === 'ta' ? 'சேர்க்கை மனு பெறப்பட்டது' : 'Enrolment Application Received')
+          : (language === 'ta' ? 'சட்ட உதவி மனு பெறப்பட்டது' : 'Legal Grievance Received')}
+        description={
+          language === 'ta'
+            ? 'உங்கள் மனு வெற்றிகரமாகப் பெறப்பட்டது. கண்காணிப்பு எண்ணைக் குறித்துக் கொள்ளவும்.'
+            : 'Your submission has been securely docketed. Please retain your tracking identification number.'
+        }
+      />
+
+      <div className="max-w-[720px] mx-auto px-[clamp(20px,4vw,56px)] pt-12">
         
-        <div className="bg-white border-2 border-[#111111] p-6 sm:p-10 rounded-[2px] shadow-sm text-center space-y-6">
+        <div className="bg-white border-2 border-[#111111] p-8 sm:p-12 text-center space-y-6">
           
-          {/* Success Check Icon */}
-          <div className="w-16 h-16 bg-[#FCE8E8] border-2 border-[#C41A1F] text-[#C41A1F] mx-auto flex items-center justify-center rounded-[2px]">
-            <CheckCircle2 className="w-10 h-10 text-[#C41A1F]" />
+          {/* Solid 16px red square */}
+          <div className="w-12 h-12 bg-[#E31E24] text-white mx-auto flex items-center justify-center">
+            <IconCheck className="w-6 h-6 text-white" />
           </div>
 
-          {/* Heading */}
           <div className="space-y-2">
-            <span className="text-xs font-bold text-[#C41A1F] uppercase tracking-wider block">
-              {isEnrol
-                ? language === 'ta'
-                  ? 'சேர்க்கை மனு பெறப்பட்டது'
-                  : 'ENROLMENT APPLICATION RECEIVED'
-                : language === 'ta'
-                ? 'சட்ட உதவி மனு பெறப்பட்டது'
-                : 'LEGAL GRIEVANCE RECEIVED'}
+            <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
+              {language === 'ta' ? 'அதிகாரப்பூர்வ பதிவு எண்' : 'OFFICIAL REGISTRATION REFERENCE'}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#111111] font-dmk-headline">
-              {language === 'ta' ? 'விண்ணப்பம் வெற்றிகரமாகப் பதிவு செய்யப்பட்டது' : 'Submission Confirmed Successfully'}
-            </h1>
-            <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body max-w-lg mx-auto leading-relaxed">
+            <h2 className="font-kavivanar font-normal text-[32px] text-[#111111] leading-tight">
               {isEnrol
-                ? language === 'ta'
-                  ? 'தங்களின் வழக்கறிஞர் சேர்க்கை விண்ணப்பம் தலைமைச் செயலகப் பதிவேட்டில் சேர்க்கப்பட்டுள்ளது.'
-                : 'Your advocate membership application has been logged with the State Legal Wing Secretariat.'
-                : language === 'ta'
-                ? 'தங்களின் சட்டக் குறைதீர்ப்பு மனு திமுக சட்டத்துறை தலைமைச் செயலகக் குழுவிற்கு அனுப்பப்பட்டுள்ளது.'
-                : 'Your legal grievance dossier has been forwarded to the designated State Secretariat Legal Panel.'}
-            </p>
+                ? (language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை பதிவு செய்யப்பட்டது' : 'Enrolment Docket Registered')
+                : (language === 'ta' ? 'சட்ட உதவி கோரிக்கை பதிவு செய்யப்பட்டது' : 'Grievance Docket Registered')}
+            </h2>
           </div>
 
-          {/* Tracking ID Box in Large Type */}
-          <div className="p-6 bg-[#FAF8F5] border-2 border-[#D8D3CB] rounded-[2px] space-y-3">
-            <span className="text-xs font-bold text-[#5B5348] uppercase tracking-wider block">
-              {language === 'ta' ? 'உங்கள் கண்காணிப்பு அடையாள எண் (TRACKING ID)' : 'YOUR OFFICIAL TRACKING ID'}
+          <p className="text-[16px] text-[#5B5348] leading-relaxed max-w-lg mx-auto">
+            {isEnrol
+              ? (language === 'ta'
+                ? 'உங்கள் விண்ணப்பம் பரிசீலிக்கப்பட்டு உங்கள் மாவட்ட வழக்கறிஞர் அணி அமைப்பாளருக்கு அனுப்பப்பட்டுள்ளது.'
+                : 'Your application has been received and routed to your designated district Legal Wing organiser.')
+              : (language === 'ta'
+                ? 'உங்கள் கோரிக்கை தொடர்புடைய மாவட்ட வழக்கறிஞர் அமைப்பாளருக்கு அனுப்பப்பட்டுள்ளது.'
+                : 'Your grievance has been assigned to the relevant district legal assistance cell.')}
+          </p>
+
+          {/* Tracking ID Box */}
+          <div className="p-6 bg-[#f1ece2] border-2 border-[#111111] space-y-3">
+            <span className="text-[12px] text-[#5B5348] font-bold uppercase block">
+              {language === 'ta' ? 'உங்கள் கண்காணிப்பு அடையாள எண்:' : 'Your Tracking ID:'}
             </span>
-            
-            <div className="text-3xl sm:text-4xl font-mono font-black text-[#C41A1F] tracking-wider break-all select-all py-1">
+            <div className="font-mono font-extrabold text-[26px] sm:text-[30px] text-[#111111] tracking-wider select-all">
               {trackingId}
             </div>
 
-            <div className="pt-2 flex justify-center">
-              <button
-                onClick={handleCopy}
-                className="min-h-[44px] px-5 py-2 bg-white hover:bg-[#111111] hover:text-white border border-[#111111] text-xs font-bold uppercase tracking-wider text-[#111111] rounded-[2px] transition-colors flex items-center gap-2 cursor-pointer shadow-2xs"
-              >
-                {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-                <span>
-                  {copied
-                    ? language === 'ta'
-                      ? 'நகலெடுக்கப்பட்டது!'
-                      : 'Copied!'
-                    : language === 'ta'
-                    ? 'ஐடியை நகலெடு'
-                    : 'Copy Tracking ID'}
-                </span>
-              </button>
-            </div>
-
-            <p className="text-[11px] text-[#5B5348] font-dmk-body pt-1">
-              {language === 'ta'
-                ? 'எதிர்காலக் குறிப்பு மற்றும் நிலையை அறிய இந்த எண்ணைப் பாதுகாப்பாக வைத்துக்கொள்ளவும்.'
-                : 'Please preserve this tracking code safely to verify review status updates.'}
-            </p>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="min-h-[44px] px-6 py-2 bg-white border-2 border-[#111111] hover:bg-[#111111] hover:text-white font-extrabold text-[13px] inline-flex items-center gap-2 cursor-pointer btn-lift"
+            >
+              <IconCheck className="w-4 h-4 text-[#C41A1F]" />
+              <span>{copied ? (language === 'ta' ? 'நகலெடுக்கப்பட்டது!' : 'Copied!') : (language === 'ta' ? 'நகலெடு' : 'Copy Tracking ID')}</span>
+            </button>
           </div>
 
-          {/* Next Steps / Actions */}
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="pt-6 border-t-2 border-[#111111] flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href={`/track?id=${encodeURIComponent(trackingId)}`}
-              className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto min-h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-extrabold text-[14px] inline-flex items-center justify-center gap-2 btn-lift"
             >
-              <Search className="w-4 h-4" />
-              <span>{language === 'ta' ? 'நிலையை இப்போது சோதிக்க' : 'Check Status Now'}</span>
+              <IconSearch className="w-4 h-4" />
+              <span>{language === 'ta' ? 'மனுவைக் கண்காணிக்க' : 'Track This Application'}</span>
             </Link>
 
             <Link
               href="/"
-              className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center justify-center cursor-pointer"
+              className="w-full sm:w-auto min-h-[48px] px-8 bg-white border-2 border-[#111111] hover:bg-[#111111] hover:text-white font-extrabold text-[14px] inline-flex items-center justify-center btn-lift"
             >
-              <span>{language === 'ta' ? 'முகப்பிற்குத் திரும்புக' : 'Return to Home'}</span>
+              {language === 'ta' ? 'முகப்புக்குத் திரும்பு' : 'Return to Home'}
             </Link>
           </div>
 
@@ -125,8 +116,8 @@ function ConfirmationContent() {
 export default function ConfirmationPage() {
   return (
     <Suspense fallback={
-      <div className="w-full bg-[#FAF8F5] py-16 text-center text-xs text-[#5B5348]">
-        Loading confirmation...
+      <div className="min-h-[50vh] flex items-center justify-center p-12 text-[#111111] font-bold">
+        Loading...
       </div>
     }>
       <ConfirmationContent />
