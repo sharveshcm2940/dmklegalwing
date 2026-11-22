@@ -15,13 +15,13 @@ export async function PATCH(
 
     const { id } = await context.params;
     const body = await request.json();
-    const { status } = body as { status: PublicEnquiry['status'] };
+    const { status, notes } = body as { status: PublicEnquiry['status']; notes?: string };
 
     if (!status || !['new', 'reviewed', 'resolved'].includes(status)) {
       return NextResponse.json({ success: false, error: 'Invalid enquiry status.' }, { status: 400 });
     }
 
-    const updated = await updateEnquiryStatus(id, status);
+    const updated = await updateEnquiryStatus(id, status, notes);
     if (!updated) {
       return NextResponse.json({ success: false, error: 'Enquiry not found.' }, { status: 404 });
     }

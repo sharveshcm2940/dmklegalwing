@@ -86,12 +86,14 @@ export async function createRegistration(
 
 export async function updateRegistrationStatus(
   id: string,
-  status: AdvocateRegistration['status']
+  status: AdvocateRegistration['status'],
+  notes?: string
 ): Promise<AdvocateRegistration | null> {
   const list = await getRegistrations();
   const index = list.findIndex((r) => r.id === id);
   if (index === -1) return null;
   list[index].status = status;
+  if (notes !== undefined) (list[index] as any).notes = notes;
   await writeTable('registrations.json', list);
   return list[index];
 }
@@ -128,12 +130,14 @@ export async function createEnquiry(
 
 export async function updateEnquiryStatus(
   id: string,
-  status: PublicEnquiry['status']
+  status: PublicEnquiry['status'],
+  notes?: string
 ): Promise<PublicEnquiry | null> {
   const list = await getEnquiries();
   const index = list.findIndex((e) => e.id === id);
   if (index === -1) return null;
   list[index].status = status;
+  if (notes !== undefined) (list[index] as any).notes = notes;
   await writeTable('enquiries.json', list);
   return list[index];
 }

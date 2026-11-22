@@ -168,6 +168,7 @@ export interface AdvocateRegistration {
   areasOfSpecialization: string[];
   submittedAt: string;
   status: 'pending' | 'verified' | 'approved' | 'rejected';
+  notes?: string;
 }
 
 export interface PublicEnquiry {
@@ -181,6 +182,7 @@ export interface PublicEnquiry {
   category: 'Legal Aid' | 'General Query' | 'High Court Wing' | 'Press / Media';
   submittedAt: string;
   status: 'new' | 'reviewed' | 'resolved';
+  notes?: string;
 }
 
 export interface FlowchartOfficer {

@@ -15,13 +15,13 @@ export async function PATCH(
 
     const { id } = await context.params;
     const body = await request.json();
-    const { status } = body as { status: AdvocateRegistration['status'] };
+    const { status, notes } = body as { status: AdvocateRegistration['status']; notes?: string };
 
     if (!status || !['pending', 'verified', 'approved', 'rejected'].includes(status)) {
       return NextResponse.json({ success: false, error: 'Invalid registration status.' }, { status: 400 });
     }
 
-    const updated = await updateRegistrationStatus(id, status);
+    const updated = await updateRegistrationStatus(id, status, notes);
     if (!updated) {
       return NextResponse.json({ success: false, error: 'Registration not found.' }, { status: 404 });
     }
