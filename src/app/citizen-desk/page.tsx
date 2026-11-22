@@ -117,7 +117,7 @@ export default function CitizenDeskPage() {
         try {
           localStorage.removeItem(STORAGE_KEY);
         } catch { }
-        router.push(`/citizen-desk/done?id=${encodeURIComponent(data.enquiry.id)}`);
+        router.push(`/confirmation?id=${encodeURIComponent(data.enquiry.id)}&type=citizen`);
       } else {
         setErrors({
           form: data.error || (language === 'ta' ? 'மனுவை சமர்ப்பிப்பதில் பிழை ஏற்பட்டது.' : 'Failed to submit request.')

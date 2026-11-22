@@ -152,7 +152,7 @@ export default function EnrolPage() {
         try {
           localStorage.removeItem(STORAGE_KEY);
         } catch {}
-        router.push(`/enrol/done?id=${encodeURIComponent(data.registration.id)}`);
+        router.push(`/confirmation?id=${encodeURIComponent(data.registration.id)}&type=enrol`);
       } else {
         setErrors({
           form: data.error || (language === 'ta' ? 'விண்ணப்பத்தைப் பதிவு செய்வதில் பிழை ஏற்பட்டது.' : 'Failed to submit enrolment.')
