@@ -6,7 +6,6 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { IDEOLOGY_PILLARS, DMK_ORGANISATION_INFO } from '@/data/content';
 import { DmkHeroSlider } from '@/components/DmkHeroSlider';
-import { FoundationalDoctrines } from '@/components/FoundationalDoctrines';
 import { TamilNaduMap } from '@/components/TamilNaduMap';
 import { 
   Calendar, 
@@ -173,12 +172,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. THE SIX FOUNDATIONAL DOCTRINES (Auto-Advancing Broadsheet System) */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8 border-b border-neutral-300">
-        <FoundationalDoctrines />
-      </section>
-
-      {/* 5. PHOTOJOURNALISM & FIELD DISPATCHES (Editorial Press Layout, No Bulky Cards) */}
+      {/* 4. PHOTOJOURNALISM & FIELD DISPATCHES (Editorial Press Layout, No Bulky Cards) */}
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10 border-b border-neutral-300">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-3 border-b-2 border-neutral-900 mb-8">
           <div>
