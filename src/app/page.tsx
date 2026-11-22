@@ -57,11 +57,13 @@ export default function HomePage() {
   const metricsRef = useRef<HTMLDivElement>(null);
   const [metricsVisible, setMetricsVisible] = useState(false);
   const [counts, setCounts] = useState<number[]>([0, 0, 0, 0]);
+  const [countsFinished, setCountsFinished] = useState(false);
 
   useEffect(() => {
     if (!metricsRef.current) return;
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setCounts([3500, 74, 50, 69]);
+      setCountsFinished(true);
       return;
     }
 
@@ -94,6 +96,7 @@ export default function HomePage() {
       if (step >= totalSteps) {
         clearInterval(timer);
         setCounts(targets);
+        setCountsFinished(true);
       }
     }, intervalMs);
 
@@ -389,56 +392,56 @@ export default function HomePage() {
             {/* Col 1: 3,500+ Registered Advocates */}
             <div className="space-y-3">
               <div
-                className="w-full h-[4px] bg-white transition-all duration-700 ease-out"
+                className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
                 style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.1s' }}
               />
-              <div className="font-helvetica font-extrabold text-[clamp(48px,6.4vw,84px)] leading-none">
-                {counts[0].toLocaleString()}+
+              <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
+                {counts[0].toLocaleString()}{countsFinished ? '+' : ''}
               </div>
-              <p className="font-catamaran font-extrabold text-[17px] text-white leading-snug">
-                {language === 'ta' ? 'பதிவுபெற்ற வழக்கறிஞர்கள்' : 'Registered Advocates'}
+              <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
+                {language === 'ta' ? 'பதிவுபெற்ற வழக்கறிஞர்கள்' : 'Registered advocates'}
               </p>
             </div>
 
             {/* Col 2: 74 District Units */}
             <div className="space-y-3">
               <div
-                className="w-full h-[4px] bg-white transition-all duration-700 ease-out"
+                className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
                 style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.2s' }}
               />
-              <div className="font-helvetica font-extrabold text-[clamp(48px,6.4vw,84px)] leading-none">
+              <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[1]}
               </div>
-              <p className="font-catamaran font-extrabold text-[17px] text-white leading-snug">
-                {language === 'ta' ? 'கழக மாவட்ட வழக்கறிஞர் அணிகள்' : 'District Units'}
+              <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
+                {language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'District units'}
               </p>
             </div>
 
             {/* Col 3: 50+ Years of Jurisprudence */}
             <div className="space-y-3">
               <div
-                className="w-full h-[4px] bg-white transition-all duration-700 ease-out"
+                className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
                 style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.3s' }}
               />
-              <div className="font-helvetica font-extrabold text-[clamp(48px,6.4vw,84px)] leading-none">
-                {counts[2]}+
+              <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
+                {counts[2]}{countsFinished ? '+' : ''}
               </div>
-              <p className="font-catamaran font-extrabold text-[17px] text-white leading-snug">
-                {language === 'ta' ? 'சட்டவியல் வரலாற்றுப் பாரம்பரியம்' : 'Years of Jurisprudence'}
+              <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
+                {language === 'ta' ? 'ஆண்டுகள் மக்கள் சட்டப்பணி' : 'Years of jurisprudence'}
               </p>
             </div>
 
             {/* Col 4: 69% Reservation Defended */}
             <div className="space-y-3">
               <div
-                className="w-full h-[4px] bg-white transition-all duration-700 ease-out"
+                className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
                 style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.4s' }}
               />
-              <div className="font-helvetica font-extrabold text-[clamp(48px,6.4vw,84px)] leading-none">
-                {counts[3]}%
+              <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
+                {counts[3]}{countsFinished ? '%' : ''}
               </div>
-              <p className="font-catamaran font-extrabold text-[17px] text-white leading-snug">
-                {language === 'ta' ? 'இடஒதுக்கீட்டுப் பாதுகாப்பு' : 'Reservation Defended'}
+              <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
+                {language === 'ta' ? 'சமூக நீதி இடஒதுக்கீடு அரண்' : 'Reservation defended'}
               </p>
             </div>
 

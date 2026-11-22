@@ -30,49 +30,49 @@ export const SITE_STATS: SiteStats = {
   metrics: [
     {
       id: 'registered-advocates',
-      figure: '28,500+',
+      figure: '3,500+',
       label: {
-        en: 'REGISTERED ADVOCATES',
+        en: 'Registered advocates',
         ta: 'பதிவுபெற்ற வழக்கறிஞர்கள்'
       },
       subtext: {
-        en: 'Tamil Nadu & Puducherry Legal Cadre',
-        ta: 'தமிழ்நாடு & புதுச்சேரி வழக்கறிஞர்கள் அரண்'
+        en: 'Active Legal Cadre in Courts',
+        ta: 'நீதிமன்றங்களில் செயல்படும் வழக்கறிஞர்கள்'
       },
       highlightRed: false
     },
     {
       id: 'district-jurisdictions',
-      figure: '74 / 74',
+      figure: '74',
       label: {
-        en: 'DISTRICT JURISDICTIONS',
-        ta: 'அமைப்பு மாவட்டக் கட்டமைப்பு'
+        en: 'District units',
+        ta: 'அமைப்பு மாவட்டங்கள்'
       },
       subtext: {
-        en: 'Active Units in All 74 Party Districts',
+        en: 'Units in All 74 Party Districts',
         ta: 'அனைத்து அமைப்பு மாவட்ட வழக்கறிஞர் அணிகள்'
       },
       highlightRed: true
     },
     {
       id: 'constitutional-advocacy',
-      figure: '50+ Years',
+      figure: '50+',
       label: {
-        en: 'CONSTITUTIONAL ADVOCACY',
-        ta: 'வரலாற்றுப் பின்னணி'
+        en: 'Years of jurisprudence',
+        ta: 'ஆண்டுகள் மக்கள் சட்டப்பணி'
       },
       subtext: {
-        en: 'Continuous Jurisprudence Since 1971',
+        en: 'Defending Dravidian Ideology Since 1971',
         ta: '1971 முதல் தொடரும் மக்கள் சட்டப்பணி'
       },
       highlightRed: false
     },
     {
       id: 'affirmative-action',
-      figure: '69% Quota',
+      figure: '69%',
       label: {
-        en: 'AFFIRMATIVE ACTION SHIELD',
-        ta: 'சமூக நீதி அரண்'
+        en: 'Reservation defended',
+        ta: 'சமூக நீதி இடஒதுக்கீடு அரண்'
       },
       subtext: {
         en: 'Ninth Schedule Constitutional Protection',

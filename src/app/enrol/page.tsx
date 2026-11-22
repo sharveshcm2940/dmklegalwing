@@ -354,6 +354,9 @@ export default function EnrolPage() {
                   }}
                   className="w-full min-h-[48px] px-4 bg-[#FAF8F5] border-2 border-[#111111] text-[16px] text-[#111111] leading-normal focus:bg-white outline-none cursor-pointer"
                 >
+                  <option value="">
+                    {language === 'ta' ? '-- அமைப்பு மாவட்டத்தைத் தேர்ந்தெடுக்கவும் --' : '-- Select party district unit --'}
+                  </option>
                   {districts.map((d) => (
                     <option key={d.id} value={d.name.en}>
                       {language === 'ta' ? `${d.name.ta} (${d.zone || ''})` : `${d.name.en} (${d.zone || ''})`}

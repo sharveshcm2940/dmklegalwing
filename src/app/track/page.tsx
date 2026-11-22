@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { PageTitleBand } from '@/components/PageTitleBand';
@@ -23,7 +23,7 @@ function TrackContent() {
 
   const mainSection = useReveal();
 
-  const fetchStatus = async (id: string) => {
+  const fetchStatus = useCallback(async (id: string) => {
     const cleanId = id.trim();
     if (!cleanId) return;
 
@@ -62,14 +62,14 @@ function TrackContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (queryId) {
       setInputVal(queryId);
       fetchStatus(queryId);
     }
-  }, [queryId]);
+  }, [queryId, fetchStatus]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
