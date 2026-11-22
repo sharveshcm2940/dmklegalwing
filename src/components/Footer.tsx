@@ -196,13 +196,31 @@ export const Footer: React.FC = () => {
 
         {/* Legal Disclaimer & Bottom Credits */}
         <div className="mt-12 pt-8 border-t border-neutral-800 text-xs text-[#D8D3CB] flex flex-col md:flex-row items-center justify-between gap-4 font-tamil-sans">
-          <p className="max-w-2xl text-center md:text-left leading-relaxed">
+          <p className="max-w-xl text-center md:text-left leading-relaxed">
             {t.footer.disclaimer}
           </p>
-          <div className="text-center md:text-right shrink-0">
+          <div className="flex flex-col sm:flex-row items-center gap-4 text-center md:text-right shrink-0">
             <p className="text-[#D8D3CB] font-mono">
               {t.footer.copyright}
             </p>
+            <div className="flex items-center gap-2 border-t sm:border-t-0 sm:border-l border-neutral-800 pt-3 sm:pt-0 sm:pl-4">
+              <span className="text-xs text-[#D8D3CB]">
+                {language === 'ta' ? 'வடிவமைப்பு & உருவாக்கம்:' : 'developed by'}
+              </span>
+              <a
+                href="https://www.onesash.co.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center min-h-[44px] hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-[2px]"
+                aria-label="OneSash (opens in a new tab)"
+              >
+                <img
+                  src="/images/onesash-logo.png"
+                  alt="OneSash"
+                  className="h-7 w-auto object-contain"
+                />
+              </a>
+            </div>
           </div>
         </div>
 
