@@ -1,370 +1,606 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { LegalResource } from '@/types';
 import { 
   Download, 
   Search, 
-  Filter, 
+  Eye, 
   CheckCircle2, 
-  ChevronDown, 
-  ChevronUp, 
-  HelpCircle,
-  X
+  FileText, 
+  X, 
+  Building2, 
+  Scale, 
+  BookOpen, 
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
+
+interface ExtendedLegalResource extends LegalResource {
+  year?: string;
+  lastUpdated?: string;
+  language?: string;
+}
 
 export default function ResourcesPage() {
   const { language } = useLanguage();
-  const { resources } = useData();
-  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const { resources: contextResources } = useData();
+
+  const [resources, setResources] = useState<ExtendedLegalResource[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedResource, setSelectedResource] = useState<LegalResource | null>(null);
-  const [downloadSuccessToast, setDownloadSuccessToast] = useState<string | null>(null);
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [activeLangFilter, setActiveLangFilter] = useState<string>('All');
+  const [previewResource, setPreviewResource] = useState<ExtendedLegalResource | null>(null);
+  const [downloadToast, setDownloadToast] = useState<string | null>(null);
 
-  const categories = ['All', 'Supreme Court', 'High Court', 'Constitution', 'Statute', 'Legal Aid'];
-
-  const filteredResources = resources.filter((r) => {
-    const matchesCategory = activeCategory === 'All' || r.category === activeCategory;
-    const matchesSearch =
-      r.title[language].toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.summary[language].toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (r.citation && r.citation.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
-
-  const faqs = [
-    {
-      q: {
-        en: 'How does DMK Legal Wing protect the 69% reservation quota in Tamil Nadu?',
-        ta: 'தமிழ்நாட்டின் 69% இடஒதுக்கீட்டை திமுக வழக்கறிஞர் அணி எவ்வாறு பாதுகாக்கிறது?'
-      },
-      a: {
-        en: 'The 69% reservation is safeguarded under the Tamil Nadu Act 45 of 1994, placed under the Ninth Schedule of the Constitution through the 76th Amendment. Our legal team regularly files defense counters in the Supreme Court, citing quantifiable sociological data on backward classes to protect the quota against judicial ceiling challenges.',
-        ta: 'தமிழ்நாட்டின் 69% இடஒதுக்கீடு 1994 சட்டம் 45 மூலம் இயற்றப்பட்டு, 76-வது அரசமைப்புத் திருத்தம் மூலம் 9-வது அட்டவணையில் இணைக்கப்பட்டுள்ளது. உச்ச நீதிமன்றத்தில் தொடுக்கப்படும் வழக்குகளுக்கு எதிராக பிற்படுத்தப்பட்டோர் ஆணையத்தின் முறையான புள்ளிவிவரங்களுடன் திமுக வழக்கறிஞர்கள் தொடர் சட்டப் பாதுகாப்பு அளித்து வருகின்றனர்.'
-      }
-    },
-    {
-      q: {
-        en: 'Can citizens receive free legal aid from DMK Legal Wing coordinators?',
-        ta: 'பொதுமக்கள் திமுக வழக்கறிஞர் அணியிடம் இருந்து இலவச சட்ட உதவி பெற முடியுமா?'
-      },
-      a: {
-        en: 'Yes. Our district legal wing units operate pro-bono citizen clinics across all 38 districts of Tamil Nadu. Litigants from underprivileged backgrounds can contact their respective district legal wing organizer or submit an inquiry through this portal for counsel on civil rights, land disputes, and bail applications.',
-        ta: 'ஆம். தமிழகத்தின் 38 மாவட்டங்களிலும் உள்ள நமது வழக்கறிஞர் அணி அமைப்புகள் எளிய மக்களுக்கு இலவச சட்ட ஆலோசனைகளை வழங்குகின்றன. இந்த இணையதளத்தில் உள்ள தொடர்பு படிவம் வழியாகவோ அல்லது மாவட்ட அமைப்பாளர் மூலமாகவோ இலவச சட்ட உதவியைப் பெறலாம்.'
-      }
-    },
-    {
-      q: {
-        en: 'What is the constitutional significance of the Governor Assent judgment?',
-        ta: 'சட்டமன்ற மசோதாக்கள் தொடர்பான உச்ச நீதிமன்ற ஆளுநர் அதிகார தீர்ப்பின் முக்கியத்துவம் என்ன?'
-      },
-      a: {
-        en: 'The Supreme Court ruled under Article 200 that Governors cannot sit indefinitely on bills passed by elected state legislatures. If an Assembly re-passes a bill, the Governor must grant assent, eliminating unconstitutional pocket-vetoes and upholding federal democracy.',
-        ta: 'அரசியலமைப்பு உறுப்பு 200-ன் படி மக்களால் தேர்ந்தெடுக்கப்பட்ட சட்டமன்றம் நிறைவேற்றும் மசோதாக்களை ஆளுநர்கள் காலவரையின்றி முடக்க முடியாது என உச்ச நீதிமன்றம் தெளிவுபடுத்தியுள்ளது. சட்டமன்றம் மீண்டும் நிறைவேற்றினால் ஒப்புதல் அளிப்பது கட்டாயமாகும்.'
-      }
-    },
-    {
-      q: {
-        en: 'What are the requirements for an advocate to register with DMK Legal Wing?',
-        ta: 'திமுக வழக்கறிஞர் அணியில் உறுப்பினராக இணைய வழக்கறிஞர்களுக்குத் தேவையான தகுதிகள் யாவை?'
-      },
-      a: {
-        en: 'Any advocate enrolled with the Bar Council of Tamil Nadu & Puducherry who subscribes to social justice, constitutional democracy, and secularism may apply via our online Advocate Registration portal.',
-        ta: 'தமிழ்நாடு & புதுச்சேரி பார் கவுன்சிலில் முறையாகப் பதிவுசெய்து, சமூக நீதி மற்றும் அரசமைப்பு ஜனநாயகக் கொள்கைகளில் நம்பிக்கையுள்ள எந்தவொரு வழக்கறிஞரும் இணையவழியில் விண்ணப்பித்து அணியில் இணையலாம்.'
-      }
-    }
+  // Categories for the filter tabs
+  const categories = [
+    { id: 'All', en: 'All Categories', ta: 'அனைத்து பிரிவுகள்' },
+    { id: 'Supreme Court', en: 'Supreme Court', ta: 'உச்ச நீதிமன்றம்' },
+    { id: 'High Court', en: 'High Court', ta: 'உயர் நீதிமன்றம்' },
+    { id: 'Constitution', en: 'Constitution', ta: 'அரசமைப்பு' },
+    { id: 'Statute', en: 'Statute', ta: 'சட்டம்' },
+    { id: 'Legal Aid', en: 'Legal Aid', ta: 'சட்ட உதவி' }
   ];
 
-  const handleDownload = (res: LegalResource) => {
-    setDownloadSuccessToast(res.title[language]);
+  // Language filter tabs
+  const languageFilters = [
+    { id: 'All', en: 'All Languages', ta: 'அனைத்து மொழிகள்' },
+    { id: 'Bilingual', en: 'Bilingual', ta: 'இருமொழி' },
+    { id: 'Tamil', en: 'Tamil', ta: 'தமிழ்' },
+    { id: 'English', en: 'English', ta: 'ஆங்கிலம்' }
+  ];
+
+  // Fetch directly from /api/resources to read all live fields
+  useEffect(() => {
+    let isMounted = true;
+    async function loadResources() {
+      try {
+        const res = await fetch('/api/resources');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.resources) && isMounted) {
+            setResources(data.resources);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Direct /api/resources fetch failed, using fallback:', err);
+      }
+      if (isMounted) {
+        setResources(contextResources as ExtendedLegalResource[]);
+        setLoading(false);
+      }
+    }
+
+    loadResources();
+    return () => {
+      isMounted = false;
+    };
+  }, [contextResources]);
+
+  // Determine item's language display
+  const getItemLanguage = (item: ExtendedLegalResource): string => {
+    if (item.language) return item.language;
+    // In our repository, resources provide both Tamil and English summaries and titles
+    if (item.title?.en && item.title?.ta) {
+      return language === 'ta' ? 'இருமொழி (தமிழ் / ஆங்கிலம்)' : 'Bilingual (Tamil / English)';
+    }
+    return language === 'ta' ? 'தமிழ்' : 'Tamil';
+  };
+
+  // Determine if item matches language filter
+  const matchesLanguageFilter = (item: ExtendedLegalResource, filter: string): boolean => {
+    if (filter === 'All') return true;
+    const itemLangStr = (item.language || 'Bilingual').toLowerCase();
+    if (filter === 'Bilingual') {
+      return itemLangStr.includes('bilingual') || (Boolean(item.title?.en) && Boolean(item.title?.ta));
+    }
+    if (filter === 'Tamil') {
+      return itemLangStr.includes('tamil') || Boolean(item.title?.ta);
+    }
+    if (filter === 'English') {
+      return itemLangStr.includes('english') || Boolean(item.title?.en);
+    }
+    return true;
+  };
+
+  // Filtered catalogue list
+  const filteredResources = resources.filter((r) => {
+    const matchesCat = activeCategory === 'All' || r.category === activeCategory;
+    const matchesLang = matchesLanguageFilter(r, activeLangFilter);
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      r.title[language]?.toLowerCase().includes(q) ||
+      r.title.en?.toLowerCase().includes(q) ||
+      r.title.ta?.toLowerCase().includes(q) ||
+      r.summary[language]?.toLowerCase().includes(q) ||
+      (r.court && r.court.toLowerCase().includes(q)) ||
+      (r.citation && r.citation.toLowerCase().includes(q)) ||
+      r.category.toLowerCase().includes(q);
+
+    return matchesCat && matchesLang && matchesSearch;
+  });
+
+  const handleDownload = (res: ExtendedLegalResource) => {
+    setDownloadToast(res.title[language] || res.title.en);
     setTimeout(() => {
-      setDownloadSuccessToast(null);
-    }, 4000);
+      setDownloadToast(null);
+    }, 4500);
+
+    // Trigger download if real url
+    if (res.downloadUrl && res.downloadUrl !== '#') {
+      window.open(res.downloadUrl, '_blank');
+    }
   };
 
   return (
-    <div className="w-full flex flex-col space-y-10 py-8 bg-[#FAF7F2] text-[#111111] font-dmk-body">
-      
-      {/* Law Journal Header Banner */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
-        <div className="border-b-2 border-neutral-900 pb-6 pt-2">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+    <div className="w-full bg-[#FAF8F5] py-8 sm:py-12 text-[#111111] font-dmk-body">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 space-y-8">
+        
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center gap-2 text-xs text-[#5B5348]">
+          <Link href="/" className="hover:text-[#111111] underline">
+            {language === 'ta' ? 'முகப்பு' : 'Home'}
+          </Link>
+          <span>/</span>
+          <span className="text-[#111111] font-semibold">
+            {language === 'ta' ? 'சட்ட ஆவணக் களஞ்சியம்' : 'Legal Library Catalogue'}
+          </span>
+        </div>
+
+        {/* Masthead / Catalogue Header */}
+        <div className="border-b-2 border-[#111111] pb-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-[#111111] text-white text-[11px] font-english uppercase px-3 py-1 tracking-widest font-bold">
-                  {language === 'ta' ? 'அரசமைப்பு & சட்ட ஆவணக் களஞ்சியம்' : 'CONSTITUTIONAL LAW REPOSITORY'}
-                </span>
-                <span className="text-xs font-english text-[#C41A1F] font-bold">
-                  50+ YEARS LEGAL ARCHIVE
+                <span className="w-2.5 h-2.5 bg-[#E31E24] inline-block" />
+                <span className="text-xs font-dmk-body text-[#C41A1F] font-bold uppercase tracking-wider">
+                  {language === 'ta' ? 'அரசமைப்பு & சட்ட நூலகப் பதிவேடு' : 'Constitutional & Legal Library Register'}
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-5xl font-black text-[#111111] font-dmk-headline tracking-tight uppercase leading-none">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#111111] font-dmk-headline">
                 {language === 'ta'
-                  ? 'சட்ட ஆவணங்கள், தீர்ப்புகள் & கையேடுகள்'
-                  : 'Constitutional Reports, Judgments & Statutes'}
+                  ? 'சட்ட ஆவணக் களஞ்சியம் & தீர்ப்புகள் பட்டியல்'
+                  : 'DMK Legal Wing Library Catalogue'}
               </h1>
             </div>
-            <div className="text-left md:text-right font-mono text-[11px] text-neutral-600">
-              <p className="font-bold text-[#111111]">JURISPRUDENCE ARCHIVE</p>
-              <p>Social Justice & State Autonomy Doctrines</p>
+            
+            <div className="text-xs text-[#5B5348] font-mono">
+              <span className="font-bold text-[#111111] block">
+                {language === 'ta' ? 'பதிவு செய்யப்பட்ட ஆவணங்கள்:' : 'Catalogue Volumes:'} {resources.length}
+              </span>
+              <span>{language === 'ta' ? 'தலைமைச் செயலகப் பதிவேடு' : 'State Secretariat Curated Archives'}</span>
             </div>
           </div>
 
-          <p className="text-base sm:text-lg text-neutral-800 leading-relaxed font-dmk-body max-w-4xl">
+          <p className="text-xs sm:text-sm text-[#5B5348] font-dmk-body mt-3 max-w-4xl leading-relaxed">
             {language === 'ta'
-              ? '69% இடஒதுக்கீடு அரசமைப்பு ஆவணங்கள், ராஜமன்னார் மாநில சுயாட்சி அறிக்கை, ஆளுநர் அதிகார வரம்புத் தீர்ப்புகள் மற்றும் மக்கள் சட்ட உதவி கையேடுகளின் அதிகாரப்பூர்வ சட்டப் பதிவேடு.'
-              : 'Primary constitutional materials, landmark Supreme Court judgments, statutory defenses, and citizen advocacy digests curated for advocate research and democratic legal awareness.'}
+              ? '69% இடஒதுக்கீடு அரசமைப்பு ஆவணங்கள், ராஜமன்னார் குழுவின் மாநில சுயாட்சி அறிக்கை, ஆளுநர் அதிகார வரம்புத் தீர்ப்புகள் மற்றும் மக்கள் சட்டப் பாதுகாப்பு வழிகாட்டிகள் அடங்கிய உத்தியோகபூர்வ ஆவணப் பதிவேடு.'
+              : 'Primary legal authorities, constitutional bench briefings, landmark Supreme Court judgments, and statutory compendiums curated for advocate practice and citizen rights research.'}
           </p>
         </div>
-      </section>
 
-      {/* Filter and Search Bar */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
-        <div className="bg-white border-y border-neutral-300 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Filter Strip & Search Section */}
+        <div className="bg-white border-2 border-[#111111] p-5 sm:p-6 rounded-[2px] shadow-xs space-y-5">
           
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1 shrink-0">
-              <Filter className="w-3.5 h-3.5 text-[#C41A1F]" />
-              {language === 'ta' ? 'வகைப்பாடு:' : 'SERIES:'}
-            </span>
-            {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setActiveCategory(c)}
-                className={`px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider transition-all border ${
-                  activeCategory === c
-                    ? 'bg-[#E31E24] text-white border-neutral-900'
-                    : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-900'
-                }`}
-              >
-                {c === 'All' ? (language === 'ta' ? 'அனைத்து ஆவணங்கள்' : 'All Series') : c}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          {/* Search Box */}
+          <div className="relative w-full">
+            <Search className="w-4 h-4 text-[#5B5348] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={language === 'ta' ? 'ஆவணம் அல்லது வழக்கு எண் தேடுக...' : 'Search dossier or citation...'}
-              className="w-full bg-[#FAF7F2] border border-neutral-300 pl-9 pr-3 py-1.5 text-xs text-[#111111] font-mono placeholder-neutral-500 focus:outline-none focus:border-[#E31E24]"
+              placeholder={
+                language === 'ta'
+                  ? 'ஆவணத்தின் தலைப்பு, நீதிமன்றம், சட்டப் பிரிவு அல்லது வழக்கு எண் தேடுக...'
+                  : 'Search by title, court, statute, or citation number...'
+              }
+              className="w-full min-h-[44px] pl-10 pr-10 py-2.5 bg-[#FAF8F5] border border-[#D8D3CB] focus:border-[#111111] text-xs sm:text-sm text-[#111111] rounded-[2px] outline-none"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5B5348] hover:text-[#111111] p-1.5 cursor-pointer"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
-        </div>
-      </section>
-
-      {/* Download Alert Toast */}
-      {downloadSuccessToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#111111] text-white border-2 border-[#E31E24] px-5 py-3 shadow-md flex items-center gap-3 font-mono">
-          <CheckCircle2 className="w-5 h-5 text-[#C41A1F] shrink-0" />
-          <div className="text-xs">
-            <strong className="block font-bold text-white">
-              {language === 'ta' ? 'ஆவணம் பதிவிறக்கம் தொடங்கப்பட்டது' : 'LEGAL DOSSIER DOWNLOAD INITIATED'}
-            </strong>
-            <span className="line-clamp-1 text-neutral-300">{downloadSuccessToast}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Legal Resources Law Journal Grid (Clean Border, No Card Appearance) */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredResources.map((res) => (
-            <article
-              key={res.id}
-              className="bg-white border border-neutral-300 hover:border-neutral-900 p-6 flex flex-col justify-between transition-colors group"
-            >
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-300 pb-2">
-                  <span className="text-xs font-mono font-bold text-[#C41A1F] bg-red-50 border border-red-200 px-2 py-0.5 uppercase">
-                    {res.category}
-                  </span>
-                  {res.citation && (
-                    <span className="text-[11px] font-mono font-bold text-neutral-700 bg-[#FAF7F2] px-2 py-0.5 border border-neutral-300">
-                      CITATION: {res.citation}
-                    </span>
-                  )}
-                </div>
-
-                <h3 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline leading-tight group-hover:text-[#E31E24] transition-colors">
-                  {res.title[language]}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-dmk-body">
-                  {res.summary[language]}
-                </p>
-
-                {/* Key Legal Highlights Box */}
-                <div className="p-3 bg-[#FAF7F2] border-l-2 border-[#E31E24] space-y-1">
-                  <span className="text-[10px] font-mono font-bold text-neutral-900 uppercase tracking-wider block">
-                    {language === 'ta' ? 'முக்கிய சட்டக் கூறுகள்:' : 'JURISPRUDENCE RECORD:'}
-                  </span>
-                  <div className="space-y-1">
-                    {res.keyHighlights[language].map((h, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-neutral-800 font-dmk-body">
-                        <span className="w-1.5 h-1.5 bg-[#E31E24] shrink-0 mt-1.5" />
-                        <span>{h}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Strip */}
-              <div className="pt-4 mt-4 border-t border-neutral-200 flex items-center justify-between">
-                <span className="text-xs font-mono text-neutral-600 font-bold">
-                  PDF • {res.fileSize}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setSelectedResource(res)}
-                    className="text-xs font-mono font-bold text-neutral-900 hover:text-[#C41A1F] px-3 py-1 bg-[#FAF7F2] hover:bg-neutral-200 border border-neutral-300 transition-colors"
-                  >
-                    {language === 'ta' ? 'விளக்கம்' : 'Digest'}
-                  </button>
-
-                  <button
-                    onClick={() => handleDownload(res)}
-                    className="flex items-center gap-1.5 px-3 py-1 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>{language === 'ta' ? 'பதிவிறக்குக' : 'Download'}</span>
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* Frequently Asked Legal Questions Section */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
-        <div className="border-t-2 border-neutral-900 pt-8">
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#C41A1F] uppercase tracking-widest mb-1">
-            <HelpCircle className="w-4 h-4" />
-            <span>{language === 'ta' ? 'அடிக்கடி கேட்கப்படும் சட்டக் கேள்விகள்' : 'CONSTITUTIONAL & STATUTORY FAQ'}</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-[#111111] font-dmk-headline mb-6 uppercase">
-            {language === 'ta' ? 'அரசமைப்பு & பொது சட்ட வினா-விடைகள்' : 'Constitutional Jurisprudence & Citizen Rights'}
-          </h2>
-
-          <div className="space-y-3">
-            {faqs.map((faq, idx) => {
-              const isOpen = expandedFaq === idx;
-              return (
-                <div
-                  key={idx}
-                  className="bg-white border border-neutral-300 overflow-hidden"
-                >
-                  <button
-                    onClick={() => setExpandedFaq(isOpen ? null : idx)}
-                    className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-[#FAF7F2] transition-colors"
-                  >
-                    <span className="text-sm sm:text-base font-bold text-[#111111] font-dmk-headline pr-4">
-                      {faq.q[language]}
-                    </span>
-                    {isOpen ? (
-                      <ChevronUp className="w-5 h-5 text-[#C41A1F] shrink-0" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-neutral-700 shrink-0" />
-                    )}
-                  </button>
-
-                  {isOpen && (
-                    <div className="p-4 sm:p-5 pt-0 text-xs sm:text-sm text-neutral-800 leading-relaxed border-t border-neutral-200 bg-[#FAF7F2] font-dmk-body">
-                      {faq.a[language]}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Resource Detail Modal */}
-      {selectedResource && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FAF7F2] border-2 border-neutral-900 max-w-2xl w-full p-6 sm:p-8 relative max-h-[85vh] overflow-y-auto font-dmk-body">
+          {/* Filter 1: Category Tabs (Square tabs with 3px red underline on active tab) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#111111] uppercase tracking-wider">
+                {language === 'ta' ? 'பிரிவு வாரியாக வகைப்படுத்துக:' : 'Filter by Category:'}
+              </span>
+              <span className="text-[11px] text-[#5B5348] font-mono">
+                {activeCategory}
+              </span>
+            </div>
             
-            <div className="w-full h-1 flex absolute top-0 left-0">
-              <div className="w-1/2 bg-black" />
-              <div className="w-1/2 bg-[#E31E24]" />
+            <div className="flex items-center gap-1 overflow-x-auto border-b border-[#D8D3CB] pb-0 scrollbar-thin">
+              {categories.map((cat) => {
+                const isActive = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    className={`min-h-[44px] px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shrink-0 rounded-none cursor-pointer border-b-[3px] ${
+                      isActive
+                        ? 'border-[#E31E24] text-[#C41A1F] bg-[#FAF8F5]'
+                        : 'border-transparent text-[#5B5348] hover:text-[#111111] hover:bg-[#FAF8F5]'
+                    }`}
+                  >
+                    {language === 'ta' ? cat.ta : cat.en}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Filter 2: Language Tabs (Square tabs with 3px red underline on active tab) */}
+          <div className="space-y-2 pt-2 border-t border-[#D8D3CB]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#111111] uppercase tracking-wider">
+                {language === 'ta' ? 'மொழி வாரியாக வடிகட்டுக:' : 'Filter by Language:'}
+              </span>
+              <span className="text-[11px] text-[#5B5348] font-mono">
+                {activeLangFilter}
+              </span>
             </div>
 
+            <div className="flex items-center gap-1 overflow-x-auto border-b border-[#D8D3CB] pb-0 scrollbar-thin">
+              {languageFilters.map((lFilter) => {
+                const isActive = activeLangFilter === lFilter.id;
+                return (
+                  <button
+                    key={lFilter.id}
+                    onClick={() => setActiveLangFilter(lFilter.id)}
+                    className={`min-h-[44px] px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors shrink-0 rounded-none cursor-pointer border-b-[3px] ${
+                      isActive
+                        ? 'border-[#E31E24] text-[#C41A1F] bg-[#FAF8F5]'
+                        : 'border-transparent text-[#5B5348] hover:text-[#111111] hover:bg-[#FAF8F5]'
+                    }`}
+                  >
+                    {language === 'ta' ? lFilter.ta : lFilter.en}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Results Counter & Active Filter Indicators */}
+        <div className="flex items-center justify-between text-xs text-[#5B5348] px-1">
+          <span>
+            {language === 'ta'
+              ? `${filteredResources.length} ஆவணங்கள் காட்டப்படுகின்றன`
+              : `Showing ${filteredResources.length} catalogue record${filteredResources.length === 1 ? '' : 's'}`}
+          </span>
+          {(activeCategory !== 'All' || activeLangFilter !== 'All' || searchQuery) && (
             <button
-              onClick={() => setSelectedResource(null)}
-              className="absolute top-5 right-5 w-8 h-8 bg-white hover:bg-[#E31E24] hover:text-white text-neutral-900 border border-neutral-900 flex items-center justify-center font-bold text-sm transition-all"
-              aria-label="Close modal"
+              onClick={() => {
+                setActiveCategory('All');
+                setActiveLangFilter('All');
+                setSearchQuery('');
+              }}
+              className="text-[#C41A1F] hover:underline font-semibold cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              {language === 'ta' ? 'அனைத்து வடிகட்டிகளையும் நீக்குக' : 'Reset All Filters'}
             </button>
+          )}
+        </div>
 
-            <div className="space-y-4 mt-2">
-              <span className="text-xs font-mono font-bold text-[#C41A1F] uppercase tracking-wider block">
-                {selectedResource.category} • {selectedResource.court || 'Constitutional Repository'}
-              </span>
+        {/* Library Catalogue Table */}
+        <div className="bg-white border-2 border-[#111111] rounded-[2px] shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs sm:text-sm">
+              <caption className="sr-only">
+                {language === 'ta' ? 'திமுக சட்டத்துறை ஆவண நூலகப் பதிவேடு' : 'DMK Legal Wing Library Catalogue Records'}
+              </caption>
 
-              <h2 className="text-2xl sm:text-3xl font-black text-[#111111] font-dmk-headline leading-tight">
-                {selectedResource.title[language]}
-              </h2>
+              <thead>
+                <tr className="bg-[#111111] text-white border-b-2 border-[#111111]">
+                  <th scope="col" className="p-4 font-bold uppercase tracking-wider min-w-[280px]">
+                    {language === 'ta' ? 'ஆவணத் தலைப்பு' : 'Title'}
+                  </th>
+                  <th scope="col" className="p-4 font-bold uppercase tracking-wider min-w-[80px]">
+                    {language === 'ta' ? 'ஆண்டு' : 'Year'}
+                  </th>
+                  <th scope="col" className="p-4 font-bold uppercase tracking-wider min-w-[180px]">
+                    {language === 'ta' ? 'நீதிமன்றம் அல்லது சட்டம்' : 'Court or Act'}
+                  </th>
+                  <th scope="col" className="p-4 font-bold uppercase tracking-wider min-w-[130px]">
+                    {language === 'ta' ? 'மொழி' : 'Language'}
+                  </th>
+                  <th scope="col" className="p-4 font-bold uppercase tracking-wider min-w-[90px]">
+                    {language === 'ta' ? 'அளவு' : 'File Size'}
+                  </th>
+                  <th scope="col" className="p-4 font-bold uppercase tracking-wider min-w-[120px]">
+                    {language === 'ta' ? 'கடைசியாகப் புதுப்பிக்கப்பட்டது' : 'Last Updated'}
+                  </th>
+                  <th scope="col" className="p-4 font-bold uppercase tracking-wider text-right min-w-[160px]">
+                    {language === 'ta' ? 'செயல்கள்' : 'Actions'}
+                  </th>
+                </tr>
+              </thead>
 
-              {selectedResource.citation && (
-                <div className="p-2.5 bg-white border border-neutral-300 text-xs font-mono text-neutral-900 font-bold">
-                  CITATION: {selectedResource.citation}
-                </div>
-              )}
+              <tbody className="divide-y divide-[#D8D3CB]">
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="p-10 text-center text-xs text-[#5B5348]">
+                      {language === 'ta' ? 'நூலகப் பதிவேடு ஏற்றப்படுகிறது...' : 'Loading library catalogue records...'}
+                    </td>
+                  </tr>
+                ) : filteredResources.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-12 text-center space-y-2">
+                      <AlertCircle className="w-6 h-6 text-[#C41A1F] mx-auto" />
+                      <p className="text-sm font-bold text-[#111111]">
+                        {language === 'ta' ? 'ஆவணங்கள் எதுவும் காணப்படவில்லை' : 'No catalogue matches found'}
+                      </p>
+                      <p className="text-xs text-[#5B5348]">
+                        {language === 'ta'
+                          ? 'தேடல் சொற்களை மாற்றி அல்லது வடிகட்டிகளை மீட்டமைத்து மீண்டும் முயற்சிக்கவும்.'
+                          : 'Try adjusting your search query or reset the category and language filters.'}
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredResources.map((item) => {
+                    const courtOrAct = item.court || item.citation || '';
+                    const yearVal = item.year || '';
+                    const lastUpdatedVal = item.lastUpdated || '';
 
-              <p className="text-sm text-neutral-800 leading-relaxed font-dmk-body">
-                {selectedResource.summary[language]}
-              </p>
+                    return (
+                      <tr 
+                        key={item.id} 
+                        className="hover:bg-[#FAF8F5] transition-colors group"
+                      >
+                        {/* Title Column (with plain-text category tag, not a pill) */}
+                        <td className="p-4 align-top">
+                          <div className="space-y-1">
+                            <span className="text-xs font-bold text-[#111111] group-hover:text-[#C41A1F] transition-colors block leading-snug">
+                              {item.title[language] || item.title.en}
+                            </span>
+                            
+                            {/* Category tag as plain text, not a pill */}
+                            <div className="text-[11px] text-[#5B5348] font-dmk-body flex items-center gap-1.5">
+                              <span className="font-semibold text-[#111111] uppercase tracking-wider">
+                                {item.category}
+                              </span>
+                              {item.citation && (
+                                <>
+                                  <span className="text-[#D8D3CB]">•</span>
+                                  <span className="font-mono text-[#5B5348] truncate max-w-xs">
+                                    {item.citation}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </td>
 
-              <div className="pt-2 space-y-2">
-                <h4 className="font-mono text-xs font-bold text-neutral-900 uppercase tracking-wider border-b border-neutral-300 pb-1">
-                  {language === 'ta' ? 'அரசமைப்பு அம்சங்கள்' : 'CONSTITUTIONAL DIGEST HIGHLIGHTS'}
-                </h4>
-                <div className="space-y-1.5">
-                  {selectedResource.keyHighlights[language].map((h, i) => (
-                    <div key={i} className="flex items-start gap-2 text-xs text-neutral-800 font-dmk-body">
-                      <CheckCircle2 className="w-4 h-4 text-[#C41A1F] shrink-0 mt-0.5" />
-                      <span>{h}</span>
-                    </div>
-                  ))}
-                </div>
+                        {/* Year Column (leave cell empty if no year in data) */}
+                        <td className="p-4 align-top font-mono text-xs text-[#111111]">
+                          {yearVal || <span className="text-neutral-300 select-none">—</span>}
+                        </td>
+
+                        {/* Court or Act Column */}
+                        <td className="p-4 align-top text-xs text-[#5B5348]">
+                          {courtOrAct ? (
+                            <span className="text-[#111111] font-medium leading-snug block">
+                              {courtOrAct}
+                            </span>
+                          ) : (
+                            <span className="text-neutral-300 select-none">—</span>
+                          )}
+                        </td>
+
+                        {/* Language Column */}
+                        <td className="p-4 align-top text-xs text-[#5B5348]">
+                          {getItemLanguage(item)}
+                        </td>
+
+                        {/* File Size Column */}
+                        <td className="p-4 align-top font-mono text-xs text-[#111111] whitespace-nowrap">
+                          {item.fileSize || 'PDF'}
+                        </td>
+
+                        {/* Last Updated Column (leave cell empty if no last-updated in data) */}
+                        <td className="p-4 align-top font-mono text-xs text-[#5B5348] whitespace-nowrap">
+                          {lastUpdatedVal || <span className="text-neutral-300 select-none">—</span>}
+                        </td>
+
+                        {/* Actions Column (Preview link + Download link) */}
+                        <td className="p-4 align-top text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-3">
+                            
+                            {/* Preview Link (Opens PDF in existing viewer before download) */}
+                            <button
+                              onClick={() => setPreviewResource(item)}
+                              className="min-h-[44px] px-2.5 py-1 text-xs font-bold text-[#111111] hover:text-[#C41A1F] underline flex items-center gap-1 cursor-pointer transition-colors"
+                              aria-label={`Preview ${item.title[language] || item.title.en}`}
+                            >
+                              <Eye className="w-3.5 h-3.5 text-[#C41A1F]" />
+                              <span>{language === 'ta' ? 'முன்னோட்டம்' : 'Preview'}</span>
+                            </button>
+
+                            {/* Download Link */}
+                            <button
+                              onClick={() => handleDownload(item)}
+                              className="min-h-[44px] px-3.5 py-1.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                              aria-label={`Download ${item.title[language] || item.title.en}`}
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span>{language === 'ta' ? 'பதிவிறக்குக' : 'Download'}</span>
+                            </button>
+
+                          </div>
+                        </td>
+
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Existing PDF Viewer Modal (Enhanced for Full Preview before download) */}
+        {previewResource && (
+          <div 
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="preview-modal-title"
+          >
+            <div className="bg-[#FAF8F5] border-2 border-[#111111] max-w-3xl w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto rounded-[2px] shadow-2xl space-y-6">
+              
+              {/* Top Accent Strip */}
+              <div className="w-full h-1.5 flex absolute top-0 left-0 right-0">
+                <div className="w-1/2 bg-[#111111]" />
+                <div className="w-1/2 bg-[#E31E24]" />
               </div>
 
-              <div className="pt-6 border-t border-neutral-300 flex items-center justify-between">
-                <button
-                  onClick={() => setSelectedResource(null)}
-                  className="px-4 py-2 bg-white hover:bg-neutral-200 border border-neutral-300 text-neutral-900 text-xs font-mono font-bold uppercase"
+              {/* Close Button (min-h-[44px] accessible touch target) */}
+              <button
+                onClick={() => setPreviewResource(null)}
+                className="absolute top-4 right-4 min-h-[44px] min-w-[44px] flex items-center justify-center bg-white hover:bg-[#E31E24] hover:text-white text-[#111111] border border-[#111111] rounded-[2px] transition-colors cursor-pointer"
+                aria-label={language === 'ta' ? 'மூடுக' : 'Close Preview'}
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Document Header & Classification */}
+              <div className="space-y-2 pt-2 border-b border-[#D8D3CB] pb-4 pr-12">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold text-[#C41A1F] uppercase tracking-wider">
+                  <span>{previewResource.category}</span>
+                  {previewResource.court && (
+                    <>
+                      <span className="text-[#D8D3CB]">•</span>
+                      <span>{previewResource.court}</span>
+                    </>
+                  )}
+                  <span className="text-[#D8D3CB]">•</span>
+                  <span>PDF • {previewResource.fileSize}</span>
+                </div>
+
+                <h2 
+                  id="preview-modal-title"
+                  className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline leading-tight"
                 >
-                  {language === 'ta' ? 'மூடுக' : 'Close Digest'}
+                  {previewResource.title[language] || previewResource.title.en}
+                </h2>
+
+                {previewResource.citation && (
+                  <div className="text-xs font-mono font-bold text-[#5B5348] pt-1">
+                    {language === 'ta' ? 'வழக்கு / சான்று எண்:' : 'Citation / Record:'} {previewResource.citation}
+                  </div>
+                )}
+              </div>
+
+              {/* Simulated PDF Document Canvas View */}
+              <div className="bg-white border-2 border-[#D8D3CB] p-6 sm:p-8 rounded-[2px] space-y-6 shadow-inner">
+                
+                {/* Official Crest & Document Masthead */}
+                <div className="border-b-2 border-[#111111] pb-4 flex items-center justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#C41A1F] font-bold block">
+                      DMK LEGAL WING • STATE SECRETARIAT REPOSITORY
+                    </span>
+                    <h3 className="text-sm font-bold text-[#111111] font-dmk-headline">
+                      {language === 'ta' ? 'உத்தியோகபூர்வ சட்ட ஆவண முன்னோட்டம்' : 'Official Legal Dossier Digest & Transcript'}
+                    </h3>
+                  </div>
+                  <span className="px-2.5 py-1 bg-[#FAF8F5] border border-[#D8D3CB] font-mono text-[11px] font-bold text-[#111111]">
+                    {getItemLanguage(previewResource)}
+                  </span>
+                </div>
+
+                {/* Summary / Legal Brief */}
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
+                    {language === 'ta' ? 'வழக்கு சுருக்கம் / ஆவண விளக்கம்:' : 'Executive Legal Brief & Background:'}
+                  </span>
+                  <p className="text-xs sm:text-sm text-[#111111] leading-relaxed font-dmk-body">
+                    {previewResource.summary[language] || previewResource.summary.en}
+                  </p>
+                </div>
+
+                {/* Key Jurisprudence Highlights */}
+                {previewResource.keyHighlights && (
+                  <div className="pt-3 border-t border-[#D8D3CB] space-y-3">
+                    <span className="text-xs font-bold text-[#C41A1F] uppercase tracking-wider block">
+                      {language === 'ta' ? 'அரசமைப்பு & தீர்ப்பு முக்கிய அம்சங்கள்:' : 'Key Constitutional & Statutory Findings:'}
+                    </span>
+                    <div className="space-y-2">
+                      {(previewResource.keyHighlights[language] || previewResource.keyHighlights.en || []).map((highlight, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#111111]">
+                          <CheckCircle2 className="w-4 h-4 text-[#C41A1F] shrink-0 mt-0.5" />
+                          <span className="leading-snug">{highlight}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+
+              {/* Bottom Actions: Close & Direct Download */}
+              <div className="pt-4 border-t border-[#D8D3CB] flex flex-col sm:flex-row items-center justify-between gap-3">
+                <button
+                  onClick={() => setPreviewResource(null)}
+                  className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
+                >
+                  {language === 'ta' ? 'முன்னோட்டத்தை மூடுக' : 'Close Preview'}
                 </button>
 
                 <button
                   onClick={() => {
-                    handleDownload(selectedResource);
-                    setSelectedResource(null);
+                    handleDownload(previewResource);
+                    setPreviewResource(null);
                   }}
-                  className="px-5 py-2 bg-[#E31E24] hover:bg-neutral-900 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2"
+                  className="w-full sm:w-auto min-h-[44px] px-8 py-2.5 bg-[#E31E24] hover:bg-[#C41A1F] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>{language === 'ta' ? 'பதிவிறக்குக' : 'Download Complete Dossier'}</span>
+                  <Download className="w-4 h-4 text-white" />
+                  <span>
+                    {language === 'ta' ? 'முழு ஆவணத்தைப் பதிவிறக்குக' : 'Download Complete PDF Dossier'}
+                  </span>
                 </button>
               </div>
+
             </div>
-
           </div>
-        </div>
-      )}
+        )}
 
+        {/* Download Success Toast Notification */}
+        {downloadToast && (
+          <div 
+            className="fixed bottom-6 right-6 z-50 bg-[#111111] text-white border-2 border-[#E31E24] p-4 shadow-xl flex items-center gap-3 rounded-[2px] max-w-md animate-fade-in"
+            role="status"
+          >
+            <CheckCircle2 className="w-5 h-5 text-[#C41A1F] shrink-0" />
+            <div className="text-xs">
+              <strong className="block font-bold text-white mb-0.5">
+                {language === 'ta' ? 'ஆவணம் பதிவிறக்கம் தொடங்கப்பட்டது' : 'Download Initiated'}
+              </strong>
+              <span className="text-[#D8D3CB] line-clamp-1">{downloadToast}</span>
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
