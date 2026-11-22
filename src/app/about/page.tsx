@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { TRANSLATIONS } from '@/data/translations';
@@ -129,12 +129,53 @@ const ARCHIVE_ITEMS = [
   }
 ];
 
-function TimelineRow({ milestone, language }: { milestone: HistoricalMilestone; language: 'ta' | 'en' }) {
+interface DecadeGroup {
+  id: string;
+  labelEn: string;
+  labelTa: string;
+  milestones: HistoricalMilestone[];
+}
+
+function getDecadeGroups(milestones: HistoricalMilestone[]): DecadeGroup[] {
+  const map = new Map<string, DecadeGroup>();
+
+  milestones.forEach((m) => {
+    const firstYear = parseInt(m.year.slice(0, 4), 10);
+    const decadeStart = Math.floor(firstYear / 10) * 10;
+    const id = `decade-${decadeStart}s`;
+
+    if (!map.has(id)) {
+      map.set(id, {
+        id,
+        labelEn: `${decadeStart}s`,
+        labelTa: `${decadeStart}-கள்`,
+        milestones: []
+      });
+    }
+
+    map.get(id)!.milestones.push(m);
+  });
+
+  return Array.from(map.values());
+}
+
+/**
+ * Individual milestone row in the elegant book-like catalogue layout.
+ * Motion: only a gentle fade-in (opacity and a 12 px rise over 0.6 s) as each entry first appears.
+ * Nothing moves on hover except the title turning #C41A1F.
+ */
+function TimelineMilestoneEntry({
+  milestone,
+  language
+}: {
+  milestone: HistoricalMilestone;
+  language: 'ta' | 'en';
+}) {
   const [inView, setInView] = useState(false);
-  const rowRef = useRef<HTMLDivElement>(null);
+  const entryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = rowRef.current;
+    const el = entryRef.current;
     if (!el) return;
 
     const observer = new IntersectionObserver(
@@ -145,7 +186,7 @@ function TimelineRow({ milestone, language }: { milestone: HistoricalMilestone; 
       },
       {
         threshold: 0.15,
-        rootMargin: '0px 0px -20% 0px'
+        rootMargin: '0px 0px -10% 0px'
       }
     );
 
@@ -154,79 +195,31 @@ function TimelineRow({ milestone, language }: { milestone: HistoricalMilestone; 
   }, []);
 
   return (
-    <div
-      ref={rowRef}
-      className={`group transition-all duration-700 ease-out ${
-        inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-7'
+    <article
+      ref={entryRef}
+      className={`py-10 group transition-all duration-[600ms] ease-out motion-reduce:transition-none motion-reduce:transform-none motion-reduce:opacity-100 ${
+        inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
       }`}
     >
-      {/* Desktop Layout (md and above) */}
-      <div className="hidden md:flex items-start gap-8">
-        {/* Year on the left: Helvetica Now Display 800 at 64px, turns red on row hover */}
-        <div className="w-[140px] text-right shrink-0 pt-1">
-          <span className="font-helvetica font-extrabold text-[64px] leading-none text-[#111111] transition-colors duration-200 group-hover:text-[#E31E24]">
-            {milestone.year}
-          </span>
-        </div>
+      {/* Year in Helvetica Now Display 800 at 20 px, in #C41A1F */}
+      <span className="font-helvetica font-extrabold text-[20px] text-[#C41A1F] leading-none block mb-2 select-none">
+        {milestone.year}
+      </span>
 
-        {/* 14px square red marker centered on the 3px line */}
-        <div className="w-[24px] flex justify-center shrink-0 pt-4 relative">
-          <div className="w-[14px] h-[14px] bg-[#E31E24] shrink-0 z-10 rounded-none" />
-        </div>
+      {/* Title in Helvetica Now Display 800 at 30 px (Kavivanar for Tamil) */}
+      <h3
+        className={`${
+          language === 'ta' ? 'font-kavivanar' : 'font-helvetica font-extrabold'
+        } text-[26px] md:text-[30px] text-[#111111] leading-snug group-hover:text-[#C41A1F] transition-colors duration-150 mb-3`}
+      >
+        {milestone.title[language]}
+      </h3>
 
-        {/* Title (Helvetica Now Display 800, 28px) and Text (18px) */}
-        <div className="flex-1 pt-2 space-y-2">
-          <div className="flex items-center gap-3">
-            <h3 className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-tight">
-              {milestone.title[language]}
-            </h3>
-            {milestone.category && (
-              <span className="text-[11px] font-extrabold uppercase px-2 py-0.5 bg-[#111111] text-white shrink-0">
-                {milestone.category}
-              </span>
-            )}
-          </div>
-          <p className="text-[18px] text-[#3a322d] leading-relaxed max-w-[780px]">
-            {milestone.description[language]}
-          </p>
-          {milestone.significance && (
-            <div className="text-[15px] text-[#5B5348] italic pt-1 border-l-2 border-[#C41A1F] pl-3 mt-2">
-              <span className="font-bold text-[#C41A1F] not-italic mr-1.5">
-                {language === 'ta' ? 'அரசமைப்பு முக்கியத்துவம்:' : 'Significance:'}
-              </span>
-              {milestone.significance[language]}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile Layout (below md) */}
-      <div className="md:hidden relative pl-9 space-y-2">
-        {/* 14px square red marker on the line */}
-        <div className="absolute left-[1.5px] top-3 w-[14px] h-[14px] bg-[#E31E24] shrink-0 z-10 rounded-none" />
-
-        {/* Year */}
-        <div className="font-helvetica font-extrabold text-[44px] leading-none text-[#111111] transition-colors duration-200 group-hover:text-[#E31E24]">
-          {milestone.year}
-        </div>
-
-        {/* Title */}
-        <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-snug">
-          {milestone.title[language]}
-        </h3>
-
-        {/* Text */}
-        <p className="text-[17px] text-[#3a322d] leading-relaxed">
-          {milestone.description[language]}
-        </p>
-
-        {milestone.significance && (
-          <div className="text-[14px] text-[#5B5348] italic pt-1 border-l-2 border-[#C41A1F] pl-3">
-            {milestone.significance[language]}
-          </div>
-        )}
-      </div>
-    </div>
+      {/* Text at 18 px, maximum 640 px wide (Catamaran, line height 1.75) */}
+      <p className="font-catamaran text-[18px] leading-[1.75] text-[#111111] max-w-[640px]">
+        {milestone.description[language]}
+      </p>
+    </article>
   );
 }
 
@@ -234,29 +227,13 @@ export default function AboutPage() {
   const { language } = useLanguage();
   const t = TRANSLATIONS[language];
 
-  // Timeline line draw trigger
-  const timelineSectionRef = useRef<HTMLElement>(null);
-  const [lineDrawn, setLineDrawn] = useState(false);
-
-  useEffect(() => {
-    const el = timelineSectionRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setLineDrawn(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
+  // Group existing historical milestones by decade
+  const decadeGroups = useMemo(() => {
+    return getDecadeGroups(HISTORICAL_MILESTONES);
   }, []);
 
   return (
-    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[17px] leading-[1.65]">
+    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[18px] leading-[1.75]">
       
       {/* Universal Page Title Band */}
       <PageTitleBand
@@ -296,47 +273,89 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 2. Timeline: Vertical 3px ink line down the left side of a wide column */}
-      <section ref={timelineSectionRef} className="bg-[#FAF8F5] py-20 md:py-28 border-b border-[#111111]">
+      {/* 2. Redesigned Timeline: Elegant, Restrained Book-Like Layout */}
+      <section
+        id="timeline"
+        aria-label={language === 'ta' ? 'அரசமைப்பு வரலாற்று மைல்கற்கள்' : 'Constitutional Milestones Timeline'}
+        className="bg-[#FAF8F5] py-20 md:py-28 border-b border-[#111111]"
+      >
         <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
           
-          <div className="mb-16">
+          {/* Header */}
+          <div className="mb-10">
             <h2 className="font-kavivanar font-normal text-[clamp(34px,4.5vw,52px)] text-[#111111] leading-none">
               {language === 'ta' ? 'அரை நூற்றாண்டு கால அரசமைப்பு வரலாற்று மைல்கற்கள்' : '50 Years of Constitutional Litigation & Milestones'}
             </h2>
-            <p className="text-[17px] text-[#5B5348] mt-3">
+            <p className="text-[18px] text-[#5B5348] mt-3">
               {language === 'ta'
                 ? 'திராவிட இயக்கத்தின் வரலாற்றுச் சிறப்புமிக்க சட்டப் போராட்டங்கள் • 1921 முதல் 2026 வரை'
                 : 'Defending affirmative action, minority rights, and state autonomy across Indian courts of record.'}
             </p>
           </div>
 
-          {/* Wide column with vertical 3px ink line */}
-          <div className="relative">
-            {/* 
-              Vertical 3px ink line down the left side of the wide column:
-              - Desktop: left-[182.5px] (centered behind the 14px red marker at x=184px)
-              - Mobile: left-[7px] (centered behind the 14px red marker at x=8.5px)
-              - Draws downward scaleY: 0 to 1 over 1.4s as section scrolls into view
-            */}
-            <div
-              className="absolute top-4 bottom-4 w-[3px] bg-[#111111] left-[7px] md:left-[182.5px] origin-top transition-transform duration-[1400ms] ease-out pointer-events-none"
-              style={{
-                transform: lineDrawn ? 'scaleY(1)' : 'scaleY(0)',
-              }}
-            />
-
-            {/* Milestone rows */}
-            <div className="space-y-16 md:space-y-20">
-              {HISTORICAL_MILESTONES.map((milestone, idx) => (
-                <TimelineRow
-                  key={milestone.year + idx}
-                  milestone={milestone}
-                  language={language}
-                />
+          {/* Small index at top: decades as plain text links separated by thin vertical rules */}
+          <nav
+            aria-label={language === 'ta' ? 'தசாப்தக் குறியீட்டு வரிசை' : 'Decades navigation index'}
+            className="mb-14 border-b border-[#d7d0c3] pb-4"
+          >
+            <div className="flex flex-wrap items-center gap-y-2">
+              {decadeGroups.map((group, index) => (
+                <React.Fragment key={group.id}>
+                  {index > 0 && (
+                    <span
+                      className="mx-3.5 h-3.5 w-px bg-[#d7d0c3] inline-block shrink-0"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <a
+                    href={`#${group.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const el = document.getElementById(group.id);
+                      if (el) {
+                        const yOffset = -90;
+                        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                      }
+                    }}
+                    className={`${
+                      language === 'ta' ? 'font-kavivanar text-[16px]' : 'font-helvetica font-extrabold text-[15px]'
+                    } text-[#111111] hover:text-[#C41A1F] transition-colors duration-150 cursor-pointer`}
+                  >
+                    {language === 'ta' ? group.labelTa : group.labelEn}
+                  </a>
+                </React.Fragment>
               ))}
             </div>
+          </nav>
 
+          {/* Two-Column Decade Sections */}
+          <div className="space-y-16 md:space-y-20">
+            {decadeGroups.map((group) => (
+              <div
+                key={group.id}
+                id={group.id}
+                className="flex flex-col md:flex-row items-start gap-8 md:gap-14 border-t border-[#d7d0c3] first:border-t-0 scroll-mt-28"
+              >
+                {/* Left Column (about 200 px): Decade Label in Kavivanar 40 px, red. Sticky while entries scroll past */}
+                <div className="w-full md:w-[200px] shrink-0 pt-8 md:pt-10 md:sticky md:top-24">
+                  <h2 className="font-kavivanar text-[36px] md:text-[40px] text-[#C41A1F] leading-none m-0">
+                    {language === 'ta' ? group.labelTa : group.labelEn}
+                  </h2>
+                </div>
+
+                {/* Right Column: Entries with 1 px #d7d0c3 rule between them and 40 px space around each */}
+                <div className="flex-1 w-full divide-y divide-[#d7d0c3]">
+                  {group.milestones.map((milestone, idx) => (
+                    <TimelineMilestoneEntry
+                      key={milestone.year + idx}
+                      milestone={milestone}
+                      language={language}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
 
         </div>
