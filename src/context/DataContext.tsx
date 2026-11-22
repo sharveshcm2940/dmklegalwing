@@ -39,8 +39,10 @@ interface DataContextType {
   addGalleryItem: (item: Omit<PressGalleryItem, 'id'>) => Promise<void>;
   deleteGalleryItem: (id: string) => Promise<void>;
   addEvent: (item: Omit<EventItem, 'id'>) => Promise<void>;
+  updateEvent: (id: string, updates: Partial<EventItem>) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
   addResource: (item: Omit<LegalResource, 'id'>) => Promise<void>;
+  updateResource: (id: string, updates: Partial<LegalResource>) => Promise<void>;
   deleteResource: (id: string) => Promise<void>;
   addLeader: (item: Omit<Leader, 'id'>) => void;
   deleteLeader: (id: string) => void;
@@ -49,6 +51,7 @@ interface DataContextType {
   updateRegistrationStatus: (id: string, status: AdvocateRegistration['status']) => Promise<void>;
   updateEnquiryStatus: (id: string, status: PublicEnquiry['status']) => Promise<void>;
   updateDistrictPhonePrivacy: (id: string, showPhonePublicly: boolean) => Promise<void>;
+  updateDistrictDetails: (id: string, updates: Partial<DistrictInfo>) => Promise<void>;
   refreshAllData: () => Promise<void>;
 }
 
@@ -319,6 +322,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setEvents((prev) => [fallback, ...prev]);
   };
 
+  const updateEvent = async (id: string, updates: Partial<EventItem>) => {
+    setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, ...updates } : e)));
+    try {
+      await fetch(`/api/events/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+    } catch (error) {
+      console.error('Update event error:', error);
+    }
+  };
+
   const deleteEvent = async (id: string) => {
     setEvents((prev) => prev.filter((e) => e.id !== id));
     try {
@@ -346,6 +362,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const fallback: LegalResource = { ...item, id: `res-${Date.now()}` };
     setResources((prev) => [fallback, ...prev]);
+  };
+
+  const updateResource = async (id: string, updates: Partial<LegalResource>) => {
+    setResources((prev) => prev.map((r) => (r.id === id ? { ...r, ...updates } : r)));
+    try {
+      await fetch(`/api/resources/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+    } catch (error) {
+      console.error('Update resource error:', error);
+    }
   };
 
   const deleteResource = async (id: string) => {
@@ -381,6 +410,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateDistrictDetails = async (id: string, updates: Partial<DistrictInfo>) => {
+    setDistricts((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, ...updates } : d))
+    );
+    try {
+      await fetch('/api/districts', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...updates })
+      });
+    } catch (error) {
+      console.error('Update district details error:', error);
+    }
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -400,8 +444,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addGalleryItem,
         deleteGalleryItem,
         addEvent,
+        updateEvent,
         deleteEvent,
         addResource,
+        updateResource,
         deleteResource,
         addLeader,
         deleteLeader,
@@ -410,6 +456,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateRegistrationStatus,
         updateEnquiryStatus,
         updateDistrictPhonePrivacy,
+        updateDistrictDetails,
         refreshAllData
       }}
     >

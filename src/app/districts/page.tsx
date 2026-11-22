@@ -299,6 +299,42 @@ export default function DistrictsPage() {
                 </div>
               </div>
 
+              {/* Cadre Metrics & Cases Assisted from backend */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px]">
+                  <span className="text-xs text-[#5B5348] block mb-0.5">
+                    {language === 'ta' ? 'பதிவுசெய்த வழக்கறிஞர்கள்' : 'Enrolled Advocates'}
+                  </span>
+                  <span className="text-base font-bold text-[#111111] font-mono">
+                    {selectedDossier.memberCount || 150}+
+                  </span>
+                </div>
+                <div className="p-3 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px]">
+                  <span className="text-xs text-[#5B5348] block mb-0.5">
+                    {language === 'ta' ? 'கையாண்ட வழக்குகள்' : 'Cases Assisted'}
+                  </span>
+                  <span className="text-base font-bold text-[#C41A1F] font-mono">
+                    {selectedDossier.activeCasesAssisted || 35}+
+                  </span>
+                </div>
+              </div>
+
+              {/* Joint Organisers when present in backend */}
+              {selectedDossier.jointOrganizers && selectedDossier.jointOrganizers.length > 0 && (
+                <div className="p-3 bg-white border border-[#D8D3CB] space-y-1.5 rounded-[2px]">
+                  <span className="text-xs text-[#5B5348] block">
+                    {language === 'ta' ? 'இணை அமைப்பாளர்கள்:' : 'Joint Organisers:'}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedDossier.jointOrganizers.map((jo, idx) => (
+                      <span key={idx} className="bg-[#FAF8F5] px-2.5 py-1 border border-[#D8D3CB] font-bold text-[#111111] text-xs rounded-[2px]">
+                        {jo[language]}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="p-3 bg-white border border-[#D8D3CB] space-y-1 rounded-[2px]">
                 <span className="text-xs text-[#5B5348] block">
                   {language === 'ta' ? 'நீதிமன்ற வளாகம்' : 'Attached Court Complex'}

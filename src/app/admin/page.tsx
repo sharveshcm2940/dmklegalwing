@@ -43,7 +43,8 @@ import {
   Layers,
   Crop,
   Sliders,
-  Check
+  Check,
+  Printer
 } from 'lucide-react';
 
 export type AdminRole = 'super_admin' | 'editorial' | 'legal_desk';
@@ -60,9 +61,11 @@ export default function AdminConsolePage() {
     deleteGalleryItem,
     events, 
     addEvent, 
+    updateEvent,
     deleteEvent, 
     resources, 
     addResource, 
+    updateResource,
     deleteResource, 
     registrations, 
     updateRegistrationStatus, 
@@ -70,6 +73,7 @@ export default function AdminConsolePage() {
     updateEnquiryStatus,
     districts,
     updateDistrictPhonePrivacy,
+    updateDistrictDetails,
     refreshAllData,
     isLoadingData
   } = useData();
@@ -121,6 +125,16 @@ export default function AdminConsolePage() {
   const [districtZoneFilter, setDistrictZoneFilter] = useState('All');
   const [editingDistrict, setEditingDistrict] = useState<DistrictInfo | null>(null);
   const [editPhonePublicly, setEditPhonePublicly] = useState<boolean>(true);
+  const [editOrganizerEn, setEditOrganizerEn] = useState('');
+  const [editOrganizerTa, setEditOrganizerTa] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editCourtEn, setEditCourtEn] = useState('');
+  const [editCourtTa, setEditCourtTa] = useState('');
+  const [editHeadquartersEn, setEditHeadquartersEn] = useState('');
+  const [editHeadquartersTa, setEditHeadquartersTa] = useState('');
+  const [editMemberCount, setEditMemberCount] = useState<number>(150);
+  const [editActiveCases, setEditActiveCases] = useState<number>(35);
 
   // ---------------------------------------------------------------------------
   // NEWS EDITOR MODAL STATE (Side-by-side, Draft/Scheduled/Published, Crop, Preview)
@@ -172,14 +186,51 @@ export default function AdminConsolePage() {
   const [newEventVenueTa, setNewEventVenueTa] = useState('');
   const [newEventDescEn, setNewEventDescEn] = useState('');
   const [newEventDescTa, setNewEventDescTa] = useState('');
+  const [newEventChiefGuestEn, setNewEventChiefGuestEn] = useState('');
+  const [newEventChiefGuestTa, setNewEventChiefGuestTa] = useState('');
+  const [newEventAttendees, setNewEventAttendees] = useState<number>(500);
+  const [newEventReportPdf, setNewEventReportPdf] = useState('');
+
+  // Event Editing
+  const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
+  const [editEventTitleEn, setEditEventTitleEn] = useState('');
+  const [editEventTitleTa, setEditEventTitleTa] = useState('');
+  const [editEventCategory, setEditEventCategory] = useState<EventItem['category']>('Conference');
+  const [editEventDate, setEditEventDate] = useState('');
+  const [editEventVenueEn, setEditEventVenueEn] = useState('');
+  const [editEventVenueTa, setEditEventVenueTa] = useState('');
+  const [editEventDescEn, setEditEventDescEn] = useState('');
+  const [editEventDescTa, setEditEventDescTa] = useState('');
+  const [editEventChiefGuestEn, setEditEventChiefGuestEn] = useState('');
+  const [editEventChiefGuestTa, setEditEventChiefGuestTa] = useState('');
+  const [editEventAttendees, setEditEventAttendees] = useState<number>(500);
+  const [editEventReportPdf, setEditEventReportPdf] = useState('');
 
   const [showAddResourceModal, setShowAddResourceModal] = useState(false);
   const [newResTitleEn, setNewResTitleEn] = useState('');
   const [newResTitleTa, setNewResTitleTa] = useState('');
   const [newResCategory, setNewResCategory] = useState<LegalResource['category']>('Supreme Court');
   const [newResCitation, setNewResCitation] = useState('');
+  const [newResCourt, setNewResCourt] = useState('');
+  const [newResFileSize, setNewResFileSize] = useState('2.4 MB');
+  const [newResDownloadUrl, setNewResDownloadUrl] = useState('/resources/sample.pdf');
   const [newResSummaryEn, setNewResSummaryEn] = useState('');
   const [newResSummaryTa, setNewResSummaryTa] = useState('');
+
+  // Resource Editing
+  const [editingResource, setEditingResource] = useState<LegalResource | null>(null);
+  const [editResTitleEn, setEditResTitleEn] = useState('');
+  const [editResTitleTa, setEditResTitleTa] = useState('');
+  const [editResCategory, setEditResCategory] = useState<LegalResource['category']>('Supreme Court');
+  const [editResCitation, setEditResCitation] = useState('');
+  const [editResCourt, setEditResCourt] = useState('');
+  const [editResFileSize, setEditResFileSize] = useState('2.4 MB');
+  const [editResDownloadUrl, setEditResDownloadUrl] = useState('');
+  const [editResSummaryEn, setEditResSummaryEn] = useState('');
+  const [editResSummaryTa, setEditResSummaryTa] = useState('');
+
+  // Digital Advocate Membership Credential Certificate
+  const [credentialRegistration, setCredentialRegistration] = useState<AdvocateRegistration | null>(null);
 
   // ---------------------------------------------------------------------------
   // AUTHENTICATION CHECK ON MOUNT
@@ -232,6 +283,23 @@ export default function AdminConsolePage() {
   const showToast = (type: 'success' | 'error', message: string) => {
     setActionNotice({ type, message });
     setTimeout(() => setActionNotice(null), 5000);
+  };
+
+  // CSV Export Helper Function
+  const exportCsv = (filename: string, headers: string[], rows: (string | number | undefined | null)[][]) => {
+    const csvContent = [
+      headers.map((h) => `"${h.replace(/"/g, '""')}"`).join(','),
+      ...rows.map((row) => row.map((cell) => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${filename}-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('success', `Exported ${filename}.csv`);
   };
 
   // ---------------------------------------------------------------------------
@@ -507,9 +575,9 @@ export default function AdminConsolePage() {
   };
 
   // ---------------------------------------------------------------------------
-  // DISTRICT PHONE PRIVACY ACTION (Super Admin only)
+  // FULL DISTRICT CONTROLS ACTION (Super Admin only)
   // ---------------------------------------------------------------------------
-  const handleSaveDistrictPrivacy = async () => {
+  const handleSaveDistrict = async () => {
     if (!editingDistrict) return;
     try {
       const res = await fetch('/api/districts', {
@@ -517,12 +585,19 @@ export default function AdminConsolePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: editingDistrict.id,
+          organizer: { en: editOrganizerEn.trim(), ta: editOrganizerTa.trim() || editOrganizerEn.trim() },
+          contactPhone: editPhone.trim(),
+          contactEmail: editEmail.trim(),
+          headquarters: { en: editHeadquartersEn.trim() || editingDistrict.headquarters.en, ta: editHeadquartersTa.trim() || editingDistrict.headquarters.ta },
+          courtComplex: { en: editCourtEn.trim() || editingDistrict.courtComplex.en, ta: editCourtTa.trim() || editingDistrict.courtComplex.ta },
+          memberCount: Number(editMemberCount) || editingDistrict.memberCount,
+          activeCasesAssisted: Number(editActiveCases) || editingDistrict.activeCasesAssisted,
           showPhonePublicly: editPhonePublicly
         })
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast('success', `Updated phone privacy for ${editingDistrict.name.en}`);
+        showToast('success', `Updated district record for ${editingDistrict.name.en}`);
         setEditingDistrict(null);
         refreshAllData();
       } else {
@@ -594,7 +669,11 @@ export default function AdminConsolePage() {
           date: newEventDate,
           venue: { en: newEventVenueEn || 'High Court Campus', ta: newEventVenueTa || 'உயர் நீதிமன்ற வளாகம்' },
           description: { en: newEventDescEn, ta: newEventDescTa || newEventDescEn },
-          isUpcoming: true
+          chiefGuest: newEventChiefGuestEn ? { en: newEventChiefGuestEn, ta: newEventChiefGuestTa || newEventChiefGuestEn } : undefined,
+          attendeesCount: Number(newEventAttendees) || undefined,
+          reportPdfUrl: newEventReportPdf.trim() || undefined,
+          image: '/images/dmk-legal-conference.jpg',
+          status: 'upcoming'
         })
       });
       const data = await res.json();
@@ -604,6 +683,37 @@ export default function AdminConsolePage() {
         refreshAllData();
       } else {
         showToast('error', data.error || 'Server rejected event creation.');
+      }
+    } catch {
+      showToast('error', 'Network error.');
+    }
+  };
+
+  const handleSaveEventEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEvent) return;
+    try {
+      const res = await fetch(`/api/events/${editingEvent.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: { en: editEventTitleEn, ta: editEventTitleTa || editEventTitleEn },
+          category: editEventCategory,
+          date: editEventDate,
+          venue: { en: editEventVenueEn, ta: editEventVenueTa || editEventVenueEn },
+          description: { en: editEventDescEn, ta: editEventDescTa || editEventDescEn },
+          chiefGuest: editEventChiefGuestEn ? { en: editEventChiefGuestEn, ta: editEventChiefGuestTa || editEventChiefGuestEn } : undefined,
+          attendeesCount: Number(editEventAttendees) || undefined,
+          reportPdfUrl: editEventReportPdf.trim() || undefined
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Updated event: ${editEventTitleEn}`);
+        setEditingEvent(null);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Failed to update event.');
       }
     } catch {
       showToast('error', 'Network error.');
@@ -637,10 +747,11 @@ export default function AdminConsolePage() {
           title: { en: newResTitleEn, ta: newResTitleTa || newResTitleEn },
           category: newResCategory,
           citation: newResCitation,
+          court: newResCourt || 'Supreme Court of India',
+          fileSize: newResFileSize || '2.4 MB',
+          downloadUrl: newResDownloadUrl || '/resources/sample.pdf',
           summary: { en: newResSummaryEn, ta: newResSummaryTa || newResSummaryEn },
           keyHighlights: { en: ['Statutory provision analysis'], ta: ['சட்டப்பிரிவு ஆய்வு'] },
-          fileSize: '3.5 MB',
-          downloadUrl: '#',
           date: new Date().toISOString().split('T')[0],
           isOfficial: true
         })
@@ -652,6 +763,36 @@ export default function AdminConsolePage() {
         refreshAllData();
       } else {
         showToast('error', data.error || 'Server rejected resource creation.');
+      }
+    } catch {
+      showToast('error', 'Network error.');
+    }
+  };
+
+  const handleSaveResourceEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingResource) return;
+    try {
+      const res = await fetch(`/api/resources/${editingResource.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: { en: editResTitleEn, ta: editResTitleTa || editResTitleEn },
+          category: editResCategory,
+          citation: editResCitation,
+          court: editResCourt,
+          fileSize: editResFileSize,
+          downloadUrl: editResDownloadUrl,
+          summary: { en: editResSummaryEn, ta: editResSummaryTa || editResSummaryEn }
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('success', `Updated resource: ${editResTitleEn}`);
+        setEditingResource(null);
+        refreshAllData();
+      } else {
+        showToast('error', data.error || 'Failed to update resource.');
       }
     } catch {
       showToast('error', 'Network error.');
@@ -1241,9 +1382,33 @@ export default function AdminConsolePage() {
                 </select>
               </div>
 
-              <span className="text-xs text-[#5B5348]">
-                Showing {filteredRegistrations.length} applications
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-[#5B5348]">
+                  Showing {filteredRegistrations.length} applications
+                </span>
+                <button
+                  onClick={() => exportCsv(
+                    'dmk-advocate-registrations',
+                    ['Tracking ID', 'Full Name', 'Bar Council No', 'District', 'Court', 'Mobile', 'Email', 'Specialization', 'Status', 'Date'],
+                    filteredRegistrations.map(r => [
+                      r.id,
+                      r.fullName,
+                      r.barCouncilNumber,
+                      r.district,
+                      r.courtOfPractice,
+                      r.mobileNumber,
+                      r.emailAddress,
+                      (r.areasOfSpecialization || []).join('; '),
+                      r.status,
+                      r.submittedAt
+                    ])
+                  )}
+                  className="min-h-[44px] px-3 py-1.5 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] rounded-[2px] flex items-center gap-1.5 cursor-pointer font-bold text-xs"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Export CSV</span>
+                </button>
+              </div>
             </div>
 
             <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden shadow-xs">
@@ -1297,6 +1462,15 @@ export default function AdminConsolePage() {
                           </td>
                           <td className="py-2.5 px-3 text-right whitespace-nowrap font-mono">
                             <div className="flex items-center justify-end gap-2">
+                              {reg.status === 'approved' && (
+                                <button
+                                  onClick={() => setCredentialRegistration(reg)}
+                                  className="px-2 py-1 text-xs text-[#C41A1F] hover:text-[#111111] font-bold border border-[#C41A1F] hover:border-[#111111] rounded-[2px] cursor-pointer"
+                                  title="View & Print Official Membership Card"
+                                >
+                                  ID Card
+                                </button>
+                              )}
                               <button
                                 onClick={() => setSelectedRegDossier(reg)}
                                 className="px-2 py-1 text-xs text-[#111111] hover:text-[#C41A1F] underline cursor-pointer"
@@ -1354,9 +1528,33 @@ export default function AdminConsolePage() {
                 </select>
               </div>
 
-              <span className="text-xs text-[#5B5348]">
-                Showing {filteredEnquiries.length} grievances
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-[#5B5348]">
+                  Showing {filteredEnquiries.length} grievances
+                </span>
+                <button
+                  onClick={() => exportCsv(
+                    'dmk-citizen-grievances',
+                    ['Tracking ID', 'Applicant Name', 'Category', 'District', 'Phone', 'Email', 'Subject', 'Message', 'Status', 'Date'],
+                    filteredEnquiries.map(e => [
+                      e.id,
+                      e.name,
+                      e.category,
+                      e.district,
+                      e.phone,
+                      e.email || '',
+                      e.subject,
+                      e.message,
+                      e.status,
+                      e.submittedAt
+                    ])
+                  )}
+                  className="min-h-[44px] px-3 py-1.5 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] rounded-[2px] flex items-center gap-1.5 cursor-pointer font-bold text-xs"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Export CSV</span>
+                </button>
+              </div>
             </div>
 
             <div className="bg-white border-2 border-[#111111] rounded-[2px] overflow-hidden shadow-xs">
@@ -1519,11 +1717,21 @@ export default function AdminConsolePage() {
                             <button
                               onClick={() => {
                                 setEditingDistrict(d);
+                                setEditOrganizerEn(d.organizer?.en || '');
+                                setEditOrganizerTa(d.organizer?.ta || d.organizer?.en || '');
+                                setEditPhone(d.contactPhone || '');
+                                setEditEmail(d.contactEmail || '');
+                                setEditHeadquartersEn(d.headquarters?.en || '');
+                                setEditHeadquartersTa(d.headquarters?.ta || d.headquarters?.en || '');
+                                setEditCourtEn(d.courtComplex?.en || '');
+                                setEditCourtTa(d.courtComplex?.ta || d.courtComplex?.en || '');
+                                setEditMemberCount(d.memberCount ?? 150);
+                                setEditActiveCases(d.activeCasesAssisted ?? 35);
                                 setEditPhonePublicly(d.showPhonePublicly !== false);
                               }}
                               className="px-2.5 py-1 text-xs text-[#111111] hover:text-[#C41A1F] underline cursor-pointer"
                             >
-                              Edit Privacy
+                              Edit District
                             </button>
                           </td>
                         </tr>
@@ -1559,10 +1767,28 @@ export default function AdminConsolePage() {
                 <button
                   onClick={fetchAuditLogs}
                   disabled={auditLoading}
-                  className="min-h-[44px] px-3.5 py-1 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] rounded-[2px] flex items-center gap-1.5 cursor-pointer"
+                  className="min-h-[44px] px-3.5 py-1 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] rounded-[2px] flex items-center gap-1.5 cursor-pointer font-bold text-xs"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} />
                   <span>Refresh Log</span>
+                </button>
+
+                <button
+                  onClick={() => exportCsv(
+                    'dmk-activity-audit-log',
+                    ['Log ID', 'Timestamp', 'Operator', 'Role', 'Action Description'],
+                    filteredAuditLogs.map(l => [
+                      l.id,
+                      l.when,
+                      l.who,
+                      l.role,
+                      l.what
+                    ])
+                  )}
+                  className="min-h-[44px] px-3.5 py-1 bg-white hover:bg-[#FAF8F5] text-[#111111] border border-[#111111] rounded-[2px] flex items-center gap-1.5 cursor-pointer font-bold text-xs"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Export CSV</span>
                 </button>
               </div>
 
@@ -1700,9 +1926,31 @@ export default function AdminConsolePage() {
                       <td className="py-2 px-3">{e.venue.en}</td>
                       <td className="py-2 px-3 font-mono">{e.date}</td>
                       <td className="py-2 px-3 text-right">
-                        <button onClick={() => handleDeleteEvent(e.id)} className="p-1 hover:text-[#C41A1F]">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingEvent(e);
+                              setEditEventTitleEn(e.title?.en || '');
+                              setEditEventTitleTa(e.title?.ta || e.title?.en || '');
+                              setEditEventCategory(e.category);
+                              setEditEventDate(e.date || '');
+                              setEditEventVenueEn(e.venue?.en || '');
+                              setEditEventVenueTa(e.venue?.ta || e.venue?.en || '');
+                              setEditEventDescEn(e.description?.en || '');
+                              setEditEventDescTa(e.description?.ta || e.description?.en || '');
+                              setEditEventChiefGuestEn(e.chiefGuest?.en || '');
+                              setEditEventChiefGuestTa(e.chiefGuest?.ta || e.chiefGuest?.en || '');
+                              setEditEventAttendees(e.attendeesCount ?? 500);
+                              setEditEventReportPdf(e.reportPdfUrl || '');
+                            }}
+                            className="px-2 py-1 text-xs text-[#111111] hover:text-[#C41A1F] underline cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                          <button onClick={() => handleDeleteEvent(e.id)} className="p-1 hover:text-[#C41A1F]" title="Delete event">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1743,9 +1991,28 @@ export default function AdminConsolePage() {
                       <td className="py-2 px-3">{r.court || 'Constitutional Repository'}</td>
                       <td className="py-2 px-3 font-mono">{r.fileSize}</td>
                       <td className="py-2 px-3 text-right">
-                        <button onClick={() => handleDeleteResource(r.id)} className="p-1 hover:text-[#C41A1F]">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingResource(r);
+                              setEditResTitleEn(r.title?.en || '');
+                              setEditResTitleTa(r.title?.ta || r.title?.en || '');
+                              setEditResCategory(r.category);
+                              setEditResCitation(r.citation || '');
+                              setEditResCourt(r.court || '');
+                              setEditResFileSize(r.fileSize || '2.4 MB');
+                              setEditResDownloadUrl(r.downloadUrl || '');
+                              setEditResSummaryEn(r.summary?.en || '');
+                              setEditResSummaryTa(r.summary?.ta || r.summary?.en || '');
+                            }}
+                            className="px-2 py-1 text-xs text-[#111111] hover:text-[#C41A1F] underline cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                          <button onClick={() => handleDeleteResource(r.id)} className="p-1 hover:text-[#C41A1F]" title="Delete volume">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -2149,27 +2416,171 @@ export default function AdminConsolePage() {
       )}
 
       {/* --------------------------------------------------------------------- */}
-      {/* DISTRICT PHONE PRIVACY MODAL */}
+      {/* FULL DISTRICT EDITOR MODAL */}
       {/* --------------------------------------------------------------------- */}
       {editingDistrict && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-white border-2 border-[#111111] max-w-md w-full p-6 rounded-[2px] shadow-2xl space-y-4 font-mono text-xs">
-            <div className="border-b border-[#D8D3CB] pb-3">
-              <span className="text-[10px] font-bold text-[#C41A1F] uppercase block mb-1">
-                SUPER ADMIN DISTRICT CONTROLS
-              </span>
-              <h3 className="text-base font-black text-[#111111]">
-                {editingDistrict.name.en} ({editingDistrict.zone} Zone)
-              </h3>
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-[#FAF8F5] border-2 border-[#111111] max-w-2xl w-full p-6 sm:p-8 rounded-[2px] shadow-2xl relative my-auto max-h-[92vh] overflow-y-auto font-sans space-y-6">
+            
+            <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-4">
+              <div>
+                <span className="text-[11px] font-mono font-bold text-[#C41A1F] uppercase tracking-wider block">
+                  DISTRICT ADMINISTRATION DESK • UNIT {editingDistrict.number || editingDistrict.id}
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black text-[#111111] font-dmk-headline">
+                  Edit District: {editingDistrict.name.en} ({editingDistrict.zone} Zone)
+                </h2>
+              </div>
+              <button
+                onClick={() => setEditingDistrict(null)}
+                className="p-2 border border-[#111111] hover:bg-[#E31E24] hover:text-white rounded-[2px] cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div className="space-y-3 font-sans">
-              <p className="text-xs text-[#5B5348]">
-                Designated Organizer: <strong className="text-[#111111]">{editingDistrict.organizer.en}</strong><br />
-                Direct Telephone: <strong className="font-mono text-[#111111]">{editingDistrict.contactPhone}</strong>
-              </p>
+            <div className="space-y-4">
+              
+              {/* Organizer EN / TA */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Designated Organizer (English) *
+                  </label>
+                  <input
+                    type="text"
+                    value={editOrganizerEn}
+                    onChange={(e) => setEditOrganizerEn(e.target.value)}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs rounded-[2px] outline-none"
+                    placeholder="Adv. K. Saravanan"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Designated Organizer (Tamil)
+                  </label>
+                  <input
+                    type="text"
+                    value={editOrganizerTa}
+                    onChange={(e) => setEditOrganizerTa(e.target.value)}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs rounded-[2px] outline-none"
+                    placeholder="வழக்கறிஞர் கே. சரவணன்"
+                  />
+                </div>
+              </div>
 
-              <div className="p-3 bg-[#FAF8F5] border border-[#D8D3CB] rounded-[2px] space-y-2">
+              {/* Contact Phone & Email */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Telephone Line (e.g. 044-25341234 or +91 94440 12345)
+                  </label>
+                  <input
+                    type="text"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs font-mono rounded-[2px] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Contact Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs font-mono rounded-[2px] outline-none"
+                    placeholder="legal@dmk.org.in"
+                  />
+                </div>
+              </div>
+
+              {/* Headquarters EN / TA */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Headquarters Office (English)
+                  </label>
+                  <input
+                    type="text"
+                    value={editHeadquartersEn}
+                    onChange={(e) => setEditHeadquartersEn(e.target.value)}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs rounded-[2px] outline-none"
+                    placeholder="Anna Arivalayam, Chennai"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Headquarters Office (Tamil)
+                  </label>
+                  <input
+                    type="text"
+                    value={editHeadquartersTa}
+                    onChange={(e) => setEditHeadquartersTa(e.target.value)}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs rounded-[2px] outline-none"
+                    placeholder="அண்ணா அறிவாலயம், சென்னை"
+                  />
+                </div>
+              </div>
+
+              {/* Court Complex EN / TA */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Principal Court Complex (English)
+                  </label>
+                  <input
+                    type="text"
+                    value={editCourtEn}
+                    onChange={(e) => setEditCourtEn(e.target.value)}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs rounded-[2px] outline-none"
+                    placeholder="Madras High Court Campus"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Principal Court Complex (Tamil)
+                  </label>
+                  <input
+                    type="text"
+                    value={editCourtTa}
+                    onChange={(e) => setEditCourtTa(e.target.value)}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs rounded-[2px] outline-none"
+                    placeholder="சென்னை உயர் நீதிமன்ற வளாகம்"
+                  />
+                </div>
+              </div>
+
+              {/* Members & Active Cases metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Registered Advocate Members
+                  </label>
+                  <input
+                    type="number"
+                    value={editMemberCount}
+                    onChange={(e) => setEditMemberCount(Number(e.target.value))}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs font-mono rounded-[2px] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-mono font-bold text-[#111111] block mb-1">
+                    Active Cases Assisted
+                  </label>
+                  <input
+                    type="number"
+                    value={editActiveCases}
+                    onChange={(e) => setEditActiveCases(Number(e.target.value))}
+                    className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-white text-xs font-mono rounded-[2px] outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Phone Privacy Toggle */}
+              <div className="p-4 bg-white border border-[#D8D3CB] rounded-[2px] space-y-2">
                 <label className="flex items-center gap-2 cursor-pointer font-bold text-xs">
                   <input
                     type="checkbox"
@@ -2177,30 +2588,33 @@ export default function AdminConsolePage() {
                     onChange={(e) => setEditPhonePublicly(e.target.checked)}
                     className="w-4 h-4 accent-[#E31E24]"
                   />
-                  <span>Show phone publicly on /districts</span>
+                  <span>Show telephone line publicly on /districts</span>
                 </label>
                 <p className="text-[11px] text-[#5B5348]">
-                  When unchecked, the phone number is hidden from the public table and replaced with &ldquo;Contact through the State Secretariat&rdquo;.
+                  When unchecked, the phone number is shielded from the public portal and replaced with &ldquo;Contact through the State Secretariat&rdquo;.
                 </p>
               </div>
+
             </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            <div className="pt-4 border-t border-[#D8D3CB] flex justify-end gap-3 font-mono text-xs">
               <button
                 type="button"
                 onClick={() => setEditingDistrict(null)}
-                className="px-4 py-2 border border-[#111111] bg-white text-[#111111] rounded-[2px] cursor-pointer"
+                className="min-h-[44px] px-5 py-2 border border-[#111111] bg-white text-[#111111] rounded-[2px] cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
-                onClick={handleSaveDistrictPrivacy}
-                className="px-5 py-2 bg-[#E31E24] hover:bg-[#111111] text-white font-bold uppercase rounded-[2px] cursor-pointer"
+                onClick={handleSaveDistrict}
+                className="min-h-[44px] px-6 py-2 bg-[#E31E24] hover:bg-[#111111] text-white font-bold uppercase rounded-[2px] cursor-pointer flex items-center gap-2"
               >
-                Save Privacy
+                <Check className="w-4 h-4" />
+                <span>Save District Details</span>
               </button>
             </div>
+
           </div>
         </div>
       )}
@@ -2277,6 +2691,23 @@ export default function AdminConsolePage() {
               </div>
             )}
 
+            {/* Approved ID Card Link */}
+            {selectedRegDossier.status === 'approved' && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-[2px] flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-green-900 block">Advocate Membership Approved</span>
+                  <span className="text-[11px] text-green-700">Official digital membership card is generated and verified.</span>
+                </div>
+                <button
+                  onClick={() => setCredentialRegistration(selectedRegDossier)}
+                  className="min-h-[44px] px-3.5 py-1.5 bg-[#111111] hover:bg-[#E31E24] text-white font-mono text-xs font-bold uppercase rounded-[2px] cursor-pointer flex items-center gap-1.5"
+                >
+                  <Scale className="w-3.5 h-3.5 text-[#E31E24]" />
+                  <span>View ID Card</span>
+                </button>
+              </div>
+            )}
+
             {/* Status Change Buttons (Legal Desk & Super Admin) */}
             <div className="pt-3 border-t border-[#D8D3CB] flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
               <span className="text-[#5B5348]">Update Verification Stage:</span>
@@ -2329,50 +2760,414 @@ export default function AdminConsolePage() {
       )}
 
       {showAddEventModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <form onSubmit={handleCreateEvent} className="bg-white border-2 border-[#111111] max-w-md w-full p-6 rounded-[2px] space-y-4 text-xs font-mono">
-            <h3 className="font-bold text-sm text-[#111111] uppercase border-b pb-2">Add Court Hearing / Legal Event</h3>
-            <div>
-              <label className="block mb-1 font-bold">Event Title (English) *</label>
-              <input required value={newEventTitleEn} onChange={(e) => setNewEventTitleEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <form onSubmit={handleCreateEvent} className="bg-white border-2 border-[#111111] max-w-2xl w-full p-6 sm:p-8 rounded-[2px] space-y-4 text-xs font-mono max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-3">
+              <h3 className="font-bold text-base text-[#111111] uppercase">Add Court Hearing / Legal Conference</h3>
+              <button type="button" onClick={() => setShowAddEventModal(false)} className="p-1 border border-[#111111]">
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <div>
-              <label className="block mb-1 font-bold">Court / Venue (English)</label>
-              <input value={newEventVenueEn} onChange={(e) => setNewEventVenueEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Event Title (English) *</label>
+                <input required value={newEventTitleEn} onChange={(e) => setNewEventTitleEn(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Event Title (Tamil)</label>
+                <input value={newEventTitleTa} onChange={(e) => setNewEventTitleTa(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
             </div>
-            <div>
-              <label className="block mb-1 font-bold">Date</label>
-              <input type="date" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Category</label>
+                <select value={newEventCategory} onChange={(e) => setNewEventCategory(e.target.value as any)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]">
+                  <option value="Conference">State Legal Conference</option>
+                  <option value="Legal Awareness">Legal Awareness Camp</option>
+                  <option value="Seminar">Constitutional Law Seminar</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Event Date</label>
+                <input type="date" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
             </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowAddEventModal(false)} className="px-3 py-1.5 border">Cancel</button>
-              <button type="submit" className="px-4 py-1.5 bg-[#E31E24] text-white font-bold">Save</button>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Court / Venue (English)</label>
+                <input value={newEventVenueEn} onChange={(e) => setNewEventVenueEn(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Court / Venue (Tamil)</label>
+                <input value={newEventVenueTa} onChange={(e) => setNewEventVenueTa(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Chief Guest (English)</label>
+                <input value={newEventChiefGuestEn} onChange={(e) => setNewEventChiefGuestEn(e.target.value)} placeholder="e.g. Senior Advocate N.R. Elango" className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Chief Guest (Tamil)</label>
+                <input value={newEventChiefGuestTa} onChange={(e) => setNewEventChiefGuestTa(e.target.value)} placeholder="எ.கா. மூத்த வழக்கறிஞர் என்.ஆர். இளங்கோ" className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Expected / Registered Attendees</label>
+                <input type="number" value={newEventAttendees} onChange={(e) => setNewEventAttendees(Number(e.target.value))} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Official Report PDF URL</label>
+                <input value={newEventReportPdf} onChange={(e) => setNewEventReportPdf(e.target.value)} placeholder="/resources/event-report.pdf" className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-bold">Description / Agenda Summary (English)</label>
+              <textarea rows={2} value={newEventDescEn} onChange={(e) => setNewEventDescEn(e.target.value)} className="w-full p-2.5 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t">
+              <button type="button" onClick={() => setShowAddEventModal(false)} className="min-h-[44px] px-4 py-2 border">Cancel</button>
+              <button type="submit" className="min-h-[44px] px-6 py-2 bg-[#E31E24] text-white font-bold uppercase">Save Hearing</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* EDIT EVENT MODAL */}
+      {editingEvent && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <form onSubmit={handleSaveEventEdit} className="bg-white border-2 border-[#111111] max-w-2xl w-full p-6 sm:p-8 rounded-[2px] space-y-4 text-xs font-mono max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-3">
+              <h3 className="font-bold text-base text-[#111111] uppercase">Edit Hearing / Event: {editingEvent.id}</h3>
+              <button type="button" onClick={() => setEditingEvent(null)} className="p-1 border border-[#111111]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Event Title (English) *</label>
+                <input required value={editEventTitleEn} onChange={(e) => setEditEventTitleEn(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Event Title (Tamil)</label>
+                <input value={editEventTitleTa} onChange={(e) => setEditEventTitleTa(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Category</label>
+                <select value={editEventCategory} onChange={(e) => setEditEventCategory(e.target.value as any)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]">
+                  <option value="Conference">State Legal Conference</option>
+                  <option value="Legal Awareness">Legal Awareness Camp</option>
+                  <option value="Seminar">Constitutional Law Seminar</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Event Date</label>
+                <input type="date" value={editEventDate} onChange={(e) => setEditEventDate(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Court / Venue (English)</label>
+                <input value={editEventVenueEn} onChange={(e) => setEditEventVenueEn(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Court / Venue (Tamil)</label>
+                <input value={editEventVenueTa} onChange={(e) => setEditEventVenueTa(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Chief Guest (English)</label>
+                <input value={editEventChiefGuestEn} onChange={(e) => setEditEventChiefGuestEn(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Chief Guest (Tamil)</label>
+                <input value={editEventChiefGuestTa} onChange={(e) => setEditEventChiefGuestTa(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Attendees Count</label>
+                <input type="number" value={editEventAttendees} onChange={(e) => setEditEventAttendees(Number(e.target.value))} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Official Report PDF URL</label>
+                <input value={editEventReportPdf} onChange={(e) => setEditEventReportPdf(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-bold">Description / Agenda Summary (English)</label>
+              <textarea rows={2} value={editEventDescEn} onChange={(e) => setEditEventDescEn(e.target.value)} className="w-full p-2.5 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t">
+              <button type="button" onClick={() => setEditingEvent(null)} className="min-h-[44px] px-4 py-2 border">Cancel</button>
+              <button type="submit" className="min-h-[44px] px-6 py-2 bg-[#E31E24] text-white font-bold uppercase">Update Event</button>
             </div>
           </form>
         </div>
       )}
 
       {showAddResourceModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <form onSubmit={handleCreateResource} className="bg-white border-2 border-[#111111] max-w-md w-full p-6 rounded-[2px] space-y-4 text-xs font-mono">
-            <h3 className="font-bold text-sm text-[#111111] uppercase border-b pb-2">Upload Legal Resource Compendium</h3>
-            <div>
-              <label className="block mb-1 font-bold">Volume Title (English) *</label>
-              <input required value={newResTitleEn} onChange={(e) => setNewResTitleEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <form onSubmit={handleCreateResource} className="bg-white border-2 border-[#111111] max-w-2xl w-full p-6 sm:p-8 rounded-[2px] space-y-4 text-xs font-mono max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-3">
+              <h3 className="font-bold text-base text-[#111111] uppercase">Upload Legal Resource Compendium</h3>
+              <button type="button" onClick={() => setShowAddResourceModal(false)} className="p-1 border border-[#111111]">
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <div>
-              <label className="block mb-1 font-bold">Citation / Docket</label>
-              <input value={newResCitation} onChange={(e) => setNewResCitation(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Volume Title (English) *</label>
+                <input required value={newResTitleEn} onChange={(e) => setNewResTitleEn(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Volume Title (Tamil)</label>
+                <input value={newResTitleTa} onChange={(e) => setNewResTitleTa(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Category</label>
+                <select value={newResCategory} onChange={(e) => setNewResCategory(e.target.value as any)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]">
+                  <option value="Supreme Court">Supreme Court</option>
+                  <option value="High Court">High Court</option>
+                  <option value="Statutes">Statutes & Acts</option>
+                  <option value="Election Law">Election Law</option>
+                  <option value="Party Constitution">Party Constitution</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Citation / Docket</label>
+                <input value={newResCitation} onChange={(e) => setNewResCitation(e.target.value)} placeholder="(2024) 4 SCC 120" className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Court / Authority</label>
+                <input value={newResCourt} onChange={(e) => setNewResCourt(e.target.value)} placeholder="Supreme Court of India" className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">File Size</label>
+                <input value={newResFileSize} onChange={(e) => setNewResFileSize(e.target.value)} placeholder="2.4 MB" className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Download URL</label>
+                <input value={newResDownloadUrl} onChange={(e) => setNewResDownloadUrl(e.target.value)} placeholder="/resources/ruling.pdf" className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
             <div>
               <label className="block mb-1 font-bold">Summary (English)</label>
-              <textarea rows={3} value={newResSummaryEn} onChange={(e) => setNewResSummaryEn(e.target.value)} className="w-full p-2 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              <textarea rows={3} value={newResSummaryEn} onChange={(e) => setNewResSummaryEn(e.target.value)} className="w-full p-2.5 border border-[#D8D3CB] bg-[#FAF8F5]" />
             </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowAddResourceModal(false)} className="px-3 py-1.5 border">Cancel</button>
-              <button type="submit" className="px-4 py-1.5 bg-[#E31E24] text-white font-bold">Save</button>
+
+            <div className="flex justify-end gap-2 pt-3 border-t">
+              <button type="button" onClick={() => setShowAddResourceModal(false)} className="min-h-[44px] px-4 py-2 border">Cancel</button>
+              <button type="submit" className="min-h-[44px] px-6 py-2 bg-[#E31E24] text-white font-bold uppercase">Save Volume</button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* EDIT RESOURCE MODAL */}
+      {editingResource && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <form onSubmit={handleSaveResourceEdit} className="bg-white border-2 border-[#111111] max-w-2xl w-full p-6 sm:p-8 rounded-[2px] space-y-4 text-xs font-mono max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-3">
+              <h3 className="font-bold text-base text-[#111111] uppercase">Edit Legal Volume: {editingResource.id}</h3>
+              <button type="button" onClick={() => setEditingResource(null)} className="p-1 border border-[#111111]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Volume Title (English) *</label>
+                <input required value={editResTitleEn} onChange={(e) => setEditResTitleEn(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Volume Title (Tamil)</label>
+                <input value={editResTitleTa} onChange={(e) => setEditResTitleTa(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Category</label>
+                <select value={editResCategory} onChange={(e) => setEditResCategory(e.target.value as any)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]">
+                  <option value="Supreme Court">Supreme Court</option>
+                  <option value="High Court">High Court</option>
+                  <option value="Statutes">Statutes & Acts</option>
+                  <option value="Election Law">Election Law</option>
+                  <option value="Party Constitution">Party Constitution</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Citation / Docket</label>
+                <input value={editResCitation} onChange={(e) => setEditResCitation(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block mb-1 font-bold">Court / Authority</label>
+                <input value={editResCourt} onChange={(e) => setEditResCourt(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">File Size</label>
+                <input value={editResFileSize} onChange={(e) => setEditResFileSize(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+              <div>
+                <label className="block mb-1 font-bold">Download URL</label>
+                <input value={editResDownloadUrl} onChange={(e) => setEditResDownloadUrl(e.target.value)} className="w-full min-h-[44px] px-3 border border-[#D8D3CB] bg-[#FAF8F5]" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-bold">Summary (English)</label>
+              <textarea rows={3} value={editResSummaryEn} onChange={(e) => setEditResSummaryEn(e.target.value)} className="w-full p-2.5 border border-[#D8D3CB] bg-[#FAF8F5]" />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t">
+              <button type="button" onClick={() => setEditingResource(null)} className="min-h-[44px] px-4 py-2 border">Cancel</button>
+              <button type="submit" className="min-h-[44px] px-6 py-2 bg-[#E31E24] text-white font-bold uppercase">Update Volume</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* DIGITAL ADVOCATE MEMBERSHIP CREDENTIAL CERTIFICATE / ID CARD MODAL */}
+      {credentialRegistration && (
+        <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-[#FAF8F5] border-2 border-[#111111] max-w-xl w-full p-6 sm:p-8 rounded-[2px] shadow-2xl relative my-auto font-sans space-y-6">
+            
+            <div className="flex items-center justify-between border-b border-[#D8D3CB] pb-3">
+              <div className="flex items-center gap-2">
+                <Scale className="w-5 h-5 text-[#C41A1F]" />
+                <h3 className="font-bold text-sm sm:text-base text-[#111111] font-mono uppercase tracking-wider">
+                  Official Advocate Credential
+                </h3>
+              </div>
+              <button
+                onClick={() => setCredentialRegistration(null)}
+                className="p-1.5 border border-[#111111] hover:bg-[#E31E24] hover:text-white rounded-[2px] cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Print Area / Official ID Card Box */}
+            <div id="advocate-credential-card" className="bg-white border-2 border-[#111111] p-6 rounded-[2px] shadow-sm relative overflow-hidden space-y-4">
+              
+              {/* Top Banner with DMK Red Accent */}
+              <div className="border-b-2 border-[#111111] pb-3 flex items-start justify-between">
+                <div>
+                  <span className="text-[10px] font-mono font-bold text-[#C41A1F] uppercase tracking-widest block">
+                    திராவிட முன்னேற்றக் கழகம் சட்டப் பிரிவு
+                  </span>
+                  <h4 className="text-lg font-black text-[#111111] font-dmk-headline tracking-tight uppercase">
+                    DMK Legal Wing Advocate Certificate
+                  </h4>
+                  <span className="text-[11px] text-[#5B5348] font-mono">
+                    State Legal Secretariat • Anna Arivalayam, Chennai
+                  </span>
+                </div>
+                <div className="w-12 h-12 bg-[#111111] text-white flex items-center justify-center font-black font-dmk-headline text-lg rounded-[2px]">
+                  திமுக
+                </div>
+              </div>
+
+              {/* Status Ribbon */}
+              <div className="bg-[#FAF8F5] border border-[#D8D3CB] px-3 py-1.5 rounded-[2px] flex items-center justify-between font-mono text-[11px]">
+                <span className="font-bold text-[#111111]">STATUS: VERIFIED ADVOCATE</span>
+                <span className="text-green-800 font-bold bg-green-100 px-2 py-0.5 rounded-[2px]">
+                  ACTIVE ENROLMENT
+                </span>
+              </div>
+
+              {/* Advocate Details */}
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="p-2.5 bg-[#FAF8F5] border border-[#D8D3CB]">
+                  <span className="text-[10px] font-mono text-[#5B5348] block">ADVOCATE NAME</span>
+                  <span className="font-bold text-[#111111] text-sm block mt-0.5">{credentialRegistration.fullName}</span>
+                </div>
+
+                <div className="p-2.5 bg-[#FAF8F5] border border-[#D8D3CB]">
+                  <span className="text-[10px] font-mono text-[#5B5348] block">BAR COUNCIL REG NO</span>
+                  <span className="font-mono font-bold text-[#C41A1F] text-sm block mt-0.5">{credentialRegistration.barCouncilNumber}</span>
+                </div>
+
+                <div className="p-2.5 bg-[#FAF8F5] border border-[#D8D3CB]">
+                  <span className="text-[10px] font-mono text-[#5B5348] block">PARTY DISTRICT</span>
+                  <span className="font-bold text-[#111111] block mt-0.5">{credentialRegistration.district}</span>
+                </div>
+
+                <div className="p-2.5 bg-[#FAF8F5] border border-[#D8D3CB]">
+                  <span className="text-[10px] font-mono text-[#5B5348] block">COURT OF PRACTICE</span>
+                  <span className="font-bold text-[#111111] block mt-0.5">{credentialRegistration.courtOfPractice}</span>
+                </div>
+
+                <div className="p-2.5 bg-[#FAF8F5] border border-[#D8D3CB]">
+                  <span className="text-[10px] font-mono text-[#5B5348] block">MEMBERSHIP ID</span>
+                  <span className="font-mono font-bold text-[#111111] block mt-0.5">{credentialRegistration.id}</span>
+                </div>
+
+                <div className="p-2.5 bg-[#FAF8F5] border border-[#D8D3CB]">
+                  <span className="text-[10px] font-mono text-[#5B5348] block">ENROLMENT YEAR</span>
+                  <span className="font-mono font-bold text-[#111111] block mt-0.5">{credentialRegistration.yearOfEnrollment}</span>
+                </div>
+              </div>
+
+              {/* Authorization Footer */}
+              <div className="border-t border-[#D8D3CB] pt-3 flex items-center justify-between text-[10px] font-mono text-[#5B5348]">
+                <span>ISSUED UNDER THE AUTHORITY OF DMK LEGAL WING</span>
+                <span className="font-bold text-[#111111]">CHENNAI, TAMIL NADU</span>
+              </div>
+
+            </div>
+
+            {/* Modal Bottom Actions */}
+            <div className="flex items-center justify-between pt-2 font-mono text-xs">
+              <button
+                type="button"
+                onClick={() => setCredentialRegistration(null)}
+                className="min-h-[44px] px-5 py-2 border border-[#111111] bg-white text-[#111111] rounded-[2px] cursor-pointer"
+              >
+                Close
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="min-h-[44px] px-6 py-2 bg-[#111111] hover:bg-[#E31E24] text-white font-bold uppercase rounded-[2px] cursor-pointer flex items-center gap-2"
+              >
+                <Printer className="w-4 h-4 text-[#E31E24]" />
+                <span>Print Official Card</span>
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 

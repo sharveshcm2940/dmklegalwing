@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Camera,
   X,
-  Filter
+  Filter,
+  FileText
 } from 'lucide-react';
 
 export default function ActivitiesPage() {
@@ -227,7 +228,17 @@ export default function ActivitiesPage() {
                     {evt.description[language]}
                   </p>
 
-                  <div className="pt-2 text-xs text-neutral-800 flex items-start gap-1.5 font-dmk-body">
+                  {evt.chiefGuest && (
+                    <div className="pt-1.5 text-xs text-[#5B5348] flex items-center gap-1.5 font-dmk-body">
+                      <Award className="w-3.5 h-3.5 text-[#C41A1F] shrink-0" />
+                      <span className="line-clamp-1">
+                        <strong>{language === 'ta' ? 'தலைமை: ' : 'Presided: '}</strong>
+                        {evt.chiefGuest[language]}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="pt-1 text-xs text-neutral-800 flex items-start gap-1.5 font-dmk-body">
                     <MapPin className="w-3.5 h-3.5 text-[#C41A1F] shrink-0 mt-0.5" />
                     <span className="line-clamp-1 font-semibold">{evt.venue[language]}</span>
                   </div>
@@ -309,6 +320,41 @@ export default function ActivitiesPage() {
                 <p className="text-sm text-neutral-800 leading-relaxed font-dmk-body">
                   {selectedEvent.description[language]}
                 </p>
+
+                {/* Report PDF Download Link when present in backend */}
+                {selectedEvent.reportPdfUrl && (
+                  <div className="pt-3">
+                    <a
+                      href={selectedEvent.reportPdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>{language === 'ta' ? 'அதிகாரப்பூர்வ தீர்மான அறிக்கை (PDF)' : 'Download Official Report & Minutes (PDF)'}</span>
+                    </a>
+                  </div>
+                )}
+
+                {/* Event Photo Gallery when present in backend */}
+                {selectedEvent.gallery && selectedEvent.gallery.length > 0 && (
+                  <div className="space-y-2 pt-4">
+                    <span className="font-english text-xs font-bold text-neutral-900 uppercase tracking-wider block border-b border-neutral-300 pb-1">
+                      {language === 'ta' ? 'நிகழ்ச்சி புகைப்படத் தொகுப்பு' : 'EVENT DISPATCH PHOTO GALLERY'}
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {selectedEvent.gallery.map((photo, pIdx) => (
+                        <div key={pIdx} className="aspect-[4/3] bg-neutral-900 border border-neutral-300 overflow-hidden">
+                          <img
+                            src={photo}
+                            alt={`${selectedEvent.title[language]} photo ${pIdx + 1}`}
+                            className="w-full h-full object-cover hover:scale-105 transition-transform"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-neutral-300 flex items-center justify-between">

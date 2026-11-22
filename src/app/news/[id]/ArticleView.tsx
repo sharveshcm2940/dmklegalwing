@@ -12,7 +12,8 @@ import {
   Printer, 
   Check, 
   Scale, 
-  ChevronRight
+  ChevronRight,
+  FileText
 } from 'lucide-react';
 
 interface ArticleViewProps {
@@ -251,6 +252,31 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
                   </span>
                 )}
               </figcaption>
+            </div>
+          )}
+
+          {/* Official Gazette / Court Order Attachment when available in backend */}
+          {article.documentUrl && (
+            <div className="my-6 p-4 bg-[#FAF8F5] border-2 border-[#111111] rounded-[2px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#C41A1F] block">
+                  {articleLang === 'ta' ? 'அதிகாரப்பூர்வ ஆவண இணைப்பு' : 'OFFICIAL DOCUMENT ATTACHMENT'}
+                </span>
+                <p className="text-xs font-bold text-[#111111] font-dmk-body">
+                  {articleLang === 'ta'
+                    ? 'முழுமையான அரசாணை / நீதிமன்ற உத்தரவு நகல் (PDF)'
+                    : 'Full Text Official Gazette / Judgment Order Copy (PDF)'}
+                </p>
+              </div>
+              <a
+                href={article.documentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="min-h-[44px] px-5 py-2.5 bg-[#E31E24] hover:bg-[#111111] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 rounded-[2px] transition-colors shrink-0"
+              >
+                <FileText className="w-4 h-4" />
+                <span>{articleLang === 'ta' ? 'பதிவிறக்கம் செய்க (PDF)' : 'Download Gazette (PDF)'}</span>
+              </a>
             </div>
           )}
 

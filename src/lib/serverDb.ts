@@ -249,6 +249,15 @@ export async function createEvent(payload: Omit<EventItem, 'id'>): Promise<Event
   return newRecord;
 }
 
+export async function updateEvent(id: string, updates: Partial<EventItem>): Promise<EventItem | null> {
+  const list = await getEvents();
+  const index = list.findIndex((e) => e.id === id);
+  if (index === -1) return null;
+  list[index] = { ...list[index], ...updates };
+  await writeTable('events.json', list);
+  return list[index];
+}
+
 export async function deleteEvent(id: string): Promise<boolean> {
   const list = await getEvents();
   const filtered = list.filter((e) => e.id !== id);
@@ -273,6 +282,15 @@ export async function createResource(payload: Omit<LegalResource, 'id'>): Promis
   const updated = [newRecord, ...list];
   await writeTable('resources.json', updated);
   return newRecord;
+}
+
+export async function updateResource(id: string, updates: Partial<LegalResource>): Promise<LegalResource | null> {
+  const list = await getResources();
+  const index = list.findIndex((r) => r.id === id);
+  if (index === -1) return null;
+  list[index] = { ...list[index], ...updates };
+  await writeTable('resources.json', list);
+  return list[index];
 }
 
 export async function deleteResource(id: string): Promise<boolean> {
