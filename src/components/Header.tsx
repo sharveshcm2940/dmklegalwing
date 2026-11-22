@@ -28,6 +28,8 @@ export const Header: React.FC = () => {
 
   return (
     <header className="w-full bg-[#111111] border-b border-[#3d3633] sticky top-0 z-50 text-[#FAF8F5]">
+      {/* Signature DMK Flag Top Strip: Top Black, Bottom Red */}
+      <div className="w-full h-[4px] dmk-flag-strip" aria-hidden="true" />
       <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] h-20 flex items-center justify-between gap-4">
         
         {/* Brand identity: Official Rising Sun & DMK Flag Logo + "திமுக வழக்கறிஞர் அணி" (Catamaran 800, 22px) + "DMK Legal Wing" (14px, #d8cfc2) */}

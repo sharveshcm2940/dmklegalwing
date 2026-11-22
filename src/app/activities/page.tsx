@@ -301,8 +301,8 @@ export default function ActivitiesPage() {
             })}
           </div>
 
-          {/* 3 px ink rule below */}
-          <div className="w-full h-[3px] bg-[#111111] mt-2 mb-12" />
+          {/* Signature DMK Flag 5px rule: Top Black, Bottom Red */}
+          <div className="w-full h-[5px] dmk-flag-strip mt-2 mb-12" aria-hidden="true" />
         </header>
 
         {/* ========================================================== */}

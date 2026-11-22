@@ -333,7 +333,8 @@ export default function IdeologyPage() {
         </div>
 
         {/* TREATY BLOCK: Plain 1 px ink-bordered box with existing text and red download button */}
-        <section className="border border-[#111111] bg-white p-8 md:p-12 mt-16 md:mt-24 shadow-sm">
+        <section className="border border-[#111111] bg-white p-8 md:p-12 mt-16 md:mt-24 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[5px] dmk-flag-strip" aria-hidden="true" />
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-3xl space-y-4">
               <div className="flex items-center gap-4">

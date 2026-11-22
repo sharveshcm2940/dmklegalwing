@@ -27,8 +27,8 @@ export const PageTitleBand: React.FC<PageTitleBandProps> = ({ title, description
           />
         </div>
       </div>
-      {/* 6px red rule along the bottom that draws from left to right in 1s on load */}
-      <div className="w-full h-[6px] bg-[#E31E24] animate-draw-line mt-6" />
+      {/* Signature DMK Flag 6px rule along bottom: Top Black, Bottom Red */}
+      <div className="w-full h-[6px] dmk-flag-strip animate-draw-line mt-6" />
     </div>
   );
 };

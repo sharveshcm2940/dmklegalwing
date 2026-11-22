@@ -487,7 +487,8 @@ export default function ResourcesPage() {
                   aria-label={language === 'ta' ? 'ஆவணக் காட்சி' : 'Document Preview'}
                   className="hidden lg:block lg:w-[45%] sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto bg-[#FAF8F5] border-2 border-[#111111] p-6 space-y-6 shrink-0 shadow-lg"
                 >
-                  <div className="border-t-[6px] border-[#E31E24] -mt-6 -mx-6 mb-4" />
+                  {/* Signature DMK Flag Bar: Top Black, Bottom Red */}
+                  <div className="h-[6px] dmk-flag-strip -mt-6 -mx-6 mb-4" />
 
                   {/* Header: Document Title & Close Button */}
                   <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#111111]">
@@ -576,7 +577,8 @@ export default function ResourcesPage() {
                   aria-modal="true"
                   className="lg:hidden fixed inset-0 z-50 bg-[#FAF8F5] p-6 overflow-y-auto space-y-6"
                 >
-                  <div className="border-t-[6px] border-[#E31E24] -mt-6 -mx-6 mb-4" />
+                  {/* Signature DMK Flag Bar: Top Black, Bottom Red */}
+                  <div className="h-[6px] dmk-flag-strip -mt-6 -mx-6 mb-4" />
 
                   <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#111111]">
                     <div className="space-y-1">

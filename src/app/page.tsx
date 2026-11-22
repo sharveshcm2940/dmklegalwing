@@ -278,8 +278,11 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Signature DMK Flag Ribbon: Top Black, Bottom Red */}
+        <div className="w-full h-[4px] dmk-flag-strip" aria-hidden="true" />
+
         {/* Live News Ticker Strip across bottom of Hero */}
-        <div className="border-t border-[#2b2522] bg-[#0c0b0a] py-3 overflow-hidden select-none">
+        <div className="bg-[#0c0b0a] py-3 overflow-hidden select-none">
           <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] flex items-center gap-4">
             <span className="shrink-0 bg-[#E31E24] text-white text-[12px] font-extrabold px-2.5 py-0.5 uppercase tracking-normal">
               {language === 'ta' ? 'முக்கிய அறிவிப்புகள்' : 'DISPATCH WIRE'}

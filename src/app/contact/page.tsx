@@ -28,6 +28,9 @@ export default function ContactGatewayPage() {
           ref={gatewaysSection.ref}
           className={`fade-rise ${gatewaysSection.revealed ? 'revealed' : ''}`}
         >
+          {/* Signature DMK Flag Ribbon */}
+          <div className="w-full h-[5px] dmk-flag-strip mb-8" aria-hidden="true" />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
             
             {/* 1. Red Block (white text): Advocate enrolment */}

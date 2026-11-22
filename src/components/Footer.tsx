@@ -9,6 +9,8 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="w-full bg-[#111111] text-[#FAF8F5] border-t border-[#3d3633]">
+      {/* Signature DMK Flag Top Strip: Top Black, Bottom Red */}
+      <div className="w-full h-[6px] dmk-flag-strip" aria-hidden="true" />
       <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] py-12 space-y-8">
         
         {/* Main Footer Row: Name on the left, State Secretariat on the right */}

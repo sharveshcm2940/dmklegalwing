@@ -74,6 +74,27 @@ html[lang="ta"] *,
   font-family: var(--font-catamaran), 'Catamaran', sans-serif;
 }
 
+/* ============================================================== */
+/* OFFICIAL DMK FLAG THEME: BLACK & RED DUALITY                   */
+/* ============================================================== */
+/* Authentic DMK Flag: Top Black (#111111), Bottom Red (#E31E24) */
+.dmk-flag-strip {
+  background: linear-gradient(180deg, #111111 50%, #E31E24 50%);
+}
+
+.dmk-flag-strip-h {
+  background: linear-gradient(90deg, #111111 50%, #E31E24 50%);
+}
+
+.dmk-flag-pill {
+  display: inline-flex;
+  height: 10px;
+  width: 22px;
+  background: linear-gradient(180deg, #111111 50%, #E31E24 50%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  vertical-align: middle;
+}
+
 /* Backward compatibility classes mapped to brand typography */
 .font-dmk-headline,
 .font-editorial,

@@ -135,8 +135,8 @@ export default function NewsPage() {
             </div>
           </div>
 
-          {/* 3 px ink rule */}
-          <div className="w-full h-[3px] bg-[#111111]" />
+          {/* Signature DMK Flag 5px rule: Top Black, Bottom Red */}
+          <div className="w-full h-[5px] dmk-flag-strip" aria-hidden="true" />
 
           {/* One-line dateline in grey 15 px */}
           <div className="flex items-center justify-between text-[15px] text-[#5B5348] font-helvetica py-2.5">
