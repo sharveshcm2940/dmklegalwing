@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     "P. Wilson Senior Advocate"
   ],
   icons: {
-    icon: "/images/dmk-flag-sun.jpg"
+    icon: "/images/dmk-official-logo.png"
   }
 };
 

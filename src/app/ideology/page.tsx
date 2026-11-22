@@ -336,9 +336,16 @@ export default function IdeologyPage() {
         <section className="border border-[#111111] bg-white p-8 md:p-12 mt-16 md:mt-24 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-3xl space-y-4">
-              <span className="font-helvetica font-extrabold text-[12px] uppercase tracking-normal text-[#C41A1F] block">
-                {language === 'ta' ? 'அதிகாரப்பூர்வ கொள்கை ஆவணம்' : 'OFFICIAL TREATY & DECLARATION'}
-              </span>
+              <div className="flex items-center gap-4">
+                <img
+                  src="/images/dmk-official-logo.png"
+                  alt="DMK Official Emblem"
+                  className="h-14 w-auto object-contain"
+                />
+                <span className="font-helvetica font-extrabold text-[12px] uppercase tracking-normal text-[#C41A1F] block">
+                  {language === 'ta' ? 'அதிகாரப்பூர்வ கொள்கை ஆவணம்' : 'OFFICIAL TREATY & DECLARATION'}
+                </span>
+              </div>
 
               <h3 className="font-kavivanar font-normal text-[clamp(26px,3.2vw,36px)] text-[#111111] leading-tight">
                 {language === 'ta'

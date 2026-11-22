@@ -105,8 +105,12 @@ export default function NewsPage() {
         <header className="mb-8">
           {/* Masthead Sub-strip */}
           <div className="flex items-center justify-between text-[13px] text-[#5B5348] font-bold uppercase tracking-normal border-b border-[#d7d0c3] pb-2 mb-4">
-            <span className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-[#E31E24] inline-block" />
+            <span className="flex items-center gap-3">
+              <img
+                src="/images/dmk-official-logo.png"
+                alt="DMK Official Emblem"
+                className="h-6 w-auto object-contain"
+              />
               <span>{language === 'ta' ? 'திமுக வழக்கறிஞர் அணி · அதிகாரப்பூர்வ செய்திப் பிரிவு' : 'DMK Legal Wing · Press & Media Bureau'}</span>
             </span>
             <span>Vol. LIV · Issue 1971</span>

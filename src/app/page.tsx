@@ -189,9 +189,16 @@ export default function HomePage() {
             {/* LEFT COLUMN: Main Typography */}
             <div className="lg:col-span-7 max-w-[560px] space-y-6">
               
-              {/* Kicker */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1e1b19] border border-[#3d3633] text-[13px] font-extrabold text-[#ff8a85] uppercase tracking-normal">
-                <span>CONSTITUTIONAL ADVOCACY & SOCIAL JUSTICE</span>
+              {/* Official Emblem & Kicker */}
+              <div className="flex items-center gap-4">
+                <img
+                  src="/images/dmk-official-logo.png"
+                  alt="DMK Rising Sun & Flag Official Emblem"
+                  className="h-16 w-auto object-contain filter drop-shadow-[0_4px_10px_rgba(227,30,36,0.3)]"
+                />
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1e1b19] border border-[#3d3633] text-[13px] font-extrabold text-[#ff8a85] uppercase tracking-normal">
+                  <span>CONSTITUTIONAL ADVOCACY & SOCIAL JUSTICE</span>
+                </div>
               </div>
 
               {/* Slogan in Kavivanar */}

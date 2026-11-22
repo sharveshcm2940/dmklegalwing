@@ -30,9 +30,13 @@ export const Header: React.FC = () => {
     <header className="w-full bg-[#111111] border-b border-[#3d3633] sticky top-0 z-50 text-[#FAF8F5]">
       <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] h-20 flex items-center justify-between gap-4">
         
-        {/* Brand identity: Red 16px square + "திமுக வழக்கறிஞர் அணி" (Catamaran 800, 22px) + "DMK Legal Wing" (14px, #d8cfc2) */}
+        {/* Brand identity: Official Rising Sun & DMK Flag Logo + "திமுக வழக்கறிஞர் அணி" (Catamaran 800, 22px) + "DMK Legal Wing" (14px, #d8cfc2) */}
         <Link href="/" className="flex items-center gap-3 shrink-0 focus-visible:outline-2 focus-visible:outline-[#E31E24]">
-          <span className="w-4 h-4 bg-[#E31E24] shrink-0" aria-hidden="true" />
+          <img
+            src="/images/dmk-official-logo.png"
+            alt="DMK Rising Sun & Flag Emblem"
+            className="h-12 w-auto object-contain shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+          />
           <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
             <span className="font-catamaran font-extrabold text-[22px] leading-tight text-[#FAF8F5] tracking-tight">
               திமுக வழக்கறிஞர் அணி

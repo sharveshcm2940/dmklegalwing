@@ -13,9 +13,13 @@ export const Footer: React.FC = () => {
         
         {/* Main Footer Row: Name on the left, State Secretariat on the right */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-[#3d3633]">
-          {/* Left: Red square + Name */}
-          <div className="flex items-center gap-3">
-            <span className="w-4 h-4 bg-[#E31E24] shrink-0" aria-hidden="true" />
+          {/* Left: Official Emblem + Name */}
+          <div className="flex items-center gap-4">
+            <img
+              src="/images/dmk-official-logo.png"
+              alt="DMK Official Emblem"
+              className="h-14 w-auto object-contain shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+            />
             <div>
               <div className="font-catamaran font-extrabold text-[20px] text-[#FAF8F5] leading-tight">
                 திமுக வழக்கறிஞர் அணி · DMK Legal Wing
