@@ -44,10 +44,10 @@ export default function HomePage() {
   const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!heroRef.current) return;
     const rect = heroRef.current.getBoundingClientRect();
-    const relX = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+    const relX = (e.clientX - rect.left) / rect.width - 0.5;
     const relY = (e.clientY - rect.top) / rect.height - 0.5;
     setParallaxOffset({
-      x: Math.round(-relX * 28), // up to 14px in either direction
+      x: Math.round(-relX * 28),
       y: Math.round(-relY * 28),
     });
   };
@@ -171,7 +171,7 @@ export default function HomePage() {
   const newsLeadStory = filteredNews[0] || leadStory;
   const wireStories = filteredNews.slice(1, 6);
 
-  // Helper for 108 px date block
+  // Helper for 108 px date block (day 56 px 800, month grey)
   const formatStoryDate = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
@@ -249,17 +249,17 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-12 pb-24 sm:pt-16 sm:pb-32 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             
-            {/* LEFT COLUMN: Main Editorial Typography */}
+            {/* LEFT COLUMN: Main Editorial Typography (Asymmetric ~60% width) */}
             <div className="lg:col-span-7 max-w-[640px] space-y-6">
               
-              {/* Kicker in #ff8a85 */}
+              {/* Kicker in #ff8a85 (15 px) */}
               <div className="hero-stagger-1 flex items-center gap-3">
                 <img
                   src="/images/dmk-official-logo.png"
                   alt="DMK Official Emblem"
                   className="h-10 sm:h-12 w-auto object-contain"
                 />
-                <span className="text-[#ff8a85] font-helvetica font-extrabold text-[14px] sm:text-[15px] uppercase tracking-normal">
+                <span className="text-[#ff8a85] font-helvetica font-extrabold text-[15px] uppercase tracking-normal">
                   {language === 'ta'
                     ? 'மாநில தலைமைச் செயலகம் · அண்ணா அறிவாலயம், சென்னை'
                     : 'State Legal Secretariat · Anna Arivalayam, Chennai'}
@@ -279,14 +279,14 @@ export default function HomePage() {
                 </span>
               </h1>
 
-              {/* 21 px Line */}
-              <p className="hero-stagger-3 text-[21px] text-[#d8cfc2] leading-[1.65] font-normal">
+              {/* 21 px Line, line height 1.65 */}
+              <p className="hero-stagger-3 text-[20px] sm:text-[21px] text-[#d8cfc2] leading-[1.65] font-normal">
                 {language === 'ta'
                   ? 'சமூக நீதி, கூட்டாட்சி தத்துவம் மற்றும் 69% இடஒதுக்கீட்டை நீதிமன்றங்களில் சமரசமின்றி நிலைநிறுத்தும் திராவிட இயக்க வழக்கறிஞர்கள்.'
                   : 'Advocates of the Dravidian movement, defending social justice, federalism and the 69% reservation in the courts.'}
               </p>
 
-              {/* Two Rectangular 48 px Buttons */}
+              {/* Two Rectangular 48 px Buttons (15 px 800) */}
               <div className="hero-stagger-4 pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                 <a
                   href="#districts"
@@ -311,29 +311,29 @@ export default function HomePage() {
                 className="w-full max-w-[440px] sm:w-[410px] bg-[#FAF8F5] text-[#111111] p-[26px_28px] border-2 border-[#111111] shadow-[10px_12px_0_#8f1118] space-y-4 relative z-10 animate-clipping-rise"
                 style={{ transform: 'rotate(-1.6deg)' }}
               >
-                {/* Ink tag with type & date */}
+                {/* Ink tag with type & date (15 px) */}
                 <div className="flex items-center justify-between border-b border-[#d7d0c3] pb-3">
-                  <span className="px-2.5 py-1 bg-[#111111] text-white text-[12px] font-extrabold uppercase tracking-normal">
+                  <span className="px-3 py-1 bg-[#111111] text-white text-[15px] font-extrabold uppercase tracking-normal">
                     {leadStory.category || 'Resolution'}
                   </span>
-                  <span className="text-[13px] font-helvetica font-bold text-[#5B5348]">
+                  <span className="text-[15px] font-helvetica font-bold text-[#5B5348]">
                     {leadStory.date}
                   </span>
                 </div>
 
-                {/* Headline in Helvetica Now Display 800 at 27 px */}
-                <h2 className="font-helvetica font-extrabold text-[27px] leading-[1.18] text-[#111111]">
+                {/* Headline in Helvetica Now Display 800 at 27 px (line height 1.12) */}
+                <h2 className="font-helvetica font-extrabold text-[27px] leading-[1.12] text-[#111111]">
                   <Link href={`/news/${leadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
                     {leadStory.title[language]}
                   </Link>
                 </h2>
 
-                {/* Summary */}
-                <p className="text-[16px] text-[#3a322d] leading-relaxed line-clamp-3">
+                {/* Summary (17 px relaxed) */}
+                <p className="text-[17px] text-[#3a322d] leading-[1.65] line-clamp-3">
                   {leadStory.summary[language]}
                 </p>
 
-                {/* "Read the full statement →" in #C41A1F */}
+                {/* "Read the full statement →" in #C41A1F (15 px) */}
                 <div className="pt-2 border-t border-[#d7d0c3] flex items-center justify-between">
                   <Link
                     href={`/news/${leadStory.id}`}
@@ -435,7 +435,7 @@ export default function HomePage() {
               <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[0].toLocaleString()}{countsFinished ? '+' : ''}
               </div>
-              <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
+              <p className="font-catamaran font-extrabold text-[17px] sm:text-[18px] text-white leading-snug">
                 {SITE_STATS.metrics[0]?.label[language] || (language === 'ta' ? 'பதிவுபெற்ற வழக்கறிஞர்கள்' : 'Registered advocates')}
               </p>
             </div>
@@ -449,7 +449,7 @@ export default function HomePage() {
               <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[1]}
               </div>
-              <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
+              <p className="font-catamaran font-extrabold text-[17px] sm:text-[18px] text-white leading-snug">
                 {SITE_STATS.metrics[1]?.label[language] || (language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'District units')}
               </p>
             </div>
@@ -463,7 +463,7 @@ export default function HomePage() {
               <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[2]}{countsFinished ? '+' : ''}
               </div>
-              <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
+              <p className="font-catamaran font-extrabold text-[17px] sm:text-[18px] text-white leading-snug">
                 {SITE_STATS.metrics[2]?.label[language] || (language === 'ta' ? 'ஆண்டுகள் மக்கள் சட்டப்பணி' : 'Years of jurisprudence')}
               </p>
             </div>
@@ -477,7 +477,7 @@ export default function HomePage() {
               <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[3]}{countsFinished ? '%' : ''}
               </div>
-              <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
+              <p className="font-catamaran font-extrabold text-[17px] sm:text-[18px] text-white leading-snug">
                 {SITE_STATS.metrics[3]?.label[language] || (language === 'ta' ? 'சமூக நீதி இடஒதுக்கீடு அரண்' : 'Reservation defended')}
               </p>
             </div>
@@ -501,7 +501,7 @@ export default function HomePage() {
             
             {/* Left: Kavivanar Title in #C41A1F and grey paragraph */}
             <div className="lg:col-span-5 space-y-6">
-              <h2 className="font-kavivanar font-normal text-[#C41A1F] text-[clamp(36px,4.5vw,56px)] leading-[1.2]">
+              <h2 className="font-kavivanar font-normal text-[#C41A1F] text-[clamp(34px,4.5vw,48px)] leading-[1.12]">
                 {language === 'ta' ? 'அணியை வழிநடத்துவோர்' : 'Those who lead the wing'}
               </h2>
 
@@ -538,13 +538,13 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-tight">
+                  <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-[1.1]">
                     {language === 'ta' ? 'ஆர். விடுதலை' : 'R. Viduthalai'}
                   </h3>
                   <p className="text-[15px] text-[#C41A1F] font-bold">
                     {language === 'ta' ? 'தலைவர்' : 'President'}
                   </p>
-                  <p className="text-[14px] text-[#5B5348] leading-snug">
+                  <p className="text-[15px] text-[#5B5348] leading-[1.6]">
                     {language === 'ta'
                       ? 'மூத்த வழக்கறிஞர் · தமிழ்நாட்டின் முன்னாள் தலைமை வழக்கறிஞர்'
                       : 'Senior Advocate · Former Advocate General of Tamil Nadu'}
@@ -566,13 +566,13 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-tight">
+                  <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-[1.1]">
                     {language === 'ta' ? 'என்.ஆர். இளங்கோ' : 'N.R. Elango'}
                   </h3>
                   <p className="text-[15px] text-[#C41A1F] font-bold">
                     {language === 'ta' ? 'செயலாளர்' : 'Secretary'}
                   </p>
-                  <p className="text-[14px] text-[#5B5348] leading-snug">
+                  <p className="text-[15px] text-[#5B5348] leading-[1.6]">
                     {language === 'ta'
                       ? 'மூத்த வழக்கறிஞர் · நாடாளுமன்ற மாநிலங்களவை உறுப்பினர்'
                       : 'Senior Advocate · Member of Parliament, Rajya Sabha'}
@@ -602,7 +602,7 @@ export default function HomePage() {
           {/* Header Row: Kavivanar Title "From the press bureau" + Filter Tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#111111] pb-6 mb-12">
             <div>
-              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(40px,5vw,64px)] leading-[1.15]">
+              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(34px,5vw,48px)] leading-[1.12]">
                 {language === 'ta' ? 'செய்திப் பணியகத்திலிருந்து' : 'From the press bureau'}
               </h2>
             </div>
@@ -676,17 +676,17 @@ export default function HomePage() {
 
                 {/* Dropping Parchment-Bordered Date Stamp (scale 1.7 to 1, rotate -7°, 0.6s) */}
                 <div className="relative z-10 self-start">
-                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[13px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
+                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[15px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
                     {newsLeadStory.date} · {newsLeadStory.category}
                   </div>
                 </div>
 
                 {/* Kavivanar Line "தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!" */}
                 <div className="relative z-10 space-y-2">
-                  <span className="text-[12px] font-bold text-[#ff8a85] uppercase tracking-normal">
+                  <span className="text-[15px] font-bold text-[#ff8a85] uppercase tracking-normal block">
                     {language === 'ta' ? 'அண்ணா அறிவாலயம் சிறப்புச் செய்தி' : 'SPECIAL DISPATCH'}
                   </span>
-                  <p className="font-kavivanar font-normal text-[clamp(24px,2.8vw,32px)] leading-tight text-white">
+                  <p className="font-kavivanar font-normal text-[26px] leading-[1.12] text-white">
                     தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!
                   </p>
                 </div>
@@ -694,11 +694,11 @@ export default function HomePage() {
 
               {/* Right Column: Type Tag, Headline, Summary 20px, Source, Ink Button */}
               <div className="lg:col-span-7 space-y-5">
-                <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal">
+                <span className="text-[15px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
                   [{newsLeadStory.category}] · {newsLeadStory.court || 'Constitutional Bench'}
                 </span>
 
-                <h3 className="font-helvetica font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.15] text-[#111111]">
+                <h3 className="font-helvetica font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.12] text-[#111111]">
                   <Link href={`/news/${newsLeadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
                     {newsLeadStory.title[language]}
                   </Link>
@@ -752,19 +752,19 @@ export default function HomePage() {
                         <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-normal uppercase">
                           {dateParts.month} {dateParts.year}
                         </div>
-                        <div className="mt-2 text-[12px] text-[#C41A1F] font-extrabold uppercase">
+                        <div className="mt-2 text-[15px] text-[#C41A1F] font-extrabold uppercase">
                           {story.category}
                         </div>
                       </div>
 
                       {/* Content: Type in #C41A1F, Headline clamp(24px, 2.6vw, 34px) 800, Summary 18 px, Source 15 px */}
                       <div className="space-y-2 flex-1">
-                        <h4 className="font-helvetica font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.2]">
+                        <h4 className="font-helvetica font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.14]">
                           <Link href={`/news/${story.id}`}>
                             {story.title[language]}
                           </Link>
                         </h4>
-                        <p className="text-[18px] text-[#3a322d] leading-relaxed">
+                        <p className="text-[17px] text-[#3a322d] leading-[1.65]">
                           {story.summary[language]}
                         </p>
                         {/* Source line (never cut off) */}
@@ -776,7 +776,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Arrow that moves 8 px on hover */}
-                    <div className="mt-4 md:mt-0 shrink-0 md:pl-6 text-[#111111] group-hover:text-[#E31E24] text-[24px] font-bold transition-transform duration-250 group-hover:translate-x-2">
+                    <div className="mt-4 md:mt-0 shrink-0 md:pl-6 text-[#111111] group-hover:text-[#E31E24] text-[26px] font-bold transition-transform duration-250 group-hover:translate-x-2">
                       &rarr;
                     </div>
                   </article>
@@ -803,7 +803,7 @@ export default function HomePage() {
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#3d3633] pb-6 mb-12">
             <div>
-              <h2 className="font-kavivanar font-normal text-white text-[clamp(36px,4.5vw,56px)] leading-[1.2]">
+              <h2 className="font-kavivanar font-normal text-white text-[clamp(34px,4.5vw,48px)] leading-[1.12]">
                 {language === 'ta' ? '74 கழக மாவட்டங்கள், ஒரு தொலைபேசி அழைப்பில்' : '74 district units, one phone call away'}
               </h2>
             </div>
@@ -856,10 +856,10 @@ export default function HomePage() {
                             : 'hover:bg-[#2a2523] text-[#FAF8F5]'
                         }`}
                       >
-                        <div className="font-helvetica font-extrabold text-[16px]">
+                        <div className="font-helvetica font-extrabold text-[17px]">
                           {d.name[language]}
                         </div>
-                        <div className={`text-[13px] text-right pl-3 ${isSelected ? 'text-white' : 'text-[#d8cfc2]'}`}>
+                        <div className={`text-[15px] text-right pl-3 ${isSelected ? 'text-white' : 'text-[#d8cfc2]'}`}>
                           {d.organizer[language]}
                         </div>
                       </button>
@@ -882,24 +882,24 @@ export default function HomePage() {
                 }`}
               >
                 <div className="border-b border-[#d7d0c3] pb-4">
-                  <span className="text-[14px] font-extrabold uppercase text-[#C41A1F] block tracking-normal">
+                  <span className="text-[15px] font-extrabold uppercase text-[#C41A1F] block tracking-normal">
                     {language === 'ta'
                       ? `மாவட்ட அமைப்பாளர் · எண். ${activeDistrictIndex}`
                       : `District organiser · No. ${activeDistrictIndex}`}
                   </span>
-                  <h3 className="font-helvetica font-extrabold text-[clamp(34px,4vw,52px)] leading-tight text-[#111111] mt-1">
+                  <h3 className="font-helvetica font-extrabold text-[clamp(34px,4vw,48px)] leading-[1.1] text-[#111111] mt-1">
                     {activeDistrict.name[language]}
                   </h3>
                 </div>
 
                 <div className="space-y-2">
-                  <span className="text-[13px] font-bold text-[#5B5348] uppercase tracking-normal">
+                  <span className="text-[15px] font-bold text-[#5B5348] uppercase tracking-normal">
                     {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'District Organiser'}
                   </span>
-                  <p className="font-helvetica font-semibold text-[26px] text-[#111111] leading-snug">
+                  <p className="font-helvetica font-semibold text-[26px] text-[#111111] leading-[1.12]">
                     {activeDistrict.organizer[language]}
                   </p>
-                  <p className="text-[15px] text-[#5B5348]">
+                  <p className="text-[15px] text-[#5B5348] leading-[1.6]">
                     {language === 'ta' ? 'தலைமையிடம் / நீதிமன்றம்:' : 'Headquarters / Court:'} {activeDistrict.headquarters[language]} · {activeDistrict.courtComplex[language]}
                   </p>
                 </div>
@@ -908,7 +908,7 @@ export default function HomePage() {
                 <div className="pt-4 space-y-3">
                   <a
                     href={`tel:${activeDistrict.contactPhone}`}
-                    className="w-full min-h-[48px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center gap-3 transition-colors cursor-pointer"
+                    className="w-full min-h-[48px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center gap-3 transition-colors cursor-pointer"
                   >
                     <span>{language === 'ta' ? 'நேரடி அழைப்பு:' : 'Direct Telephone Call:'}</span>
                     <span>{activeDistrict.contactPhone}</span>
@@ -935,7 +935,7 @@ export default function HomePage() {
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#111111] pb-6 mb-12">
             <div>
-              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(36px,4.5vw,56px)] leading-[1.2]">
+              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(34px,4.5vw,48px)] leading-[1.12]">
                 {language === 'ta' ? 'செயலாளரின் கீழ் மூன்று நிர்வாகப் பிரிவுகள்' : 'Three branches under the Secretary'}
               </h2>
             </div>
@@ -963,10 +963,10 @@ export default function HomePage() {
               <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
                 09
               </div>
-              <h3 className="font-helvetica font-extrabold text-[22px] leading-tight mb-2">
+              <h3 className="font-helvetica font-extrabold text-[26px] leading-[1.1] mb-2">
                 {language === 'ta' ? 'இணைச் செயலாளர்கள்' : 'Joint Secretaries'}
               </h3>
-              <p className={`text-[14px] leading-normal ${activeBranch === 'joint' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
+              <p className={`text-[15px] leading-[1.6] ${activeBranch === 'joint' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
                 {language === 'ta'
                   ? 'மண்டல ஒருங்கிணைப்பு மற்றும் அரசமைப்பு வழக்குகளுக்கான தலைமைக் குழு.'
                   : 'Zone-level administrative coordinators and constitutional bench counsels.'}
@@ -986,10 +986,10 @@ export default function HomePage() {
               <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
                 05
               </div>
-              <h3 className="font-helvetica font-extrabold text-[22px] leading-tight mb-2">
+              <h3 className="font-helvetica font-extrabold text-[26px] leading-[1.1] mb-2">
                 {language === 'ta' ? 'துணைச் செயலாளர்கள்' : 'Deputy Secretaries'}
               </h3>
-              <p className={`text-[14px] leading-normal ${activeBranch === 'deputy' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
+              <p className={`text-[15px] leading-[1.6] ${activeBranch === 'deputy' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
                 {language === 'ta'
                   ? 'களப்பணி, பயிற்சி முகாம்கள் மற்றும் ஆவணக் காப்பகப் பொறுப்பாளர்கள்.'
                   : 'Field operations, training academies, and legal documentation registry.'}
@@ -1009,10 +1009,10 @@ export default function HomePage() {
               <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
                 09
               </div>
-              <h3 className="font-helvetica font-extrabold text-[22px] leading-tight mb-2">
+              <h3 className="font-helvetica font-extrabold text-[26px] leading-[1.1] mb-2">
                 {language === 'ta' ? 'தலைமை நிலைய வழக்கறிஞர்கள்' : 'Head Office Advocates'}
               </h3>
-              <p className={`text-[14px] leading-normal ${activeBranch === 'headoffice' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
+              <p className={`text-[15px] leading-[1.6] ${activeBranch === 'headoffice' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
                 {language === 'ta'
                   ? 'அண்ணா அறிவாலயத்தில் நேரடி சட்ட ஆலோசனை மற்றும் வழக்காடல் குழு.'
                   : 'Permanent advisory counsel and urgent litigation desk at Anna Arivalayam.'}
@@ -1031,13 +1031,13 @@ export default function HomePage() {
                   animation: `fade-rise 0.4s ease-out ${idx * 40}ms forwards`,
                 }}
               >
-                <h4 className="font-helvetica font-extrabold text-[18px] text-[#111111]">
+                <h4 className="font-helvetica font-extrabold text-[17px] text-[#111111] leading-snug">
                   {officer.name[language]}
                 </h4>
-                <div className="text-[13px] text-[#5B5348] font-bold">
+                <div className="text-[15px] text-[#5B5348] font-bold">
                   {officer.district[language]}
                 </div>
-                <div className="text-[13px] text-[#C41A1F]">
+                <div className="text-[15px] text-[#C41A1F]">
                   {officer.role[language]}
                 </div>
               </div>
@@ -1064,10 +1064,10 @@ export default function HomePage() {
             {/* Block 1: Red Advocate Enrolment with Ink Button */}
             <div className="bg-[#E31E24] text-white p-8 md:p-12 space-y-6 flex flex-col justify-between border-2 border-[#111111]">
               <div className="space-y-4">
-                <h3 className="font-kavivanar font-normal text-[44px] leading-tight text-white">
+                <h3 className="font-kavivanar font-normal text-[44px] leading-[1.08] text-white">
                   {language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'Advocate enrolment'}
                 </h3>
-                <p className="text-[17px] text-white/95 leading-relaxed font-normal">
+                <p className="text-[17px] text-white/95 leading-[1.65] font-normal">
                   {language === 'ta'
                     ? 'பார் கவுன்சில் பதிவுபெற்ற அனைத்து வழக்கறிஞர்களும் கழகத்தின் சட்டப் பிரிவில் இணைந்து சமூக நீதி மற்றும் அரசமைப்பு மாண்புகளைக் காக்க முன்வாருங்கள்.'
                     : 'Join thousands of bar practitioners defending constitutional democracy, federalism, and the reservation architecture across all 74 districts.'}
@@ -1077,7 +1077,7 @@ export default function HomePage() {
               <div className="pt-4">
                 <Link
                   href="/enrol"
-                  className="w-full min-h-[48px] px-8 bg-[#111111] hover:bg-[#333333] text-white font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-full min-h-[48px] px-8 bg-[#111111] hover:bg-[#333333] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                 >
                   {language === 'ta' ? 'இப்போதே சேர்க்கை பெறுக' : 'Enrol now'}
                 </Link>
@@ -1087,17 +1087,17 @@ export default function HomePage() {
             {/* Block 2: Ink Citizen Legal Desk with 2 px Red Border Custody Notice & Parchment Button */}
             <div className="bg-[#111111] text-[#FAF8F5] p-8 md:p-12 space-y-6 flex flex-col justify-between border-2 border-[#111111]">
               <div className="space-y-4">
-                <h3 className="font-kavivanar font-normal text-[44px] leading-tight text-white">
+                <h3 className="font-kavivanar font-normal text-[44px] leading-[1.08] text-white">
                   {language === 'ta' ? 'பொதுமக்கள் சட்ட உதவி மையம்' : 'Citizen legal desk'}
                 </h3>
-                <p className="text-[17px] text-[#d8cfc2] leading-relaxed font-normal">
+                <p className="text-[17px] text-[#d8cfc2] leading-[1.65] font-normal">
                   {language === 'ta'
                     ? 'அரசியல் உள்நோக்கக் கைதுகள், அவசர வழக்காடல் மற்றும் அடிப்படை உரிமை மீறல்களுக்கு மாநிலம் முழுவதும் உடனடி இலவச சட்ட உதவி.'
                     : 'Urgent legal representation against unlawful detentions, political harassment, and civil rights violations through verified district panels.'}
                 </p>
 
                 {/* 2 px Red bordered notice: keep placeholder as written */}
-                <div className="p-4 bg-[#1a1715] border-2 border-[#E31E24] text-[15px] font-bold text-white leading-relaxed">
+                <div className="p-4 bg-[#1a1715] border-2 border-[#E31E24] text-[15px] font-bold text-white leading-[1.6]">
                   If you or someone you know is in police custody, call [HELPLINE NUMBER] now.
                 </div>
               </div>
@@ -1105,7 +1105,7 @@ export default function HomePage() {
               <div className="pt-4">
                 <Link
                   href="/citizen-desk"
-                  className="w-full min-h-[48px] px-8 bg-[#FAF8F5] hover:bg-white text-[#111111] font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-full min-h-[48px] px-8 bg-[#FAF8F5] hover:bg-white text-[#111111] font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                 >
                   {language === 'ta' ? 'கோரிக்கையை அனுப்புக' : 'Submit a request'}
                 </Link>
