@@ -134,15 +134,15 @@ export default function NewsPage() {
       {/* "Chennai · [today's date]"                                  */}
       {/* Kavivanar "செய்திகள்" clamp(64px,11vw,150px) in #E31E24     */}
       {/* beside "Press releases, statements & media wire" 800 28px   */}
-      {/* 6 px ink rule draws across in 1s, then 2px rule 4px below */}
+      {/* 6 px ink rule draws across in 1s, then 2px rule 4px below  */}
       {/* ========================================================== */}
       <header className="w-full bg-[#FAF8F5] pt-0">
         
         {/* Ink strip */}
         <div className="w-full bg-[#111111] text-[#FAF8F5] py-2.5 px-[clamp(20px,4vw,56px)] border-b border-[#111111]">
-          <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[14px] font-helvetica font-extrabold uppercase tracking-normal">
+          <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[15px] font-helvetica font-extrabold uppercase tracking-normal">
             <div className="flex items-center gap-3">
-              <span className="w-3 h-3 bg-[#E31E24] inline-block" aria-hidden="true" />
+              <span className="w-3.5 h-3.5 bg-[#E31E24] inline-block" aria-hidden="true" />
               <span>திமுக வழக்கறிஞர் அணி · Press Bureau</span>
             </div>
             <div className="text-[#d8cfc2]">
@@ -162,7 +162,7 @@ export default function NewsPage() {
               <p className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-tight">
                 Press releases, statements & media wire
               </p>
-              <p className="text-[16px] text-[#5B5348] font-normal">
+              <p className="text-[17px] text-[#5B5348] font-normal leading-[1.6]">
                 {language === 'ta'
                   ? 'கழகத் தலைமைச் செயலகம், அண்ணா அறிவாலயம் — சென்னை 600 018'
                   : 'State Legal Secretariat, Anna Arivalayam, Chennai — 600 018'}
@@ -220,13 +220,13 @@ export default function NewsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={language === 'ta' ? 'தேடுக (வார்த்தை, எண், நீதிமன்றம்)...' : 'Filter wire by keyword...'}
-              className="w-full bg-transparent border-0 border-b-2 border-[#111111] focus:border-[#E31E24] outline-none text-[16px] text-[#111111] placeholder-[#5B5348] py-1.5 px-0"
+              className="w-full bg-transparent border-0 border-b-2 border-[#111111] focus:border-[#E31E24] outline-none text-[15px] sm:text-[17px] text-[#111111] placeholder-[#5B5348] py-1.5 px-0"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-0 top-2 text-[13px] font-bold text-[#C41A1F] hover:underline cursor-pointer"
+                className="absolute right-0 top-2 text-[15px] font-bold text-[#C41A1F] hover:underline cursor-pointer"
               >
                 ✕
               </button>
@@ -236,7 +236,7 @@ export default function NewsPage() {
 
         {/* Empty state */}
         {filteredNews.length === 0 && (
-          <div className="py-20 text-center text-[#5B5348] text-[18px]">
+          <div className="py-20 text-center text-[#5B5348] text-[17px]">
             {language === 'ta'
               ? 'தேடலுக்குரிய செய்திகள் எதுவும் கிடைக்கவில்லை.'
               : 'No releases found matching the selected filter.'}
@@ -281,17 +281,17 @@ export default function NewsPage() {
 
                 {/* Dropping Parchment-Bordered Date Stamp (scale 1.7 to 1, rotate -7°, 0.6s) */}
                 <div className="relative z-10 self-start">
-                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[13px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
+                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[15px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
                     {leadStory.date} · {leadStory.category}
                   </div>
                 </div>
 
                 {/* Kavivanar Line "தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!" */}
                 <div className="relative z-10 space-y-2">
-                  <span className="text-[12px] font-bold text-[#ff8a85] uppercase tracking-normal">
+                  <span className="text-[15px] font-bold text-[#ff8a85] uppercase tracking-normal block">
                     {language === 'ta' ? 'அண்ணா அறிவாலயம் சிறப்புச் செய்தி' : 'SPECIAL DISPATCH'}
                   </span>
-                  <p className="font-kavivanar font-normal text-[clamp(24px,2.8vw,32px)] leading-tight text-white">
+                  <p className="font-kavivanar font-normal text-[26px] leading-[1.12] text-white">
                     தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!
                   </p>
                 </div>
@@ -299,11 +299,11 @@ export default function NewsPage() {
 
               {/* Right Column: Type Tag, Headline, Summary 20px, Source, Ink Button */}
               <div className="lg:col-span-7 space-y-5">
-                <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal">
+                <span className="text-[15px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
                   [{leadStory.category}] · {leadStory.court || 'Constitutional Bench'}
                 </span>
 
-                <h2 className="font-helvetica font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.15] text-[#111111]">
+                <h2 className="font-helvetica font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.12] text-[#111111]">
                   <Link href={`/news/${leadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
                     {leadStory.title[language]}
                   </Link>
@@ -339,7 +339,7 @@ export default function NewsPage() {
         {wireStories.length > 0 && (
           <section className="mb-20">
             <div className="border-b-2 border-[#111111] pb-3 mb-6">
-              <h3 className="font-helvetica font-extrabold text-[24px] text-[#111111] uppercase tracking-normal">
+              <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] uppercase tracking-normal leading-[1.1]">
                 {language === 'ta' ? 'செய்தியகத்தின் பிற பதிவுகள்' : 'Also on the wire'}
               </h3>
             </div>
@@ -367,19 +367,19 @@ export default function NewsPage() {
                         <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-normal uppercase">
                           {dateParts.month} {dateParts.year}
                         </div>
-                        <div className="mt-2 text-[12px] text-[#C41A1F] font-extrabold uppercase">
+                        <div className="mt-2 text-[15px] text-[#C41A1F] font-extrabold uppercase">
                           {story.category}
                         </div>
                       </div>
 
                       {/* Content: Type in #C41A1F, Headline clamp(24px, 2.6vw, 34px) 800, Summary 18 px, Source 15 px */}
                       <div className="space-y-2 flex-1">
-                        <h4 className="font-helvetica font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.2]">
+                        <h4 className="font-helvetica font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.14]">
                           <Link href={`/news/${story.id}`}>
                             {story.title[language]}
                           </Link>
                         </h4>
-                        <p className="text-[18px] text-[#3a322d] leading-relaxed">
+                        <p className="text-[17px] text-[#3a322d] leading-[1.65]">
                           {story.summary[language]}
                         </p>
                         {/* Source line (never cut off) */}
@@ -391,7 +391,7 @@ export default function NewsPage() {
                     </div>
 
                     {/* Arrow that moves 8 px on hover */}
-                    <div className="mt-4 md:mt-0 shrink-0 md:pl-6 text-[#111111] group-hover:text-[#E31E24] text-[24px] font-bold transition-transform duration-250 group-hover:translate-x-2">
+                    <div className="mt-4 md:mt-0 shrink-0 md:pl-6 text-[#111111] group-hover:text-[#E31E24] text-[26px] font-bold transition-transform duration-250 group-hover:translate-x-2">
                       &rarr;
                     </div>
                   </article>
@@ -413,14 +413,14 @@ export default function NewsPage() {
         >
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 border-b border-[#3d3633] pb-4">
             <div>
-              <span className="text-[13px] font-extrabold uppercase text-[#ff8a85] tracking-normal block">
+              <span className="text-[15px] font-extrabold uppercase text-[#ff8a85] tracking-normal block">
                 CONSTITUTIONAL BENCH DOCKET
               </span>
-              <h2 className="font-kavivanar font-normal text-[clamp(32px,4vw,44px)] text-white mt-1 leading-tight">
+              <h2 className="font-kavivanar font-normal text-[clamp(34px,4vw,48px)] text-white mt-1 leading-[1.12]">
                 {language === 'ta' ? 'நீதிமன்றக் கண்காணிப்பு' : 'Court Watch'}
               </h2>
             </div>
-            <span className="text-[14px] text-[#d8cfc2]">
+            <span className="text-[15px] text-[#d8cfc2]">
               {language === 'ta'
                 ? 'வழக்கு விவரங்களைப் பார்வையிட வரியைத் தொடுக'
                 : 'Active constitutional litigations & state autonomy hearings'}
@@ -489,7 +489,7 @@ export default function NewsPage() {
           </span>
           <Link
             href="/resources"
-            className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[16px] text-[#111111] hover:text-[#C41A1F] border-b-2 border-[#111111] hover:border-[#C41A1F] pb-0.5 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] border-b-2 border-[#111111] hover:border-[#C41A1F] pb-0.5 transition-colors cursor-pointer"
           >
             <span>{language === 'ta' ? 'முழு ஆவணக் காப்பகத்தைத் திறக்க →' : 'Open the full archive →'}</span>
           </Link>
@@ -511,27 +511,27 @@ export default function NewsPage() {
           >
             <div className="flex items-start justify-between border-b-2 border-[#111111] pb-4">
               <div>
-                <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
+                <span className="text-[15px] font-extrabold uppercase text-[#C41A1F] block mb-1">
                   [{selectedCaseModal.court || 'Constitutional Bench'}]
                 </span>
-                <h3 className="font-helvetica font-extrabold text-[24px] text-[#111111] leading-tight">
+                <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-[1.12]">
                   {selectedCaseModal.caseTitle?.[language] || selectedCaseModal.caseNumber || ''}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedCaseModal(null)}
-                className="min-h-[44px] h-[44px] px-4 font-helvetica font-extrabold text-[14px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
+                className="min-h-[44px] h-[44px] px-4 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
               >
                 CLOSE [✕]
               </button>
             </div>
 
-            <p className="text-[17px] text-[#3a322d] leading-relaxed">
+            <p className="text-[17px] text-[#3a322d] leading-[1.65]">
               {selectedCaseModal.summary[language]}
             </p>
 
-            <div className="p-4 bg-white border border-[#d7d0c3] space-y-2 text-[14px]">
+            <div className="p-4 bg-white border border-[#d7d0c3] space-y-2 text-[15px]">
               <div>
                 <strong className="text-[#5B5348] uppercase">Bench / Counsel: </strong>
                 <span className="font-bold text-[#111111]">
@@ -556,7 +556,7 @@ export default function NewsPage() {
               <button
                 type="button"
                 onClick={() => setSelectedCaseModal(null)}
-                className="min-h-[44px] h-[44px] px-6 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase cursor-pointer transition-colors"
+                className="min-h-[44px] h-[44px] px-6 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase cursor-pointer transition-colors"
               >
                 Close Case Record
               </button>
