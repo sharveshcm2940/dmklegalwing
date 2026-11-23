@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { LegalResource } from '@/types';
-import { PageTitleBand } from '@/components/PageTitleBand';
-import { useReveal } from '@/hooks/useReveal';
 
 interface ExtendedLegalResource extends LegalResource {
   year?: string;
@@ -26,20 +24,29 @@ const BASE_CATEGORIES: CategoryOption[] = [
   { id: 'State Autonomy', en: 'State Autonomy', ta: 'மாநில சுயாட்சி' },
   { id: 'Social Justice', en: 'Social Justice', ta: 'சமூக நீதி' },
   { id: 'Constitutional Law', en: 'Constitutional Law', ta: 'அரசமைப்புச் சட்டம்' },
-  { id: 'Statutory Reform', en: 'Statutory Reform', ta: 'சட்ட சீர்திருத்தம்' }
+  { id: 'Statutory Reform', en: 'Statutory Reform', ta: 'சட்ட சீர்திருத்தம்' },
 ];
+
+type SortField = 'year' | 'size' | 'updated';
+type SortDir = 'asc' | 'desc';
 
 export default function ResourcesPage() {
   const { language } = useLanguage();
   const { resources: contextResources } = useData();
 
   const [resources, setResources] = useState<ExtendedLegalResource[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [previewResource, setPreviewResource] = useState<ExtendedLegalResource | null>(null);
 
-  const mainSection = useReveal();
+  // Sorting state
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
 
+  // Focus return ref
+  const lastFocusedRowRef = useRef<HTMLButtonElement | null>(null);
+
+  // Load from /api/resources with fallback to context
   useEffect(() => {
     let isMounted = true;
     async function loadResources() {
@@ -53,7 +60,7 @@ export default function ResourcesPage() {
           }
         }
       } catch (err) {
-        console.warn('Direct fetch failed, falling back to context:', err);
+        console.warn('Direct fetch from /api/resources failed, using context:', err);
       }
       if (isMounted) {
         setResources(contextResources as ExtendedLegalResource[]);
@@ -66,18 +73,30 @@ export default function ResourcesPage() {
     };
   }, [contextResources]);
 
-  // Close preview on escape key
+  // Handle escape key to close preview and return focus
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && previewResource) {
-        setPreviewResource(null);
+        handleClosePreview();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [previewResource]);
 
-  // Extract all categories from data to supplement the base categories
+  const handleOpenPreview = (item: ExtendedLegalResource, buttonEl?: HTMLButtonElement | null) => {
+    if (buttonEl) lastFocusedRowRef.current = buttonEl;
+    setPreviewResource(item);
+  };
+
+  const handleClosePreview = useCallback(() => {
+    setPreviewResource(null);
+    if (lastFocusedRowRef.current) {
+      lastFocusedRowRef.current.focus();
+    }
+  }, []);
+
+  // Category collection from data
   const categories: CategoryOption[] = useMemo(() => {
     const list = [...BASE_CATEGORIES];
     const existingIds = new Set(list.map((c) => c.id.toLowerCase()));
@@ -99,7 +118,7 @@ export default function ResourcesPage() {
               ? 'சட்டம்'
               : r.category === 'Legal Aid'
               ? 'சட்ட உதவி'
-              : r.category
+              : r.category,
         });
       }
     });
@@ -159,7 +178,8 @@ export default function ResourcesPage() {
     return item.category.toLowerCase() === catId.toLowerCase();
   }, []);
 
-  const filteredResources = useMemo(() => {
+  // Filtered resources
+  const filteredList = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return resources.filter((item) => {
       const matchCat = matchesCategory(item, activeCategory);
@@ -179,66 +199,180 @@ export default function ResourcesPage() {
     });
   }, [resources, activeCategory, searchQuery, matchesCategory]);
 
+  // Helpers for sorting
+  const parseSizeToKb = (sizeStr?: string): number => {
+    if (!sizeStr) return 0;
+    const num = parseFloat(sizeStr);
+    if (isNaN(num)) return 0;
+    if (sizeStr.toLowerCase().includes('mb')) return num * 1024;
+    if (sizeStr.toLowerCase().includes('gb')) return num * 1024 * 1024;
+    return num;
+  };
+
+  const parseYearVal = (item: ExtendedLegalResource): number => {
+    if (item.year) {
+      const parsed = parseInt(item.year, 10);
+      if (!isNaN(parsed)) return parsed;
+    }
+    if (item.date) {
+      const parsed = parseInt(item.date.slice(0, 4), 10);
+      if (!isNaN(parsed)) return parsed;
+    }
+    return 0;
+  };
+
+  const parseUpdatedTime = (item: ExtendedLegalResource): number => {
+    const dateStr = item.lastUpdated || item.date;
+    if (!dateStr) return 0;
+    const t = new Date(dateStr).getTime();
+    return isNaN(t) ? 0 : t;
+  };
+
+  // Sorted resources
+  const sortedResources = useMemo(() => {
+    if (!sortField) return filteredList;
+
+    return [...filteredList].sort((a, b) => {
+      let comparison = 0;
+      if (sortField === 'year') {
+        comparison = parseYearVal(a) - parseYearVal(b);
+      } else if (sortField === 'size') {
+        comparison = parseSizeToKb(a.fileSize) - parseSizeToKb(b.fileSize);
+      } else if (sortField === 'updated') {
+        comparison = parseUpdatedTime(a) - parseUpdatedTime(b);
+      }
+      return sortDir === 'asc' ? comparison : -comparison;
+    });
+  }, [filteredList, sortField, sortDir]);
+
+  // Handle header sort button clicks
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('desc');
+    }
+  };
+
+  // Counting "N documents" in grey when filter changes
+  const [displayCount, setDisplayCount] = useState<number>(sortedResources.length);
+
+  useEffect(() => {
+    const start = displayCount;
+    const end = sortedResources.length;
+    if (start === end) return;
+    let step = 0;
+    const totalSteps = 12;
+    const interval = setInterval(() => {
+      step++;
+      const current = Math.round(start + (end - start) * (step / totalSteps));
+      setDisplayCount(current);
+      if (step >= totalSteps) {
+        setDisplayCount(end);
+        clearInterval(interval);
+      }
+    }, 25);
+    return () => clearInterval(interval);
+  }, [sortedResources.length]);
+
+  // Helper to mark matched letters with #f6c9ca background
+  const highlightMatch = (text: string, query: string) => {
+    const q = query.trim();
+    if (!q) return text;
+    try {
+      const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      const parts = text.split(regex);
+      return parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} className="bg-[#f6c9ca] text-[#111111] px-0.5 font-bold">
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      );
+    } catch {
+      return text;
+    }
+  };
+
   return (
-    <div className="w-full bg-[#FAF8F5] text-[#111111] font-catamaran text-[18px] leading-[1.75] pb-24">
-      {/* Universal Page Title Band */}
-      <PageTitleBand
-        title={language === 'ta' ? 'சட்ட ஆவண கல்விற்கூடம்' : 'Legal document vault'}
-        description={
-          language === 'ta'
-            ? 'அரசமைப்பு அறிக்கைகள், வரலாற்றுச் சிறப்புமிக்க நீதிமன்றத் தீர்ப்புகள் மற்றும் சட்டக் கையேடுகளின் அதிகாரப்பூர்வ ஆவணக் காப்பகம்.'
-            : 'Authoritative constitutional archives, landmark judicial precedents, statutory reports and party legal briefs.'
-        }
-      />
+    <div className="w-full min-h-screen bg-[#FAF8F5] text-[#111111] font-catamaran antialiased overflow-x-clip selection:bg-[#E31E24] selection:text-white">
+      
+      {/* ========================================================== */}
+      {/* 1. TITLE BAND (INK)                                        */}
+      {/* Kavivanar title "Legal document vault" / "சட்ட ஆவண         */}
+      {/* கல்விக்கூடம்" clamp(44px,6vw,84px), parchment text,        */}
+      {/* one 20 px line in #d8cfc2, 6 px red rule drawing 1s        */}
+      {/* ========================================================== */}
+      <section className="w-full bg-[#111111] text-[#FAF8F5] pt-14 pb-12 px-[clamp(20px,4vw,56px)] border-b border-[#111111] relative overflow-hidden">
+        <div className="max-w-[1280px] mx-auto space-y-4">
+          <span className="text-[13px] font-extrabold uppercase text-[#ff8a85] tracking-normal block">
+            OFFICIAL DIGITAL REPOSITORY · ANNA ARIVALAYAM
+          </span>
 
-      <div className="max-w-[1400px] mx-auto px-[clamp(20px,4vw,56px)] pt-10 space-y-8">
-        <section
-          ref={mainSection.ref}
-          className={`fade-rise ${mainSection.revealed ? 'revealed' : ''} space-y-6`}
-        >
-          {/* 1. Search Box & Category Tabs Toolbar */}
-          <div className="space-y-4">
-            {/* Search Box: 2 px ink border, inline-SVG magnifier */}
-            <div className="relative border-2 border-[#111111] bg-white flex items-center px-4 min-h-[48px]">
-              <svg
-                className="w-5 h-5 text-[#5B5348] shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="square"
-                  strokeLinejoin="miter"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
+          <h1 className="font-kavivanar font-normal text-[#FAF8F5] text-[clamp(44px,6vw,84px)] leading-[1.1] tracking-normal">
+            {language === 'ta' ? 'சட்ட ஆவண கல்விக்கூடம்' : 'Legal document vault'}
+          </h1>
+
+          <p className="text-[20px] text-[#d8cfc2] leading-[1.65] max-w-[860px] font-normal">
+            {language === 'ta'
+              ? 'அரசமைப்பு அறிக்கைகள், வரலாற்றுச் சிறப்புமிக்க நீதிமன்றத் தீர்ப்புகள் மற்றும் சட்டக் கையேடுகளின் அதிகாரப்பூர்வ ஆவணக் காப்பகம்.'
+              : 'Authoritative constitutional archives, landmark judicial precedents, statutory reports and party legal briefs.'}
+          </p>
+        </div>
+
+        {/* 6 px red rule along the bottom that draws left to right in 1 s */}
+        <div className="w-full h-[6px] bg-[#E31E24] animate-draw-rule-1s absolute bottom-0 left-0" />
+      </section>
+
+      {/* Main Container */}
+      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-10 pb-24">
+        
+        {/* ========================================================== */}
+        {/* 2. TOOLBAR ON PARCHMENT                                    */}
+        {/* Search box (2 px ink border, inline-SVG magnifier)         */}
+        {/* Category tabs with sliding red underline                   */}
+        {/* Right: line "N documents" in grey counting to new number   */}
+        {/* ========================================================== */}
+        <section className="bg-[#FAF8F5] pb-8 space-y-6">
+          
+          {/* Search box: 2 px ink border, inline-SVG magnifier */}
+          <div className="relative border-2 border-[#111111] bg-white flex items-center px-4 min-h-[48px]">
+            <span className="text-[#111111] shrink-0" aria-hidden="true">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={
-                  language === 'ta'
-                    ? 'ஆவணத்தின் தலைப்பு, வழக்கு எண் அல்லது குறிப்புரை தேடுக...'
-                    : 'Search catalogue by title, citation, year or topic...'
-                }
-                className="w-full bg-transparent border-none outline-none text-[16px] text-[#111111] font-catamaran pl-3 pr-2 placeholder-[#5B5348]"
-                aria-label={language === 'ta' ? 'ஆவணங்களைத் தேடுக' : 'Search documents'}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="text-[13px] font-extrabold text-[#C41A1F] hover:underline cursor-pointer px-2"
-                >
-                  {language === 'ta' ? 'அழிக்க' : 'Clear'}
-                </button>
-              )}
-            </div>
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={
+                language === 'ta'
+                  ? 'ஆவணத் தலைப்பு, வழக்கு எண் அல்லது குறிப்புரை தேடுக (வார்த்தை நிறமிடப்படும்)...'
+                  : 'Search by title, category, year or citation (matches highlighted)...'
+              }
+              className="w-full bg-transparent border-none outline-none text-[16px] text-[#111111] pl-3 pr-2 py-2 placeholder-[#5B5348]"
+              aria-label={language === 'ta' ? 'ஆவணங்களைத் தேடுக' : 'Search documents'}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="text-[13px] font-extrabold text-[#C41A1F] hover:underline cursor-pointer px-2"
+              >
+                {language === 'ta' ? 'அழிக்க' : 'Clear'}
+              </button>
+            )}
+          </div>
 
-            {/* Category tabs: plain text buttons with a red underline for the active one */}
-            <div className="flex items-center gap-1 sm:gap-4 overflow-x-auto border-b border-[#d7d0c3] pb-1 scrollbar-none">
+          {/* Category tabs + Count */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#111111] pb-3">
+            
+            {/* Category tabs: All, State Autonomy, Social Justice, Constitutional Law, Statutory Reform... */}
+            <div className="flex items-center gap-6 overflow-x-auto pb-1">
               {categories.map((c) => {
                 const isActive = activeCategory === c.id;
                 return (
@@ -246,387 +380,434 @@ export default function ResourcesPage() {
                     key={c.id}
                     type="button"
                     onClick={() => setActiveCategory(c.id)}
-                    className={`min-h-[44px] px-3 py-2 text-[15px] font-extrabold whitespace-nowrap cursor-pointer transition-colors border-b-[3px] -mb-[1px] ${
-                      isActive
-                        ? 'border-[#E31E24] text-[#C41A1F]'
-                        : 'border-transparent text-[#111111] hover:text-[#C41A1F]'
+                    className={`relative py-1 font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
+                      isActive ? 'text-[#111111]' : 'text-[#5B5348] hover:text-[#111111]'
                     }`}
                   >
-                    {language === 'ta' ? c.ta : c.en}
+                    <span>{language === 'ta' ? c.ta : c.en}</span>
+                    <span
+                      className={`absolute bottom-0 left-0 right-0 h-[3px] bg-[#E31E24] transition-all duration-250 ${
+                        isActive ? 'opacity-100' : 'opacity-0'
+                      }`}
+                      aria-hidden="true"
+                    />
                   </button>
                 );
               })}
             </div>
-          </div>
 
-          {/* Catalogue count bar */}
-          <div className="flex items-center justify-between text-[14px] text-[#5B5348] border-b border-[#d7d0c3] pb-2">
-            <span>
-              {language === 'ta' ? 'மொத்தப் பதிவுகள்: ' : 'Catalogue entries: '}
-              <strong className="text-[#111111] font-helvetica font-extrabold">
-                {filteredResources.length}
-              </strong>
-            </span>
-            {activeCategory !== 'All' && (
-              <button
-                type="button"
-                onClick={() => setActiveCategory('All')}
-                className="text-[#C41A1F] hover:underline font-extrabold text-xs cursor-pointer"
+            {/* Right: "N documents" in grey counting to new number when filter changes */}
+            <div className="font-helvetica font-bold text-[15px] text-[#5B5348] whitespace-nowrap shrink-0 md:text-right">
+              <span className="text-[#111111] font-extrabold">{displayCount}</span>{' '}
+              {language === 'ta'
+                ? 'ஆவணங்கள்'
+                : displayCount === 1
+                ? 'document'
+                : 'documents'}
+            </div>
+
+          </div>
+        </section>
+
+        {/* Empty state */}
+        {sortedResources.length === 0 && (
+          <div className="py-20 text-center text-[#5B5348] text-[18px]">
+            {language === 'ta'
+              ? 'தேடலுக்குரிய சட்ட ஆவணங்கள் எதுவும் கிடைக்கவில்லை.'
+              : 'No documents match your query in this catalogue.'}
+          </div>
+        )}
+
+        {/* ========================================================== */}
+        {/* 3. TABLE (DESKTOP & TABLETS)                               */}
+        {/* Header on ink, parchment text, 800, 15 px                  */}
+        {/* Columns: Title, Category, Year, Language, Size, Updated,   */}
+        {/* Actions. Year, Size, Updated are sort buttons with arrow.  */}
+        {/* Rows 64 px tall, 18 px text, 1 px #d7d0c3 lines,           */}
+        {/* Title Helvetica Now Display 800.                           */}
+        {/* Hover: 4 px red bar grows at left, turns #f1ece2.          */}
+        {/* Rows fade in 40 ms apart. Leave cell empty when no value.  */}
+        {/* Click on table closes preview.                             */}
+        {/* ========================================================== */}
+        {sortedResources.length > 0 && (
+          <>
+            <div className="hidden md:block overflow-x-auto border-2 border-[#111111] bg-white">
+              <table
+                onClick={previewResource ? handleClosePreview : undefined}
+                className="w-full text-left border-collapse"
               >
-                {language === 'ta' ? 'அனைத்தையும் காட்டுக' : 'Reset category'}
-              </button>
-            )}
-          </div>
-
-          {/* Main Content Layout: Table on left, PDF viewer panel on right when active */}
-          <div className="flex flex-col lg:flex-row items-start gap-8">
-            {/* Table Area (Wide Screens: table stays visible even when preview is open) */}
-            <div
-              className={`w-full transition-all duration-300 ${
-                previewResource ? 'lg:w-[55%]' : 'lg:w-full'
-              }`}
-            >
-              {filteredResources.length === 0 ? (
-                <div className="py-12 text-center text-[#5B5348] text-[17px]">
-                  {language === 'ta'
-                    ? 'தேடலுக்குரிய சட்ட ஆவணங்கள் எதுவும் கிடைக்கவில்லை.'
-                    : 'No documents match your query in this catalogue.'}
-                </div>
-              ) : (
-                <>
-                  {/* Desktop / Tablet Table View */}
-                  <div className="hidden md:block overflow-x-auto border-2 border-[#111111] bg-white">
-                    <table className="w-full text-left border-collapse">
-                      {/* Header row: ink background, parchment text, 800 weight, 15 px */}
-                      <thead>
-                        <tr className="bg-[#111111] text-[#FAF8F5] font-extrabold text-[15px] border-b-2 border-[#111111]">
-                          <th className="py-3 px-4 font-extrabold">{language === 'ta' ? 'தலைப்பு' : 'Title'}</th>
-                          <th className="py-3 px-4 font-extrabold whitespace-nowrap">{language === 'ta' ? 'பிரிவு' : 'Category'}</th>
-                          <th className="py-3 px-4 font-extrabold whitespace-nowrap">{language === 'ta' ? 'ஆண்டு' : 'Year'}</th>
-                          <th className="py-3 px-4 font-extrabold whitespace-nowrap">{language === 'ta' ? 'மொழி' : 'Language'}</th>
-                          <th className="py-3 px-4 font-extrabold whitespace-nowrap">{language === 'ta' ? 'அளவு' : 'Size'}</th>
-                          <th className="py-3 px-4 font-extrabold whitespace-nowrap">{language === 'ta' ? 'புதுப்பிக்கப்பட்டது' : 'Updated'}</th>
-                          <th className="py-3 px-4 font-extrabold text-right whitespace-nowrap">{language === 'ta' ? 'செயல்கள்' : 'Actions'}</th>
-                        </tr>
-                      </thead>
-                      {/* Rows: 18 px text, 1 px #d7d0c3 lines, 64 px tall, hover #f1ece2 */}
-                      <tbody>
-                        {filteredResources.map((item) => {
-                          const isSelected = previewResource?.id === item.id;
-                          const yearValue = item.year || (item.date ? item.date.slice(0, 4) : '');
-                          const updatedValue = item.lastUpdated || item.date || '';
-                          const sizeValue = item.fileSize || '';
-                          const languageValue = item.language || '';
-
-                          return (
-                            <tr
-                              key={item.id}
-                              className={`text-[18px] border-b border-[#d7d0c3] min-h-[64px] h-[64px] transition-colors ${
-                                isSelected ? 'bg-[#f1ece2]' : 'hover:bg-[#f1ece2]'
-                              }`}
-                            >
-                              {/* Title: Helvetica Now Display 800 */}
-                              <td className="py-3 px-4 align-middle">
-                                <div
-                                  className={
-                                    language === 'ta'
-                                      ? 'font-kavivanar text-[18px] text-[#111111]'
-                                      : 'font-helvetica font-extrabold text-[17px] text-[#111111]'
-                                  }
-                                >
-                                  {item.title[language] || item.title.en}
-                                </div>
-                                {item.citation && (
-                                  <div className="text-[13px] text-[#5B5348] font-catamaran mt-0.5">
-                                    {item.citation}
-                                  </div>
-                                )}
-                              </td>
-
-                              {/* Category */}
-                              <td className="py-3 px-4 align-middle text-[15px] font-semibold text-[#5B5348] whitespace-nowrap">
-                                {item.category || ''}
-                              </td>
-
-                              {/* Year: Leave cell empty when no value */}
-                              <td className="py-3 px-4 align-middle font-helvetica font-extrabold text-[16px] text-[#111111] whitespace-nowrap">
-                                {yearValue}
-                              </td>
-
-                              {/* Language: Leave cell empty when no value */}
-                              <td className="py-3 px-4 align-middle text-[15px] text-[#5B5348] whitespace-nowrap">
-                                {languageValue}
-                              </td>
-
-                              {/* Size: Leave cell empty when no value */}
-                              <td className="py-3 px-4 align-middle font-helvetica text-[15px] text-[#5B5348] whitespace-nowrap">
-                                {sizeValue}
-                              </td>
-
-                              {/* Updated: Leave cell empty when no value */}
-                              <td className="py-3 px-4 align-middle font-helvetica text-[15px] text-[#5B5348] whitespace-nowrap">
-                                {updatedValue}
-                              </td>
-
-                              {/* Actions: Two text links, "Preview" and "Download" (red button on hover) */}
-                              <td className="py-3 px-4 align-middle text-right whitespace-nowrap">
-                                <div className="inline-flex items-center gap-3">
-                                  <button
-                                    type="button"
-                                    onClick={() => setPreviewResource(item)}
-                                    className="text-[15px] font-extrabold text-[#111111] underline hover:no-underline hover:bg-[#E31E24] hover:text-white px-3 py-1.5 cursor-pointer transition-colors"
-                                  >
-                                    {language === 'ta' ? 'பார்வை' : 'Preview'}
-                                  </button>
-                                  <a
-                                    href={item.downloadUrl || '#'}
-                                    download
-                                    className="text-[15px] font-extrabold text-[#111111] underline hover:no-underline hover:bg-[#E31E24] hover:text-white px-3 py-1.5 cursor-pointer transition-colors"
-                                  >
-                                    {language === 'ta' ? 'பதிவிறக்கு' : 'Download'}
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* 4. Mobile Phones: Stacked Block View with title first and two actions at bottom >= 44 px */}
-                  <div className="block md:hidden space-y-4">
-                    {filteredResources.map((item) => {
-                      const isSelected = previewResource?.id === item.id;
-                      const yearValue = item.year || (item.date ? item.date.slice(0, 4) : '');
-                      const updatedValue = item.lastUpdated || item.date || '';
-                      const sizeValue = item.fileSize || '';
-                      const languageValue = item.language || '';
-
-                      return (
-                        <div
-                          key={item.id}
-                          className={`border-2 border-[#111111] bg-white p-5 space-y-3 transition-colors ${
-                            isSelected ? 'bg-[#f1ece2]' : 'hover:bg-[#f1ece2]'
+                {/* Header row on ink (parchment text, 800, 15 px) */}
+                <thead>
+                  <tr className="bg-[#111111] text-[#FAF8F5] font-helvetica font-extrabold text-[15px] uppercase tracking-normal border-b-2 border-[#111111]">
+                    <th className="py-4 px-4 w-5/12">
+                      {language === 'ta' ? 'தலைப்பு' : 'Title'}
+                    </th>
+                    <th className="py-4 px-4 whitespace-nowrap">
+                      {language === 'ta' ? 'பிரிவு' : 'Category'}
+                    </th>
+                    
+                    {/* Sortable: Year */}
+                    <th className="py-4 px-4 whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSort('year');
+                        }}
+                        className="inline-flex items-center gap-1.5 font-helvetica font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
+                      >
+                        <span>{language === 'ta' ? 'ஆண்டு' : 'Year'}</span>
+                        <svg
+                          className={`w-4 h-4 transition-transform ${
+                            sortField === 'year' && sortDir === 'asc' ? 'rotate-180 text-[#E31E24]' : 'text-[#d8cfc2]'
                           }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
                         >
-                          <div>
-                            <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
-                              [{item.category}]
-                            </span>
-                            <h3
-                              className={`${
-                                language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                              } font-extrabold text-[20px] text-[#111111] leading-tight`}
-                            >
-                              {item.title[language] || item.title.en}
-                            </h3>
-                            {item.citation && (
-                              <p className="text-[13px] text-[#5B5348] font-catamaran mt-1">
-                                {item.citation}
-                              </p>
-                            )}
-                          </div>
+                          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </th>
 
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px] text-[#5B5348] pt-2 border-t border-[#d7d0c3]">
-                            {yearValue && (
-                              <span>
-                                {language === 'ta' ? 'ஆண்டு: ' : 'Year: '}
-                                <strong className="text-[#111111] font-helvetica">{yearValue}</strong>
-                              </span>
-                            )}
-                            {languageValue && (
-                              <span>
-                                {language === 'ta' ? 'மொழி: ' : 'Language: '}
-                                <strong className="text-[#111111]">{languageValue}</strong>
-                              </span>
-                            )}
-                            {sizeValue && (
-                              <span>
-                                {language === 'ta' ? 'அளவு: ' : 'Size: '}
-                                <strong className="text-[#111111] font-helvetica">{sizeValue}</strong>
-                              </span>
-                            )}
-                            {updatedValue && (
-                              <span>
-                                {language === 'ta' ? 'புதுப்பிக்கப்பட்டது: ' : 'Updated: '}
-                                <strong className="text-[#111111] font-helvetica">{updatedValue}</strong>
-                              </span>
-                            )}
-                          </div>
+                    <th className="py-4 px-4 whitespace-nowrap">
+                      {language === 'ta' ? 'மொழி' : 'Language'}
+                    </th>
 
-                          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#d7d0c3]">
+                    {/* Sortable: Size */}
+                    <th className="py-4 px-4 whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSort('size');
+                        }}
+                        className="inline-flex items-center gap-1.5 font-helvetica font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
+                      >
+                        <span>{language === 'ta' ? 'அளவு' : 'Size'}</span>
+                        <svg
+                          className={`w-4 h-4 transition-transform ${
+                            sortField === 'size' && sortDir === 'asc' ? 'rotate-180 text-[#E31E24]' : 'text-[#d8cfc2]'
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </th>
+
+                    {/* Sortable: Updated */}
+                    <th className="py-4 px-4 whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSort('updated');
+                        }}
+                        className="inline-flex items-center gap-1.5 font-helvetica font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
+                      >
+                        <span>{language === 'ta' ? 'புதுப்பிக்கப்பட்டது' : 'Updated'}</span>
+                        <svg
+                          className={`w-4 h-4 transition-transform ${
+                            sortField === 'updated' && sortDir === 'asc' ? 'rotate-180 text-[#E31E24]' : 'text-[#d8cfc2]'
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </th>
+
+                    <th className="py-4 px-4 text-right whitespace-nowrap">
+                      {language === 'ta' ? 'செயல்கள்' : 'Actions'}
+                    </th>
+                  </tr>
+                </thead>
+
+                {/* Rows: 64 px tall, 18 px text, 1 px #d7d0c3 lines, title Helvetica 800 */}
+                {/* Hover: 4 px red bar grows at left edge, row turns #f1ece2 */}
+                {/* Staggered fade in 40 ms apart */}
+                <tbody className="divide-y divide-[#d7d0c3]">
+                  {sortedResources.map((item, idx) => {
+                    const isSelected = previewResource?.id === item.id;
+                    const yearVal = item.year || (item.date ? item.date.slice(0, 4) : '');
+                    const updatedVal = item.lastUpdated || item.date || '';
+                    const sizeVal = item.fileSize || '';
+                    const langVal = item.language || '';
+                    const titleStr = item.title[language] || item.title.en;
+
+                    return (
+                      <tr
+                        key={item.id}
+                        className={`group relative text-[18px] min-h-[64px] h-[64px] transition-colors cursor-pointer ${
+                          isSelected ? 'bg-[#f1ece2]' : 'hover:bg-[#f1ece2]'
+                        }`}
+                        style={{
+                          animation: `fade-rise 0.4s ease-out ${idx * 40}ms forwards`,
+                        }}
+                      >
+                        {/* Title with matched letters highlighted in #f6c9ca background */}
+                        <td className="py-3 px-4 align-middle relative">
+                          {/* 4 px red bar grows at left edge on hover */}
+                          <div
+                            className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-[4px] bg-[#E31E24] transition-all duration-200"
+                            aria-hidden="true"
+                          />
+                          <div className="font-helvetica font-extrabold text-[18px] text-[#111111] leading-tight">
+                            {highlightMatch(titleStr, searchQuery)}
+                          </div>
+                          {item.citation && (
+                            <div className="text-[13px] text-[#5B5348] font-catamaran mt-0.5">
+                              {item.citation}
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Category */}
+                        <td className="py-3 px-4 align-middle text-[15px] font-semibold text-[#5B5348] whitespace-nowrap">
+                          {item.category || ''}
+                        </td>
+
+                        {/* Year: Leave cell empty when no value */}
+                        <td className="py-3 px-4 align-middle font-helvetica font-extrabold text-[16px] text-[#111111] whitespace-nowrap">
+                          {yearVal || ''}
+                        </td>
+
+                        {/* Language: Leave cell empty when no value */}
+                        <td className="py-3 px-4 align-middle text-[15px] text-[#5B5348] whitespace-nowrap">
+                          {langVal || ''}
+                        </td>
+
+                        {/* Size: Leave cell empty when no value */}
+                        <td className="py-3 px-4 align-middle font-helvetica text-[15px] text-[#5B5348] whitespace-nowrap">
+                          {sizeVal || ''}
+                        </td>
+
+                        {/* Updated: Leave cell empty when no value */}
+                        <td className="py-3 px-4 align-middle font-helvetica text-[15px] text-[#5B5348] whitespace-nowrap">
+                          {updatedVal || ''}
+                        </td>
+
+                        {/* Actions: Text links "Preview" and "Download" (Download becomes red rectangular button on hover) */}
+                        <td className="py-3 px-4 align-middle text-right whitespace-nowrap">
+                          <div className="inline-flex items-center gap-3">
                             <button
                               type="button"
-                              onClick={() => setPreviewResource(item)}
-                              className="min-h-[44px] w-full px-4 py-2 border-2 border-[#111111] bg-white hover:bg-[#E31E24] hover:text-white hover:border-[#E31E24] text-[#111111] font-extrabold text-[14px] flex items-center justify-center cursor-pointer transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenPreview(item, e.currentTarget);
+                              }}
+                              className="font-helvetica font-extrabold text-[15px] text-[#111111] underline hover:text-[#E31E24] cursor-pointer py-1"
                             >
                               {language === 'ta' ? 'பார்வை' : 'Preview'}
                             </button>
                             <a
                               href={item.downloadUrl || '#'}
                               download
-                              className="min-h-[44px] w-full px-4 py-2 border-2 border-[#111111] bg-white hover:bg-[#E31E24] hover:text-white hover:border-[#E31E24] text-[#111111] font-extrabold text-[14px] flex items-center justify-center cursor-pointer transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                              className="font-helvetica font-extrabold text-[15px] text-[#111111] underline hover:no-underline hover:bg-[#E31E24] hover:text-white px-3 py-1.5 transition-colors cursor-pointer border border-transparent hover:border-[#E31E24]"
                             >
                               {language === 'ta' ? 'பதிவிறக்கு' : 'Download'}
                             </a>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
-            {/* 3. PDF Viewer Panel on Right (about 45% width on wide screens, full screen on phones) */}
-            {previewResource && (
-              <>
-                {/* Desktop/Tablet Panel (45% width, sticky) */}
-                <aside
-                  aria-label={language === 'ta' ? 'ஆவணக் காட்சி' : 'Document Preview'}
-                  className="hidden lg:block lg:w-[45%] sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto bg-[#FAF8F5] border-2 border-[#111111] p-6 space-y-6 shrink-0"
-                >
-                  {/* Signature DMK Flag Bar: Top Black, Bottom Red */}
-                  <div className="h-[6px] dmk-flag-strip -mt-6 -mx-6 mb-4" />
+            {/* ========================================================== */}
+            {/* 4. MOBILE PHONES (STACKED BLOCKS)                          */}
+            {/* Title first, then category, language, size on one line,    */}
+            {/* then actions each at least 44 px tall.                     */}
+            {/* ========================================================== */}
+            <div className="block md:hidden space-y-4">
+              {sortedResources.map((item, idx) => {
+                const yearVal = item.year || (item.date ? item.date.slice(0, 4) : '');
+                const sizeVal = item.fileSize || '';
+                const langVal = item.language || '';
+                const titleStr = item.title[language] || item.title.en;
 
-                  {/* Header: Document Title & Close Button */}
-                  <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#111111]">
-                    <div className="space-y-1">
-                      <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
-                        [{previewResource.category}]
-                      </span>
-                      <h2
-                        className={`${
-                          language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                        } font-extrabold text-[24px] text-[#111111] leading-tight`}
-                      >
-                        {previewResource.title[language] || previewResource.title.en}
-                      </h2>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setPreviewResource(null)}
-                      className="min-h-[44px] px-4 py-2 border-2 border-[#111111] bg-white hover:bg-[#111111] hover:text-white text-[#111111] font-extrabold text-[14px] cursor-pointer shrink-0 transition-colors"
-                    >
-                      {language === 'ta' ? 'மூடுக' : 'Close'}
-                    </button>
-                  </div>
+                return (
+                  <div
+                    key={item.id}
+                    className="border-2 border-[#111111] bg-white p-5 space-y-3 relative group"
+                    style={{
+                      animation: `fade-rise 0.4s ease-out ${idx * 40}ms forwards`,
+                    }}
+                  >
+                    {/* 4 px red bar on hover */}
+                    <div
+                      className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-[4px] bg-[#E31E24] transition-all duration-200"
+                      aria-hidden="true"
+                    />
 
-                  {/* PDF Viewer Sheet */}
-                  <div className="bg-white border-2 border-[#111111] p-6 space-y-4 shadow-none">
-                    <div className="flex items-center justify-between pb-3 border-b border-[#d7d0c3] text-[13px] text-[#5B5348]">
-                      <span>{language === 'ta' ? 'அதிகாரப்பூர்வ ஆவணக் குறிப்பு' : 'Official Legal Docket'}</span>
-                      <span className="font-helvetica font-extrabold text-[#111111]">
-                        {previewResource.fileSize || 'PDF'}
-                      </span>
-                    </div>
-
-                    <p className="text-[17px] text-[#111111] leading-relaxed">
-                      {previewResource.summary[language] || previewResource.summary.en}
-                    </p>
-
-                    {previewResource.court && (
-                      <div className="p-3 bg-[#f1ece2] border-l-4 border-[#111111] text-[14px] text-[#111111]">
-                        <strong className="block text-xs text-[#5B5348]">
-                          {language === 'ta' ? 'நீதிமன்றம்:' : 'Court / Tribunal:'}
-                        </strong>
-                        <span className="font-bold">{previewResource.court}</span>
-                      </div>
-                    )}
-
-                    {previewResource.citation && (
-                      <div className="p-3 bg-[#f1ece2] border-l-4 border-[#E31E24] text-[14px] text-[#111111]">
-                        <strong className="block text-xs text-[#5B5348]">
-                          {language === 'ta' ? 'வழக்கு குறிப்புரை:' : 'Official Citation:'}
-                        </strong>
-                        <span className="font-bold">{previewResource.citation}</span>
-                      </div>
-                    )}
-
-                    {previewResource.keyHighlights &&
-                      previewResource.keyHighlights[language]?.length > 0 && (
-                        <div className="space-y-2 pt-2 border-t border-[#d7d0c3]">
-                          <strong className="text-[13px] uppercase tracking-normal text-[#C41A1F] block">
-                            {language === 'ta' ? 'முக்கிய சட்ட வாதங்கள்:' : 'Ratio & Key Submissions:'}
-                          </strong>
-                          <ul className="space-y-1.5 text-[15px] list-disc list-inside text-[#333333]">
-                            {previewResource.keyHighlights[language].map((pt, i) => (
-                              <li key={i} className="leading-snug">{pt}</li>
-                            ))}
-                          </ul>
-                        </div>
+                    {/* Title first */}
+                    <div>
+                      <h3 className="font-helvetica font-extrabold text-[20px] text-[#111111] leading-snug">
+                        {highlightMatch(titleStr, searchQuery)}
+                      </h3>
+                      {item.citation && (
+                        <p className="text-[13px] text-[#5B5348] font-catamaran mt-1">
+                          {item.citation}
+                        </p>
                       )}
+                    </div>
 
-                    {/* Download button */}
-                    <div className="pt-4 border-t border-[#d7d0c3]">
-                      <a
-                        href={previewResource.downloadUrl || '#'}
-                        download
-                        className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer btn-lift"
+                    {/* Category, language, and size on one line */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-[#5B5348] pt-2 border-t border-[#d7d0c3]">
+                      <span className="font-bold text-[#C41A1F] uppercase">
+                        [{item.category}]
+                      </span>
+                      {langVal && <span>· {langVal}</span>}
+                      {sizeVal && <span>· {sizeVal}</span>}
+                      {yearVal && <span>· {yearVal}</span>}
+                    </div>
+
+                    {/* Two actions, each at least 44 px tall */}
+                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#d7d0c3]">
+                      <button
+                        type="button"
+                        onClick={(e) => handleOpenPreview(item, e.currentTarget)}
+                        className="min-h-[44px] h-[44px] w-full px-4 border-2 border-[#111111] bg-white hover:bg-[#111111] hover:text-white text-[#111111] font-helvetica font-extrabold text-[14px] uppercase flex items-center justify-center cursor-pointer transition-colors"
                       >
-                        {language === 'ta' ? 'முழு ஆவணத்தைப் பதிவிறக்குக (PDF)' : 'Download Full Document (PDF)'}
+                        {language === 'ta' ? 'பார்வை' : 'Preview'}
+                      </button>
+                      <a
+                        href={item.downloadUrl || '#'}
+                        download
+                        className="min-h-[44px] h-[44px] w-full px-4 border-2 border-[#111111] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase flex items-center justify-center cursor-pointer transition-colors"
+                      >
+                        {language === 'ta' ? 'பதிவிறக்கு' : 'Download'}
                       </a>
                     </div>
                   </div>
-                </aside>
+                );
+              })}
+            </div>
+          </>
+        )}
 
-                {/* Mobile Fullscreen Panel */}
-                <div
-                  role="dialog"
-                  aria-modal="true"
-                  className="lg:hidden fixed inset-0 z-50 bg-[#FAF8F5] p-6 overflow-y-auto space-y-6"
-                >
-                  {/* Signature DMK Flag Bar: Top Black, Bottom Red */}
-                  <div className="h-[6px] dmk-flag-strip -mt-6 -mx-6 mb-4" />
-
-                  <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#111111]">
-                    <div className="space-y-1">
-                      <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
-                        [{previewResource.category}]
-                      </span>
-                      <h2
-                        className={`${
-                          language === 'ta' ? 'font-kavivanar' : 'font-helvetica'
-                        } font-extrabold text-[22px] text-[#111111] leading-tight`}
-                      >
-                        {previewResource.title[language] || previewResource.title.en}
-                      </h2>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setPreviewResource(null)}
-                      className="min-h-[44px] px-4 py-2 border-2 border-[#111111] bg-white text-[#111111] font-extrabold text-[14px] cursor-pointer"
-                    >
-                      {language === 'ta' ? 'மூடுக' : 'Close'}
-                    </button>
-                  </div>
-
-                  <p className="text-[16px] text-[#111111] leading-relaxed">
-                    {previewResource.summary[language] || previewResource.summary.en}
-                  </p>
-
-                  {previewResource.citation && (
-                    <div className="p-3 bg-[#f1ece2] border-l-4 border-[#E31E24] text-[14px] text-[#111111]">
-                      <span className="font-bold">{previewResource.citation}</span>
-                    </div>
-                  )}
-
-                  <div className="pt-4">
-                    <a
-                      href={previewResource.downloadUrl || '#'}
-                      download
-                      className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
-                    >
-                      {language === 'ta' ? 'பதிவிறக்குக (PDF)' : 'Download (PDF)'}
-                    </a>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </section>
       </div>
+
+      {/* ========================================================== */}
+      {/* 5. PREVIEW PANEL (SLIDES FROM RIGHT: 45% DESKTOP, FULL MOBILE)*/}
+      {/* 0.4s transition, PDF viewer, document title, short significance */}
+      {/* line from data, red Download button, ink Close button.       */}
+      {/* Escape key and click on table close it, focus returns to row. */}
+      {/* Table stays visible and preserves scroll.                    */}
+      {/* ========================================================== */}
+      {previewResource && (
+        <aside
+          role="dialog"
+          aria-modal="true"
+          aria-label={previewResource.title[language] || previewResource.title.en}
+          className="fixed right-0 top-0 bottom-0 w-full lg:w-[45%] bg-[#FAF8F5] text-[#111111] border-l-2 border-[#111111] z-50 p-6 md:p-8 overflow-y-auto space-y-6 shadow-[0_0_0_9999px_rgba(0,0,0,0.4)] transition-transform duration-400 ease-out"
+        >
+          {/* Header Strip with Title and Ink Close Button */}
+          <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#111111]">
+            <div className="space-y-1">
+              <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block tracking-normal">
+                [{previewResource.category}] · OFFICIAL ARCHIVE
+              </span>
+              <h2 className="font-helvetica font-extrabold text-[24px] sm:text-[28px] text-[#111111] leading-tight">
+                {previewResource.title[language] || previewResource.title.en}
+              </h2>
+            </div>
+            
+            {/* Ink Close Button */}
+            <button
+              type="button"
+              onClick={handleClosePreview}
+              className="min-h-[44px] h-[44px] px-5 bg-[#111111] hover:bg-[#333333] text-white font-helvetica font-extrabold text-[14px] uppercase cursor-pointer shrink-0 transition-colors"
+            >
+              {language === 'ta' ? 'மூடுக [✕]' : 'Close [✕]'}
+            </button>
+          </div>
+
+          {/* Short significance line from the data */}
+          <div className="p-4 bg-[#f1ece2] border-l-4 border-[#E31E24] space-y-1">
+            <span className="text-[12px] font-bold text-[#5B5348] uppercase tracking-normal block">
+              {language === 'ta' ? 'அரசமைப்பு முக்கியத்துவம்:' : 'Constitutional Significance:'}
+            </span>
+            <p className="text-[16px] text-[#111111] font-semibold leading-snug">
+              {previewResource.significance?.[language] ||
+                previewResource.summary[language] ||
+                previewResource.summary.en}
+            </p>
+          </div>
+
+          {/* PDF Viewer Sheet */}
+          <div className="bg-white border-2 border-[#111111] p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#d7d0c3] text-[13px] text-[#5B5348]">
+              <span className="font-bold uppercase tracking-normal">
+                {language === 'ta' ? 'சட்டக் கோப்பு உரை வடிவம்' : 'Official PDF Document Docket'}
+              </span>
+              <span className="font-helvetica font-extrabold text-[#111111]">
+                {previewResource.fileSize || 'PDF FORMAT'}
+              </span>
+            </div>
+
+            {/* Embedded Document Preview Body */}
+            <div className="h-[280px] sm:h-[340px] border border-[#d7d0c3] bg-[#FAF8F5] p-5 overflow-y-auto space-y-3 font-catamaran text-[15px] leading-relaxed text-[#333333]">
+              <div className="text-center pb-3 border-b border-[#d7d0c3] space-y-1">
+                <span className="text-[11px] font-extrabold uppercase text-[#C41A1F] block">
+                  LEGAL WING HEADQUARTERS · CHENNAI
+                </span>
+                <p className="font-helvetica font-extrabold text-[16px] text-[#111111]">
+                  {previewResource.title[language] || previewResource.title.en}
+                </p>
+                {previewResource.citation && (
+                  <p className="text-[13px] text-[#5B5348] font-mono">
+                    {previewResource.citation}
+                  </p>
+                )}
+              </div>
+
+              <p>
+                {previewResource.summary[language] || previewResource.summary.en}
+              </p>
+
+              {previewResource.court && (
+                <p className="text-[14px] text-[#111111] font-bold pt-2">
+                  <span className="text-[#5B5348]">Court / Bench:</span> {previewResource.court}
+                </p>
+              )}
+
+              {previewResource.keyHighlights && previewResource.keyHighlights[language]?.length > 0 && (
+                <div className="pt-2 border-t border-[#d7d0c3] space-y-1">
+                  <strong className="text-[12px] uppercase text-[#C41A1F] block">
+                    Key Legal Submissions:
+                  </strong>
+                  <ul className="list-disc list-inside space-y-1 text-[14px]">
+                    {previewResource.keyHighlights[language].map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Red Download Button */}
+            <div className="pt-4 border-t border-[#d7d0c3]">
+              <a
+                href={previewResource.downloadUrl || '#'}
+                download
+                className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+              >
+                {language === 'ta' ? 'ஆவணத்தைப் பதிவிறக்குக (PDF)' : 'Download Full Document (PDF)'}
+              </a>
+            </div>
+          </div>
+        </aside>
+      )}
+
     </div>
   );
 }
