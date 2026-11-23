@@ -317,13 +317,13 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 760 px Sun-Ray Graphic: right -140px, bottom -380px so only upper half shows */}
+        {/* 760 px Logo Animation in Home Page Hero */}
         {/* Turns once per 160s. Parallax mouse tracking shifts rays up to 14px opposite mouse */}
         <div
           className="absolute pointer-events-none select-none z-0 overflow-hidden"
           style={{
             right: -140,
-            bottom: -380,
+            bottom: -280,
             width: 760,
             height: 760,
             transform: `translate(${parallaxOffset.x}px, ${parallaxOffset.y}px)`,
@@ -333,19 +333,31 @@ export default function HomePage() {
         >
           <svg
             viewBox="-380 -380 760 760"
-            className="w-[760px] h-[760px] animate-spin-160s origin-center"
+            className="w-[760px] h-[760px] relative overflow-visible"
           >
-            {/* 12 polygons points="-22,-110 22,-110 64,-380 -64,-380" rotated at i * 30 deg */}
-            {Array.from({ length: 12 }).map((_, i) => (
-              <polygon
-                key={i}
-                points="-22,-110 22,-110 64,-380 -64,-380"
-                transform={`rotate(${i * 30})`}
-                fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
-              />
-            ))}
-            {/* Center circle r=96 filled #111111 with stroke #E31E24 4px */}
-            <circle cx="0" cy="0" r="96" fill="#111111" stroke="#E31E24" strokeWidth="4" />
+            {/* 12 polygons points="-22,-110 22,-110 64,-380 -64,-380" rotated at i * 30 deg turning once per 160s */}
+            <g className="animate-spin-160s origin-center">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <polygon
+                  key={i}
+                  points="-22,-110 22,-110 64,-380 -64,-380"
+                  transform={`rotate(${i * 30})`}
+                  fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
+                />
+              ))}
+              {/* Central circle backing */}
+              <circle cx="0" cy="0" r="140" fill="#111111" stroke="#E31E24" strokeWidth="4" />
+            </g>
+
+            {/* Official DMK Rising Sun & Flag Emblem Image centered in the animation */}
+            <image
+              href="/images/dmk-official-logo.png"
+              x="-130"
+              y="-130"
+              width="260"
+              height="260"
+              preserveAspectRatio="xMidYMid meet"
+            />
           </svg>
         </div>
 
@@ -645,6 +657,14 @@ export default function HomePage() {
                     />
                   ))}
                   <circle cx="0" cy="0" r="48" fill="#111111" stroke="#E31E24" strokeWidth="2" />
+                  <image
+                    href="/images/dmk-official-logo.png"
+                    x="-40"
+                    y="-40"
+                    width="80"
+                    height="80"
+                    preserveAspectRatio="xMidYMid meet"
+                  />
                 </svg>
               </div>
 
