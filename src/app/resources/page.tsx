@@ -704,12 +704,19 @@ export default function ResourcesPage() {
       {/* Table stays visible and preserves scroll.                    */}
       {/* ========================================================== */}
       {previewResource && (
-        <aside
-          role="dialog"
-          aria-modal="true"
-          aria-label={previewResource.title[language] || previewResource.title.en}
-          className="fixed right-0 top-0 bottom-0 w-full lg:w-[45%] bg-[#FAF8F5] text-[#111111] border-l-2 border-[#111111] z-50 p-6 md:p-8 overflow-y-auto space-y-6 shadow-[0_0_0_9999px_rgba(0,0,0,0.4)] transition-transform duration-400 ease-out"
-        >
+        <>
+          {/* Backdrop overlay that closes preview on click */}
+          <div
+            onClick={handleClosePreview}
+            className="fixed inset-0 bg-[#111111]/50 z-40"
+            aria-hidden="true"
+          />
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-label={previewResource.title[language] || previewResource.title.en}
+            className="fixed right-0 top-0 bottom-0 w-full lg:w-[45%] bg-[#FAF8F5] text-[#111111] border-l-2 border-[#111111] z-50 p-6 md:p-8 overflow-y-auto space-y-6 transition-transform duration-400 ease-out"
+          >
           {/* Header Strip with Title and Ink Close Button */}
           <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#111111]">
             <div className="space-y-1">
@@ -806,7 +813,8 @@ export default function ResourcesPage() {
             </div>
           </div>
         </aside>
-      )}
+      </>
+    )}
 
     </div>
   );

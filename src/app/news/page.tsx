@@ -134,7 +134,7 @@ export default function NewsPage() {
       {/* "Chennai · [today's date]"                                  */}
       {/* Kavivanar "செய்திகள்" clamp(64px,11vw,150px) in #E31E24     */}
       {/* beside "Press releases, statements & media wire" 800 28px   */}
-      {/* 6 px ink rule draws left-to-right in 1s, then 2px rule 4px below */}
+      {/* 6 px ink rule draws across in 1s, then 2px rule 4px below */}
       {/* ========================================================== */}
       <header className="w-full bg-[#FAF8F5] pt-0">
         
@@ -364,7 +364,7 @@ export default function NewsPage() {
                         <div className="font-helvetica font-extrabold text-[56px] leading-none text-[#111111]">
                           {dateParts.day}
                         </div>
-                        <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-wider uppercase">
+                        <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-normal uppercase">
                           {dateParts.month} {dateParts.year}
                         </div>
                         <div className="mt-2 text-[12px] text-[#C41A1F] font-extrabold uppercase">

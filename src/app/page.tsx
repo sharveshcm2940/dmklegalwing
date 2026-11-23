@@ -749,7 +749,7 @@ export default function HomePage() {
                         <div className="font-helvetica font-extrabold text-[56px] leading-none text-[#111111]">
                           {dateParts.day}
                         </div>
-                        <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-wider uppercase">
+                        <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-normal uppercase">
                           {dateParts.month} {dateParts.year}
                         </div>
                         <div className="mt-2 text-[12px] text-[#C41A1F] font-extrabold uppercase">
