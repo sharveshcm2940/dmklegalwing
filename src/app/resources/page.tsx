@@ -73,6 +73,18 @@ export default function ResourcesPage() {
     };
   }, [contextResources]);
 
+  const handleClosePreview = useCallback(() => {
+    setPreviewResource(null);
+    if (lastFocusedRowRef.current) {
+      lastFocusedRowRef.current.focus();
+    }
+  }, []);
+
+  const handleOpenPreview = (item: ExtendedLegalResource, buttonEl?: HTMLButtonElement | null) => {
+    if (buttonEl) lastFocusedRowRef.current = buttonEl;
+    setPreviewResource(item);
+  };
+
   // Handle escape key to close preview and return focus
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -82,19 +94,7 @@ export default function ResourcesPage() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [previewResource]);
-
-  const handleOpenPreview = (item: ExtendedLegalResource, buttonEl?: HTMLButtonElement | null) => {
-    if (buttonEl) lastFocusedRowRef.current = buttonEl;
-    setPreviewResource(item);
-  };
-
-  const handleClosePreview = useCallback(() => {
-    setPreviewResource(null);
-    if (lastFocusedRowRef.current) {
-      lastFocusedRowRef.current.focus();
-    }
-  }, []);
+  }, [previewResource, handleClosePreview]);
 
   // Category collection from data
   const categories: CategoryOption[] = useMemo(() => {
@@ -257,9 +257,11 @@ export default function ResourcesPage() {
 
   // Counting "N documents" in grey when filter changes
   const [displayCount, setDisplayCount] = useState<number>(sortedResources.length);
+  const displayCountRef = useRef<number>(displayCount);
+  displayCountRef.current = displayCount;
 
   useEffect(() => {
-    const start = displayCount;
+    const start = displayCountRef.current;
     const end = sortedResources.length;
     if (start === end) return;
     let step = 0;
