@@ -98,6 +98,7 @@ export interface NewsItem {
   readTime?: string;
   author: { en: string; ta: string };
   issuingAuthority?: { en: string; ta: string };
+  source?: string;
   summary: { en: string; ta: string };
   content: { en: string; ta: string };
   image: string;

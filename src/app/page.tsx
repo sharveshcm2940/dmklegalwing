@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { OFFICIAL_HIERARCHY_CHART } from '@/data/content';
+import { SITE_STATS } from '@/data/siteStats';
 
 export default function HomePage() {
   const { language } = useLanguage();
@@ -22,6 +23,8 @@ export default function HomePage() {
         id: 'supreme-court-governor-ruling',
         category: 'Resolution',
         date: '2026-11-18',
+        court: 'Supreme Court of India',
+        source: 'Press Bureau, Anna Arivalayam',
         title: {
           en: 'Supreme Court upholds Tamil Nadu stand: Governors cannot delay assent to Assembly Bills indefinitely',
           ta: 'மாநில சட்டமன்ற மசோதாக்களுக்கு ஆளுநர்கள் ஒப்புதல் அளிக்காமல் காலவரையின்றி தாமதிக்க முடியாது: உச்சநீதிமன்றம் தீர்ப்பு',
@@ -103,7 +106,7 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, [metricsVisible]);
 
-  // 3. SECTIONS 4-8 INTERSECTION OBSERVER (Fade & Rise 28px over 0.8s at 12% visibility)
+  // 3. SECTIONS d TO h INTERSECTION OBSERVER (Fade & Rise 28px over 0.8s at 12% visibility)
   const leadersRef = useRef<HTMLElement>(null);
   const newsRef = useRef<HTMLElement>(null);
   const districtsRef = useRef<HTMLElement>(null);
@@ -147,8 +150,18 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  // 4. NEWS SECTION FILTER TABS
+  // 4. NEWS SECTION FILTER TABS & TRANSITION
   const [newsFilter, setNewsFilter] = useState<'All' | 'Press release' | 'Statement' | 'Resolution'>('All');
+  const [newsFading, setNewsFading] = useState(false);
+
+  const handleNewsFilterChange = (tab: 'All' | 'Press release' | 'Statement' | 'Resolution') => {
+    if (tab === newsFilter) return;
+    setNewsFading(true);
+    setTimeout(() => {
+      setNewsFilter(tab);
+      setNewsFading(false);
+    }, 150);
+  };
 
   const filteredNews = useMemo(() => {
     if (newsFilter === 'All') return publishedNews;
@@ -156,12 +169,25 @@ export default function HomePage() {
   }, [publishedNews, newsFilter]);
 
   const newsLeadStory = filteredNews[0] || leadStory;
-  const wireStories = filteredNews.slice(1, 5);
+  const wireStories = filteredNews.slice(1, 6);
+
+  // Helper for 108 px date block
+  const formatStoryDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return { day: '18', month: 'NOV', year: '2026' };
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+      return { day, month, year: String(d.getFullYear()) };
+    } catch {
+      return { day: '18', month: 'NOV', year: '2026' };
+    }
+  };
 
   // 5. DISTRICTS SECTION SEARCH & DOCKET
   const [districtQuery, setDistrictQuery] = useState('');
   const [selectedDistrictId, setSelectedDistrictId] = useState<string>('chennai-north');
-  const [copiedPhone, setCopiedPhone] = useState(false);
+  const [districtPanelSlide, setDistrictPanelSlide] = useState(false);
 
   const filteredDistricts = useMemo(() => {
     const q = districtQuery.toLowerCase().trim();
@@ -177,16 +203,22 @@ export default function HomePage() {
     );
   }, [districts, districtQuery]);
 
+  const activeDistrictIndex = useMemo(() => {
+    const idx = districts.findIndex((d) => d.id === selectedDistrictId);
+    return idx >= 0 ? idx + 1 : 1;
+  }, [districts, selectedDistrictId]);
+
   const activeDistrict = useMemo(() => {
     return districts.find((d) => d.id === selectedDistrictId) || filteredDistricts[0] || districts[0];
   }, [districts, selectedDistrictId, filteredDistricts]);
 
-  const handleCopyPhone = (phone: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(phone);
-      setCopiedPhone(true);
-      setTimeout(() => setCopiedPhone(false), 2000);
-    }
+  const handleSelectDistrict = (id: string) => {
+    if (id === selectedDistrictId) return;
+    setDistrictPanelSlide(true);
+    setSelectedDistrictId(id);
+    setTimeout(() => {
+      setDistrictPanelSlide(false);
+    }, 50);
   };
 
   // 6. STRUCTURE SECTION: 3 EQUAL BLOCKS
@@ -218,13 +250,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             
             {/* LEFT COLUMN: Main Editorial Typography */}
-            <div className="lg:col-span-7 max-w-[620px] space-y-6">
+            <div className="lg:col-span-7 max-w-[640px] space-y-6">
               
               {/* Kicker in #ff8a85 */}
               <div className="hero-stagger-1 flex items-center gap-3">
                 <img
                   src="/images/dmk-official-logo.png"
-                  alt="DMK Rising Sun & Flag Official Emblem"
+                  alt="DMK Official Emblem"
                   className="h-10 sm:h-12 w-auto object-contain"
                 />
                 <span className="text-[#ff8a85] font-helvetica font-extrabold text-[14px] sm:text-[15px] uppercase tracking-normal">
@@ -290,7 +322,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Headline in Helvetica Now Display 800 at 27 px */}
-                <h2 className="font-helvetica font-extrabold text-[27px] leading-[1.15] text-[#111111]">
+                <h2 className="font-helvetica font-extrabold text-[27px] leading-[1.18] text-[#111111]">
                   <Link href={`/news/${leadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
                     {leadStory.title[language]}
                   </Link>
@@ -307,8 +339,7 @@ export default function HomePage() {
                     href={`/news/${leadStory.id}`}
                     className="inline-flex items-center gap-1.5 text-[#C41A1F] hover:text-[#111111] font-helvetica font-extrabold text-[15px] transition-colors cursor-pointer"
                   >
-                    <span>{language === 'ta' ? 'முழு அறிக்கையைப் படிக்க' : 'Read the full statement'}</span>
-                    <span>&rarr;</span>
+                    <span>{language === 'ta' ? 'முழு அறிக்கையைப் படிக்க →' : 'Read the full statement →'}</span>
                   </Link>
                 </div>
               </article>
@@ -317,13 +348,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 760 px Logo Animation in Home Page Hero */}
-        {/* Turns once per 160s. Parallax mouse tracking shifts rays up to 14px opposite mouse */}
+        {/* 760 px Sun-ray Graphic at bottom right: right -140 px, bottom -380 px */}
         <div
           className="absolute pointer-events-none select-none z-0 overflow-hidden"
           style={{
             right: -140,
-            bottom: -280,
+            bottom: -380,
             width: 760,
             height: 760,
             transform: `translate(${parallaxOffset.x}px, ${parallaxOffset.y}px)`,
@@ -333,36 +363,32 @@ export default function HomePage() {
         >
           <svg
             viewBox="-380 -380 760 760"
-            className="w-[760px] h-[760px] relative overflow-visible"
+            className="w-[760px] h-[760px] relative overflow-visible animate-spin-slow origin-center"
           >
-            {/* 12 polygons points="-22,-110 22,-110 64,-380 -64,-380" rotated at i * 30 deg turning once per 160s */}
-            <g className="animate-spin-160s origin-center">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <polygon
-                  key={i}
-                  points="-22,-110 22,-110 64,-380 -64,-380"
-                  transform={`rotate(${i * 30})`}
-                  fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
-                />
-              ))}
-              {/* Central circle backing */}
-              <circle cx="0" cy="0" r="140" fill="#111111" stroke="#E31E24" strokeWidth="4" />
-            </g>
-
-            {/* Official DMK Rising Sun & Flag Emblem Image centered in the animation */}
+            {/* 12 polygons rotated every 30 degrees, alternating #E31E24 and #8f1118 */}
+            {Array.from({ length: 12 }).map((_, i) => (
+              <polygon
+                key={i}
+                points="-22,-110 22,-110 64,-380 -64,-380"
+                transform={`rotate(${i * 30})`}
+                fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
+              />
+            ))}
+            {/* Central circle r=96 filled #111 with 4px #E31E24 stroke */}
+            <circle cx="0" cy="0" r="96" fill="#111111" stroke="#E31E24" strokeWidth="4" />
             <image
               href="/images/dmk-official-logo.png"
-              x="-130"
-              y="-130"
-              width="260"
-              height="260"
+              x="-80"
+              y="-80"
+              width="160"
+              height="160"
               preserveAspectRatio="xMidYMid meet"
             />
           </svg>
         </div>
 
-        {/* Signature DMK Flag Ribbon at bottom of Hero */}
-        <div className="w-full h-[4px] dmk-flag-strip" aria-hidden="true" />
+        {/* Bottom edge rule */}
+        <div className="w-full h-[3px] bg-[#E31E24]" aria-hidden="true" />
       </section>
 
       {/* ===================================================================== */}
@@ -371,7 +397,6 @@ export default function HomePage() {
       <section className="w-full bg-[#FAF8F5] border-b-[3px] border-[#111111] py-3.5 overflow-hidden select-none">
         <div className="overflow-hidden whitespace-nowrap">
           <div className="animate-ticker-50s inline-flex items-center">
-            {/* Repeat items to create an uninterrupted 50s marquee */}
             {[...publishedNews, ...publishedNews].map((item, idx) => (
               <div
                 key={`${item.id}-${idx}`}
@@ -392,7 +417,7 @@ export default function HomePage() {
       </section>
 
       {/* ===================================================================== */}
-      {/* 3. RED METRICS BAND (#E31E24, 48 px Padding, 4 Columns, Top 4px Rule) */}
+      {/* 3. RED METRICS BAND (#E31E24, 48 px Padding, 4 Counters, Top 4px Rule)*/}
       {/* ===================================================================== */}
       <section
         ref={metricsRef}
@@ -401,7 +426,7 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
             
-            {/* Col 1: 3,500+ Registered Advocates */}
+            {/* Col 1: 3,500+ Registered advocates */}
             <div className="space-y-3">
               <div
                 className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
@@ -411,11 +436,11 @@ export default function HomePage() {
                 {counts[0].toLocaleString()}{countsFinished ? '+' : ''}
               </div>
               <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
-                {language === 'ta' ? 'பதிவுபெற்ற வழக்கறிஞர்கள்' : 'Registered advocates'}
+                {SITE_STATS.metrics[0]?.label[language] || (language === 'ta' ? 'பதிவுபெற்ற வழக்கறிஞர்கள்' : 'Registered advocates')}
               </p>
             </div>
 
-            {/* Col 2: 74 District Units */}
+            {/* Col 2: 74 District units */}
             <div className="space-y-3">
               <div
                 className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
@@ -425,11 +450,11 @@ export default function HomePage() {
                 {counts[1]}
               </div>
               <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
-                {language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'District units'}
+                {SITE_STATS.metrics[1]?.label[language] || (language === 'ta' ? 'அமைப்பு மாவட்டங்கள்' : 'District units')}
               </p>
             </div>
 
-            {/* Col 3: 50+ Years of Jurisprudence */}
+            {/* Col 3: 50+ Years of jurisprudence */}
             <div className="space-y-3">
               <div
                 className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
@@ -439,11 +464,11 @@ export default function HomePage() {
                 {counts[2]}{countsFinished ? '+' : ''}
               </div>
               <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
-                {language === 'ta' ? 'ஆண்டுகள் மக்கள் சட்டப்பணி' : 'Years of jurisprudence'}
+                {SITE_STATS.metrics[2]?.label[language] || (language === 'ta' ? 'ஆண்டுகள் மக்கள் சட்டப்பணி' : 'Years of jurisprudence')}
               </p>
             </div>
 
-            {/* Col 4: 69% Reservation Defended */}
+            {/* Col 4: 69% Reservation defended */}
             <div className="space-y-3">
               <div
                 className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
@@ -453,7 +478,7 @@ export default function HomePage() {
                 {counts[3]}{countsFinished ? '%' : ''}
               </div>
               <p className="font-catamaran font-extrabold text-[18px] text-white leading-snug">
-                {language === 'ta' ? 'சமூக நீதி இடஒதுக்கீடு அரண்' : 'Reservation defended'}
+                {SITE_STATS.metrics[3]?.label[language] || (language === 'ta' ? 'சமூக நீதி இடஒதுக்கீடு அரண்' : 'Reservation defended')}
               </p>
             </div>
 
@@ -474,22 +499,16 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
-            {/* Left: Kavivanar #C41A1F Title clamp(36px, 4.4vw, 56px) + 20 px Paragraph */}
+            {/* Left: Kavivanar Title in #C41A1F and grey paragraph */}
             <div className="lg:col-span-5 space-y-6">
-              <span className="text-[13px] font-extrabold uppercase text-[#5B5348] tracking-normal block">
-                {language === 'ta' ? 'அணித் தலைமை' : 'LEGAL WING LEADERSHIP'}
-              </span>
-
-              <h2 className="font-kavivanar font-normal text-[#C41A1F] text-[clamp(36px,4.4vw,56px)] leading-[1.2]">
-                {language === 'ta'
-                  ? 'அரசமைப்பு அமர்வுகளில் அறப்போர் நடத்தும் தலைமை'
-                  : 'Guardians of Constitutional Law and Social Equity'}
+              <h2 className="font-kavivanar font-normal text-[#C41A1F] text-[clamp(36px,4.5vw,56px)] leading-[1.2]">
+                {language === 'ta' ? 'அணியை வழிநடத்துவோர்' : 'Those who lead the wing'}
               </h2>
 
-              <p className="text-[20px] text-[#111111] leading-[1.7] font-normal">
+              <p className="text-[17px] text-[#5B5348] leading-[1.65] font-normal">
                 {language === 'ta'
                   ? 'பேரறிஞர் அண்ணா மற்றும் முத்தமிழறிஞர் கலைஞர் வகுத்தளித்த கொள்கைப் பாதையில், மாண்புமிகு முதலமைச்சர் மு.க. ஸ்டாலின் வழிகாட்டுதலில் உச்ச நீதிமன்றம் மற்றும் உயர் நீதிமன்றங்களில் சமூக நீதியை சமரசமின்றிப் பாதுகாக்கும் தலைமை வழக்கறிஞர் பெருமக்கள்.'
-                  : 'Led by senior members of the Bar dedicated to advancing federal autonomy, linguistic equality, and affirmative action across India’s constitutional courts.'}
+                  : 'Advocating before the highest constitutional courts of the Republic, upholding state autonomy, linguistic rights, and the historic 69% reservation architecture for Tamil Nadu.'}
               </p>
 
               <div className="pt-2">
@@ -497,77 +516,66 @@ export default function HomePage() {
                   href="/structure"
                   className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors"
                 >
-                  <span>{language === 'ta' ? 'முழு கட்டமைப்பு வரைபடம்' : 'Full structural chart'}</span>
-                  <span>&rarr;</span>
+                  <span>{language === 'ta' ? 'முழு கட்டமைப்பு வரைபடம் →' : 'Full structural chart →'}</span>
                 </Link>
               </div>
             </div>
 
-            {/* Right: Two 4:5 Portraits with 2 px Ink Border, 6 px Top Rule expanding to 10 px */}
+            {/* Right: Two 4:5 Portraits with 2 px Ink Borders, 6 px Top Rule growing to 10 px */}
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8">
               
               {/* Leader 1: R. Viduthalai (Red Top Rule) */}
-              <div className="group bg-white border-2 border-[#111111] p-6 space-y-4 hover:-translate-y-1.5 transition-transform duration-200">
-                {/* 6 px Red top rule expanding to 10 px */}
+              <div className="group bg-white border-2 border-[#111111] p-6 space-y-4 hover:-translate-y-[6px] transition-transform duration-200">
+                {/* 6 px Red top rule growing to 10 px on hover */}
                 <div className="w-full h-[6px] bg-[#E31E24] group-hover:h-[10px] transition-all duration-200" />
 
-                <div className="aspect-[4/5] w-full bg-[#f1ece2] overflow-hidden border border-[#d7d0c3] relative">
+                <div className="aspect-[4/5] w-full bg-[#f1ece2] overflow-hidden border border-[#111111] relative">
                   <img
                     src="/images/r-viduthalai.jpg"
-                    alt="R. Viduthalai Senior Advocate"
-                    className="w-full h-full object-cover object-[center_15%] filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    alt="R. Viduthalai, President"
+                    className="w-full h-full object-cover object-[center_15%]"
                   />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#111111]/90 text-white text-[12px] font-bold">
-                    PRESIDENT · SENIOR ADVOCATE
-                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-tight">
+                <div className="space-y-1.5">
+                  <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-tight">
                     {language === 'ta' ? 'ஆர். விடுதலை' : 'R. Viduthalai'}
                   </h3>
-                  <p className="text-[14px] text-[#C41A1F] font-bold">
-                    {language === 'ta'
-                      ? 'தலைவர், வழக்கறிஞர் அணி · மூத்த வழக்கறிஞர்'
-                      : 'President, DMK Legal Wing · Senior Advocate'}
+                  <p className="text-[15px] text-[#C41A1F] font-bold">
+                    {language === 'ta' ? 'தலைவர்' : 'President'}
                   </p>
-                  <p className="text-[13px] text-[#5B5348] line-clamp-2">
+                  <p className="text-[14px] text-[#5B5348] leading-snug">
                     {language === 'ta'
-                      ? 'முன்னாள் தலைமை வழக்கறிஞர் (Advocate General of Tamil Nadu).'
-                      : 'Former Advocate General of Tamil Nadu & Senior Counsel before Supreme Court.'}
+                      ? 'மூத்த வழக்கறிஞர் · தமிழ்நாட்டின் முன்னாள் தலைமை வழக்கறிஞர்'
+                      : 'Senior Advocate · Former Advocate General of Tamil Nadu'}
                   </p>
                 </div>
               </div>
 
               {/* Leader 2: N.R. Elango (Ink Top Rule) */}
-              <div className="group bg-white border-2 border-[#111111] p-6 space-y-4 hover:-translate-y-1.5 transition-transform duration-200">
-                {/* 6 px Ink top rule expanding to 10 px */}
+              <div className="group bg-white border-2 border-[#111111] p-6 space-y-4 hover:-translate-y-[6px] transition-transform duration-200">
+                {/* 6 px Ink top rule growing to 10 px on hover */}
                 <div className="w-full h-[6px] bg-[#111111] group-hover:h-[10px] transition-all duration-200" />
 
-                <div className="aspect-[4/5] w-full bg-[#f1ece2] overflow-hidden border border-[#d7d0c3] relative">
+                <div className="aspect-[4/5] w-full bg-[#f1ece2] overflow-hidden border border-[#111111] relative">
                   <img
                     src="/images/nr-elango.jpg"
-                    alt="N.R. Elango Senior Advocate & MP"
-                    className="w-full h-full object-cover object-top filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    alt="N.R. Elango, Secretary"
+                    className="w-full h-full object-cover object-top"
                   />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#111111]/90 text-white text-[12px] font-bold">
-                    SECRETARY · SENIOR ADVOCATE & MP
-                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-tight">
+                <div className="space-y-1.5">
+                  <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-tight">
                     {language === 'ta' ? 'என்.ஆர். இளங்கோ' : 'N.R. Elango'}
                   </h3>
-                  <p className="text-[14px] text-[#111111] font-bold">
-                    {language === 'ta'
-                      ? 'செயலாளர், வழக்கறிஞர் அணி · மூத்த வழக்கறிஞர் & எம்.பி.'
-                      : 'Secretary, DMK Legal Wing · Senior Advocate & MP'}
+                  <p className="text-[15px] text-[#C41A1F] font-bold">
+                    {language === 'ta' ? 'செயலாளர்' : 'Secretary'}
                   </p>
-                  <p className="text-[13px] text-[#5B5348] line-clamp-2">
+                  <p className="text-[14px] text-[#5B5348] leading-snug">
                     {language === 'ta'
-                      ? 'நாடாளுமன்ற மாநிலங்களவை உறுப்பினர் மற்றும் மூத்த வழக்கறிஞர்.'
-                      : 'Member of Parliament (Rajya Sabha) & Senior Advocate, Madras High Court.'}
+                      ? 'மூத்த வழக்கறிஞர் · நாடாளுமன்ற மாநிலங்களவை உறுப்பினர்'
+                      : 'Senior Advocate · Member of Parliament, Rajya Sabha'}
                   </p>
                 </div>
               </div>
@@ -591,18 +599,15 @@ export default function HomePage() {
       >
         <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)]">
           
-          {/* Header Row: Kavivanar Title + Sliding 3 px Underline Filter Tabs */}
+          {/* Header Row: Kavivanar Title "From the press bureau" + Filter Tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#111111] pb-6 mb-12">
             <div>
-              <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
-                {language === 'ta' ? 'செய்திப் பிரிவு' : 'PRESS BUREAU & MEDIA WIRE'}
-              </span>
-              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(36px,4.5vw,56px)] leading-[1.2] mt-1">
-                {language === 'ta' ? 'அறிக்கைகள் மற்றும் நீதிமன்ற உத்தரவுகள்' : 'Official Statements & Court Rulings'}
+              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(40px,5vw,64px)] leading-[1.15]">
+                {language === 'ta' ? 'செய்திப் பணியகத்திலிருந்து' : 'From the press bureau'}
               </h2>
             </div>
 
-            {/* Sliding 3 px Underline Filter Tabs: All / Press release / Statement / Resolution */}
+            {/* Sliding Red Underline Filter Tabs: All / Press release / Statement / Resolution */}
             <div className="flex items-center gap-6 overflow-x-auto pb-1">
               {(['All', 'Press release', 'Statement', 'Resolution'] as const).map((tab) => {
                 const isActive = newsFilter === tab;
@@ -618,14 +623,14 @@ export default function HomePage() {
                   <button
                     key={tab}
                     type="button"
-                    onClick={() => setNewsFilter(tab)}
+                    onClick={() => handleNewsFilterChange(tab)}
                     className={`relative py-1 font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
                       isActive ? 'text-[#111111]' : 'text-[#5B5348] hover:text-[#111111]'
                     }`}
                   >
                     <span>{language === 'ta' ? tabLabelTa : tab}</span>
                     <span
-                      className={`absolute bottom-0 left-0 right-0 h-[3px] bg-[#E31E24] transition-all duration-200 ${
+                      className={`absolute bottom-0 left-0 right-0 h-[3px] bg-[#E31E24] transition-all duration-250 ${
                         isActive ? 'opacity-100' : 'opacity-0'
                       }`}
                       aria-hidden="true"
@@ -636,126 +641,148 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Large Lead Block */}
-          <div className="bg-white border-2 border-[#111111] p-8 md:p-12 mb-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            {/* Left 420 px Ink Panel: Sweeping Rays -14° to 0°, Dropping Date Stamp, Kavivanar Slogan */}
-            <div className="lg:col-span-5 h-[340px] bg-[#111111] text-[#FAF8F5] p-6 relative overflow-hidden flex flex-col justify-between border-2 border-[#111111]">
+          {/* First Story: Two-column block with 2 px ink border */}
+          <div className={`transition-opacity duration-300 ${newsFading ? 'opacity-0' : 'opacity-100'}`}>
+            <div className="bg-white border-2 border-[#111111] p-8 md:p-12 mb-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
-              {/* Sweeping Rays Graphic behind */}
-              <div
-                className="absolute -right-20 -bottom-20 w-[360px] h-[360px] opacity-40 pointer-events-none select-none animate-ray-sweep"
-                aria-hidden="true"
-              >
-                <svg viewBox="-180 -180 360 360" className="w-full h-full">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <polygon
-                      key={i}
-                      points="-11,-55 11,-55 32,-190 -32,-190"
-                      transform={`rotate(${i * 30})`}
-                      fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
-                    />
-                  ))}
-                  <circle cx="0" cy="0" r="48" fill="#111111" stroke="#E31E24" strokeWidth="2" />
-                  <image
-                    href="/images/dmk-official-logo.png"
-                    x="-40"
-                    y="-40"
-                    width="80"
-                    height="80"
-                    preserveAspectRatio="xMidYMid meet"
-                  />
-                </svg>
-              </div>
-
-              {/* Dropping Date Stamp (scale 1.7 to 1, rotate -7°) */}
-              <div className="relative z-10 self-start">
-                <div className="animate-stamp-drop inline-block px-3 py-1 bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase border border-white">
-                  {newsLeadStory.date} · {newsLeadStory.category}
-                </div>
-              </div>
-
-              {/* Kavivanar Slogan */}
-              <div className="relative z-10 space-y-1">
-                <span className="text-[12px] font-bold text-[#ff8a85] uppercase tracking-normal">
-                  SPECIAL DISPATCH
-                </span>
-                <p className="font-kavivanar font-normal text-[26px] leading-tight text-white">
-                  {language === 'ta'
-                    ? 'நீதிமன்றங்களில் சமரசமற்ற சமூக நீதி!'
-                    : 'Uncompromising Social Justice in the Courts!'}
-                </p>
-              </div>
-            </div>
-
-            {/* Right Text + Ink Button */}
-            <div className="lg:col-span-7 space-y-4">
-              <span className="text-[13px] font-extrabold uppercase text-[#C41A1F]">
-                {newsLeadStory.court || 'Supreme Court of India'}
-              </span>
-
-              <h3 className="font-helvetica font-extrabold text-[clamp(26px,3.5vw,36px)] leading-[1.2] text-[#111111]">
-                <Link href={`/news/${newsLeadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
-                  {newsLeadStory.title[language]}
-                </Link>
-              </h3>
-
-              <p className="text-[18px] text-[#3a322d] leading-relaxed">
-                {newsLeadStory.summary[language]}
-              </p>
-
-              <div className="pt-2">
-                <Link
-                  href={`/news/${newsLeadStory.id}`}
-                  className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
-                >
-                  {language === 'ta' ? 'முழு அறிக்கையைப் படிக்க' : 'Read full statement →'}
-                </Link>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Ruled Story Rows (108 px Date Block, Red Hover Bar 0 to 6 px, 22 px Slide Right) */}
-          <div className="space-y-0 divide-y divide-[#111111] border-t border-b border-[#111111] bg-white">
-            {wireStories.map((story) => (
-              <article
-                key={story.id}
-                className="group relative flex flex-col md:flex-row md:items-center justify-between p-6 transition-all duration-200 hover:bg-[#FAF8F5] hover:pl-10 cursor-pointer"
-              >
-                {/* Red hover bar 0 to 6 px */}
+              {/* Left 420 px Ink Panel: Sweeping Rays -14° to 0°, Dropping Date Stamp, Kavivanar Line */}
+              <div className="lg:col-span-5 h-[420px] bg-[#111111] text-[#FAF8F5] p-8 relative overflow-hidden flex flex-col justify-between border-2 border-[#111111]">
+                
+                {/* Sweeping Rays Graphic behind (-14 to 0 deg in 1.6s) */}
                 <div
-                  className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-[6px] bg-[#E31E24] transition-all duration-200"
+                  className="absolute -right-16 -bottom-16 w-[380px] h-[380px] opacity-40 pointer-events-none select-none animate-ray-sweep origin-center"
                   aria-hidden="true"
-                />
+                >
+                  <svg viewBox="-180 -180 360 360" className="w-full h-full">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <polygon
+                        key={i}
+                        points="-11,-55 11,-55 32,-190 -32,-190"
+                        transform={`rotate(${i * 30})`}
+                        fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
+                      />
+                    ))}
+                    <circle cx="0" cy="0" r="48" fill="#111111" stroke="#E31E24" strokeWidth="2" />
+                    <image
+                      href="/images/dmk-official-logo.png"
+                      x="-40"
+                      y="-40"
+                      width="80"
+                      height="80"
+                      preserveAspectRatio="xMidYMid meet"
+                    />
+                  </svg>
+                </div>
 
-                <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 flex-1">
-                  {/* 108 px Date Block */}
-                  <div className="w-[108px] shrink-0 font-helvetica font-bold text-[14px] text-[#5B5348]">
-                    <div>{story.date}</div>
-                    <span className="text-[12px] text-[#C41A1F] font-extrabold uppercase">
-                      {story.category}
-                    </span>
-                  </div>
-
-                  {/* Title & Summary */}
-                  <div className="space-y-1 flex-1">
-                    <h4 className="font-helvetica font-extrabold text-[20px] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-snug">
-                      <Link href={`/news/${story.id}`}>
-                        {story.title[language]}
-                      </Link>
-                    </h4>
-                    <p className="text-[15px] text-[#5B5348] line-clamp-1">
-                      {story.summary[language]}
-                    </p>
+                {/* Dropping Parchment-Bordered Date Stamp (scale 1.7 to 1, rotate -7°, 0.6s) */}
+                <div className="relative z-10 self-start">
+                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[13px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
+                    {newsLeadStory.date} · {newsLeadStory.category}
                   </div>
                 </div>
 
-                <div className="mt-4 md:mt-0 shrink-0 font-helvetica font-bold text-[14px] text-[#C41A1F] uppercase md:pl-4">
-                  <span>{language === 'ta' ? 'விவரம் →' : 'Read →'}</span>
+                {/* Kavivanar Line "தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!" */}
+                <div className="relative z-10 space-y-2">
+                  <span className="text-[12px] font-bold text-[#ff8a85] uppercase tracking-normal">
+                    {language === 'ta' ? 'அண்ணா அறிவாலயம் சிறப்புச் செய்தி' : 'SPECIAL DISPATCH'}
+                  </span>
+                  <p className="font-kavivanar font-normal text-[clamp(24px,2.8vw,32px)] leading-tight text-white">
+                    தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!
+                  </p>
                 </div>
-              </article>
-            ))}
+              </div>
+
+              {/* Right Column: Type Tag, Headline, Summary 20px, Source, Ink Button */}
+              <div className="lg:col-span-7 space-y-5">
+                <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal">
+                  [{newsLeadStory.category}] · {newsLeadStory.court || 'Constitutional Bench'}
+                </span>
+
+                <h3 className="font-helvetica font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.15] text-[#111111]">
+                  <Link href={`/news/${newsLeadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
+                    {newsLeadStory.title[language]}
+                  </Link>
+                </h3>
+
+                <p className="text-[20px] text-[#3a322d] leading-[1.65]">
+                  {newsLeadStory.summary[language]}
+                </p>
+
+                {/* Source line (never cut off) */}
+                <div className="text-[15px] font-bold text-[#5B5348] border-t border-[#d7d0c3] pt-3">
+                  {language === 'ta' ? 'ஆதாரம்:' : 'Source:'}{' '}
+                  {newsLeadStory.source || newsLeadStory.issuingAuthority?.[language] || 'State Legal Secretariat, Anna Arivalayam, Chennai'}
+                </div>
+
+                <div className="pt-2">
+                  <Link
+                    href={`/news/${newsLeadStory.id}`}
+                    className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
+                  >
+                    {language === 'ta' ? 'முழு அறிக்கையைப் படிக்க →' : 'Read the full statement →'}
+                  </Link>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Other stories as Ruled Rows with NO cards */}
+            {/* 108 px Date Block (Day 56 px 800, Month grey), Type in #C41A1F, Headline clamp(24px, 2.6vw, 34px) 800, Summary 18 px, Source 15 px, Arrow */}
+            {/* Hover: red bar grows 0 to 6 px, moves 22 px right, turns #e9e3d7, arrow moves 8 px (all 0.25 s) */}
+            <div className="divide-y divide-[#111111] border-t border-b border-[#111111] bg-white">
+              {wireStories.map((story) => {
+                const dateParts = formatStoryDate(story.date);
+                return (
+                  <article
+                    key={story.id}
+                    className="group relative flex flex-col md:flex-row md:items-center justify-between p-6 sm:p-8 transition-all duration-250 hover:bg-[#e9e3d7] hover:translate-x-[22px] cursor-pointer overflow-hidden"
+                  >
+                    {/* Red hover bar 0 to 6 px on left edge */}
+                    <div
+                      className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-[6px] bg-[#E31E24] transition-all duration-250"
+                      aria-hidden="true"
+                    />
+
+                    <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8 flex-1">
+                      {/* 108 px Date Block */}
+                      <div className="w-[108px] shrink-0 text-left">
+                        <div className="font-helvetica font-extrabold text-[56px] leading-none text-[#111111]">
+                          {dateParts.day}
+                        </div>
+                        <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-wider uppercase">
+                          {dateParts.month} {dateParts.year}
+                        </div>
+                        <div className="mt-2 text-[12px] text-[#C41A1F] font-extrabold uppercase">
+                          {story.category}
+                        </div>
+                      </div>
+
+                      {/* Content: Type in #C41A1F, Headline clamp(24px, 2.6vw, 34px) 800, Summary 18 px, Source 15 px */}
+                      <div className="space-y-2 flex-1">
+                        <h4 className="font-helvetica font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.2]">
+                          <Link href={`/news/${story.id}`}>
+                            {story.title[language]}
+                          </Link>
+                        </h4>
+                        <p className="text-[18px] text-[#3a322d] leading-relaxed">
+                          {story.summary[language]}
+                        </p>
+                        {/* Source line (never cut off) */}
+                        <p className="text-[15px] text-[#5B5348] font-bold">
+                          {language === 'ta' ? 'வெளியீடு:' : 'Issued by:'}{' '}
+                          {story.source || story.issuingAuthority?.[language] || 'DMK Legal Wing Press Bureau'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Arrow that moves 8 px on hover */}
+                    <div className="mt-4 md:mt-0 shrink-0 md:pl-6 text-[#111111] group-hover:text-[#E31E24] text-[24px] font-bold transition-transform duration-250 group-hover:translate-x-2">
+                      &rarr;
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </div>
 
         </div>
@@ -776,11 +803,8 @@ export default function HomePage() {
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#3d3633] pb-6 mb-12">
             <div>
-              <span className="text-[13px] font-extrabold uppercase text-[#ff8a85] tracking-normal block">
-                {language === 'ta' ? '74 கழக மாவட்டங்கள்' : '74 DISTRICT ADMINISTRATIVE UNITS'}
-              </span>
-              <h2 className="font-kavivanar font-normal text-white text-[clamp(36px,4.5vw,56px)] leading-[1.2] mt-1">
-                {language === 'ta' ? 'மாவட்ட வழக்கறிஞர் அணிகள்' : 'Find Your District Legal Secretariat'}
+              <h2 className="font-kavivanar font-normal text-white text-[clamp(36px,4.5vw,56px)] leading-[1.2]">
+                {language === 'ta' ? '74 கழக மாவட்டங்கள், ஒரு தொலைபேசி அழைப்பில்' : '74 district units, one phone call away'}
               </h2>
             </div>
             <Link
@@ -793,12 +817,12 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {/* Left: Search Box with SVG Magnifier + 380 px Scroll List with 1 px #3d3633 Rules */}
-            <div className="lg:col-span-5 bg-[#1a1715] border border-[#3d3633] p-6 space-y-4">
+            {/* Left: 2 px Parchment Bordered Search Box + 380 px Scroll List */}
+            <div className="lg:col-span-5 bg-[#1a1715] border-2 border-[#FAF8F5] p-6 space-y-4">
               
-              {/* Search box with SVG magnifier */}
+              {/* Search box with inline-SVG magnifier */}
               <div className="relative">
-                <span className="absolute left-3.5 top-3.5 text-[#d8cfc2]" aria-hidden="true">
+                <span className="absolute left-3.5 top-3.5 text-[#111111]" aria-hidden="true">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -807,13 +831,13 @@ export default function HomePage() {
                   type="text"
                   value={districtQuery}
                   onChange={(e) => setDistrictQuery(e.target.value)}
-                  placeholder={language === 'ta' ? 'மாவட்டப் பெயர் அல்லது அமைப்பாளர்...' : 'Search by district or organizer...'}
-                  className="w-full bg-[#111111] border border-[#3d3633] pl-11 pr-4 py-3 text-[15px] text-white placeholder-[#8a7f78] focus:outline-none focus:border-[#E31E24]"
+                  placeholder={language === 'ta' ? 'மாவட்டப் பெயர் அல்லது அமைப்பாளர்...' : 'Filter by district or organiser...'}
+                  className="w-full bg-[#FAF8F5] border-2 border-[#111111] pl-11 pr-4 py-3 text-[15px] text-[#111111] placeholder-[#5B5348] focus:outline-none focus:ring-2 focus:ring-[#E31E24]"
                 />
               </div>
 
-              {/* 380 px Scroll List */}
-              <div className="max-h-[380px] overflow-y-auto divide-y divide-[#3d3633] border-t border-b border-[#3d3633]">
+              {/* 380 px Scroll List: name 800 left, organiser right, 1 px #3d3633 lines, hover #2a2523, selected row red */}
+              <div className="h-[380px] overflow-y-auto divide-y divide-[#3d3633] border-t border-b border-[#3d3633]">
                 {filteredDistricts.length === 0 ? (
                   <p className="py-8 text-center text-[#d8cfc2] text-[15px]">
                     {language === 'ta' ? 'மாவட்டங்கள் கிடைக்கவில்லை.' : 'No matching units found.'}
@@ -825,24 +849,19 @@ export default function HomePage() {
                       <button
                         key={d.id}
                         type="button"
-                        onClick={() => setSelectedDistrictId(d.id)}
+                        onClick={() => handleSelectDistrict(d.id)}
                         className={`w-full text-left p-3.5 flex items-center justify-between transition-colors cursor-pointer ${
                           isSelected
                             ? 'bg-[#E31E24] text-white font-bold'
-                            : 'hover:bg-[#25201d] text-[#FAF8F5]'
+                            : 'hover:bg-[#2a2523] text-[#FAF8F5]'
                         }`}
                       >
-                        <div>
-                          <div className="font-helvetica font-extrabold text-[16px]">
-                            {d.name[language]}
-                          </div>
-                          <div className={`text-[13px] line-clamp-1 ${isSelected ? 'text-white/90' : 'text-[#d8cfc2]'}`}>
-                            {d.organizer[language]} · {d.headquarters[language]}
-                          </div>
+                        <div className="font-helvetica font-extrabold text-[16px]">
+                          {d.name[language]}
                         </div>
-                        <span className="text-[12px] uppercase tracking-normal px-2 py-0.5 bg-black/40 border border-white/20">
-                          {d.zone}
-                        </span>
+                        <div className={`text-[13px] text-right pl-3 ${isSelected ? 'text-white' : 'text-[#d8cfc2]'}`}>
+                          {d.organizer[language]}
+                        </div>
                       </button>
                     );
                   })
@@ -850,68 +869,50 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right: Parchment Panel (#FAF8F5) with 8 px Red Top Border and Full-width Red Tel: Button */}
-            <div className="lg:col-span-7 bg-[#FAF8F5] text-[#111111] border-2 border-[#111111] p-8 md:p-10 space-y-6">
+            {/* Right: Parchment Panel with 8 px Red Top Border */}
+            {/* "District organiser · No. N" in #C41A1F, district name clamp(34px, 4vw, 52px) 800, organiser 600 at 26px, full-width red tel: button */}
+            {/* Selecting a row slides the panel content in from the right (24 px, 0.35 s) */}
+            <div className="lg:col-span-7 bg-[#FAF8F5] text-[#111111] border-2 border-[#111111] p-8 md:p-10 space-y-6 overflow-hidden">
               {/* 8 px Red top border */}
               <div className="w-full h-[8px] bg-[#E31E24]" />
 
-              <div className="space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#d7d0c3] pb-4">
-                  <div>
-                    <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
-                      [{activeDistrict.zone} ZONE · DISTRICT REGISTRY]
-                    </span>
-                    <h3 className="font-helvetica font-extrabold text-[32px] leading-tight text-[#111111] mt-0.5">
-                      {activeDistrict.name[language]}
-                    </h3>
-                  </div>
-                  <span className="px-3 py-1 bg-[#111111] text-white font-helvetica font-extrabold text-[13px] uppercase">
-                    HQ: {activeDistrict.headquarters[language]}
+              <div
+                className={`space-y-5 transition-transform duration-350 ease-out ${
+                  districtPanelSlide ? 'translate-x-6 opacity-0' : 'translate-x-0 opacity-100'
+                }`}
+              >
+                <div className="border-b border-[#d7d0c3] pb-4">
+                  <span className="text-[14px] font-extrabold uppercase text-[#C41A1F] block tracking-normal">
+                    {language === 'ta'
+                      ? `மாவட்ட அமைப்பாளர் · எண். ${activeDistrictIndex}`
+                      : `District organiser · No. ${activeDistrictIndex}`}
                   </span>
+                  <h3 className="font-helvetica font-extrabold text-[clamp(34px,4vw,52px)] leading-tight text-[#111111] mt-1">
+                    {activeDistrict.name[language]}
+                  </h3>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-white border border-[#d7d0c3] space-y-1">
-                    <span className="text-[12px] font-bold text-[#5B5348] uppercase">
-                      {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'District Organizer'}
-                    </span>
-                    <p className="font-helvetica font-extrabold text-[18px] text-[#111111]">
-                      {activeDistrict.organizer[language]}
-                    </p>
-                  </div>
-
-                  <div className="p-4 bg-white border border-[#d7d0c3] space-y-1">
-                    <span className="text-[12px] font-bold text-[#5B5348] uppercase">
-                      {language === 'ta' ? 'நீதிமன்ற வளாகம்' : 'Court Complex'}
-                    </span>
-                    <p className="font-helvetica font-extrabold text-[18px] text-[#111111]">
-                      {activeDistrict.courtComplex[language]}
-                    </p>
-                  </div>
+                <div className="space-y-2">
+                  <span className="text-[13px] font-bold text-[#5B5348] uppercase tracking-normal">
+                    {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'District Organiser'}
+                  </span>
+                  <p className="font-helvetica font-semibold text-[26px] text-[#111111] leading-snug">
+                    {activeDistrict.organizer[language]}
+                  </p>
+                  <p className="text-[15px] text-[#5B5348]">
+                    {language === 'ta' ? 'தலைமையிடம் / நீதிமன்றம்:' : 'Headquarters / Court:'} {activeDistrict.headquarters[language]} · {activeDistrict.courtComplex[language]}
+                  </p>
                 </div>
 
-                {/* Full-width Red tel: button */}
-                <div className="pt-2">
+                {/* One full-width red tel: button per number */}
+                <div className="pt-4 space-y-3">
                   <a
                     href={`tel:${activeDistrict.contactPhone}`}
                     className="w-full min-h-[48px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center gap-3 transition-colors cursor-pointer"
                   >
-                    <span>{language === 'ta' ? 'நேரடித் தொலைபேசி அழைப்பு:' : 'Call District Secretariat:'}</span>
+                    <span>{language === 'ta' ? 'நேரடி அழைப்பு:' : 'Direct Telephone Call:'}</span>
                     <span>{activeDistrict.contactPhone}</span>
                   </a>
-                </div>
-
-                {/* Copy phone link */}
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => handleCopyPhone(activeDistrict.contactPhone)}
-                    className="text-[13px] font-bold text-[#5B5348] hover:text-[#111111] underline cursor-pointer"
-                  >
-                    {copiedPhone
-                      ? (language === 'ta' ? 'எண் நகலெடுக்கப்பட்டது!' : 'Phone copied!')
-                      : (language === 'ta' ? 'தொலைபேசி எண்ணை நகலெடு' : 'Copy phone number')}
-                  </button>
                 </div>
               </div>
             </div>
@@ -934,11 +935,8 @@ export default function HomePage() {
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-[#111111] pb-6 mb-12">
             <div>
-              <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal block">
-                {language === 'ta' ? 'அமைப்புச் சட்டம்' : 'ORGANIZATIONAL APPARATUS'}
-              </span>
-              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(36px,4.5vw,56px)] leading-[1.2] mt-1">
-                {language === 'ta' ? 'செயலாளரின் கீழ் மூன்று நிர்வாகப் பிரிவுகள்' : 'Three Wings Under the Secretary'}
+              <h2 className="font-kavivanar font-normal text-[#111111] text-[clamp(36px,4.5vw,56px)] leading-[1.2]">
+                {language === 'ta' ? 'செயலாளரின் கீழ் மூன்று நிர்வாகப் பிரிவுகள்' : 'Three branches under the Secretary'}
               </h2>
             </div>
             <Link
@@ -949,14 +947,14 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* 3 Equal Blocks: Joint Secretaries (9), Deputy Secretaries (5), Head Office Advocates (9) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {/* Three equal blocks in a 2 px ink frame: Joint Secretaries 9, Deputy Secretaries 5, Head Office Advocates 9 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 border-2 border-[#111111] divide-y md:divide-y-0 md:divide-x-2 divide-[#111111] mb-12">
             
             {/* Block 1: Joint Secretaries 9 */}
             <button
               type="button"
               onClick={() => setActiveBranch('joint')}
-              className={`p-8 border-2 border-[#111111] text-left transition-colors cursor-pointer ${
+              className={`p-8 text-left transition-colors cursor-pointer ${
                 activeBranch === 'joint'
                   ? 'bg-[#111111] text-white'
                   : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
@@ -979,7 +977,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setActiveBranch('deputy')}
-              className={`p-8 border-2 border-[#111111] text-left transition-colors cursor-pointer ${
+              className={`p-8 text-left transition-colors cursor-pointer ${
                 activeBranch === 'deputy'
                   ? 'bg-[#111111] text-white'
                   : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
@@ -1002,7 +1000,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setActiveBranch('headoffice')}
-              className={`p-8 border-2 border-[#111111] text-left transition-colors cursor-pointer ${
+              className={`p-8 text-left transition-colors cursor-pointer ${
                 activeBranch === 'headoffice'
                   ? 'bg-[#111111] text-white'
                   : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
@@ -1023,23 +1021,25 @@ export default function HomePage() {
 
           </div>
 
-          {/* Roster below fades in staggered 40 ms */}
+          {/* Members below in columns: name 800, district grey; each fading in 40 ms after the previous */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {branchRoster.map((officer, idx) => (
               <div
                 key={officer.id || idx}
-                className="p-5 bg-white border border-[#d7d0c3] space-y-1 transition-all duration-300 hover:border-[#111111]"
-                style={{ animationDelay: `${idx * 40}ms` }}
+                className="p-5 bg-white border border-[#111111] space-y-1 transition-all duration-300"
+                style={{
+                  animation: `fade-rise 0.4s ease-out ${idx * 40}ms forwards`,
+                }}
               >
-                <span className="text-[12px] font-extrabold text-[#C41A1F] uppercase">
-                  {officer.district[language]}
-                </span>
                 <h4 className="font-helvetica font-extrabold text-[18px] text-[#111111]">
                   {officer.name[language]}
                 </h4>
-                <p className="text-[13px] text-[#5B5348]">
+                <div className="text-[13px] text-[#5B5348] font-bold">
+                  {officer.district[language]}
+                </div>
+                <div className="text-[13px] text-[#C41A1F]">
                   {officer.role[language]}
-                </p>
+                </div>
               </div>
             ))}
           </div>
@@ -1062,17 +1062,12 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Block 1: Red Advocate Enrolment with Ink Button */}
-            <div className="bg-[#E31E24] text-white p-8 md:p-12 space-y-6 flex flex-col justify-between">
+            <div className="bg-[#E31E24] text-white p-8 md:p-12 space-y-6 flex flex-col justify-between border-2 border-[#111111]">
               <div className="space-y-4">
-                <span className="px-3 py-1 bg-white text-[#E31E24] font-helvetica font-extrabold text-[12px] uppercase">
-                  {language === 'ta' ? 'வழக்கறிஞர்களுக்கான தளம்' : 'FOR LICENSED ADVOCATES'}
-                </span>
-                <h3 className="font-helvetica font-extrabold text-[32px] sm:text-[38px] leading-tight text-white">
-                  {language === 'ta'
-                    ? 'திமுக வழக்கறிஞர் அணியில் உறுப்பினராகப் பதிவு செய்க'
-                    : 'Enrol in the DMK Legal Wing Registry'}
+                <h3 className="font-kavivanar font-normal text-[44px] leading-tight text-white">
+                  {language === 'ta' ? 'வழக்கறிஞர் சேர்க்கை' : 'Advocate enrolment'}
                 </h3>
-                <p className="text-[17px] text-white/90 leading-relaxed font-normal">
+                <p className="text-[17px] text-white/95 leading-relaxed font-normal">
                   {language === 'ta'
                     ? 'பார் கவுன்சில் பதிவுபெற்ற அனைத்து வழக்கறிஞர்களும் கழகத்தின் சட்டப் பிரிவில் இணைந்து சமூக நீதி மற்றும் அரசமைப்பு மாண்புகளைக் காக்க முன்வாருங்கள்.'
                     : 'Join thousands of bar practitioners defending constitutional democracy, federalism, and the reservation architecture across all 74 districts.'}
@@ -1084,21 +1079,16 @@ export default function HomePage() {
                   href="/enrol"
                   className="w-full min-h-[48px] px-8 bg-[#111111] hover:bg-[#333333] text-white font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  {language === 'ta' ? 'வழக்கறிஞர் சேர்க்கைப் படிவம்' : 'Enrol as Advocate →'}
+                  {language === 'ta' ? 'இப்போதே சேர்க்கை பெறுக' : 'Enrol now'}
                 </Link>
               </div>
             </div>
 
             {/* Block 2: Ink Citizen Legal Desk with 2 px Red Border Custody Notice & Parchment Button */}
-            <div className="bg-[#111111] text-[#FAF8F5] p-8 md:p-12 space-y-6 flex flex-col justify-between">
+            <div className="bg-[#111111] text-[#FAF8F5] p-8 md:p-12 space-y-6 flex flex-col justify-between border-2 border-[#111111]">
               <div className="space-y-4">
-                <span className="px-3 py-1 bg-[#25201d] text-[#ff8a85] border border-[#3d3633] font-helvetica font-extrabold text-[12px] uppercase">
-                  {language === 'ta' ? 'பொதுமக்கள் சட்ட உதவி' : 'CITIZEN LEGAL ASSISTANCE'}
-                </span>
-                <h3 className="font-helvetica font-extrabold text-[32px] sm:text-[38px] leading-tight text-white">
-                  {language === 'ta'
-                    ? 'கழகத் தோழர்கள் & பொதுமக்கள் சட்ட உதவி மையம்'
-                    : 'Cadre & Citizen Legal Aid Desk'}
+                <h3 className="font-kavivanar font-normal text-[44px] leading-tight text-white">
+                  {language === 'ta' ? 'பொதுமக்கள் சட்ட உதவி மையம்' : 'Citizen legal desk'}
                 </h3>
                 <p className="text-[17px] text-[#d8cfc2] leading-relaxed font-normal">
                   {language === 'ta'
@@ -1106,7 +1096,7 @@ export default function HomePage() {
                     : 'Urgent legal representation against unlawful detentions, political harassment, and civil rights violations through verified district panels.'}
                 </p>
 
-                {/* 2 px Red border custody notice */}
+                {/* 2 px Red bordered notice: keep placeholder as written */}
                 <div className="p-4 bg-[#1a1715] border-2 border-[#E31E24] text-[15px] font-bold text-white leading-relaxed">
                   If you or someone you know is in police custody, call [HELPLINE NUMBER] now.
                 </div>
@@ -1117,7 +1107,7 @@ export default function HomePage() {
                   href="/citizen-desk"
                   className="w-full min-h-[48px] px-8 bg-[#FAF8F5] hover:bg-white text-[#111111] font-helvetica font-extrabold text-[16px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  {language === 'ta' ? 'சட்ட உதவி கோரிக்கை வைக்க' : 'Submit Assistance Request →'}
+                  {language === 'ta' ? 'கோரிக்கையை அனுப்புக' : 'Submit a request'}
                 </Link>
               </div>
             </div>
