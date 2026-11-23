@@ -34,7 +34,9 @@ export default function ResourcesPage() {
   const { language } = useLanguage();
   const { resources: contextResources } = useData();
 
-  const [resources, setResources] = useState<ExtendedLegalResource[]>([]);
+  const [resources, setResources] = useState<ExtendedLegalResource[]>(
+    () => (contextResources as ExtendedLegalResource[]) || []
+  );
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [previewResource, setPreviewResource] = useState<ExtendedLegalResource | null>(null);
@@ -46,7 +48,13 @@ export default function ResourcesPage() {
   // Focus return ref
   const lastFocusedRowRef = useRef<HTMLButtonElement | null>(null);
 
-  // Load from /api/resources with fallback to context
+  // Sync with contextResources immediately and load from /api/resources if needed
+  useEffect(() => {
+    if (contextResources && contextResources.length > 0) {
+      setResources(contextResources as ExtendedLegalResource[]);
+    }
+  }, [contextResources]);
+
   useEffect(() => {
     let isMounted = true;
     async function loadResources() {
@@ -62,16 +70,13 @@ export default function ResourcesPage() {
       } catch (err) {
         console.warn('Direct fetch from /api/resources failed, using context:', err);
       }
-      if (isMounted) {
-        setResources(contextResources as ExtendedLegalResource[]);
-      }
     }
 
     loadResources();
     return () => {
       isMounted = false;
     };
-  }, [contextResources]);
+  }, []);
 
   const handleClosePreview = useCallback(() => {
     setPreviewResource(null);
@@ -652,9 +657,9 @@ export default function ResourcesPage() {
 
                     {/* Title first */}
                     <div>
-                      <h3 className="font-helvetica font-extrabold text-[20px] text-[#111111] leading-[1.14]">
+                      <h2 className="font-helvetica font-extrabold text-[20px] text-[#111111] leading-[1.14]">
                         {highlightMatch(titleStr, searchQuery)}
-                      </h3>
+                      </h2>
                       {item.citation && (
                         <p className="text-[15px] text-[#5B5348] font-catamaran mt-1">
                           {item.citation}

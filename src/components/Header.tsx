@@ -38,7 +38,7 @@ export const Header: React.FC = () => {
         <Link 
           href="/" 
           className="flex items-center gap-3 shrink-0 focus-visible:outline-2 focus-visible:outline-[#E31E24]"
-          aria-label="DMK Legal Wing Home"
+          aria-label="திமுக வழக்கறிஞர் அணி - DMK Legal Wing"
         >
           {/* Official Emblem */}
           <img
@@ -80,7 +80,7 @@ export const Header: React.FC = () => {
                   ? 'bg-[#E31E24] text-white font-extrabold'
                   : 'text-[#d8cfc2] hover:text-white'
               }`}
-              aria-label="Switch to Tamil"
+              aria-label="தமிழ்"
             >
               தமிழ்
             </button>
@@ -92,7 +92,7 @@ export const Header: React.FC = () => {
                   ? 'bg-[#E31E24] text-white font-extrabold'
                   : 'text-[#d8cfc2] hover:text-white'
               }`}
-              aria-label="Switch to English"
+              aria-label="EN"
             >
               EN
             </button>
