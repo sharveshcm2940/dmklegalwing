@@ -387,7 +387,7 @@ export default function ResourcesPage() {
                     key={c.id}
                     type="button"
                     onClick={() => setActiveCategory(c.id)}
-                    className={`relative py-1 font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
+                    className={`relative py-1 font-manrope font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
                       isActive ? 'text-[#111111]' : 'text-[#5B5348] hover:text-[#111111]'
                     }`}
                   >
@@ -404,7 +404,7 @@ export default function ResourcesPage() {
             </div>
 
             {/* Right: "N documents" in grey counting to new number when filter changes */}
-            <div className="font-helvetica font-bold text-[15px] text-[#5B5348] whitespace-nowrap shrink-0 md:text-right">
+            <div className="font-manrope font-bold text-[15px] text-[#5B5348] whitespace-nowrap shrink-0 md:text-right">
               <span className="text-[#111111] font-extrabold">{displayCount}</span>{' '}
               {language === 'ta'
                 ? 'ஆவணங்கள்'
@@ -445,7 +445,7 @@ export default function ResourcesPage() {
               >
                 {/* Header row on ink (parchment text, 800, 15 px) */}
                 <thead>
-                  <tr className="bg-[#111111] text-[#FAF8F5] font-helvetica font-extrabold text-[15px] uppercase tracking-normal border-b-2 border-[#111111]">
+                  <tr className="bg-[#111111] text-[#FAF8F5] font-manrope font-extrabold text-[15px] uppercase tracking-normal border-b-2 border-[#111111]">
                     <th className="py-4 px-4 w-5/12">
                       {language === 'ta' ? 'தலைப்பு' : 'Title'}
                     </th>
@@ -461,7 +461,7 @@ export default function ResourcesPage() {
                           e.stopPropagation();
                           handleSort('year');
                         }}
-                        className="inline-flex items-center gap-1.5 font-helvetica font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
+                        className="inline-flex items-center gap-1.5 font-manrope font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
                       >
                         <span>{language === 'ta' ? 'ஆண்டு' : 'Year'}</span>
                         <svg
@@ -489,7 +489,7 @@ export default function ResourcesPage() {
                           e.stopPropagation();
                           handleSort('size');
                         }}
-                        className="inline-flex items-center gap-1.5 font-helvetica font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
+                        className="inline-flex items-center gap-1.5 font-manrope font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
                       >
                         <span>{language === 'ta' ? 'அளவு' : 'Size'}</span>
                         <svg
@@ -513,7 +513,7 @@ export default function ResourcesPage() {
                           e.stopPropagation();
                           handleSort('updated');
                         }}
-                        className="inline-flex items-center gap-1.5 font-helvetica font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
+                        className="inline-flex items-center gap-1.5 font-manrope font-extrabold text-[15px] uppercase text-[#FAF8F5] hover:text-[#ff8a85] cursor-pointer"
                       >
                         <span>{language === 'ta' ? 'புதுப்பிக்கப்பட்டது' : 'Updated'}</span>
                         <svg
@@ -564,7 +564,7 @@ export default function ResourcesPage() {
                             className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-[4px] bg-[#E31E24] transition-all duration-200"
                             aria-hidden="true"
                           />
-                          <div className="font-helvetica font-extrabold text-[18px] text-[#111111] leading-[1.12]">
+                          <div className="font-manrope font-extrabold text-[18px] text-[#111111] leading-[1.12]">
                             {highlightMatch(titleStr, searchQuery)}
                           </div>
                           {item.citation && (
@@ -580,7 +580,7 @@ export default function ResourcesPage() {
                         </td>
 
                         {/* Year: Leave cell empty when no value */}
-                        <td className="py-3 px-4 align-middle font-helvetica font-extrabold text-[15px] text-[#111111] whitespace-nowrap">
+                        <td className="py-3 px-4 align-middle font-manrope font-extrabold text-[15px] text-[#111111] whitespace-nowrap">
                           {yearVal || ''}
                         </td>
 
@@ -590,12 +590,12 @@ export default function ResourcesPage() {
                         </td>
 
                         {/* Size: Leave cell empty when no value */}
-                        <td className="py-3 px-4 align-middle font-helvetica text-[15px] text-[#5B5348] whitespace-nowrap">
+                        <td className="py-3 px-4 align-middle font-manrope text-[15px] text-[#5B5348] whitespace-nowrap">
                           {sizeVal || ''}
                         </td>
 
                         {/* Updated: Leave cell empty when no value */}
-                        <td className="py-3 px-4 align-middle font-helvetica text-[15px] text-[#5B5348] whitespace-nowrap">
+                        <td className="py-3 px-4 align-middle font-manrope text-[15px] text-[#5B5348] whitespace-nowrap">
                           {updatedVal || ''}
                         </td>
 
@@ -608,7 +608,7 @@ export default function ResourcesPage() {
                                 e.stopPropagation();
                                 handleOpenPreview(item, e.currentTarget);
                               }}
-                              className="font-helvetica font-extrabold text-[15px] text-[#111111] underline hover:text-[#E31E24] cursor-pointer py-1"
+                              className="font-manrope font-extrabold text-[15px] text-[#111111] underline hover:text-[#E31E24] cursor-pointer py-1"
                             >
                               {language === 'ta' ? 'பார்வை' : 'Preview'}
                             </button>
@@ -616,7 +616,7 @@ export default function ResourcesPage() {
                               href={item.downloadUrl || '#'}
                               download
                               onClick={(e) => e.stopPropagation()}
-                              className="font-helvetica font-extrabold text-[15px] text-[#111111] underline hover:no-underline hover:bg-[#E31E24] hover:text-white px-3 py-1.5 transition-colors cursor-pointer border border-transparent hover:border-[#E31E24]"
+                              className="font-manrope font-extrabold text-[15px] text-[#111111] underline hover:no-underline hover:bg-[#E31E24] hover:text-white px-3 py-1.5 transition-colors cursor-pointer border border-transparent hover:border-[#E31E24]"
                             >
                               {language === 'ta' ? 'பதிவிறக்கு' : 'Download'}
                             </a>
@@ -657,7 +657,7 @@ export default function ResourcesPage() {
 
                     {/* Title first */}
                     <div>
-                      <h2 className="font-helvetica font-extrabold text-[20px] text-[#111111] leading-[1.14]">
+                      <h2 className="font-manrope font-extrabold text-[20px] text-[#111111] leading-[1.14]">
                         {highlightMatch(titleStr, searchQuery)}
                       </h2>
                       {item.citation && (
@@ -682,14 +682,14 @@ export default function ResourcesPage() {
                       <button
                         type="button"
                         onClick={(e) => handleOpenPreview(item, e.currentTarget)}
-                        className="min-h-[44px] h-[44px] w-full px-4 border-2 border-[#111111] bg-white hover:bg-[#111111] hover:text-white text-[#111111] font-helvetica font-extrabold text-[15px] uppercase flex items-center justify-center cursor-pointer transition-colors"
+                        className="min-h-[44px] h-[44px] w-full px-4 border-2 border-[#111111] bg-white hover:bg-[#111111] hover:text-white text-[#111111] font-manrope font-extrabold text-[15px] uppercase flex items-center justify-center cursor-pointer transition-colors"
                       >
                         {language === 'ta' ? 'பார்வை' : 'Preview'}
                       </button>
                       <a
                         href={item.downloadUrl || '#'}
                         download
-                        className="min-h-[44px] h-[44px] w-full px-4 border-2 border-[#111111] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase flex items-center justify-center cursor-pointer transition-colors"
+                        className="min-h-[44px] h-[44px] w-full px-4 border-2 border-[#111111] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-manrope font-extrabold text-[15px] uppercase flex items-center justify-center cursor-pointer transition-colors"
                       >
                         {language === 'ta' ? 'பதிவிறக்கு' : 'Download'}
                       </a>
@@ -730,7 +730,7 @@ export default function ResourcesPage() {
                 <span className="text-[15px] font-extrabold uppercase text-[#C41A1F] block tracking-normal">
                   [{previewResource.category}] · OFFICIAL ARCHIVE
                 </span>
-                <h2 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-[1.12]">
+                <h2 className="font-manrope font-extrabold text-[26px] text-[#111111] leading-[1.12]">
                   {previewResource.title[language] || previewResource.title.en}
                 </h2>
               </div>
@@ -739,7 +739,7 @@ export default function ResourcesPage() {
               <button
                 type="button"
                 onClick={handleClosePreview}
-                className="min-h-[44px] h-[44px] px-5 bg-[#111111] hover:bg-[#333333] text-white font-helvetica font-extrabold text-[15px] uppercase cursor-pointer shrink-0 transition-colors"
+                className="min-h-[44px] h-[44px] px-5 bg-[#111111] hover:bg-[#333333] text-white font-manrope font-extrabold text-[15px] uppercase cursor-pointer shrink-0 transition-colors"
               >
                 {language === 'ta' ? 'மூடுக [✕]' : 'Close [✕]'}
               </button>
@@ -763,7 +763,7 @@ export default function ResourcesPage() {
                 <span className="font-bold uppercase tracking-normal">
                   {language === 'ta' ? 'சட்டக் கோப்பு உரை வடிவம்' : 'Official PDF Document Docket'}
                 </span>
-                <span className="font-helvetica font-extrabold text-[#111111]">
+                <span className="font-manrope font-extrabold text-[#111111]">
                   {previewResource.fileSize || 'PDF FORMAT'}
                 </span>
               </div>
@@ -774,7 +774,7 @@ export default function ResourcesPage() {
                   <span className="text-[15px] font-extrabold uppercase text-[#C41A1F] block">
                     LEGAL WING HEADQUARTERS · CHENNAI
                   </span>
-                  <p className="font-helvetica font-extrabold text-[17px] text-[#111111] leading-snug">
+                  <p className="font-manrope font-extrabold text-[17px] text-[#111111] leading-snug">
                     {previewResource.title[language] || previewResource.title.en}
                   </p>
                   {previewResource.citation && (
@@ -813,7 +813,7 @@ export default function ResourcesPage() {
                 <a
                   href={previewResource.downloadUrl || '#'}
                   download
-                  className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-full min-h-[48px] h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white font-manrope font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                 >
                   {language === 'ta' ? 'ஆவணத்தைப் பதிவிறக்குக (PDF)' : 'Download Full Document (PDF)'}
                 </a>

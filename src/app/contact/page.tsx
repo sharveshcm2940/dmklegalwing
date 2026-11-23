@@ -43,7 +43,7 @@ export default function ContactGatewayPage() {
                   className={`${
                     language === 'ta'
                       ? 'font-kavivanar font-normal text-[34px] sm:text-[40px] leading-[1.25]'
-                      : 'font-helvetica font-extrabold text-[32px] sm:text-[38px] leading-tight'
+                      : 'font-manrope font-extrabold text-[32px] sm:text-[38px] leading-tight'
                   } text-white`}
                 >
                   {language === 'ta' ? 'வழக்கறிஞர் உறுப்பினர் சேர்க்கை' : 'Advocate enrolment'}
@@ -76,7 +76,7 @@ export default function ContactGatewayPage() {
                     className={`${
                       language === 'ta'
                         ? 'font-kavivanar font-normal text-[34px] sm:text-[40px] leading-[1.25]'
-                        : 'font-helvetica font-extrabold text-[32px] sm:text-[38px] leading-tight'
+                        : 'font-manrope font-extrabold text-[32px] sm:text-[38px] leading-tight'
                     } text-white`}
                   >
                     {language === 'ta' ? 'பொது மக்கள் சட்ட உதவி மையம்' : 'Citizen legal desk'}
@@ -90,7 +90,9 @@ export default function ContactGatewayPage() {
 
                 {/* Boxed notice: 2 px red border */}
                 <div className="border-2 border-[#E31E24] p-4 bg-[#111111] text-[15px] font-bold text-white leading-relaxed">
-                  If you or someone you know is in police custody, call [HELPLINE NUMBER] now.
+                  {language === 'ta'
+                    ? 'நீங்களோ அல்லது உங்களுக்குத் தெரிந்தவர்களோ காவல்துறை காவலில் வைக்கப்பட்டிருந்தால், உடனடியாக 044-2434 4455 என்ற எண்ணை அழைக்கவும்.'
+                    : 'If you or someone you know is in police custody, call 044-2434 4455 now.'}
                 </div>
               </div>
 

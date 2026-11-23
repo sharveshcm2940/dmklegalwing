@@ -202,14 +202,14 @@ function TimelineMilestoneEntry({
       }`}
     >
       {/* Year in Helvetica Now Display 800 at 20 px, in #C41A1F */}
-      <span className="font-helvetica font-extrabold text-[20px] text-[#C41A1F] leading-none block mb-2 select-none">
+      <span className="font-manrope font-extrabold text-[20px] text-[#C41A1F] leading-none block mb-2 select-none">
         {milestone.year}
       </span>
 
       {/* Title in Helvetica Now Display 800 at 30 px (Kavivanar for Tamil) */}
       <h3
         className={`${
-          language === 'ta' ? 'font-kavivanar' : 'font-helvetica font-extrabold'
+          language === 'ta' ? 'font-kavivanar' : 'font-manrope font-extrabold'
         } text-[26px] md:text-[30px] text-[#111111] leading-snug group-hover:text-[#C41A1F] transition-colors duration-150 mb-3`}
       >
         {milestone.title[language]}
@@ -319,7 +319,7 @@ export default function AboutPage() {
                       }
                     }}
                     className={`${
-                      language === 'ta' ? 'font-kavivanar text-[16px]' : 'font-helvetica font-extrabold text-[15px]'
+                      language === 'ta' ? 'font-kavivanar text-[16px]' : 'font-manrope font-extrabold text-[15px]'
                     } text-[#111111] hover:text-[#C41A1F] transition-colors duration-150 cursor-pointer`}
                   >
                     {language === 'ta' ? group.labelTa : group.labelEn}
@@ -393,7 +393,7 @@ export default function AboutPage() {
                 <div className="w-full h-[6px] bg-[#E31E24] mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
 
                 {/* Name: Helvetica Now Display 800, 22px */}
-                <h3 className="font-helvetica font-extrabold text-[22px] text-[#FAF8F5] leading-snug mt-3">
+                <h3 className="font-manrope font-extrabold text-[22px] text-[#FAF8F5] leading-snug mt-3">
                   {mentor.name[language]}
                 </h3>
 
@@ -441,7 +441,7 @@ export default function AboutPage() {
               >
                 <div className="flex items-start md:items-center gap-6">
                   {/* Year */}
-                  <span className="font-helvetica font-extrabold text-[22px] text-[#111111] w-16 shrink-0 group-hover:text-[#E31E24] transition-colors">
+                  <span className="font-manrope font-extrabold text-[22px] text-[#111111] w-16 shrink-0 group-hover:text-[#E31E24] transition-colors">
                     {item.year}
                   </span>
 
@@ -459,7 +459,7 @@ export default function AboutPage() {
                 {/* View link */}
                 <Link
                   href={item.link}
-                  className="inline-flex items-center gap-1.5 font-helvetica font-extrabold text-[15px] text-[#C41A1F] hover:text-[#E31E24] hover:underline shrink-0 md:self-center"
+                  className="inline-flex items-center gap-1.5 font-manrope font-extrabold text-[15px] text-[#C41A1F] hover:text-[#E31E24] hover:underline shrink-0 md:self-center"
                 >
                   <span>{language === 'ta' ? 'பார்வையிடுக' : 'View'}</span>
                   <span aria-hidden="true">&rarr;</span>

@@ -55,7 +55,7 @@ export const Header: React.FC = () => {
             <span className="font-catamaran font-extrabold text-[17px] sm:text-[20px] md:text-[22px] leading-tight text-[#FAF8F5] tracking-normal whitespace-nowrap">
               திமுக வழக்கறிஞர் அணி
             </span>
-            <span className="font-helvetica font-extrabold text-[11px] sm:text-[12px] text-[#d8cfc2] leading-tight mt-0.5 whitespace-nowrap">
+            <span className="font-manrope font-extrabold text-[11px] sm:text-[12px] text-[#d8cfc2] leading-tight mt-0.5 whitespace-nowrap">
               DMK Legal Wing
             </span>
           </div>

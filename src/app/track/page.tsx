@@ -168,7 +168,7 @@ function TrackContent() {
                     <span className="text-[14px] font-extrabold uppercase text-[#5B5348]">
                       {language === 'ta' ? 'கடைசியாக புதுப்பிக்கப்பட்ட தேதி' : 'Date of last update'}
                     </span>
-                    <span className="font-helvetica font-extrabold text-[18px] text-[#111111]">
+                    <span className="font-manrope font-extrabold text-[18px] text-[#111111]">
                       {result.lastUpdated || '—'}
                     </span>
                   </div>

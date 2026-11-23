@@ -140,7 +140,7 @@ export default function NewsPage() {
         
         {/* Ink strip */}
         <div className="w-full bg-[#111111] text-[#FAF8F5] py-2.5 px-[clamp(20px,4vw,56px)] border-b border-[#111111]">
-          <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[15px] font-helvetica font-extrabold uppercase tracking-normal">
+          <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[15px] font-manrope font-extrabold uppercase tracking-normal">
             <div className="flex items-center gap-3">
               <span className="w-3.5 h-3.5 bg-[#E31E24] inline-block" aria-hidden="true" />
               <span>திமுக வழக்கறிஞர் அணி · Press Bureau</span>
@@ -159,7 +159,7 @@ export default function NewsPage() {
             </h1>
 
             <div className="lg:text-right space-y-1 pb-2">
-              <p className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-tight">
+              <p className="font-manrope font-extrabold text-[28px] text-[#111111] leading-tight">
                 Press releases, statements & media wire
               </p>
               <p className="text-[17px] text-[#5B5348] font-normal leading-[1.6]">
@@ -197,7 +197,7 @@ export default function NewsPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => handleTabChange(tab.id)}
-                  className={`relative py-1 font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
+                  className={`relative py-1 font-manrope font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
                     isActive ? 'text-[#111111]' : 'text-[#5B5348] hover:text-[#111111]'
                   }`}
                 >
@@ -281,7 +281,7 @@ export default function NewsPage() {
 
                 {/* Dropping Parchment-Bordered Date Stamp (scale 1.7 to 1, rotate -7°, 0.6s) */}
                 <div className="relative z-10 self-start">
-                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[15px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
+                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-manrope font-extrabold text-[15px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
                     {leadStory.date} · {leadStory.category}
                   </div>
                 </div>
@@ -303,7 +303,7 @@ export default function NewsPage() {
                   [{leadStory.category}] · {leadStory.court || 'Constitutional Bench'}
                 </span>
 
-                <h2 className="font-helvetica font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.12] text-[#111111]">
+                <h2 className="font-manrope font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.12] text-[#111111]">
                   <Link href={`/news/${leadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
                     {leadStory.title[language]}
                   </Link>
@@ -322,7 +322,7 @@ export default function NewsPage() {
                 <div className="pt-2">
                   <Link
                     href={`/news/${leadStory.id}`}
-                    className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
+                    className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-manrope font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
                   >
                     {language === 'ta' ? 'முழு அறிக்கையைப் படிக்க →' : 'Read the full statement →'}
                   </Link>
@@ -339,7 +339,7 @@ export default function NewsPage() {
         {wireStories.length > 0 && (
           <section className="mb-20">
             <div className="border-b-2 border-[#111111] pb-3 mb-6">
-              <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] uppercase tracking-normal leading-[1.1]">
+              <h3 className="font-manrope font-extrabold text-[26px] text-[#111111] uppercase tracking-normal leading-[1.1]">
                 {language === 'ta' ? 'செய்தியகத்தின் பிற பதிவுகள்' : 'Also on the wire'}
               </h3>
             </div>
@@ -361,10 +361,10 @@ export default function NewsPage() {
                     <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8 flex-1">
                       {/* 108 px Date Block */}
                       <div className="w-[108px] shrink-0 text-left">
-                        <div className="font-helvetica font-extrabold text-[56px] leading-none text-[#111111]">
+                        <div className="font-manrope font-extrabold text-[56px] leading-none text-[#111111]">
                           {dateParts.day}
                         </div>
-                        <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-normal uppercase">
+                        <div className="font-manrope font-bold text-[15px] text-[#5B5348] mt-1 tracking-normal uppercase">
                           {dateParts.month} {dateParts.year}
                         </div>
                         <div className="mt-2 text-[15px] text-[#C41A1F] font-extrabold uppercase">
@@ -374,7 +374,7 @@ export default function NewsPage() {
 
                       {/* Content: Type in #C41A1F, Headline clamp(24px, 2.6vw, 34px) 800, Summary 18 px, Source 15 px */}
                       <div className="space-y-2 flex-1">
-                        <h4 className="font-helvetica font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.14]">
+                        <h4 className="font-manrope font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.14]">
                           <Link href={`/news/${story.id}`}>
                             {story.title[language]}
                           </Link>
@@ -431,16 +431,16 @@ export default function NewsPage() {
             <table className="w-full text-left border-collapse border-t-2 border-[#FAF8F5]">
               <thead>
                 <tr className="border-b border-[#4a423d] text-[#ff8a85]">
-                  <th className="py-4 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/4">
+                  <th className="py-4 px-4 font-manrope font-extrabold text-[15px] uppercase tracking-normal w-1/4">
                     Court
                   </th>
-                  <th className="py-4 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-5/12">
+                  <th className="py-4 px-4 font-manrope font-extrabold text-[15px] uppercase tracking-normal w-5/12">
                     Matter
                   </th>
-                  <th className="py-4 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/6">
+                  <th className="py-4 px-4 font-manrope font-extrabold text-[15px] uppercase tracking-normal w-1/6">
                     Date
                   </th>
-                  <th className="py-4 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/6">
+                  <th className="py-4 px-4 font-manrope font-extrabold text-[15px] uppercase tracking-normal w-1/6">
                     Status
                   </th>
                 </tr>
@@ -464,10 +464,10 @@ export default function NewsPage() {
                     <td className="py-4 px-4 font-bold text-white">
                       {dev.caseTitle?.[language] || dev.caseNumber || ''}
                     </td>
-                    <td className="py-4 px-4 font-helvetica text-[#d8cfc2]">
+                    <td className="py-4 px-4 font-manrope text-[#d8cfc2]">
                       {dev.date || ''}
                     </td>
-                    <td className="py-4 px-4 font-helvetica font-extrabold text-[#ff8a85]">
+                    <td className="py-4 px-4 font-manrope font-extrabold text-[#ff8a85]">
                       {dev.statusTag?.[language] || ''}
                     </td>
                   </tr>
@@ -482,14 +482,14 @@ export default function NewsPage() {
         {/* "Open the full archive →"                                   */}
         {/* ========================================================== */}
         <section className="border-t-[6px] border-[#E31E24] pt-8 mt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <span className="font-helvetica font-bold text-[15px] text-[#5B5348]">
+          <span className="font-manrope font-bold text-[15px] text-[#5B5348]">
             {language === 'ta'
               ? 'திமுக வழக்கறிஞர் அணி சட்ட வரலாற்றுப் பதிவுகள் மற்றும் ஆவணங்கள்'
               : 'DMK Legal Wing Historical Archives & Case Law Vault'}
           </span>
           <Link
             href="/resources"
-            className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] border-b-2 border-[#111111] hover:border-[#C41A1F] pb-0.5 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 font-manrope font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] border-b-2 border-[#111111] hover:border-[#C41A1F] pb-0.5 transition-colors cursor-pointer"
           >
             <span>{language === 'ta' ? 'முழு ஆவணக் காப்பகத்தைத் திறக்க →' : 'Open the full archive →'}</span>
           </Link>
@@ -514,14 +514,14 @@ export default function NewsPage() {
                 <span className="text-[15px] font-extrabold uppercase text-[#C41A1F] block mb-1">
                   [{selectedCaseModal.court || 'Constitutional Bench'}]
                 </span>
-                <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-[1.12]">
+                <h3 className="font-manrope font-extrabold text-[26px] text-[#111111] leading-[1.12]">
                   {selectedCaseModal.caseTitle?.[language] || selectedCaseModal.caseNumber || ''}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedCaseModal(null)}
-                className="min-h-[44px] h-[44px] px-4 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
+                className="min-h-[44px] h-[44px] px-4 font-manrope font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
               >
                 CLOSE [✕]
               </button>
@@ -556,7 +556,7 @@ export default function NewsPage() {
               <button
                 type="button"
                 onClick={() => setSelectedCaseModal(null)}
-                className="min-h-[44px] h-[44px] px-6 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase cursor-pointer transition-colors"
+                className="min-h-[44px] h-[44px] px-6 bg-[#111111] hover:bg-[#E31E24] text-white font-manrope font-extrabold text-[15px] uppercase cursor-pointer transition-colors"
               >
                 Close Case Record
               </button>

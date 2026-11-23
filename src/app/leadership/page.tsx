@@ -105,7 +105,7 @@ export default function LeadershipPage() {
             <div className="flex items-center justify-between text-[14px] text-[#5B5348] border-t border-[#3d3633] pt-3">
               <span>
                 {language === 'ta' ? 'பொறுப்பாளர்கள் எண்ணிக்கை: ' : 'Showing members: '}
-                <strong className="text-[#111111] font-helvetica">{filteredLeaders.length}</strong>
+                <strong className="text-[#111111] font-manrope">{filteredLeaders.length}</strong>
               </span>
               {searchQuery && (
                 <button
@@ -136,14 +136,14 @@ export default function LeadershipPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="font-helvetica font-bold text-[#d8cfc2] text-sm">
+                      <span className="font-manrope font-bold text-[#d8cfc2] text-sm">
                         [Official Photo]
                       </span>
                     )}
                   </div>
 
                   <div className="border-t-4 border-[#E31E24] pt-3 space-y-1">
-                    <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-snug">
+                    <h3 className="font-manrope font-extrabold text-[22px] text-[#111111] leading-snug">
                       {leader.name[language]}
                     </h3>
                     <p className="text-[#C41A1F] font-extrabold text-[15px]">
@@ -184,7 +184,7 @@ export default function LeadershipPage() {
                 <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
                   {selectedLeader.designation[language]}
                 </span>
-                <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111]">
+                <h3 className="font-manrope font-extrabold text-[26px] text-[#111111]">
                   {selectedLeader.name[language]}
                 </h3>
               </div>

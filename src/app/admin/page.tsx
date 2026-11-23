@@ -593,7 +593,7 @@ export default function AdminConsolePage() {
             <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block">
               DMK LEGAL WING APEX
             </span>
-            <h1 className="font-helvetica font-extrabold text-[24px] text-[#111111]">
+            <h1 className="font-manrope font-extrabold text-[24px] text-[#111111]">
               Administration Login
             </h1>
           </div>
@@ -669,7 +669,7 @@ export default function AdminConsolePage() {
               <span className="text-[11px] font-extrabold uppercase text-[#ff8a85] tracking-normal block">
                 திமுக வழக்கறிஞர் அணி
               </span>
-              <span className="font-helvetica font-extrabold text-[16px] text-white block">
+              <span className="font-manrope font-extrabold text-[16px] text-white block">
                 Apex Administration
               </span>
             </Link>
@@ -710,7 +710,7 @@ export default function AdminConsolePage() {
                       : 'text-[#d7d0c3] hover:bg-[#222222] hover:text-white'
                   }`}
                 >
-                  <span className="font-helvetica font-extrabold text-[12px] opacity-80 shrink-0">
+                  <span className="font-manrope font-extrabold text-[12px] opacity-80 shrink-0">
                     {dom.id}
                   </span>
                   <span className="truncate">{dom.title}</span>
@@ -733,7 +733,7 @@ export default function AdminConsolePage() {
         {/* TOP BAR */}
         <header className="h-[56px] bg-white border-b-2 border-[#111111] px-6 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-4">
-            <span className="font-helvetica font-extrabold text-[15px] text-[#111111]">
+            <span className="font-manrope font-extrabold text-[15px] text-[#111111]">
               {authenticatedUser}
             </span>
             <span className="text-[12px] border border-[#111111] px-2 py-0.5 font-extrabold uppercase">
@@ -798,7 +798,7 @@ export default function AdminConsolePage() {
           {/* ================================================================= */}
           {activeDomain === '01' && (
             <div className="space-y-6">
-              <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+              <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                 Telemetry and Overview
               </h1>
 
@@ -807,7 +807,7 @@ export default function AdminConsolePage() {
                   <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block">
                     Advocate Applications
                   </span>
-                  <span className="font-helvetica font-extrabold text-[32px] text-[#111111]">
+                  <span className="font-manrope font-extrabold text-[32px] text-[#111111]">
                     {registrations.length}
                   </span>
                 </div>
@@ -815,7 +815,7 @@ export default function AdminConsolePage() {
                   <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block">
                     Citizen Legal Inquiries
                   </span>
-                  <span className="font-helvetica font-extrabold text-[32px] text-[#111111]">
+                  <span className="font-manrope font-extrabold text-[32px] text-[#111111]">
                     {enquiries.length}
                   </span>
                 </div>
@@ -823,7 +823,7 @@ export default function AdminConsolePage() {
                   <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block">
                     Newsroom Dispatches
                   </span>
-                  <span className="font-helvetica font-extrabold text-[32px] text-[#111111]">
+                  <span className="font-manrope font-extrabold text-[32px] text-[#111111]">
                     {news.length}
                   </span>
                 </div>
@@ -831,7 +831,7 @@ export default function AdminConsolePage() {
                   <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block">
                     74 District Units
                   </span>
-                  <span className="font-helvetica font-extrabold text-[32px] text-[#111111]">
+                  <span className="font-manrope font-extrabold text-[32px] text-[#111111]">
                     {districts.length}
                   </span>
                 </div>
@@ -839,7 +839,7 @@ export default function AdminConsolePage() {
 
               {/* Recent Activity snippet */}
               <div className="bg-white border-2 border-[#111111] p-6 space-y-4">
-                <h2 className="font-helvetica font-extrabold text-[17px] text-[#111111] border-b border-[#d7d0c3] pb-2">
+                <h2 className="font-manrope font-extrabold text-[17px] text-[#111111] border-b border-[#d7d0c3] pb-2">
                   System Health & Authorization Boundaries
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-[14px]">
@@ -866,7 +866,7 @@ export default function AdminConsolePage() {
           {activeDomain === '02' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                   Advocate Enrolment Applications
                 </h1>
                 <span className="text-[13px] text-[#5B5348]">
@@ -1006,7 +1006,7 @@ export default function AdminConsolePage() {
                                 className="w-4 h-4 rounded-none accent-[#E31E24] cursor-pointer"
                               />
                             </td>
-                            <td className="px-3 py-2 font-helvetica font-extrabold text-[#111111]">
+                            <td className="px-3 py-2 font-manrope font-extrabold text-[#111111]">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -1069,7 +1069,7 @@ export default function AdminConsolePage() {
           {activeDomain === '03' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                   Citizen Legal Desk Inquiries
                 </h1>
                 <span className="text-[13px] text-[#5B5348]">
@@ -1155,7 +1155,7 @@ export default function AdminConsolePage() {
                               className="w-4 h-4 rounded-none accent-[#E31E24] cursor-pointer"
                             />
                           </td>
-                          <td className="px-3 py-2 font-helvetica font-extrabold text-[#111111]">
+                          <td className="px-3 py-2 font-manrope font-extrabold text-[#111111]">
                             <button
                               type="button"
                               onClick={() => {
@@ -1219,7 +1219,7 @@ export default function AdminConsolePage() {
               {newsEditMode === 'list' ? (
                 <>
                   <div className="flex items-center justify-between">
-                    <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                    <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                       Editorial Newsroom
                     </h1>
                     <button
@@ -1288,7 +1288,7 @@ export default function AdminConsolePage() {
                                 key={item.id}
                                 className="h-[44px] min-h-[44px] border-b border-[#d7d0c3] hover:bg-[#f1ece2] transition-colors duration-150"
                               >
-                                <td className="px-3 py-2 font-helvetica font-extrabold text-[#111111] max-w-md truncate">
+                                <td className="px-3 py-2 font-manrope font-extrabold text-[#111111] max-w-md truncate">
                                   {item.title.en}
                                 </td>
                                 <td className="px-3 py-2">{item.category}</td>
@@ -1345,7 +1345,7 @@ export default function AdminConsolePage() {
                 /* NEWS EDITOR: Tamil and English fields side by side, type, status, publish date/time, lead toggle, crop box & live preview */
                 <div className="bg-white border-2 border-[#111111] p-6 sm:p-8 space-y-6">
                   <div className="flex items-center justify-between border-b-2 border-[#111111] pb-3">
-                    <h2 className="font-helvetica font-extrabold text-[20px] text-[#111111]">
+                    <h2 className="font-manrope font-extrabold text-[20px] text-[#111111]">
                       {newsForm.id ? 'Edit Dispatch' : 'New Newsroom Dispatch'}
                     </h2>
                     <button
@@ -1514,7 +1514,7 @@ export default function AdminConsolePage() {
 
                     {/* Image URL & Crop Box for Lead Picture */}
                     <div className="border-t-2 border-[#111111] pt-6 space-y-4">
-                      <h3 className="font-helvetica font-extrabold text-[16px] text-[#111111]">
+                      <h3 className="font-manrope font-extrabold text-[16px] text-[#111111]">
                         Lead Picture & Interactive Crop Box (16:9)
                       </h3>
 
@@ -1605,7 +1605,7 @@ export default function AdminConsolePage() {
                         <span className="text-[12px] font-extrabold uppercase text-[#C41A1F]">
                           [{newsForm.category}] • {newsForm.publishDate}
                         </span>
-                        <h4 className="font-helvetica font-extrabold text-[22px] text-[#111111] leading-tight">
+                        <h4 className="font-manrope font-extrabold text-[22px] text-[#111111] leading-tight">
                           {newsForm.titleEn || 'Headline Preview in English'}
                         </h4>
                         <p className="text-[14px] text-[#333333] line-clamp-2">
@@ -1643,7 +1643,7 @@ export default function AdminConsolePage() {
           {activeDomain === '05' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                   74 Organisational District Registry
                 </h1>
                 <span className="text-[13px] text-[#5B5348]">
@@ -1685,7 +1685,7 @@ export default function AdminConsolePage() {
                           className="h-[44px] min-h-[44px] border-b border-[#d7d0c3] hover:bg-[#f1ece2] transition-colors duration-150"
                         >
                           <td className="px-3 py-2 font-mono text-[13px]">{d.number || idx + 1}</td>
-                          <td className="px-3 py-2 font-helvetica font-extrabold text-[#111111]">
+                          <td className="px-3 py-2 font-manrope font-extrabold text-[#111111]">
                             {d.name.en}
                           </td>
                           <td className="px-3 py-2">{d.organizer.en}</td>
@@ -1727,7 +1727,7 @@ export default function AdminConsolePage() {
                 <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
                   <div className="bg-[#FAF8F5] border-2 border-[#111111] max-w-lg w-full p-6 space-y-4">
                     <div className="flex items-center justify-between border-b-2 border-[#111111] pb-2">
-                      <h3 className="font-helvetica font-extrabold text-[18px]">
+                      <h3 className="font-manrope font-extrabold text-[18px]">
                         Edit District: {selectedDistrict.name.en}
                       </h3>
                       <button
@@ -1853,7 +1853,7 @@ export default function AdminConsolePage() {
           {activeDomain === '06' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                   Legal Dossiers & Vault
                 </h1>
                 <span className="text-[13px] text-[#5B5348]">
@@ -1879,7 +1879,7 @@ export default function AdminConsolePage() {
                         key={item.id}
                         className="h-[44px] min-h-[44px] border-b border-[#d7d0c3] hover:bg-[#f1ece2] transition-colors duration-150"
                       >
-                        <td className="px-3 py-2 font-helvetica font-extrabold text-[#111111]">
+                        <td className="px-3 py-2 font-manrope font-extrabold text-[#111111]">
                           {item.title.en}
                         </td>
                         <td className="px-3 py-2">{item.category}</td>
@@ -1917,7 +1917,7 @@ export default function AdminConsolePage() {
           {activeDomain === '07' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                   Press Photojournalism Wire
                 </h1>
                 <span className="text-[13px] text-[#5B5348]">
@@ -1949,7 +1949,7 @@ export default function AdminConsolePage() {
                             className="w-8 h-8 object-cover border border-[#111111]"
                           />
                         </td>
-                        <td className="px-3 py-2 font-helvetica font-extrabold text-[#111111] max-w-sm truncate">
+                        <td className="px-3 py-2 font-manrope font-extrabold text-[#111111] max-w-sm truncate">
                           {item.caption.en}
                         </td>
                         <td className="px-3 py-2">{item.category}</td>
@@ -1985,7 +1985,7 @@ export default function AdminConsolePage() {
           {activeDomain === '08' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                   State Conferences & Events
                 </h1>
                 <span className="text-[13px] text-[#5B5348]">
@@ -2010,7 +2010,7 @@ export default function AdminConsolePage() {
                         key={item.id}
                         className="h-[44px] min-h-[44px] border-b border-[#d7d0c3] hover:bg-[#f1ece2] transition-colors duration-150"
                       >
-                        <td className="px-3 py-2 font-helvetica font-extrabold text-[#111111] max-w-sm truncate">
+                        <td className="px-3 py-2 font-manrope font-extrabold text-[#111111] max-w-sm truncate">
                           {item.title.en}
                         </td>
                         <td className="px-3 py-2 font-mono text-[13px]">
@@ -2053,7 +2053,7 @@ export default function AdminConsolePage() {
           {activeDomain === '09' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                <h1 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                   System Activity Log
                 </h1>
                 <span className="text-[13px] text-[#5B5348]">
@@ -2117,7 +2117,7 @@ export default function AdminConsolePage() {
               <span className="text-[11px] font-extrabold uppercase text-[#C41A1F] block">
                 Advocate Application
               </span>
-              <h2 className="font-helvetica font-extrabold text-[20px] text-[#111111]">
+              <h2 className="font-manrope font-extrabold text-[20px] text-[#111111]">
                 {selectedApp.fullName}
               </h2>
             </div>
@@ -2215,7 +2215,7 @@ export default function AdminConsolePage() {
               <span className="text-[11px] font-extrabold uppercase text-[#C41A1F] block">
                 Citizen Legal Grievance
               </span>
-              <h2 className="font-helvetica font-extrabold text-[20px] text-[#111111]">
+              <h2 className="font-manrope font-extrabold text-[20px] text-[#111111]">
                 {selectedGrievance.name}
               </h2>
             </div>
@@ -2307,7 +2307,7 @@ export default function AdminConsolePage() {
               <span className="text-[11px] font-extrabold uppercase text-[#C41A1F] block">
                 Irreversible Action Warning
               </span>
-              <h3 className="font-helvetica font-extrabold text-[20px] text-[#111111]">
+              <h3 className="font-manrope font-extrabold text-[20px] text-[#111111]">
                 Confirm Record Deletion
               </h3>
             </div>
@@ -2315,7 +2315,7 @@ export default function AdminConsolePage() {
             <p className="text-[15px] text-[#111111] leading-relaxed">
               Are you sure you want to permanently delete the {deleteDialog.type} record:
               <br />
-              <strong className="font-helvetica font-extrabold text-[16px] text-[#C41A1F] block mt-1">
+              <strong className="font-manrope font-extrabold text-[16px] text-[#C41A1F] block mt-1">
                 &ldquo;{deleteDialog.recordName}&rdquo;
               </strong>
             </p>

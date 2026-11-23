@@ -34,7 +34,7 @@ function CitizenDeskDoneContent() {
           <span className="text-[13px] font-extrabold uppercase text-[#5B5348] block">
             {language === 'ta' ? 'கண்காணிப்பு அடையாள எண்' : 'Tracking ID'}
           </span>
-          <div className="font-helvetica font-extrabold text-[clamp(28px,5.5vw,64px)] text-[#E31E24] tracking-normal select-all break-all leading-tight">
+          <div className="font-manrope font-extrabold text-[clamp(28px,5.5vw,64px)] text-[#E31E24] tracking-normal select-all break-all leading-tight">
             {trackingId}
           </div>
           <div>

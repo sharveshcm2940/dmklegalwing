@@ -143,7 +143,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
         <div className="no-print">
           <Link
             href="/news"
-            className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal"
+            className="inline-flex items-center gap-2 font-manrope font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal"
           >
             <span>&larr;</span>
             <span>{language === 'ta' ? 'செய்தியகத்திற்குத் திரும்புக' : 'Back to Newsroom'}</span>
@@ -159,12 +159,12 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               {/* Type tag: Red background, white 800 text */}
-              <span className="px-3 py-1 bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase tracking-normal">
+              <span className="px-3 py-1 bg-[#E31E24] text-white font-manrope font-extrabold text-[13px] uppercase tracking-normal">
                 {article.category}
               </span>
 
               {/* Date */}
-              <span className="font-helvetica font-bold text-[15px] text-[#5B5348]">
+              <span className="font-manrope font-bold text-[15px] text-[#5B5348]">
                 {article.date}
               </span>
             </div>
@@ -193,7 +193,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
           </div>
 
           {/* Headline: Helvetica Now Display 800, clamp(34px, 5vw, 60px), line height 1.05, max-w 900px */}
-          <h1 className="font-helvetica font-extrabold text-[clamp(34px,5vw,60px)] leading-[1.05] max-w-[900px] text-[#111111]">
+          <h1 className="font-manrope font-extrabold text-[clamp(34px,5vw,60px)] leading-[1.05] max-w-[900px] text-[#111111]">
             {article.title[articleLang]}
           </h1>
 
@@ -261,7 +261,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
         {/* ========================================================== */}
         {(article.caseNumber || article.court) && (
           <div className="w-full max-w-[720px] mx-auto border-2 border-[#111111] bg-white p-5 flex items-start gap-4 rounded-none">
-            <div className="w-10 h-10 bg-[#111111] text-white flex items-center justify-center shrink-0 font-helvetica font-extrabold text-[12px] uppercase">
+            <div className="w-10 h-10 bg-[#111111] text-white flex items-center justify-center shrink-0 font-manrope font-extrabold text-[12px] uppercase">
               LAW
             </div>
             <div className="space-y-0.5">
@@ -269,7 +269,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
                 {language === 'ta' ? 'அரசமைப்பு வழக்கு மேற்கோள்' : 'Constitutional Case Citation'}
               </span>
               {article.caseNumber && (
-                <span className="font-helvetica font-extrabold text-[17px] text-[#111111] block">
+                <span className="font-manrope font-extrabold text-[17px] text-[#111111] block">
                   {article.caseNumber}
                 </span>
               )}
@@ -292,7 +292,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
             if (idx === 0) {
               const firstLetter = p.charAt(0);
               const rest = p.slice(1);
-              const dropCapFont = articleLang === 'ta' ? 'font-kavivanar' : 'font-helvetica font-extrabold';
+              const dropCapFont = articleLang === 'ta' ? 'font-kavivanar' : 'font-manrope font-extrabold';
 
               return (
                 <p key={idx} className="leading-[1.75]">
@@ -314,7 +314,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
 
               return (
                 <blockquote key={idx} className="border-t-4 border-[#111111] pt-4 my-8 not-italic">
-                  <p className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-snug">
+                  <p className="font-manrope font-extrabold text-[28px] text-[#111111] leading-snug">
                     &ldquo;{cleanQuote}&rdquo;
                   </p>
                 </blockquote>
@@ -344,13 +344,13 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
           <section className="border-t-2 border-[#111111] pt-12 no-print space-y-8">
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <h2 className="font-helvetica font-extrabold text-[clamp(24px,2.8vw,34px)] text-[#111111]">
+              <h2 className="font-manrope font-extrabold text-[clamp(24px,2.8vw,34px)] text-[#111111]">
                 {language === 'ta' ? 'தொடர்புடைய முக்கிய அறிக்கைகள்' : 'Related dispatches on wire'}
               </h2>
 
               <Link
                 href="/news"
-                className="font-helvetica font-extrabold text-[15px] text-[#C41A1F] hover:underline uppercase tracking-normal"
+                className="font-manrope font-extrabold text-[15px] text-[#C41A1F] hover:underline uppercase tracking-normal"
               >
                 {language === 'ta' ? 'அனைத்து அறிக்கைகளும் →' : 'View all dispatches →'}
               </Link>
@@ -378,10 +378,10 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
                       <div className="flex items-start gap-6 md:gap-8 flex-1">
                         {/* Day & Month */}
                         <div className="w-[84px] shrink-0 text-left">
-                          <span className="font-helvetica font-extrabold text-[52px] leading-none text-[#111111] block">
+                          <span className="font-manrope font-extrabold text-[52px] leading-none text-[#111111] block">
                             {dayStr}
                           </span>
-                          <span className="font-helvetica font-extrabold text-[14px] text-[#5B5348] uppercase block mt-1">
+                          <span className="font-manrope font-extrabold text-[14px] text-[#5B5348] uppercase block mt-1">
                             {monthStr}
                           </span>
                         </div>
@@ -392,7 +392,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
                             {item.category}
                           </span>
 
-                          <h3 className="font-helvetica font-extrabold text-[clamp(22px,2.4vw,30px)] text-[#111111] leading-snug group-hover:text-[#C41A1F] transition-colors">
+                          <h3 className="font-manrope font-extrabold text-[clamp(22px,2.4vw,30px)] text-[#111111] leading-snug group-hover:text-[#C41A1F] transition-colors">
                             {item.title[language]}
                           </h3>
 
@@ -421,7 +421,7 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
             <div className="pt-4 text-center">
               <Link
                 href="/news"
-                className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal btn-lift cursor-pointer transition-colors"
+                className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-manrope font-extrabold text-[15px] uppercase tracking-normal btn-lift cursor-pointer transition-colors"
               >
                 <span>&larr; {language === 'ta' ? 'செய்தியகப் பதிவுக்குத் திரும்புக' : 'Back to Newsroom'}</span>
               </Link>

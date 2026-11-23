@@ -209,7 +209,7 @@ export default function DistrictsPage() {
                         }`}
                       >
                         {/* Name in 800 weight on the left */}
-                        <span className="font-helvetica font-extrabold text-[15px] truncate">
+                        <span className="font-manrope font-extrabold text-[15px] truncate">
                           {d.name[language]}
                         </span>
 
@@ -243,7 +243,7 @@ export default function DistrictsPage() {
                     </span>
 
                     {/* District name: Helvetica Now Display 800, clamp(34px, 4vw, 52px) */}
-                    <h3 className="font-helvetica font-extrabold text-[clamp(34px,4vw,52px)] text-[#111111] leading-tight">
+                    <h3 className="font-manrope font-extrabold text-[clamp(34px,4vw,52px)] text-[#111111] leading-tight">
                       {selectedDistrict.name[language]}
                     </h3>
 
@@ -278,7 +278,7 @@ export default function DistrictsPage() {
                           <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
-                          <span className="font-helvetica font-extrabold text-[24px] leading-none">
+                          <span className="font-manrope font-extrabold text-[24px] leading-none">
                             {phone}
                           </span>
                         </a>
@@ -331,7 +331,7 @@ export default function DistrictsPage() {
             <h2 className="font-kavivanar font-normal text-[clamp(28px,3.5vw,40px)] text-[#111111] leading-tight">
               {language === 'ta' ? 'தமிழ்நாடு மாவட்ட வரைபட கட்டமைப்பு' : 'Geographic District Mapping of Tamil Nadu'}
             </h2>
-            <span className="font-helvetica font-extrabold text-[13px] text-[#C41A1F] uppercase">
+            <span className="font-manrope font-extrabold text-[13px] text-[#C41A1F] uppercase">
               38 Revenue Districts • 74 Units
             </span>
           </div>
@@ -369,7 +369,7 @@ export default function DistrictsPage() {
                 <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
                   {language === 'ta' ? 'அதிகாரப்பூர்வ மாவட்ட ஆவணம்' : 'Official District Dossier'}
                 </span>
-                <h3 id="dossier-title" className="font-helvetica font-extrabold text-[26px] text-[#111111]">
+                <h3 id="dossier-title" className="font-manrope font-extrabold text-[26px] text-[#111111]">
                   {selectedDossier.name[language]}
                 </h3>
                 <span className="text-[13px] text-[#5B5348] font-bold block mt-0.5">
@@ -381,7 +381,7 @@ export default function DistrictsPage() {
                 ref={modalCloseBtnRef}
                 type="button"
                 onClick={handleCloseDossier}
-                className="min-h-[44px] h-[44px] px-4 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase tracking-normal transition-colors cursor-pointer btn-lift"
+                className="min-h-[44px] h-[44px] px-4 bg-[#111111] hover:bg-[#E31E24] text-white font-manrope font-extrabold text-[13px] uppercase tracking-normal transition-colors cursor-pointer btn-lift"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
@@ -439,7 +439,7 @@ export default function DistrictsPage() {
                   <span className="text-[12px] text-[#5B5348] block mb-0.5 font-bold">
                     {language === 'ta' ? 'பதிவுசெய்த வழக்கறிஞர்கள்' : 'Enrolled Advocates'}
                   </span>
-                  <span className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                  <span className="font-manrope font-extrabold text-[22px] text-[#111111]">
                     {selectedDossier.memberCount || 150}+
                   </span>
                 </div>
@@ -448,7 +448,7 @@ export default function DistrictsPage() {
                   <span className="text-[12px] text-[#5B5348] block mb-0.5 font-bold">
                     {language === 'ta' ? 'கையாண்ட வழக்குகள்' : 'Cases Assisted'}
                   </span>
-                  <span className="font-helvetica font-extrabold text-[22px] text-[#C41A1F]">
+                  <span className="font-manrope font-extrabold text-[22px] text-[#C41A1F]">
                     {selectedDossier.activeCasesAssisted || 35}+
                   </span>
                 </div>
@@ -459,7 +459,7 @@ export default function DistrictsPage() {
                 {selectedDossier.showPhonePublicly !== false && selectedDossier.contactPhone ? (
                   <a
                     href={`tel:${selectedDossier.contactPhone.replace(/\s+/g, '')}`}
-                    className="w-full min-h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white flex items-center justify-center gap-2 font-helvetica font-extrabold text-[18px] btn-lift cursor-pointer"
+                    className="w-full min-h-[48px] bg-[#E31E24] hover:bg-[#C41A1F] text-white flex items-center justify-center gap-2 font-manrope font-extrabold text-[18px] btn-lift cursor-pointer"
                   >
                     <span>{language === 'ta' ? 'அழைக்க:' : 'Call:'} {selectedDossier.contactPhone}</span>
                   </a>

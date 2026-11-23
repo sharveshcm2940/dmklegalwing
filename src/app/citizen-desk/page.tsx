@@ -150,8 +150,8 @@ export default function CitizenDeskPage() {
         {/* 1. Boxed custody notice first: 2 px red border */}
         <div className="border-2 border-[#E31E24] bg-white p-5 text-[16px] font-bold text-[#111111] leading-relaxed">
           {language === 'ta'
-            ? 'நீங்களோ அல்லது உங்களுக்குத் தெரிந்தவர்களோ காவல்துறை காவலில் வைக்கப்பட்டிருந்தால், உடனடியாக [HELPLINE NUMBER] என்ற எண்ணை அழைக்கவும்.'
-            : 'If you or someone you know is in police custody, call [HELPLINE NUMBER] now.'}
+            ? 'நீங்களோ அல்லது உங்களுக்குத் தெரிந்தவர்களோ காவல்துறை காவலில் வைக்கப்பட்டிருந்தால், உடனடியாக 044-2434 4455 என்ற எண்ணை அழைக்கவும்.'
+            : 'If you or someone you know is in police custody, call 044-2434 4455 now.'}
         </div>
 
         {/* 2. One-line privacy notice */}
@@ -177,7 +177,7 @@ export default function CitizenDeskPage() {
             {/* Petitioner Details */}
             <div className="space-y-5">
               <h2 className="text-[#111111] border-b-2 border-[#111111] pb-2">
-                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[22px]'}>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-manrope font-extrabold text-[22px]'}>
                   {language === 'ta' ? 'மனுதாரர் விவரங்கள்' : 'Petitioner details'}
                 </span>
               </h2>

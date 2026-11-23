@@ -196,8 +196,8 @@ export default function EnrolPage() {
             {/* Section 1: Identity */}
             <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
               <h2 className="text-[#111111] flex items-center gap-2">
-                <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">1.</span>
-                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[24px]'}>
+                <span className="font-manrope font-extrabold text-[24px] text-[#C41A1F]">1.</span>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-manrope font-extrabold text-[24px]'}>
                   {language === 'ta' ? 'சுய விவரங்கள்' : 'Identity'}
                 </span>
               </h2>
@@ -244,8 +244,8 @@ export default function EnrolPage() {
             {/* Section 2: Practice */}
             <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
               <h2 className="text-[#111111] flex items-center gap-2">
-                <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">2.</span>
-                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[24px]'}>
+                <span className="font-manrope font-extrabold text-[24px] text-[#C41A1F]">2.</span>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-manrope font-extrabold text-[24px]'}>
                   {language === 'ta' ? 'தொழில் விவரங்கள்' : 'Practice'}
                 </span>
               </h2>
@@ -333,8 +333,8 @@ export default function EnrolPage() {
             {/* Section 3: Unit */}
             <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
               <h2 className="text-[#111111] flex items-center gap-2">
-                <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">3.</span>
-                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[24px]'}>
+                <span className="font-manrope font-extrabold text-[24px] text-[#C41A1F]">3.</span>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-manrope font-extrabold text-[24px]'}>
                   {language === 'ta' ? 'அமைப்பு மாவட்டம்' : 'Unit'}
                 </span>
               </h2>
@@ -372,8 +372,8 @@ export default function EnrolPage() {
             {/* Section 4: Contact */}
             <div className="border-t-[3px] border-[#111111] pt-6 space-y-6">
               <h2 className="text-[#111111] flex items-center gap-2">
-                <span className="font-helvetica font-extrabold text-[24px] text-[#C41A1F]">4.</span>
-                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-helvetica font-extrabold text-[24px]'}>
+                <span className="font-manrope font-extrabold text-[24px] text-[#C41A1F]">4.</span>
+                <span className={language === 'ta' ? 'font-kavivanar font-normal text-[26px] leading-[1.3]' : 'font-manrope font-extrabold text-[24px]'}>
                   {language === 'ta' ? 'தொடர்பு விவரங்கள்' : 'Contact'}
                 </span>
               </h2>

@@ -92,7 +92,7 @@ export const OrgChart: React.FC = () => {
             <span className="font-extrabold text-[13px] md:text-[14px] text-[#C41A1F] uppercase tracking-normal block mb-1">
               {language === 'ta' ? 'தலைவர்' : 'President'}
             </span>
-            <h3 className="font-helvetica font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight group-hover:text-[#E31E24] transition-colors">
+            <h3 className="font-manrope font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight group-hover:text-[#E31E24] transition-colors">
               {president.name[language]}
             </h3>
             <p className="text-[14px] text-[#5B5348] mt-1">
@@ -133,7 +133,7 @@ export const OrgChart: React.FC = () => {
             <span className="font-extrabold text-[13px] md:text-[14px] text-[#111111] uppercase tracking-normal block mb-1">
               {language === 'ta' ? 'செயலாளர்' : 'Secretary'}
             </span>
-            <h3 className="font-helvetica font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight group-hover:text-[#E31E24] transition-colors">
+            <h3 className="font-manrope font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight group-hover:text-[#E31E24] transition-colors">
               {secretary.name[language]}
             </h3>
             <p className="text-[14px] text-[#5B5348] mt-1">
@@ -239,7 +239,7 @@ export const OrgChart: React.FC = () => {
           <div className="border-2 border-[#111111] bg-white flex flex-col">
             {/* Ink header with title and count */}
             <div className="bg-[#111111] text-[#FAF8F5] p-4 text-center">
-              <h4 className="font-helvetica font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
+              <h4 className="font-manrope font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
                 {language === 'ta' ? 'இணைச் செயலாளர்கள் (9)' : 'Joint Secretaries (9)'}
               </h4>
             </div>
@@ -253,7 +253,7 @@ export const OrgChart: React.FC = () => {
                   onClick={(e) => handleOpenOfficer(officer, e)}
                   className="w-full min-h-[48px] px-4 py-3 flex items-center justify-between gap-3 text-left group hover:bg-[#FAF8F5] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#E31E24]"
                 >
-                  <span className="font-helvetica font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
+                  <span className="font-manrope font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
                     {officer.name[language]}
                   </span>
                   <span className="text-[13px] md:text-[14px] text-[#5B5348] shrink-0 font-normal">
@@ -268,7 +268,7 @@ export const OrgChart: React.FC = () => {
           <div className="border-2 border-[#111111] bg-white flex flex-col">
             {/* Ink header with title and count */}
             <div className="bg-[#111111] text-[#FAF8F5] p-4 text-center">
-              <h4 className="font-helvetica font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
+              <h4 className="font-manrope font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
                 {language === 'ta' ? 'துணைச் செயலாளர்கள் (5)' : 'Deputy Secretaries (5)'}
               </h4>
             </div>
@@ -282,7 +282,7 @@ export const OrgChart: React.FC = () => {
                   onClick={(e) => handleOpenOfficer(officer, e)}
                   className="w-full min-h-[48px] px-4 py-3 flex items-center justify-between gap-3 text-left group hover:bg-[#FAF8F5] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#E31E24]"
                 >
-                  <span className="font-helvetica font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
+                  <span className="font-manrope font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
                     {officer.name[language]}
                   </span>
                   <span className="text-[13px] md:text-[14px] text-[#5B5348] shrink-0 font-normal">
@@ -297,7 +297,7 @@ export const OrgChart: React.FC = () => {
           <div className="border-2 border-[#111111] bg-white flex flex-col">
             {/* Ink header with title and count */}
             <div className="bg-[#111111] text-[#FAF8F5] p-4 text-center">
-              <h4 className="font-helvetica font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
+              <h4 className="font-manrope font-extrabold text-[18px] md:text-[20px] text-[#FAF8F5]">
                 {language === 'ta' ? 'தலைமையக வழக்கறிஞர்கள் (9)' : 'Head Office Advocates (9)'}
               </h4>
             </div>
@@ -311,7 +311,7 @@ export const OrgChart: React.FC = () => {
                   onClick={(e) => handleOpenOfficer(officer, e)}
                   className="w-full min-h-[48px] px-4 py-3 flex items-center justify-between gap-3 text-left group hover:bg-[#FAF8F5] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#E31E24]"
                 >
-                  <span className="font-helvetica font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
+                  <span className="font-manrope font-extrabold text-[15px] md:text-[16px] text-[#111111] group-hover:text-[#E31E24] transition-colors">
                     {officer.name[language]}
                   </span>
                   <span className="text-[13px] md:text-[14px] text-[#5B5348] shrink-0 font-normal">
@@ -353,7 +353,7 @@ export const OrgChart: React.FC = () => {
                 <span className="font-extrabold text-[13px] text-[#C41A1F] uppercase tracking-normal block mb-1">
                   {selectedOfficer.designation[language]}
                 </span>
-                <h3 id="modal-officer-name" className="font-helvetica font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight">
+                <h3 id="modal-officer-name" className="font-manrope font-extrabold text-[24px] md:text-[28px] text-[#111111] leading-tight">
                   {selectedOfficer.name[language]}
                 </h3>
                 <span className="text-[14px] text-[#5B5348] font-bold block mt-0.5">
@@ -366,7 +366,7 @@ export const OrgChart: React.FC = () => {
                 ref={modalCloseButtonRef}
                 type="button"
                 onClick={handleCloseModal}
-                className="min-h-[44px] h-[44px] px-4 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase tracking-normal transition-colors cursor-pointer btn-lift"
+                className="min-h-[44px] h-[44px] px-4 bg-[#111111] hover:bg-[#E31E24] text-white font-manrope font-extrabold text-[13px] uppercase tracking-normal transition-colors cursor-pointer btn-lift"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
@@ -415,7 +415,7 @@ export const OrgChart: React.FC = () => {
                   <span className="text-[12px] font-extrabold uppercase text-[#5B5348] block mb-0.5">
                     {language === 'ta' ? 'பார் கவுன்சில் பதிவு எண்' : 'Bar Council Enrollment'}
                   </span>
-                  <span className="font-helvetica font-extrabold text-[16px] text-[#C41A1F]">
+                  <span className="font-manrope font-extrabold text-[16px] text-[#C41A1F]">
                     {selectedOfficer.barCouncilNo}
                   </span>
                 </div>

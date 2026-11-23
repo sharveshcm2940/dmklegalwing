@@ -259,7 +259,7 @@ export default function HomePage() {
                   alt="DMK Official Emblem"
                   className="h-10 sm:h-12 w-auto object-contain"
                 />
-                <span className="text-[#ff8a85] font-helvetica font-extrabold text-[15px] uppercase tracking-normal">
+                <span className="text-[#ff8a85] font-manrope font-extrabold text-[15px] uppercase tracking-normal">
                   {language === 'ta'
                     ? 'மாநில தலைமைச் செயலகம் · அண்ணா அறிவாலயம், சென்னை'
                     : 'State Legal Secretariat · Anna Arivalayam, Chennai'}
@@ -290,14 +290,14 @@ export default function HomePage() {
               <div className="hero-stagger-4 pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                 <a
                   href="#districts"
-                  className="min-h-[48px] h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center cursor-pointer transition-colors duration-150 btn-lift"
+                  className="min-h-[48px] h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-manrope font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center cursor-pointer transition-colors duration-150 btn-lift"
                 >
                   {language === 'ta' ? 'மாவட்ட அணியைக் கண்டறிக' : 'Find your district unit'}
                 </a>
 
                 <a
                   href="#join"
-                  className="min-h-[48px] h-[48px] px-8 bg-transparent hover:bg-[#FAF8F5] hover:text-[#111111] text-[#FAF8F5] font-helvetica font-extrabold text-[15px] uppercase tracking-normal border-2 border-[#FAF8F5] flex items-center justify-center cursor-pointer transition-colors duration-150 btn-lift"
+                  className="min-h-[48px] h-[48px] px-8 bg-transparent hover:bg-[#FAF8F5] hover:text-[#111111] text-[#FAF8F5] font-manrope font-extrabold text-[15px] uppercase tracking-normal border-2 border-[#FAF8F5] flex items-center justify-center cursor-pointer transition-colors duration-150 btn-lift"
                 >
                   {language === 'ta' ? 'அணியில் இணைக' : 'Join the Legal Wing'}
                 </a>
@@ -316,13 +316,13 @@ export default function HomePage() {
                   <span className="px-3 py-1 bg-[#111111] text-white text-[15px] font-extrabold uppercase tracking-normal">
                     {leadStory.category || 'Resolution'}
                   </span>
-                  <span className="text-[15px] font-helvetica font-bold text-[#5B5348]">
+                  <span className="text-[15px] font-manrope font-bold text-[#5B5348]">
                     {leadStory.date}
                   </span>
                 </div>
 
                 {/* Headline in Helvetica Now Display 800 at 27 px (line height 1.12) */}
-                <h2 className="font-helvetica font-extrabold text-[27px] leading-[1.12] text-[#111111]">
+                <h2 className="font-manrope font-extrabold text-[27px] leading-[1.12] text-[#111111]">
                   <Link href={`/news/${leadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
                     {leadStory.title[language]}
                   </Link>
@@ -337,7 +337,7 @@ export default function HomePage() {
                 <div className="pt-2 border-t border-[#d7d0c3] flex items-center justify-between">
                   <Link
                     href={`/news/${leadStory.id}`}
-                    className="inline-flex items-center gap-1.5 text-[#C41A1F] hover:text-[#111111] font-helvetica font-extrabold text-[15px] transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-[#C41A1F] hover:text-[#111111] font-manrope font-extrabold text-[15px] transition-colors cursor-pointer"
                   >
                     <span>{language === 'ta' ? 'முழு அறிக்கையைப் படிக்க →' : 'Read the full statement →'}</span>
                   </Link>
@@ -400,7 +400,7 @@ export default function HomePage() {
             {[...publishedNews, ...publishedNews].map((item, idx) => (
               <div
                 key={`${item.id}-${idx}`}
-                className="inline-flex items-center text-[16px] font-helvetica font-extrabold uppercase mr-[56px] shrink-0"
+                className="inline-flex items-center text-[16px] font-manrope font-extrabold uppercase mr-[56px] shrink-0"
               >
                 <span className="text-[#C41A1F] mr-2">[{item.category}]</span>
                 <Link
@@ -432,7 +432,7 @@ export default function HomePage() {
                 className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
                 style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.1s' }}
               />
-              <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
+              <div className="font-manrope font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[0].toLocaleString()}{countsFinished ? '+' : ''}
               </div>
               <p className="font-catamaran font-extrabold text-[17px] sm:text-[18px] text-white leading-snug">
@@ -446,7 +446,7 @@ export default function HomePage() {
                 className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
                 style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.2s' }}
               />
-              <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
+              <div className="font-manrope font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[1]}
               </div>
               <p className="font-catamaran font-extrabold text-[17px] sm:text-[18px] text-white leading-snug">
@@ -460,7 +460,7 @@ export default function HomePage() {
                 className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
                 style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.3s' }}
               />
-              <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
+              <div className="font-manrope font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[2]}{countsFinished ? '+' : ''}
               </div>
               <p className="font-catamaran font-extrabold text-[17px] sm:text-[18px] text-white leading-snug">
@@ -474,7 +474,7 @@ export default function HomePage() {
                 className="w-full h-[4px] bg-white transition-all duration-600 ease-out"
                 style={{ width: metricsVisible ? '100%' : '0%', transitionDelay: '0.4s' }}
               />
-              <div className="font-helvetica font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
+              <div className="font-manrope font-extrabold text-[clamp(48px,6vw,76px)] leading-none">
                 {counts[3]}{countsFinished ? '%' : ''}
               </div>
               <p className="font-catamaran font-extrabold text-[17px] sm:text-[18px] text-white leading-snug">
@@ -514,7 +514,7 @@ export default function HomePage() {
               <div className="pt-2">
                 <Link
                   href="/structure"
-                  className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors"
+                  className="inline-flex items-center gap-2 font-manrope font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors"
                 >
                   <span>{language === 'ta' ? 'முழு கட்டமைப்பு வரைபடம் →' : 'Full structural chart →'}</span>
                 </Link>
@@ -538,7 +538,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-[1.1]">
+                  <h3 className="font-manrope font-extrabold text-[26px] text-[#111111] leading-[1.1]">
                     {language === 'ta' ? 'ஆர். விடுதலை' : 'R. Viduthalai'}
                   </h3>
                   <p className="text-[15px] text-[#C41A1F] font-bold">
@@ -566,7 +566,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <h3 className="font-helvetica font-extrabold text-[26px] text-[#111111] leading-[1.1]">
+                  <h3 className="font-manrope font-extrabold text-[26px] text-[#111111] leading-[1.1]">
                     {language === 'ta' ? 'என்.ஆர். இளங்கோ' : 'N.R. Elango'}
                   </h3>
                   <p className="text-[15px] text-[#C41A1F] font-bold">
@@ -624,7 +624,7 @@ export default function HomePage() {
                     key={tab}
                     type="button"
                     onClick={() => handleNewsFilterChange(tab)}
-                    className={`relative py-1 font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
+                    className={`relative py-1 font-manrope font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
                       isActive ? 'text-[#111111]' : 'text-[#5B5348] hover:text-[#111111]'
                     }`}
                   >
@@ -676,7 +676,7 @@ export default function HomePage() {
 
                 {/* Dropping Parchment-Bordered Date Stamp (scale 1.7 to 1, rotate -7°, 0.6s) */}
                 <div className="relative z-10 self-start">
-                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[15px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
+                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-manrope font-extrabold text-[15px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
                     {newsLeadStory.date} · {newsLeadStory.category}
                   </div>
                 </div>
@@ -698,7 +698,7 @@ export default function HomePage() {
                   [{newsLeadStory.category}] · {newsLeadStory.court || 'Constitutional Bench'}
                 </span>
 
-                <h3 className="font-helvetica font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.12] text-[#111111]">
+                <h3 className="font-manrope font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.12] text-[#111111]">
                   <Link href={`/news/${newsLeadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
                     {newsLeadStory.title[language]}
                   </Link>
@@ -717,7 +717,7 @@ export default function HomePage() {
                 <div className="pt-2">
                   <Link
                     href={`/news/${newsLeadStory.id}`}
-                    className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
+                    className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-manrope font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
                   >
                     {language === 'ta' ? 'முழு அறிக்கையைப் படிக்க →' : 'Read the full statement →'}
                   </Link>
@@ -746,10 +746,10 @@ export default function HomePage() {
                     <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8 flex-1">
                       {/* 108 px Date Block */}
                       <div className="w-[108px] shrink-0 text-left">
-                        <div className="font-helvetica font-extrabold text-[56px] leading-none text-[#111111]">
+                        <div className="font-manrope font-extrabold text-[56px] leading-none text-[#111111]">
                           {dateParts.day}
                         </div>
-                        <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-normal uppercase">
+                        <div className="font-manrope font-bold text-[15px] text-[#5B5348] mt-1 tracking-normal uppercase">
                           {dateParts.month} {dateParts.year}
                         </div>
                         <div className="mt-2 text-[15px] text-[#C41A1F] font-extrabold uppercase">
@@ -759,7 +759,7 @@ export default function HomePage() {
 
                       {/* Content: Type in #C41A1F, Headline clamp(24px, 2.6vw, 34px) 800, Summary 18 px, Source 15 px */}
                       <div className="space-y-2 flex-1">
-                        <h4 className="font-helvetica font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.14]">
+                        <h4 className="font-manrope font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.14]">
                           <Link href={`/news/${story.id}`}>
                             {story.title[language]}
                           </Link>
@@ -809,7 +809,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/districts"
-              className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#FAF8F5] hover:text-[#ff8a85] uppercase tracking-normal border-b-2 border-[#FAF8F5] pb-0.5 hover:border-[#ff8a85] transition-colors shrink-0"
+              className="inline-flex items-center gap-2 font-manrope font-extrabold text-[15px] text-[#FAF8F5] hover:text-[#ff8a85] uppercase tracking-normal border-b-2 border-[#FAF8F5] pb-0.5 hover:border-[#ff8a85] transition-colors shrink-0"
             >
               <span>{language === 'ta' ? 'முழு மாவட்டக் கோப்பகம் →' : 'View full 74 directory →'}</span>
             </Link>
@@ -856,7 +856,7 @@ export default function HomePage() {
                             : 'hover:bg-[#2a2523] text-[#FAF8F5]'
                         }`}
                       >
-                        <div className="font-helvetica font-extrabold text-[17px]">
+                        <div className="font-manrope font-extrabold text-[17px]">
                           {d.name[language]}
                         </div>
                         <div className={`text-[15px] text-right pl-3 ${isSelected ? 'text-white' : 'text-[#d8cfc2]'}`}>
@@ -887,7 +887,7 @@ export default function HomePage() {
                       ? `மாவட்ட அமைப்பாளர் · எண். ${activeDistrictIndex}`
                       : `District organiser · No. ${activeDistrictIndex}`}
                   </span>
-                  <h3 className="font-helvetica font-extrabold text-[clamp(34px,4vw,48px)] leading-[1.1] text-[#111111] mt-1">
+                  <h3 className="font-manrope font-extrabold text-[clamp(34px,4vw,48px)] leading-[1.1] text-[#111111] mt-1">
                     {activeDistrict.name[language]}
                   </h3>
                 </div>
@@ -896,7 +896,7 @@ export default function HomePage() {
                   <span className="text-[15px] font-bold text-[#5B5348] uppercase tracking-normal">
                     {language === 'ta' ? 'மாவட்ட அமைப்பாளர்' : 'District Organiser'}
                   </span>
-                  <p className="font-helvetica font-semibold text-[26px] text-[#111111] leading-[1.12]">
+                  <p className="font-manrope font-semibold text-[26px] text-[#111111] leading-[1.12]">
                     {activeDistrict.organizer[language]}
                   </p>
                   <p className="text-[15px] text-[#5B5348] leading-[1.6]">
@@ -908,7 +908,7 @@ export default function HomePage() {
                 <div className="pt-4 space-y-3">
                   <a
                     href={`tel:${activeDistrict.contactPhone}`}
-                    className="w-full min-h-[48px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center gap-3 transition-colors cursor-pointer"
+                    className="w-full min-h-[48px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-manrope font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center gap-3 transition-colors cursor-pointer"
                   >
                     <span>{language === 'ta' ? 'நேரடி அழைப்பு:' : 'Direct Telephone Call:'}</span>
                     <span>{activeDistrict.contactPhone}</span>
@@ -941,7 +941,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/structure"
-              className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors shrink-0"
+              className="inline-flex items-center gap-2 font-manrope font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] uppercase tracking-normal border-b-2 border-[#111111] pb-0.5 hover:border-[#C41A1F] transition-colors shrink-0"
             >
               <span>{language === 'ta' ? 'முழு நிர்வாகிகள் பட்டியல் →' : 'View full roster →'}</span>
             </Link>
@@ -960,10 +960,10 @@ export default function HomePage() {
                   : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
               }`}
             >
-              <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
+              <div className="font-manrope font-extrabold text-[64px] leading-none mb-4">
                 09
               </div>
-              <h3 className="font-helvetica font-extrabold text-[26px] leading-[1.1] mb-2">
+              <h3 className="font-manrope font-extrabold text-[26px] leading-[1.1] mb-2">
                 {language === 'ta' ? 'இணைச் செயலாளர்கள்' : 'Joint Secretaries'}
               </h3>
               <p className={`text-[15px] leading-[1.6] ${activeBranch === 'joint' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
@@ -983,10 +983,10 @@ export default function HomePage() {
                   : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
               }`}
             >
-              <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
+              <div className="font-manrope font-extrabold text-[64px] leading-none mb-4">
                 05
               </div>
-              <h3 className="font-helvetica font-extrabold text-[26px] leading-[1.1] mb-2">
+              <h3 className="font-manrope font-extrabold text-[26px] leading-[1.1] mb-2">
                 {language === 'ta' ? 'துணைச் செயலாளர்கள்' : 'Deputy Secretaries'}
               </h3>
               <p className={`text-[15px] leading-[1.6] ${activeBranch === 'deputy' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
@@ -1006,10 +1006,10 @@ export default function HomePage() {
                   : 'bg-white text-[#111111] hover:bg-[#f1ece2]'
               }`}
             >
-              <div className="font-helvetica font-extrabold text-[64px] leading-none mb-4">
+              <div className="font-manrope font-extrabold text-[64px] leading-none mb-4">
                 09
               </div>
-              <h3 className="font-helvetica font-extrabold text-[26px] leading-[1.1] mb-2">
+              <h3 className="font-manrope font-extrabold text-[26px] leading-[1.1] mb-2">
                 {language === 'ta' ? 'தலைமை நிலைய வழக்கறிஞர்கள்' : 'Head Office Advocates'}
               </h3>
               <p className={`text-[15px] leading-[1.6] ${activeBranch === 'headoffice' ? 'text-[#d8cfc2]' : 'text-[#5B5348]'}`}>
@@ -1031,7 +1031,7 @@ export default function HomePage() {
                   animation: `fade-rise 0.4s ease-out ${idx * 40}ms forwards`,
                 }}
               >
-                <h4 className="font-helvetica font-extrabold text-[17px] text-[#111111] leading-snug">
+                <h4 className="font-manrope font-extrabold text-[17px] text-[#111111] leading-snug">
                   {officer.name[language]}
                 </h4>
                 <div className="text-[15px] text-[#5B5348] font-bold">
@@ -1077,7 +1077,7 @@ export default function HomePage() {
               <div className="pt-4">
                 <Link
                   href="/enrol"
-                  className="w-full min-h-[48px] px-8 bg-[#111111] hover:bg-[#333333] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-full min-h-[48px] px-8 bg-[#111111] hover:bg-[#333333] text-white font-manrope font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                 >
                   {language === 'ta' ? 'இப்போதே சேர்க்கை பெறுக' : 'Enrol now'}
                 </Link>
@@ -1096,16 +1096,18 @@ export default function HomePage() {
                     : 'Urgent legal representation against unlawful detentions, political harassment, and civil rights violations through verified district panels.'}
                 </p>
 
-                {/* 2 px Red bordered notice: keep placeholder as written */}
+                {/* 2 px Red bordered notice */}
                 <div className="p-4 bg-[#1a1715] border-2 border-[#E31E24] text-[15px] font-bold text-white leading-[1.6]">
-                  If you or someone you know is in police custody, call [HELPLINE NUMBER] now.
+                  {language === 'ta'
+                    ? 'நீங்களோ அல்லது உங்களுக்குத் தெரிந்தவர்களோ காவல்துறை காவலில் வைக்கப்பட்டிருந்தால், உடனடியாக 044-2434 4455 என்ற எண்ணை அழைக்கவும்.'
+                    : 'If you or someone you know is in police custody, call 044-2434 4455 now.'}
                 </div>
               </div>
 
               <div className="pt-4">
                 <Link
                   href="/citizen-desk"
-                  className="w-full min-h-[48px] px-8 bg-[#FAF8F5] hover:bg-white text-[#111111] font-helvetica font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-full min-h-[48px] px-8 bg-[#FAF8F5] hover:bg-white text-[#111111] font-manrope font-extrabold text-[15px] uppercase tracking-normal flex items-center justify-center transition-colors cursor-pointer"
                 >
                   {language === 'ta' ? 'கோரிக்கையை அனுப்புக' : 'Submit a request'}
                 </Link>

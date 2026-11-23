@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "who": "super_admin-officer",
+    "role": "super_admin",
+    "what": "Admin session authenticated as super admin",
+    "when": "2026-11-23T14:12:09.607Z",
+    "id": "log-1795443129615-h7hrb"
+  }
+]

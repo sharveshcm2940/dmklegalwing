@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Catamaran, Noto_Serif_Tamil, Source_Serif_4 } from "next/font/google";
+import { Manrope, Catamaran, Noto_Serif_Tamil, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { DataProvider } from "@/context/DataContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-manrope",
+  display: "swap",
+});
 
 const catamaran = Catamaran({
   subsets: ["latin", "tamil"],
@@ -53,12 +60,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ta" className={`${catamaran.variable} ${notoSerifTamil.variable} ${sourceSerif4.variable} h-full scroll-smooth`}>
+    <html lang="ta" className={`${manrope.variable} ${catamaran.variable} ${notoSerifTamil.variable} ${sourceSerif4.variable} h-full scroll-smooth`}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Kavivanar&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Serif+Tamil:wght@400;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Kavivanar&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Serif+Tamil:wght@400;600;700&display=swap"
           rel="stylesheet"
         />
       </head>

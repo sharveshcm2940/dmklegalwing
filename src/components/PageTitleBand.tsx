@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface PageTitleBandProps {
   title: string;
@@ -8,12 +9,14 @@ interface PageTitleBandProps {
 }
 
 export const PageTitleBand: React.FC<PageTitleBandProps> = ({ title, description }) => {
+  const { language } = useLanguage();
+
   return (
     <div className="w-full bg-[#111111] text-[#FAF8F5] pt-14 pb-16 relative overflow-hidden border-b border-[#111111]">
       <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] flex flex-col md:flex-row md:items-end justify-between gap-8 relative z-10">
         <div className="space-y-4 max-w-4xl">
-          {/* Kavivanar Title at clamp(44px, 6vw, 84px) */}
-          <h1 className="font-kavivanar font-normal text-[clamp(44px,6vw,84px)] leading-[1.12] text-[#FAF8F5] tracking-normal">
+          {/* Manrope ExtraBold for English, Kavivanar for Tamil at clamp(44px, 6vw, 84px) */}
+          <h1 className={`${language === 'ta' ? 'font-kavivanar font-normal' : 'font-manrope font-extrabold'} text-[clamp(44px,6vw,84px)] leading-[1.12] text-[#FAF8F5] tracking-normal`}>
             {title}
           </h1>
 

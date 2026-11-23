@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Kavivanar&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Serif+Tamil:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Kavivanar&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Serif+Tamil:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -12,10 +12,11 @@
   --color-ink-line: #3D3633;
   --color-ink-text: #D8CFC2;
 
-  /* Typography Variables: Fallbacks include Noto Sans Tamil & Noto Serif Tamil for robust cross-browser alignment */
+  /* Typography Variables: Manrope ExtraBold prioritized throughout website */
+  --font-manrope: var(--font-manrope), 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-helvetica: var(--font-manrope), 'Manrope', 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-body: var(--font-catamaran), 'Catamaran', 'Noto Sans Tamil', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-kavivanar: 'Kavivanar', var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
-  --font-helvetica: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
   /* Corner Radius: strictly 0px or 2px across all elements */
   --radius-xs: 2px;
@@ -138,12 +139,27 @@ header nav span {
   font-family: 'Kavivanar', var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
 }
 
+.font-manrope {
+  font-family: var(--font-manrope), 'Manrope', sans-serif;
+}
+
 .font-helvetica {
-  font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: var(--font-manrope), 'Manrope', 'Helvetica Now Display', sans-serif;
 }
 
 .font-catamaran {
   font-family: var(--font-catamaran), 'Catamaran', sans-serif;
+}
+
+/* Headings default to Manrope ExtraBold (Kavivanar for Tamil) */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-manrope), 'Manrope', var(--font-catamaran), 'Catamaran', sans-serif;
+  font-weight: 800;
+}
+
+:lang(ta) h1, :lang(ta) h2, :lang(ta) h3, :lang(ta) h4, :lang(ta) h5, :lang(ta) h6 {
+  font-family: 'Kavivanar', var(--font-noto-serif-tamil), 'Noto Serif Tamil', serif;
+  font-weight: normal;
 }
 
 /* ============================================================== */
@@ -158,20 +174,12 @@ header nav span {
   background: linear-gradient(90deg, #111111 50%, #E31E24 50%);
 }
 
-.dmk-flag-pill {
-  display: inline-flex;
-  height: 10px;
-  width: 22px;
-  background: linear-gradient(180deg, #111111 50%, #E31E24 50%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  vertical-align: middle;
-}
-
 /* Backward compatibility classes mapped to brand typography */
 .font-dmk-headline,
 .font-editorial,
 .font-serif {
-  font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: var(--font-manrope), 'Manrope', 'Helvetica Now Display', sans-serif;
+  font-weight: 800;
 }
 
 html[lang="ta"] .font-dmk-headline,

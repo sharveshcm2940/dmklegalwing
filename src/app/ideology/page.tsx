@@ -121,12 +121,12 @@ export default function IdeologyPage() {
                   }`}
                 >
                   <div className="flex items-center gap-4 truncate">
-                    <span className="font-helvetica font-extrabold text-[18px] text-[#C41A1F] shrink-0 w-7">
+                    <span className="font-manrope font-extrabold text-[18px] text-[#C41A1F] shrink-0 w-7">
                       {pillar.number}
                     </span>
                     <span
                       className={`truncate text-[17px] leading-snug ${
-                        language === 'ta' ? 'font-kavivanar font-normal' : 'font-helvetica font-bold'
+                        language === 'ta' ? 'font-kavivanar font-normal' : 'font-manrope font-bold'
                       } ${isSelected ? 'text-[#111111]' : ''}`}
                     >
                       {pillar.title[language]}
@@ -156,7 +156,7 @@ export default function IdeologyPage() {
             >
               {/* Number and Subtitle */}
               <div className="flex items-center justify-between border-b border-[#d7d0c3] pb-3">
-                <span className="font-helvetica font-extrabold text-[22px] text-[#C41A1F] leading-none">
+                <span className="font-manrope font-extrabold text-[22px] text-[#C41A1F] leading-none">
                   DOCTRINE {activePillar.number}
                 </span>
                 <span className="text-[13px] font-bold text-[#5B5348] uppercase">
@@ -170,7 +170,7 @@ export default function IdeologyPage() {
                   {activePillar.title.ta}
                 </h2>
               ) : (
-                <h2 className="font-helvetica font-extrabold text-[48px] text-[#111111] leading-[1.12]">
+                <h2 className="font-manrope font-extrabold text-[48px] text-[#111111] leading-[1.12]">
                   {activePillar.title.en}
                 </h2>
               )}
@@ -269,18 +269,18 @@ export default function IdeologyPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="font-helvetica font-extrabold text-[18px] text-[#C41A1F] shrink-0">
+                    <span className="font-manrope font-extrabold text-[18px] text-[#C41A1F] shrink-0">
                       {pillar.number}
                     </span>
                     <span
                       className={`text-[17px] leading-snug ${
-                        language === 'ta' ? 'font-kavivanar font-normal' : 'font-helvetica font-bold'
+                        language === 'ta' ? 'font-kavivanar font-normal' : 'font-manrope font-bold'
                       }`}
                     >
                       {pillar.title[language]}
                     </span>
                   </div>
-                  <span className="font-helvetica font-extrabold text-[18px] text-[#5B5348] shrink-0 ml-2">
+                  <span className="font-manrope font-extrabold text-[18px] text-[#5B5348] shrink-0 ml-2">
                     {isOpen ? '—' : '+'}
                   </span>
                 </button>
@@ -290,7 +290,7 @@ export default function IdeologyPage() {
                     id={`mobile-doctrine-${idx}`}
                     className="bg-white border-t border-[#111111] p-6 space-y-4"
                   >
-                    <div className="font-helvetica font-extrabold text-[18px] text-[#C41A1F] leading-none">
+                    <div className="font-manrope font-extrabold text-[18px] text-[#C41A1F] leading-none">
                       DOCTRINE {pillar.number}
                     </div>
 
@@ -299,7 +299,7 @@ export default function IdeologyPage() {
                         {pillar.title.ta}
                       </h3>
                     ) : (
-                      <h3 className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-tight">
+                      <h3 className="font-manrope font-extrabold text-[28px] text-[#111111] leading-tight">
                         {pillar.title.en}
                       </h3>
                     )}
@@ -343,7 +343,7 @@ export default function IdeologyPage() {
                   alt="DMK Official Emblem"
                   className="h-14 w-auto object-contain"
                 />
-                <span className="font-helvetica font-extrabold text-[12px] uppercase tracking-normal text-[#C41A1F] block">
+                <span className="font-manrope font-extrabold text-[12px] uppercase tracking-normal text-[#C41A1F] block">
                   {language === 'ta' ? 'அதிகாரப்பூர்வ கொள்கை ஆவணம்' : 'OFFICIAL TREATY & DECLARATION'}
                 </span>
               </div>
@@ -371,7 +371,7 @@ export default function IdeologyPage() {
             {/* Red rectangular Download button */}
             <Link
               href="/resources#res-69-reservation"
-              className="min-h-[48px] h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[15px] inline-flex items-center justify-center shrink-0 uppercase tracking-normal transition-colors duration-150 btn-lift"
+              className="min-h-[48px] h-[48px] px-8 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-manrope font-extrabold text-[15px] inline-flex items-center justify-center shrink-0 uppercase tracking-normal transition-colors duration-150 btn-lift"
             >
               {language === 'ta' ? 'பிரகடன ஆவணத்தைப் பதிவிறக்குக (PDF)' : 'Download Treaty Manifesto (PDF)'}
             </Link>

@@ -218,7 +218,7 @@ export default function ActivitiesPage() {
         <header className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#3d3633]/20">
             {/* Slogan / Subhead */}
-            <span className="font-helvetica font-extrabold text-[14px] uppercase text-[#C41A1F] tracking-normal">
+            <span className="font-manrope font-extrabold text-[14px] uppercase text-[#C41A1F] tracking-normal">
               {language === 'ta' ? 'கழக நிகழ்வு அட்டவணை' : 'Official Wing Calendar'}
             </span>
 
@@ -227,7 +227,7 @@ export default function ActivitiesPage() {
               <button
                 type="button"
                 onClick={() => setActiveView('list')}
-                className={`min-h-[44px] h-[44px] inline-flex items-center font-helvetica font-extrabold text-[17px] cursor-pointer transition-colors ${
+                className={`min-h-[44px] h-[44px] inline-flex items-center font-manrope font-extrabold text-[17px] cursor-pointer transition-colors ${
                   activeView === 'list'
                     ? 'text-[#111111] border-b-[3px] border-[#E31E24]'
                     : 'text-[#5B5348] hover:text-[#111111] border-b-[3px] border-transparent'
@@ -238,7 +238,7 @@ export default function ActivitiesPage() {
               <button
                 type="button"
                 onClick={() => setActiveView('month')}
-                className={`min-h-[44px] h-[44px] inline-flex items-center font-helvetica font-extrabold text-[17px] cursor-pointer transition-colors ${
+                className={`min-h-[44px] h-[44px] inline-flex items-center font-manrope font-extrabold text-[17px] cursor-pointer transition-colors ${
                   activeView === 'month'
                     ? 'text-[#111111] border-b-[3px] border-[#E31E24]'
                     : 'text-[#5B5348] hover:text-[#111111] border-b-[3px] border-transparent'
@@ -255,7 +255,7 @@ export default function ActivitiesPage() {
             <button
               type="button"
               onClick={() => setActiveStatus('all')}
-              className={`min-h-[44px] inline-flex items-center font-helvetica font-bold cursor-pointer transition-colors ${
+              className={`min-h-[44px] inline-flex items-center font-manrope font-bold cursor-pointer transition-colors ${
                 activeStatus === 'all'
                   ? 'text-[#111111] border-b-2 border-[#E31E24]'
                   : 'text-[#5B5348] hover:text-[#111111]'
@@ -267,7 +267,7 @@ export default function ActivitiesPage() {
             <button
               type="button"
               onClick={() => setActiveStatus('upcoming')}
-              className={`min-h-[44px] inline-flex items-center font-helvetica font-bold cursor-pointer transition-colors ${
+              className={`min-h-[44px] inline-flex items-center font-manrope font-bold cursor-pointer transition-colors ${
                 activeStatus === 'upcoming'
                   ? 'text-[#111111] border-b-2 border-[#E31E24]'
                   : 'text-[#5B5348] hover:text-[#111111]'
@@ -279,7 +279,7 @@ export default function ActivitiesPage() {
             <button
               type="button"
               onClick={() => setActiveStatus('past')}
-              className={`min-h-[44px] inline-flex items-center font-helvetica font-bold cursor-pointer transition-colors ${
+              className={`min-h-[44px] inline-flex items-center font-manrope font-bold cursor-pointer transition-colors ${
                 activeStatus === 'past'
                   ? 'text-[#111111] border-b-2 border-[#E31E24]'
                   : 'text-[#5B5348] hover:text-[#111111]'
@@ -299,7 +299,7 @@ export default function ActivitiesPage() {
                   <button
                     type="button"
                     onClick={() => setActiveCategory(cat)}
-                    className={`min-h-[44px] inline-flex items-center font-helvetica font-bold cursor-pointer transition-colors ${
+                    className={`min-h-[44px] inline-flex items-center font-manrope font-bold cursor-pointer transition-colors ${
                       isActive
                         ? 'text-[#111111] border-b-2 border-[#E31E24]'
                         : 'text-[#5B5348] hover:text-[#111111]'
@@ -346,7 +346,7 @@ export default function ActivitiesPage() {
                     <h2 className="font-kavivanar font-normal text-[36px] text-[#111111] leading-tight">
                       {getMonthName(grp.monthIndex, language)}
                     </h2>
-                    <p className="font-helvetica font-bold text-[18px] text-[#5B5348] mt-1">
+                    <p className="font-manrope font-bold text-[18px] text-[#5B5348] mt-1">
                       {grp.year}
                     </p>
                   </div>
@@ -372,7 +372,7 @@ export default function ActivitiesPage() {
                             {/* Day number in Helvetica Now Display 800 at 44 px */}
                             <div className="shrink-0 w-16">
                               <span
-                                className={`font-helvetica font-extrabold text-[44px] leading-none block ${
+                                className={`font-manrope font-extrabold text-[44px] leading-none block ${
                                   isPast ? 'text-[#5B5348]' : 'text-[#111111]'
                                 }`}
                               >
@@ -396,7 +396,7 @@ export default function ActivitiesPage() {
                                 className={`text-[26px] leading-[1.2] ${
                                   language === 'ta'
                                     ? 'font-kavivanar font-normal'
-                                    : 'font-helvetica font-extrabold'
+                                    : 'font-manrope font-extrabold'
                                 } ${isPast ? 'text-[#5B5348]' : 'text-[#111111]'}`}
                               >
                                 {event.title[language]}
@@ -430,7 +430,7 @@ export default function ActivitiesPage() {
                                   <button
                                     type="button"
                                     onClick={() => setSelectedEvent(event)}
-                                    className="min-h-[44px] inline-flex items-center font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
+                                    className="min-h-[44px] inline-flex items-center font-manrope font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
                                   >
                                     {language === 'ta' ? 'விவரங்கள் →' : 'Details →'}
                                   </button>
@@ -438,7 +438,7 @@ export default function ActivitiesPage() {
                                   {event.status === 'upcoming' && (
                                     <Link
                                       href="/enrol"
-                                      className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer btn-lift"
+                                      className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-manrope font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer btn-lift"
                                     >
                                       {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
                                     </Link>
@@ -463,7 +463,7 @@ export default function ActivitiesPage() {
                 <button
                   type="button"
                   onClick={goToPrevMonth}
-                  className="min-h-[44px] h-[44px] px-2 font-helvetica font-bold text-[16px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
+                  className="min-h-[44px] h-[44px] px-2 font-manrope font-bold text-[16px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
                 >
                   ← {getMonthName((calendarMonth - 1 + 12) % 12, language)}
                 </button>
@@ -475,7 +475,7 @@ export default function ActivitiesPage() {
                 <button
                   type="button"
                   onClick={goToNextMonth}
-                  className="min-h-[44px] h-[44px] px-2 font-helvetica font-bold text-[16px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
+                  className="min-h-[44px] h-[44px] px-2 font-manrope font-bold text-[16px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
                 >
                   {getMonthName((calendarMonth + 1) % 12, language)} →
                 </button>
@@ -486,7 +486,7 @@ export default function ActivitiesPage() {
                 {(language === 'ta' ? WEEKDAYS_TA : WEEKDAYS_EN).map((dayName) => (
                   <div
                     key={dayName}
-                    className="border-r border-b border-[#d7d0c3] py-2 font-helvetica font-extrabold text-[14px] text-[#5B5348] uppercase tracking-normal"
+                    className="border-r border-b border-[#d7d0c3] py-2 font-manrope font-extrabold text-[14px] text-[#5B5348] uppercase tracking-normal"
                   >
                     {dayName}
                   </div>
@@ -528,7 +528,7 @@ export default function ActivitiesPage() {
                       }`}
                     >
                       {/* Day number */}
-                      <span className="font-helvetica font-extrabold text-[16px] md:text-[18px] text-[#111111] leading-none">
+                      <span className="font-manrope font-extrabold text-[16px] md:text-[18px] text-[#111111] leading-none">
                         {cell.dayNum}
                       </span>
 
@@ -548,7 +548,7 @@ export default function ActivitiesPage() {
               {selectedDay && selectedDay.events.length > 0 && (
                 <div className="bg-white border border-[#111111] p-6 md:p-8 mt-8 space-y-6">
                   <div className="flex items-center justify-between border-b border-[#d7d0c3] pb-4">
-                    <h3 className="font-helvetica font-extrabold text-[22px] text-[#111111]">
+                    <h3 className="font-manrope font-extrabold text-[22px] text-[#111111]">
                       {language === 'ta'
                         ? `நிகழ்வுகள்: ${selectedDay.dateStr}`
                         : `Events on ${selectedDay.dateStr}`}
@@ -556,7 +556,7 @@ export default function ActivitiesPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedDay(null)}
-                      className="min-h-[44px] h-[44px] px-4 font-helvetica font-bold text-[15px] text-[#5B5348] hover:text-[#111111] cursor-pointer"
+                      className="min-h-[44px] h-[44px] px-4 font-manrope font-bold text-[15px] text-[#5B5348] hover:text-[#111111] cursor-pointer"
                     >
                       {language === 'ta' ? 'மூடுக' : 'Close'}
                     </button>
@@ -572,7 +572,7 @@ export default function ActivitiesPage() {
                           className={`text-[22px] text-[#111111] leading-snug ${
                             language === 'ta'
                               ? 'font-kavivanar font-normal'
-                              : 'font-helvetica font-extrabold'
+                              : 'font-manrope font-extrabold'
                           }`}
                         >
                           {ev.title[language]}
@@ -592,14 +592,14 @@ export default function ActivitiesPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedEvent(ev)}
-                            className="min-h-[44px] inline-flex items-center font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
+                            className="min-h-[44px] inline-flex items-center font-manrope font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] underline decoration-1 underline-offset-4 cursor-pointer"
                           >
                             {language === 'ta' ? 'விவரங்கள் →' : 'Details →'}
                           </button>
                           {ev.status === 'upcoming' && (
                             <Link
                               href="/enrol"
-                              className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer btn-lift"
+                              className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-manrope font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors cursor-pointer btn-lift"
                             >
                               {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
                             </Link>
@@ -641,7 +641,7 @@ export default function ActivitiesPage() {
                   className={`text-[24px] md:text-[28px] text-[#111111] leading-tight ${
                     language === 'ta'
                       ? 'font-kavivanar font-normal'
-                      : 'font-helvetica font-extrabold'
+                      : 'font-manrope font-extrabold'
                   }`}
                 >
                   {selectedEvent.title[language]}
@@ -651,7 +651,7 @@ export default function ActivitiesPage() {
                 ref={modalCloseBtnRef}
                 type="button"
                 onClick={() => setSelectedEvent(null)}
-                className="min-h-[44px] h-[44px] px-4 font-helvetica font-bold text-[14px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
+                className="min-h-[44px] h-[44px] px-4 font-manrope font-bold text-[14px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
@@ -691,7 +691,7 @@ export default function ActivitiesPage() {
               {selectedEvent.status === 'upcoming' ? (
                 <Link
                   href="/enrol"
-                  className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-helvetica font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors"
+                  className="min-h-[44px] h-[44px] px-6 bg-[#E31E24] hover:bg-[#C41A1F] text-white font-manrope font-extrabold text-[14px] uppercase tracking-normal inline-flex items-center justify-center transition-colors"
                 >
                   {language === 'ta' ? 'பதிவுசெய்க' : 'Register'}
                 </Link>
@@ -703,7 +703,7 @@ export default function ActivitiesPage() {
               <button
                 type="button"
                 onClick={() => setSelectedEvent(null)}
-                className="min-h-[44px] h-[44px] px-4 font-helvetica font-bold text-[14px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
+                className="min-h-[44px] h-[44px] px-4 font-manrope font-bold text-[14px] text-[#111111] hover:text-[#C41A1F] cursor-pointer"
               >
                 {language === 'ta' ? 'மூடுக' : 'Close'}
               </button>
