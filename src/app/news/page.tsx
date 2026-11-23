@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
@@ -11,18 +11,21 @@ export default function NewsPage() {
   const { language } = useLanguage();
   const { news } = useData();
 
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'All releases' | 'Press release' | 'Statement' | 'Resolution' | 'Gazette'>('All releases');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [mounted, setMounted] = useState<boolean>(false);
-  const [todayDate, setTodayDate] = useState<string>('22 November 2026');
+  const [newsFading, setNewsFading] = useState<boolean>(false);
+  const [todayDate, setTodayDate] = useState<string>('23 November 2026');
 
-  // Case detail modal
+  // Case detail modal for Court Watch
   const [selectedCaseModal, setSelectedCaseModal] = useState<LegalDevelopmentItem | null>(null);
 
+  // Court watch scroll-into-view observer
+  const courtWatchRef = useRef<HTMLElement>(null);
+  const [courtWatchVisible, setCourtWatchVisible] = useState<boolean>(false);
+
   useEffect(() => {
-    setMounted(true);
-    const d = new Date();
     try {
+      const d = new Date();
       const formatted = d.toLocaleDateString(language === 'ta' ? 'ta-IN' : 'en-GB', {
         day: 'numeric',
         month: 'long',
@@ -30,17 +33,45 @@ export default function NewsPage() {
       });
       setTodayDate(formatted);
     } catch {
-      // Fallback
+      setTodayDate('23 November 2026');
     }
   }, [language]);
 
-  const filterTabs = [
-    { id: 'all', en: 'All', ta: 'அனைத்தும்' },
-    { id: 'press', en: 'Press release', ta: 'செய்திக்குறிப்பு' },
-    { id: 'statement', en: 'Statement', ta: 'அறிக்கை' },
-    { id: 'resolution', en: 'Resolution', ta: 'தீர்மானம்' },
-    { id: 'gazette', en: 'Gazette', ta: 'அரசிதழ்' },
+  useEffect(() => {
+    if (!courtWatchRef.current) return;
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCourtWatchVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCourtWatchVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(courtWatchRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const tabs: Array<{ id: 'All releases' | 'Press release' | 'Statement' | 'Resolution' | 'Gazette'; en: string; ta: string }> = [
+    { id: 'All releases', en: 'All releases', ta: 'அனைத்து வெளியீடுகள்' },
+    { id: 'Press release', en: 'Press release', ta: 'செய்திக்குறிப்பு' },
+    { id: 'Statement', en: 'Statement', ta: 'அறிக்கை' },
+    { id: 'Resolution', en: 'Resolution', ta: 'தீர்மானம்' },
+    { id: 'Gazette', en: 'Gazette', ta: 'அரசிதழ்' },
   ];
+
+  const handleTabChange = (tabId: 'All releases' | 'Press release' | 'Statement' | 'Resolution' | 'Gazette') => {
+    if (tabId === activeTab) return;
+    setNewsFading(true);
+    setTimeout(() => {
+      setActiveTab(tabId);
+      setNewsFading(false);
+    }, 150);
+  };
 
   const publishedNews = useMemo(() => {
     return news.filter((item) => !item.status || item.status.toLowerCase() === 'published');
@@ -50,16 +81,16 @@ export default function NewsPage() {
     const q = searchQuery.trim().toLowerCase();
 
     return publishedNews.filter((item) => {
-      let matchesCategory = true;
+      let matchesTab = true;
       const cat = item.category.toLowerCase();
-      if (activeCategory === 'press') {
-        matchesCategory = cat.includes('press');
-      } else if (activeCategory === 'statement') {
-        matchesCategory = cat.includes('statement');
-      } else if (activeCategory === 'resolution') {
-        matchesCategory = cat.includes('resolution');
-      } else if (activeCategory === 'gazette') {
-        matchesCategory = cat.includes('gazette');
+      if (activeTab === 'Press release') {
+        matchesTab = cat.includes('press');
+      } else if (activeTab === 'Statement') {
+        matchesTab = cat.includes('statement');
+      } else if (activeTab === 'Resolution') {
+        matchesTab = cat.includes('resolution');
+      } else if (activeTab === 'Gazette') {
+        matchesTab = cat.includes('gazette');
       }
 
       const matchesSearch =
@@ -74,107 +105,110 @@ export default function NewsPage() {
         (item.court && item.court.toLowerCase().includes(q)) ||
         item.date.includes(q);
 
-      return matchesCategory && matchesSearch;
+      return matchesTab && matchesSearch;
     });
-  }, [publishedNews, activeCategory, searchQuery, language]);
+  }, [publishedNews, activeTab, searchQuery, language]);
 
   const leadStory = filteredNews[0] || null;
   const wireStories = filteredNews.slice(1);
 
-  return (
-    <div
-      className={`w-full min-h-screen bg-[#FAF8F5] text-[#111111] font-catamaran transition-opacity duration-500 ease-out motion-reduce:transition-none ${
-        mounted ? 'opacity-100' : 'opacity-0'
-      }`}
-    >
-      <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-10 pb-20">
-        
-        {/* ========================================================== */}
-        {/* 1. MASTHEAD                                                */}
-        {/* ========================================================== */}
-        <header className="mb-8">
-          {/* Masthead Ink Sub-strip */}
-          <div className="flex items-center justify-between text-[13px] text-[#5B5348] font-bold uppercase tracking-normal border-b border-[#d7d0c3] pb-2 mb-4">
-            <span className="flex items-center gap-3">
-              <img
-                src="/images/dmk-official-logo.png"
-                alt="DMK Official Emblem"
-                className="h-6 w-auto object-contain"
-              />
-              <span>
-                {language === 'ta'
-                  ? 'திமுக வழக்கறிஞர் அணி · அதிகாரப்பூர்வ செய்திப் பிரிவு'
-                  : 'DMK Legal Wing · Press & Media Bureau'}
-              </span>
-            </span>
-            <span>Vol. LIV · Issue 1971</span>
-          </div>
+  // Helper for 108 px date block (day 56 px 800, month grey)
+  const formatStoryDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return { day: '18', month: 'NOV', year: '2026' };
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+      return { day, month, year: String(d.getFullYear()) };
+    } catch {
+      return { day: '18', month: 'NOV', year: '2026' };
+    }
+  };
 
-          {/* Huge Kavivanar "செய்திகள்" in RED beside "Press releases, statements & media wire" */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
-            <h1 className="font-kavivanar font-normal text-[clamp(56px,9vw,120px)] text-[#E31E24] leading-[1.08] tracking-normal">
+  return (
+    <div className="w-full min-h-screen bg-[#FAF8F5] text-[#111111] font-catamaran antialiased overflow-x-clip selection:bg-[#E31E24] selection:text-white">
+      
+      {/* ========================================================== */}
+      {/* 1. MASTHEAD (NO TITLE BAND)                                */}
+      {/* Ink strip with "திமுக வழக்கறிஞர் அணி · Press Bureau" and   */}
+      {/* "Chennai · [today's date]"                                  */}
+      {/* Kavivanar "செய்திகள்" clamp(64px,11vw,150px) in #E31E24     */}
+      {/* beside "Press releases, statements & media wire" 800 28px   */}
+      {/* 6 px ink rule draws left-to-right in 1s, then 2px rule 4px below */}
+      {/* ========================================================== */}
+      <header className="w-full bg-[#FAF8F5] pt-0">
+        
+        {/* Ink strip */}
+        <div className="w-full bg-[#111111] text-[#FAF8F5] py-2.5 px-[clamp(20px,4vw,56px)] border-b border-[#111111]">
+          <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[14px] font-helvetica font-extrabold uppercase tracking-normal">
+            <div className="flex items-center gap-3">
+              <span className="w-3 h-3 bg-[#E31E24] inline-block" aria-hidden="true" />
+              <span>திமுக வழக்கறிஞர் அணி · Press Bureau</span>
+            </div>
+            <div className="text-[#d8cfc2]">
+              Chennai · {todayDate}
+            </div>
+          </div>
+        </div>
+
+        {/* Masthead Banner: Kavivanar title "செய்திகள்" in #E31E24 beside Helvetica 800 28px text */}
+        <div className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pt-10 pb-4">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6">
+            <h1 className="font-kavivanar font-normal text-[#E31E24] text-[clamp(64px,11vw,150px)] leading-[0.95] tracking-normal select-none">
               செய்திகள்
             </h1>
 
-            <div className="md:text-right space-y-1">
+            <div className="lg:text-right space-y-1 pb-2">
               <p className="font-helvetica font-extrabold text-[28px] text-[#111111] leading-tight">
                 Press releases, statements & media wire
               </p>
-              <p className="text-[14px] text-[#5B5348]">
+              <p className="text-[16px] text-[#5B5348] font-normal">
                 {language === 'ta'
-                  ? 'தலைமைச் செயலகத்தின் அதிகாரப்பூர்வ ஊடகப் பதிவுகள் மற்றும் நீதிமன்ற உத்தரவுகள்'
-                  : 'Official dispatches, constitutional resolutions & media updates from Anna Arivalayam'}
+                  ? 'கழகத் தலைமைச் செயலகம், அண்ணா அறிவாலயம் — சென்னை 600 018'
+                  : 'State Legal Secretariat, Anna Arivalayam, Chennai — 600 018'}
               </p>
             </div>
           </div>
 
-          {/* 6 px ink rule drawing in, 2 px rule below */}
-          <div className="w-full h-[6px] bg-[#111111] animate-draw-rule-1s" />
-          <div className="w-full h-[2px] bg-[#111111] mt-1" />
-
-          {/* One-line dateline in grey 15 px */}
-          <div className="flex items-center justify-between text-[15px] text-[#5B5348] font-helvetica py-2.5">
-            <span>
-              {language === 'ta' ? `சென்னை · ${todayDate}` : `Chennai · ${todayDate}`}
-            </span>
-            <span className="font-bold">
-              {filteredNews.length}{' '}
-              {language === 'ta'
-                ? 'அறிக்கைகள்'
-                : filteredNews.length === 1
-                ? 'dispatch'
-                : 'dispatches'}
-            </span>
+          {/* 6 px ink rule that draws left to right in 1 s, then a 2 px rule 4 px below it */}
+          <div className="w-full space-y-[4px]">
+            <div className="w-full h-[6px] bg-[#111111] animate-draw-rule-1s" />
+            <div className="w-full h-[2px] bg-[#111111]" />
           </div>
-        </header>
+        </div>
 
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-[1280px] mx-auto px-[clamp(20px,4vw,56px)] pb-24 pt-6">
+        
         {/* ========================================================== */}
-        {/* 2. FILTERS & SEARCH FIELD                                  */}
+        {/* 2. FILTER ROW: TABS (sliding red underline) + SEARCH FIELD  */}
+        {/* Live filtering, 1 px ink rule below                        */}
         {/* ========================================================== */}
-        <section className="border-t border-b border-[#d7d0c3] py-4 my-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          {/* Plain text links separated by slashes */}
-          <div className="flex flex-wrap items-center gap-2 text-[16px]">
-            {filterTabs.map((tab, idx) => {
-              const isActive = activeCategory === tab.id;
+        <section className="pb-6 mb-12 border-b border-[#111111] flex flex-col md:flex-row md:items-center justify-between gap-6">
+          
+          {/* Tabs: All releases / Press release / Statement / Resolution / Gazette */}
+          <div className="flex items-center gap-6 overflow-x-auto pb-1">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
               return (
-                <React.Fragment key={tab.id}>
-                  {idx > 0 && (
-                    <span className="text-[#5B5348] select-none mx-1" aria-hidden="true">
-                      /
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setActiveCategory(tab.id)}
-                    className={`font-helvetica font-extrabold text-[16px] pb-0.5 cursor-pointer transition-colors ${
-                      isActive
-                        ? 'text-[#111111] border-b-2 border-[#E31E24]'
-                        : 'text-[#5B5348] hover:text-[#111111]'
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`relative py-1 font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer whitespace-nowrap ${
+                    isActive ? 'text-[#111111]' : 'text-[#5B5348] hover:text-[#111111]'
+                  }`}
+                >
+                  <span>{language === 'ta' ? tab.ta : tab.en}</span>
+                  <span
+                    className={`absolute bottom-0 left-0 right-0 h-[3px] bg-[#E31E24] transition-all duration-250 ${
+                      isActive ? 'opacity-100' : 'opacity-0'
                     }`}
-                  >
-                    {tab[language]}
-                  </button>
-                </React.Fragment>
+                    aria-hidden="true"
+                  />
+                </button>
               );
             })}
           </div>
@@ -182,17 +216,17 @@ export default function NewsPage() {
           {/* Search field with only a bottom border */}
           <div className="w-full md:w-80 relative">
             <input
-              type="search"
+              type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={language === 'ta' ? 'செய்திகளைத் தேடுக...' : 'Search dispatches...'}
-              className="w-full bg-transparent border-0 border-b-2 border-[#111111] focus:border-[#E31E24] outline-none text-[16px] text-[#111111] placeholder-[#5B5348] py-1 px-0 pr-8"
+              placeholder={language === 'ta' ? 'தேடுக (வார்த்தை, எண், நீதிமன்றம்)...' : 'Filter wire by keyword...'}
+              className="w-full bg-transparent border-0 border-b-2 border-[#111111] focus:border-[#E31E24] outline-none text-[16px] text-[#111111] placeholder-[#5B5348] py-1.5 px-0"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-0 top-1 text-[13px] font-bold text-[#C41A1F] hover:underline cursor-pointer"
+                className="absolute right-0 top-2 text-[13px] font-bold text-[#C41A1F] hover:underline cursor-pointer"
               >
                 ✕
               </button>
@@ -200,197 +234,230 @@ export default function NewsPage() {
           </div>
         </section>
 
-        {/* No stories matching */}
+        {/* Empty state */}
         {filteredNews.length === 0 && (
           <div className="py-20 text-center text-[#5B5348] text-[18px]">
             {language === 'ta'
               ? 'தேடலுக்குரிய செய்திகள் எதுவும் கிடைக்கவில்லை.'
-              : 'No dispatches found matching the criteria.'}
+              : 'No releases found matching the selected filter.'}
           </div>
         )}
 
         {/* ========================================================== */}
-        {/* 3. LEAD STORY BLOCK                                        */}
+        {/* 3. LEAD STORY (EXACTLY AS IN 1e)                           */}
         {/* ========================================================== */}
         {leadStory && (
-          <article className="bg-white border-2 border-[#111111] p-8 md:p-12 mb-14 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            {/* Left 420 px Ink Panel with Sweeping Rays and Dropping Date Stamp */}
-            <div className="lg:col-span-5 h-[340px] bg-[#111111] text-[#FAF8F5] p-6 relative overflow-hidden flex flex-col justify-between border-2 border-[#111111]">
-              {/* Sweeping Rays Graphic */}
-              <div
-                className="absolute -right-20 -bottom-20 w-[360px] h-[360px] opacity-40 pointer-events-none select-none animate-ray-sweep"
-                aria-hidden="true"
-              >
-                <svg viewBox="-180 -180 360 360" className="w-full h-full">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <polygon
-                      key={i}
-                      points="-11,-55 11,-55 32,-190 -32,-190"
-                      transform={`rotate(${i * 30})`}
-                      fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
+          <div className={`transition-opacity duration-300 ${newsFading ? 'opacity-0' : 'opacity-100'}`}>
+            <article className="bg-white border-2 border-[#111111] p-8 md:p-12 mb-14 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Left 420 px Ink Panel: Sweeping Rays -14° to 0°, Dropping Date Stamp, Kavivanar Line */}
+              <div className="lg:col-span-5 h-[420px] bg-[#111111] text-[#FAF8F5] p-8 relative overflow-hidden flex flex-col justify-between border-2 border-[#111111]">
+                
+                {/* Sweeping Rays Graphic behind (-14 to 0 deg in 1.6s) */}
+                <div
+                  className="absolute -right-16 -bottom-16 w-[380px] h-[380px] opacity-40 pointer-events-none select-none animate-ray-sweep origin-center"
+                  aria-hidden="true"
+                >
+                  <svg viewBox="-180 -180 360 360" className="w-full h-full">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <polygon
+                        key={i}
+                        points="-11,-55 11,-55 32,-190 -32,-190"
+                        transform={`rotate(${i * 30})`}
+                        fill={i % 2 === 0 ? '#E31E24' : '#8f1118'}
+                      />
+                    ))}
+                    <circle cx="0" cy="0" r="48" fill="#111111" stroke="#E31E24" strokeWidth="2" />
+                    <image
+                      href="/images/dmk-official-logo.png"
+                      x="-40"
+                      y="-40"
+                      width="80"
+                      height="80"
+                      preserveAspectRatio="xMidYMid meet"
                     />
-                  ))}
-                  <circle cx="0" cy="0" r="48" fill="#111111" stroke="#E31E24" strokeWidth="2" />
-                </svg>
-              </div>
+                  </svg>
+                </div>
 
-              {/* Dropping Date Stamp */}
-              <div className="relative z-10 self-start">
-                <div className="animate-stamp-drop inline-block px-3 py-1 bg-[#E31E24] text-white font-helvetica font-extrabold text-[13px] uppercase border border-white">
-                  {leadStory.date} · {leadStory.category}
+                {/* Dropping Parchment-Bordered Date Stamp (scale 1.7 to 1, rotate -7°, 0.6s) */}
+                <div className="relative z-10 self-start">
+                  <div className="animate-stamp-drop inline-block px-3.5 py-1.5 bg-[#FAF8F5] text-[#111111] font-helvetica font-extrabold text-[13px] uppercase border-2 border-[#111111] shadow-[2px_2px_0_#8f1118]">
+                    {leadStory.date} · {leadStory.category}
+                  </div>
+                </div>
+
+                {/* Kavivanar Line "தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!" */}
+                <div className="relative z-10 space-y-2">
+                  <span className="text-[12px] font-bold text-[#ff8a85] uppercase tracking-normal">
+                    {language === 'ta' ? 'அண்ணா அறிவாலயம் சிறப்புச் செய்தி' : 'SPECIAL DISPATCH'}
+                  </span>
+                  <p className="font-kavivanar font-normal text-[clamp(24px,2.8vw,32px)] leading-tight text-white">
+                    தமிழ்நாட்டைத் தலைகுனிய விடமாட்டேன்!
+                  </p>
                 </div>
               </div>
 
-              {/* Slogan */}
-              <div className="relative z-10 space-y-1">
-                <span className="text-[12px] font-bold text-[#ff8a85] uppercase tracking-normal">
-                  LEAD COMMUNIQUÉ
+              {/* Right Column: Type Tag, Headline, Summary 20px, Source, Ink Button */}
+              <div className="lg:col-span-7 space-y-5">
+                <span className="text-[13px] font-extrabold uppercase text-[#C41A1F] tracking-normal">
+                  [{leadStory.category}] · {leadStory.court || 'Constitutional Bench'}
                 </span>
-                <p className="font-kavivanar font-normal text-[26px] leading-tight text-white">
-                  {language === 'ta'
-                    ? 'நீதிமன்றங்களில் சமரசமற்ற சமூக நீதி!'
-                    : 'Uncompromising Social Justice in the Courts!'}
+
+                <h2 className="font-helvetica font-extrabold text-[clamp(30px,3.6vw,48px)] leading-[1.15] text-[#111111]">
+                  <Link href={`/news/${leadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
+                    {leadStory.title[language]}
+                  </Link>
+                </h2>
+
+                <p className="text-[20px] text-[#3a322d] leading-[1.65]">
+                  {leadStory.summary[language]}
                 </p>
-              </div>
-            </div>
 
-            {/* Right: Headline, Summary, Never Cut Off Source Line, Button */}
-            <div className="lg:col-span-7 space-y-4">
-              <span className="text-[13px] font-extrabold uppercase text-[#C41A1F]">
-                [{leadStory.category}]
-              </span>
+                {/* Source line (never cut off) */}
+                <div className="text-[15px] font-bold text-[#5B5348] border-t border-[#d7d0c3] pt-3">
+                  {language === 'ta' ? 'ஆதாரம்:' : 'Source:'}{' '}
+                  {leadStory.source || leadStory.issuingAuthority?.[language] || 'State Legal Secretariat, Anna Arivalayam, Chennai'}
+                </div>
 
-              <h2 className="font-helvetica font-extrabold text-[clamp(28px,3.8vw,42px)] leading-[1.12] text-[#111111]">
-                <Link href={`/news/${leadStory.id}`} className="hover:text-[#C41A1F] transition-colors">
-                  {leadStory.title[language]}
-                </Link>
-              </h2>
-
-              <p className="text-[18px] text-[#3a322d] leading-relaxed">
-                {leadStory.summary[language]}
-              </p>
-
-              {/* Never cut off a source line */}
-              <div className="text-[15px] text-[#5B5348] font-normal pt-1">
-                <strong className="text-[#111111] uppercase font-bold mr-1">Source:</strong>
-                <span>
-                  {leadStory.court ||
-                    leadStory.issuingAuthority?.[language] ||
-                    leadStory.author?.[language] ||
-                    'State Legal Secretariat, Anna Arivalayam, Chennai — 600 018'}
-                </span>
+                <div className="pt-2">
+                  <Link
+                    href={`/news/${leadStory.id}`}
+                    className="inline-flex items-center justify-center min-h-[48px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
+                  >
+                    {language === 'ta' ? 'முழு அறிக்கையைப் படிக்க →' : 'Read the full statement →'}
+                  </Link>
+                </div>
               </div>
 
-              <div className="pt-2">
-                <Link
-                  href={`/news/${leadStory.id}`}
-                  className="inline-flex items-center justify-center min-h-[44px] px-8 bg-[#111111] hover:bg-[#E31E24] text-white font-helvetica font-extrabold text-[15px] uppercase tracking-normal transition-colors cursor-pointer"
-                >
-                  {language === 'ta' ? 'முழு அறிக்கையைப் படிக்க' : 'Read full statement →'}
-                </Link>
-              </div>
-            </div>
-
-          </article>
+            </article>
+          </div>
         )}
 
         {/* ========================================================== */}
-        {/* 4. ALSO ON THE WIRE (RULED ROWS)                           */}
+        {/* 4. ALSO ON THE WIRE (EXACTLY AS IN 1e)                     */}
         {/* ========================================================== */}
         {wireStories.length > 0 && (
-          <section className="mb-16">
+          <section className="mb-20">
             <div className="border-b-2 border-[#111111] pb-3 mb-6">
-              <h2 className="font-helvetica font-extrabold text-[24px] text-[#111111] uppercase tracking-normal">
-                {language === 'ta' ? 'செய்தியகக் குறிப்புகள்' : 'Also on the wire'}
-              </h2>
+              <h3 className="font-helvetica font-extrabold text-[24px] text-[#111111] uppercase tracking-normal">
+                {language === 'ta' ? 'செய்தியகத்தின் பிற பதிவுகள்' : 'Also on the wire'}
+              </h3>
             </div>
 
-            <div className="divide-y divide-[#d7d0c3] border-t border-b border-[#d7d0c3] bg-white">
-              {wireStories.map((item) => (
-                <article
-                  key={item.id}
-                  className="p-6 md:p-8 space-y-3 hover:bg-[#FAF8F5] transition-colors group"
-                >
-                  <div className="text-[15px] flex items-center gap-2 flex-wrap">
-                    <span className="text-[#C41A1F] font-extrabold uppercase">
-                      [{item.category}]
-                    </span>
-                    <span className="text-[#5B5348]" aria-hidden="true">·</span>
-                    <span className="font-helvetica font-bold text-[#5B5348]">{item.date}</span>
-                  </div>
+            <div className="divide-y divide-[#111111] border-t border-b border-[#111111] bg-white">
+              {wireStories.map((story) => {
+                const dateParts = formatStoryDate(story.date);
+                return (
+                  <article
+                    key={story.id}
+                    className="group relative flex flex-col md:flex-row md:items-center justify-between p-6 sm:p-8 transition-all duration-250 hover:bg-[#e9e3d7] hover:translate-x-[22px] cursor-pointer overflow-hidden"
+                  >
+                    {/* Red hover bar 0 to 6 px on left edge */}
+                    <div
+                      className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-[6px] bg-[#E31E24] transition-all duration-250"
+                      aria-hidden="true"
+                    />
 
-                  <Link href={`/news/${item.id}`} className="block">
-                    <h3 className="font-helvetica font-extrabold text-[26px] leading-[1.2] text-[#111111] group-hover:text-[#E31E24] group-hover:underline transition-all">
-                      {item.title[language]}
-                    </h3>
-                  </Link>
+                    <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8 flex-1">
+                      {/* 108 px Date Block */}
+                      <div className="w-[108px] shrink-0 text-left">
+                        <div className="font-helvetica font-extrabold text-[56px] leading-none text-[#111111]">
+                          {dateParts.day}
+                        </div>
+                        <div className="font-helvetica font-bold text-[15px] text-[#5B5348] mt-1 tracking-wider uppercase">
+                          {dateParts.month} {dateParts.year}
+                        </div>
+                        <div className="mt-2 text-[12px] text-[#C41A1F] font-extrabold uppercase">
+                          {story.category}
+                        </div>
+                      </div>
 
-                  <p className="text-[17px] text-[#111111] leading-[1.65] line-clamp-2">
-                    {item.summary[language]}
-                  </p>
+                      {/* Content: Type in #C41A1F, Headline clamp(24px, 2.6vw, 34px) 800, Summary 18 px, Source 15 px */}
+                      <div className="space-y-2 flex-1">
+                        <h4 className="font-helvetica font-extrabold text-[clamp(24px,2.6vw,34px)] text-[#111111] group-hover:text-[#C41A1F] transition-colors leading-[1.2]">
+                          <Link href={`/news/${story.id}`}>
+                            {story.title[language]}
+                          </Link>
+                        </h4>
+                        <p className="text-[18px] text-[#3a322d] leading-relaxed">
+                          {story.summary[language]}
+                        </p>
+                        {/* Source line (never cut off) */}
+                        <p className="text-[15px] text-[#5B5348] font-bold">
+                          {language === 'ta' ? 'வெளியீடு:' : 'Issued by:'}{' '}
+                          {story.source || story.issuingAuthority?.[language] || 'DMK Legal Wing Press Bureau'}
+                        </p>
+                      </div>
+                    </div>
 
-                  {/* Never cut off source line */}
-                  <div className="text-[14px] text-[#5B5348] font-normal pt-1">
-                    <strong className="text-[#111111] uppercase font-bold mr-1">Source:</strong>
-                    <span>
-                      {item.court ||
-                        item.issuingAuthority?.[language] ||
-                        item.author?.[language] ||
-                        'State Legal Secretariat, Anna Arivalayam, Chennai — 600 018'}
-                    </span>
-                  </div>
-                </article>
-              ))}
+                    {/* Arrow that moves 8 px on hover */}
+                    <div className="mt-4 md:mt-0 shrink-0 md:pl-6 text-[#111111] group-hover:text-[#E31E24] text-[24px] font-bold transition-transform duration-250 group-hover:translate-x-2">
+                      &rarr;
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </section>
         )}
 
         {/* ========================================================== */}
-        {/* 5. COURT WATCH (TABLE IN AN INK BAND)                      */}
+        {/* 5. COURT WATCH (INK BAND WITH KAVIVANAR TITLE & TABLE)     */}
+        {/* Header #ff8a85 800 15px; 18px rows, 1px #4a423d lines;      */}
+        {/* hover #2a2523. Staggered 60ms on scroll. Leave cell empty   */}
+        {/* when data has no value.                                     */}
         {/* ========================================================== */}
-        <section className="my-16 bg-[#111111] text-[#FAF8F5] border-2 border-[#111111] p-8 md:p-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 border-b border-[#3d3633] pb-4">
+        <section
+          ref={courtWatchRef}
+          className="my-20 bg-[#111111] text-[#FAF8F5] border-2 border-[#111111] p-8 md:p-12"
+        >
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 border-b border-[#3d3633] pb-4">
             <div>
               <span className="text-[13px] font-extrabold uppercase text-[#ff8a85] tracking-normal block">
-                BENCH MONITOR
+                CONSTITUTIONAL BENCH DOCKET
               </span>
-              <h2 className="font-kavivanar font-normal text-[32px] text-white mt-1">
+              <h2 className="font-kavivanar font-normal text-[clamp(32px,4vw,44px)] text-white mt-1 leading-tight">
                 {language === 'ta' ? 'நீதிமன்றக் கண்காணிப்பு' : 'Court Watch'}
               </h2>
             </div>
-            <span className="text-[13px] text-[#d8cfc2]">
+            <span className="text-[14px] text-[#d8cfc2]">
               {language === 'ta'
-                ? 'வழக்கு விவரங்களைப் பார்க்க வரியைத் தொடவும்'
-                : 'Click any row for detailed case record'}
+                ? 'வழக்கு விவரங்களைப் பார்வையிட வரியைத் தொடுக'
+                : 'Active constitutional litigations & state autonomy hearings'}
             </span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse border-t-2 border-white">
+            <table className="w-full text-left border-collapse border-t-2 border-[#FAF8F5]">
               <thead>
-                <tr className="border-b border-[#3d3633] text-[#ff8a85]">
-                  <th className="py-3 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/4">
+                <tr className="border-b border-[#4a423d] text-[#ff8a85]">
+                  <th className="py-4 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/4">
                     Court
                   </th>
-                  <th className="py-3 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-5/12">
+                  <th className="py-4 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-5/12">
                     Matter
                   </th>
-                  <th className="py-3 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/6">
+                  <th className="py-4 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/6">
                     Date
                   </th>
-                  <th className="py-3 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/6">
+                  <th className="py-4 px-4 font-helvetica font-extrabold text-[15px] uppercase tracking-normal w-1/6">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#3d3633]">
-                {LEGAL_DEVELOPMENTS_DATA.map((dev) => (
+              <tbody className="divide-y divide-[#4a423d]">
+                {LEGAL_DEVELOPMENTS_DATA.map((dev, idx) => (
                   <tr
                     key={dev.id}
                     onClick={() => setSelectedCaseModal(dev)}
-                    className="text-[18px] text-[#FAF8F5] hover:bg-[#1a1715] cursor-pointer transition-colors"
+                    className="text-[18px] text-[#FAF8F5] hover:bg-[#2a2523] cursor-pointer transition-colors"
+                    style={{
+                      opacity: courtWatchVisible ? 1 : 0,
+                      transform: courtWatchVisible ? 'translateY(0)' : 'translateY(16px)',
+                      transition: `opacity 0.4s ease-out ${idx * 60}ms, transform 0.4s ease-out ${idx * 60}ms`,
+                    }}
                   >
+                    {/* Leave empty when data has no value */}
                     <td className="py-4 px-4 font-semibold text-white">
                       {dev.court || ''}
                     </td>
@@ -411,22 +478,24 @@ export default function NewsPage() {
         </section>
 
         {/* ========================================================== */}
-        {/* 6. PRESS ARCHIVE FOOTER STRIP                              */}
+        {/* 6. FOOTER STRIP WITH 6 px RED TOP BORDER                   */}
+        {/* "Open the full archive →"                                   */}
         {/* ========================================================== */}
-        <footer className="border-t border-[#111111] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <section className="border-t-[6px] border-[#E31E24] pt-8 mt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <span className="font-helvetica font-bold text-[15px] text-[#5B5348]">
             {language === 'ta'
-              ? 'திமுக வழக்கறிஞர் அணி வரலாற்று ஆவணக் காப்பகம் · 1971–2026'
-              : 'DMK Legal Wing Historical Archives · 1971–2026'}
+              ? 'திமுக வழக்கறிஞர் அணி சட்ட வரலாற்றுப் பதிவுகள் மற்றும் ஆவணங்கள்'
+              : 'DMK Legal Wing Historical Archives & Case Law Vault'}
           </span>
           <Link
             href="/resources"
-            className="font-helvetica font-extrabold text-[15px] text-[#111111] hover:text-[#C41A1F] border-b border-[#111111] hover:border-[#C41A1F] transition-colors"
+            className="inline-flex items-center gap-2 font-helvetica font-extrabold text-[16px] text-[#111111] hover:text-[#C41A1F] border-b-2 border-[#111111] hover:border-[#C41A1F] pb-0.5 transition-colors cursor-pointer"
           >
-            {language === 'ta' ? 'முழு ஆவணக் காப்பகத்தைத் திறக்க →' : 'Open the full archive & vault →'}
+            <span>{language === 'ta' ? 'முழு ஆவணக் காப்பகத்தைத் திறக்க →' : 'Open the full archive →'}</span>
           </Link>
-        </footer>
-      </div>
+        </section>
+
+      </main>
 
       {/* Case Details Modal (Solid 2 px ink border, zero drop shadows) */}
       {selectedCaseModal && (
@@ -443,10 +512,10 @@ export default function NewsPage() {
             <div className="flex items-start justify-between border-b-2 border-[#111111] pb-4">
               <div>
                 <span className="text-[12px] font-extrabold uppercase text-[#C41A1F] block mb-1">
-                  [{selectedCaseModal.court}]
+                  [{selectedCaseModal.court || 'Constitutional Bench'}]
                 </span>
                 <h3 className="font-helvetica font-extrabold text-[24px] text-[#111111] leading-tight">
-                  {selectedCaseModal.caseTitle?.[language] || selectedCaseModal.caseNumber}
+                  {selectedCaseModal.caseTitle?.[language] || selectedCaseModal.caseNumber || ''}
                 </h3>
               </div>
               <button
@@ -466,19 +535,19 @@ export default function NewsPage() {
               <div>
                 <strong className="text-[#5B5348] uppercase">Bench / Counsel: </strong>
                 <span className="font-bold text-[#111111]">
-                  {selectedCaseModal.counsel[language]} · {selectedCaseModal.bench}
+                  {selectedCaseModal.counsel?.[language] || ''} · {selectedCaseModal.bench || ''}
                 </span>
               </div>
               <div>
                 <strong className="text-[#5B5348] uppercase">Case Status: </strong>
                 <span className="font-bold text-[#C41A1F]">
-                  {selectedCaseModal.statusTag[language]}
+                  {selectedCaseModal.statusTag?.[language] || ''}
                 </span>
               </div>
               <div>
                 <strong className="text-[#5B5348] uppercase">Constitutional Significance: </strong>
                 <span className="text-[#111111]">
-                  {selectedCaseModal.significance[language]}
+                  {selectedCaseModal.significance?.[language] || ''}
                 </span>
               </div>
             </div>
@@ -495,6 +564,7 @@ export default function NewsPage() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
