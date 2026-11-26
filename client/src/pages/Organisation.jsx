@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { Monogram, PageTitle, Status, VerificationBanner, telHref } from '../components.jsx';
+import { Fragment, useState } from 'react';
+import { Monogram, PageTitle, Reveal, Status, VerificationBanner, telHref } from '../components.jsx';
 import { fileUrl, useFetch } from '../api.js';
 import { useLang } from '../i18n.jsx';
 
 const GROUPS = [['head', 'group_head'], ['secretary', 'group_secretary'], ['joint', 'group_joint'], ['deputy', 'group_deputy'], ['hq', 'group_hq']];
 
 const TIERS_2021 = [
-  { tier_ta: 'மாநிலத் தலைவர் (இருப்பின் உறுதிப்படுத்தல் தேவை)', tier_en: 'President (if post exists — confirm)', count: '1 (R. Viduthalai as of Dec 2021)' },
-  { tier_ta: 'மாநிலச் செயலாளர்', tier_en: 'Secretary', count: '1 (N. R. Elango in DT Next 2024–2026; confirm exact title)' },
-  { tier_ta: 'இணைச் செயலாளர்கள்', tier_en: 'Joint Secretaries', count: '5 (as of Dec 2021 self-reported, Newslaundry)' },
-  { tier_ta: 'துணைச் செயலாளர்கள்', tier_en: 'Deputy Secretaries', count: '4 (as of Dec 2021 self-reported, Newslaundry)' },
-  { tier_ta: 'தலைமைக் கழக வழக்கறிஞர்கள்', tier_en: 'Headquarters Advocates', count: '10 (as of Dec 2021 self-reported, Newslaundry)' },
-  { tier_ta: 'மாவட்ட அமைப்பாளர்கள்', tier_en: 'District Organisers', count: '72 (as of Dec 2021; party districts restructured to 110 in Aug 2026)' },
+  { apex: true, tier_ta: 'மாநிலத் தலைவர் (இருப்பின் உறுதிப்படுத்தல் தேவை)', tier_en: 'President (if post exists — confirm)', count: '1 · R. Viduthalai (as of Dec 2021)' },
+  { apex: true, tier_ta: 'மாநிலச் செயலாளர்', tier_en: 'Secretary', count: '1 · N. R. Elango in DT Next 2024–2026 (confirm exact title)' },
+  { tier_ta: 'இணைச் செயலாளர்கள்', tier_en: 'Joint Secretaries', count: '5 · As of Dec 2021 self-reported (Newslaundry)' },
+  { tier_ta: 'துணைச் செயலாளர்கள்', tier_en: 'Deputy Secretaries', count: '4 · As of Dec 2021 self-reported (Newslaundry)' },
+  { tier_ta: 'தலைமைக் கழக வழக்கறிஞர்கள்', tier_en: 'Headquarters Advocates', count: '10 · As of Dec 2021 self-reported (Newslaundry)' },
+  { tier_ta: 'மாவட்ட அமைப்பாளர்கள்', tier_en: 'District Organisers', count: '72 (Dec 2021) · Party districts restructured to 110 in Aug 2026' },
 ];
 
 export default function Organisation() {
@@ -28,6 +28,7 @@ export default function Organisation() {
         lead={lang === 'ta'
           ? '2021-ஆம் ஆண்டு ஆவணப்படுத்தப்பட்ட கட்டமைப்பு, 2017–2026 சரிபார்க்கப்பட்ட தலைமைப் பின்னணி மற்றும் ஒப்புதல் பெற்ற நிர்வாகிகள்.'
           : 'Documented 2021 wing hierarchy, verified historical office-holders, and confirmed office contacts.'}
+        meta={lang === 'ta' ? 'தனிநபர் சம்மதத்துடன் அலுவலகத் தொடர்பு மட்டும்' : 'Office Contacts Only · Consent Gated'}
       >
         {t('organisation_title')}
       </PageTitle>
@@ -36,43 +37,42 @@ export default function Organisation() {
         <VerificationBanner
           text={lang === 'ta'
             ? 'தனிநபர் சம்மதம் மற்றும் சட்டத்துறைத் தலைமையின் எழுத்துப்பூர்வ ஒப்புதல் இல்லாமல் தனிப்பட்ட தொலைபேசி எண்கள், வீட்டு முகவரிகள் அல்லது உறுதிப்படுத்தப்படாத பதவிகள் இங்கே வெளியிடப்படுவதில்லை. (என். ஆர். இளங்கோவின் மாநிலங்களவைப் பதவிக்காலம் 2 ஏப்ரல் 2026 அன்று முடிவடைந்தது — Wikipedia.)'
-            : 'No current office-bearer roster, phone number, or disputed title is published until confirmed in writing by the wing with individual consent. Note: N. R. Elango’s Rajya Sabha term ended on 2 April 2026 (Wikipedia); he is not described as a sitting MP.'}
+            : 'No current office-bearer roster, phone number, or disputed title is published until confirmed in writing by the wing with individual consent. N. R. Elango’s Rajya Sabha term ended on 2 April 2026 (Wikipedia); he is never described as a sitting MP.'}
         />
 
-        <section className="sub-section">
+        <section>
           <div className="section-head">
-            <h2>{lang === 'ta' ? 'ஆவணப்படுத்தப்பட்ட கட்டமைப்பு (டிசம்பர் 2021 நிலை — உறுதிப்படுத்தப்பட வேண்டும்)' : 'Indicative Structure (As of Dec 2021 — To Be Confirmed)'}</h2>
-            <div className="chips" style={{ marginBottom: 0 }}>
-              <button type="button" className={viewMode === 'tree' ? 'chip on' : 'chip'} onClick={() => setViewMode('tree')}>
-                {lang === 'ta' ? 'மர வரைபடம்' : 'Org Tree'}
+            <h2>{lang === 'ta' ? 'ஆவணப்படுத்தப்பட்ட கட்டமைப்பு (டிசம்பர் 2021 நிலை — உறுதிப்படுத்தப்பட வேண்டும்)' : 'Indicative Hierarchy (As of Dec 2021 — To Be Confirmed)'}</h2>
+            <div className="tab-strip">
+              <button type="button" className={viewMode === 'tree' ? 'tab-link on' : 'tab-link'} onClick={() => setViewMode('tree')}>
+                {lang === 'ta' ? 'கட்டமைப்பு வரைபடம்' : 'Architectural Tree'}
               </button>
-              <button type="button" className={viewMode === 'list' ? 'chip on' : 'chip'} onClick={() => setViewMode('list')}>
+              <button type="button" className={viewMode === 'list' ? 'tab-link on' : 'tab-link'} onClick={() => setViewMode('list')}>
                 {lang === 'ta' ? 'அணுகல் பட்டியல்' : 'Accessible List'}
               </button>
             </div>
           </div>
 
           {viewMode === 'tree' ? (
-            <div className="org-tree" role="region" aria-label="Organisational hierarchy">
+            <div className="hierarchy-canvas" role="region" aria-label="Organisational hierarchy">
               {TIERS_2021.map((tier, idx) => (
-                <div key={idx} className="org-node">
-                  <span className="org-step">0{idx + 1}</span>
-                  <div>
-                    <strong>{lang === 'ta' ? tier.tier_ta : tier.tier_en}</strong>
+                <Fragment key={idx}>
+                  {idx > 0 ? <div className="hierarchy-connector" aria-hidden="true" /> : null}
+                  <Reveal delay={idx * 55} className={`hierarchy-tier ${tier.apex ? 'is-apex' : ''}`}>
+                    <strong>0{idx + 1} · {lang === 'ta' ? tier.tier_ta : tier.tier_en}</strong>
                     <span>{tier.count}</span>
-                  </div>
-                </div>
+                  </Reveal>
+                </Fragment>
               ))}
             </div>
           ) : (
-            <ol className="timeline-list">
+            <ol className="chronicle-timeline">
               {TIERS_2021.map((tier, idx) => (
-                <li key={idx} className="timeline-item">
-                  <span className="timeline-date">Tier {idx + 1}</span>
-                  <div>
-                    <h3>{lang === 'ta' ? tier.tier_ta : tier.tier_en}</h3>
-                    <p>{tier.count}</p>
-                  </div>
+                <li key={idx} className="chronicle-item">
+                  <span className="chronicle-dot" aria-hidden="true" />
+                  <span className="chronicle-date">Tier 0{idx + 1}</span>
+                  <h3>{lang === 'ta' ? tier.tier_ta : tier.tier_en}</h3>
+                  <p>{tier.count}</p>
                 </li>
               ))}
             </ol>
@@ -80,25 +80,30 @@ export default function Organisation() {
         </section>
 
         <section className="sub-section">
-          <h2 className="h-sub">{lang === 'ta' ? 'சரிபார்க்கப்பட்ட வரலாற்று & 2026 குறிப்புகள்' : 'Verified Historical & 2026 Leadership Context'}</h2>
-          <div className="three-grid">
-            <article className="info-card">
+          <Reveal>
+            <h2 className="h-sub">{lang === 'ta' ? 'சரிபார்க்கப்பட்ட வரலாற்று & 2026 குறிப்புகள்' : 'Verified Historical & 2026 Leadership Context'}</h2>
+          </Reveal>
+          <Reveal delay={80} className="broadsheet-three">
+            <article className="broadsheet-col">
+              <span className="broadsheet-num">I</span>
               <h3>N. R. Elango</h3>
               <p>
                 {lang === 'ta'
-                  ? 'DT Next செய்திகள் (ஜூலை 2024, நவம்பர் 2025, மே 2026, செப்டம்பர் 2026) இவரைச் சட்டத்துறை செயலாளர் எனக் குறிப்பிடுகின்றன; 17 ஜனவரி 2025 NIE செய்தி தலைவர் எனக் குறிப்பிடுகிறது. எழுத்துப்பூர்வ உறுதிப்படுத்தல் தேவை.'
+                  ? 'DT Next செய்திகள் (ஜூலை 2024 – செப்டம்பர் 2026) இவரைச் சட்டத்துறை செயலாளர் எனக் குறிப்பிடுகின்றன; 17 ஜனவரி 2025 NIE செய்தி தலைவர் எனக் குறிப்பிடுகிறது. எழுத்துப்பூர்வ உறுதிப்படுத்தல் தேவை.'
                   : 'Named Legal Wing Secretary in DT Next (Jul 2024 – Sep 2026) and President in a 17 Jan 2025 NIE report. Exact current title awaits written wing confirmation.'}
               </p>
             </article>
-            <article className="info-card">
+            <article className="broadsheet-col">
+              <span className="broadsheet-num">II</span>
               <h3>R. Viduthalai & R. Girirajan</h3>
               <p>
                 {lang === 'ta'
-                  ? 'ஆர். விடுதலை (முன்னாள் தலைமை அரசு வழக்கறிஞர்) டிசம்பர் 2021-ல் தலைவராகவும் ஜூலை 2024 கூட்டத்திலும் காணப்பட்டார். ஆர். கிரிராஜன் 2017–2021 காலத்தில் செயலாளராக இருந்தார். தற்போதைய பொறுப்புகள் உறுதிப்படுத்தப்படவில்லை.'
-                  : 'R. Viduthalai (former Advocate General) was President by Dec 2021 and attended a Jul 2024 wing meeting. R. Girirajan served as Secretary (2017–at least 2021). Current wing roles unverified.'}
+                  ? 'ஆர். விடுதலை (முன்னாள் தலைமை அரசு வழக்கறிஞர்) டிசம்பர் 2021-ல் தலைவராகவும் ஜூலை 2024 கூட்டத்திலும் காணப்பட்டார். ஆர். கிரிராஜன் 2017–2021 காலத்தில் செயலாளராக இருந்தார்.'
+                  : 'R. Viduthalai (former Advocate General) was President by Dec 2021 and attended a Jul 2024 wing meeting. R. Girirajan served as Secretary (2017–at least 2021). Current roles unverified.'}
               </p>
             </article>
-            <article className="info-card">
+            <article className="broadsheet-col">
+              <span className="broadsheet-num">III</span>
               <h3>R. Shanmugasundaram</h3>
               <p>
                 {lang === 'ta'
@@ -106,7 +111,7 @@ export default function Organisation() {
                   : 'Served as Legal Wing President in February 2017 when the five-member free-advice committee was announced (DT Next).'}
               </p>
             </article>
-          </div>
+          </Reveal>
         </section>
 
         <section className="sub-section">

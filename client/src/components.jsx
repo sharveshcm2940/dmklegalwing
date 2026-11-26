@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useLang } from './i18n.jsx';
 import { paragraphs } from './api.js';
@@ -24,6 +24,40 @@ export function ScrollToTop() {
   return null;
 }
 
+export function Reveal({ children, className = '', delay = 0, as: Tag = 'div' }) {
+  const ref = useRef(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setShown(true);
+      return undefined;
+    }
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShown(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -24px 0px' },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <Tag
+      ref={ref}
+      className={`reveal ${shown ? 'is-visible' : ''} ${className}`.trim()}
+      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+    >
+      {children}
+    </Tag>
+  );
+}
+
 export function JsonLd({ data }) {
   if (!data) return null;
   return (
@@ -37,15 +71,30 @@ export function JsonLd({ data }) {
 export function ActorBadge({ actor }) {
   const { actorLabel } = useLang();
   if (!actor) return null;
-  return <span className={`badge badge-actor badge-${actor}`}>{actorLabel(actor)}</span>;
+  return <span className={`stamp stamp-actor stamp-${actor}`}>{actorLabel(actor)}</span>;
 }
 
 export function VerificationBanner({ text }) {
   const { lang } = useLang();
+  const [open, setOpen] = useState(false);
   return (
-    <div className="verify-banner" role="note">
-      <strong>{lang === 'ta' ? 'சரிபார்ப்புக் குறிப்பு:' : 'Verification Note:'}</strong> {text}
-    </div>
+    <aside className="colophon-bar" aria-label={lang === 'ta' ? 'ஆதார சரிபார்ப்புக் குறிப்பு' : 'Verification Ledger'}>
+      <div className="colophon-head">
+        <span className="colophon-mark" aria-hidden="true">§</span>
+        <span className="colophon-label">
+          {lang === 'ta' ? 'சரிபார்ப்பு & ஆதார நிலை' : 'Verification & Archival Ledger'}
+        </span>
+        <button
+          type="button"
+          className="colophon-toggle"
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
+        >
+          {open ? (lang === 'ta' ? 'சுருக்குக' : 'Hide note') : (lang === 'ta' ? 'விவரம் காண்க' : 'Read verification note')}
+        </button>
+      </div>
+      {open ? <p className="colophon-body">{text}</p> : null}
+    </aside>
   );
 }
 
@@ -61,7 +110,7 @@ export function Header() {
       <div className="top-status-bar">
         <div className="wrap top-status-inner">
           <span>{t('official_badge')}</span>
-          <span className="lang-pill">{lang === 'ta' ? 'தமிழ் (Default)' : 'English'}</span>
+          <span className="lang-pill">{lang === 'ta' ? 'தமிழ் · இயல்புநிலை' : 'English Edition'}</span>
         </div>
       </div>
       {settings && settings.election_mode && (
@@ -71,7 +120,7 @@ export function Header() {
       )}
       <div className="brand-row wrap">
         <Link to={lp('/')} className="brand" aria-label={`${t('org')} — ${t('wing')}`}>
-          <img src={`${BASE}logo.png`} alt="" width="56" height="50" />
+          <img src={`${BASE}logo.png`} alt="" width="54" height="48" />
           <span className="brand-text">
             <span className="brand-org">{t('org')}</span>
             <span className="brand-wing">{t('wing')}</span>
@@ -122,7 +171,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="wrap footer-grid">
         <div className="footer-brand">
-          <img src={`${BASE}logo.png`} alt="" width="84" height="75" />
+          <img src={`${BASE}logo.png`} alt="" width="80" height="72" />
           <div>
             <p className="footer-title">{t('wing')}</p>
             <p>{t('org')}</p>
@@ -170,15 +219,19 @@ export function Status({ state, children }) {
   return children;
 }
 
-export function PageTitle({ children, lead, eyebrow }) {
+export function PageTitle({ children, lead, eyebrow, meta }) {
   return (
-    <div className="page-title">
-      <div className="wrap">
-        {eyebrow ? <p className="page-eyebrow">{eyebrow}</p> : null}
-        <h1>{children}</h1>
-        {lead ? <p className="lead">{lead}</p> : null}
+    <header className="page-title">
+      <div className="page-title-horizon" aria-hidden="true" />
+      <div className="wrap page-title-inner">
+        <div className="page-title-main">
+          {eyebrow ? <p className="page-eyebrow">{eyebrow}</p> : null}
+          <h1>{children}</h1>
+          {lead ? <p className="lead">{lead}</p> : null}
+        </div>
+        {meta ? <div className="page-title-meta">{meta}</div> : null}
       </div>
-    </div>
+    </header>
   );
 }
 

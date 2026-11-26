@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PageTitle, Status } from '../components.jsx';
+import { PageTitle, Reveal, Status } from '../components.jsx';
 import { fileUrl, useFetch } from '../api.js';
 import { useLang } from '../i18n.jsx';
 
@@ -13,7 +13,7 @@ const LANG_BADGE_TEXT = {
 
 const RIGHTS_FAQS = [
   {
-    q_ta: 'கைது செய்யப்பட்டால் உள்ள அடிப்படை அரசியலமைப்பு உரிமைகள் என்ன?',
+    q_ta: 'கைது செய்யப்பட்டால் உள்ள அடிப்படை அரசியலமைப்பு உரிமைகள் என்ன? (பிரிவு 22)',
     q_en: 'What are the core constitutional safeguards on arrest (Article 22)?',
     a_ta: 'கைதுக்கான காரணங்கள் தெரிவிக்கப்பட வேண்டும்; விரும்பிய வழக்கறிஞரைக் கலந்தாலோசிக்கவும் சட்ட உதவி பெறவும் உரிமை உண்டு; பயண நேரம் தவிர்த்து 24 மணி நேரத்திற்குள் அருகிலுள்ள நீதிபதி முன் ஆஜர்படுத்தப்பட வேண்டும்.',
     a_en: 'Under Article 22 of the Constitution, an arrested person must be informed of the grounds of arrest, has the right to consult and be defended by a legal practitioner of their choice, and must be produced before a magistrate within 24 hours (excluding travel time).',
@@ -45,51 +45,66 @@ export default function Resources() {
   return (
     <>
       <PageTitle
-        eyebrow={lang === 'ta' ? 'சட்ட விழிப்புணர்வு & அதிகாரப்பூர்வ இணைப்புகள்' : 'Verified Official Portals & Case Summaries'}
+        eyebrow={lang === 'ta' ? 'சட்ட நூலகம் & அரசு உதவி எண்கள்' : 'Law Library & Statutory Aid'}
         lead={t('resources_lead')}
+        meta={lang === 'ta' ? 'BCI விதி 36 இணக்கம் · அதிகாரப்பூர்வ இணைப்புகள்' : 'BCI Rule 36 Compliant · Official Portals'}
       >
         {t('resources_page')}
       </PageTitle>
 
       <div className="wrap section">
-        {/* BCI Rule 36 Mandatory Compliance Banner */}
-        <div className="compliance-box" role="note">
-          <h2>{lang === 'ta' ? 'சட்ட மறுப்பு & BCI விதி 36 இணக்கம்' : 'BCI Rule 36 Compliance & Legal Disclaimer'}</h2>
-          <p>
-            {lang === 'ta'
-              ? 'இந்தப் பக்கத்தில் உள்ள தகவல்கள் பொது விழிப்புணர்வுக்காக மட்டுமே; இவை சட்ட ஆலோசனை அல்ல. இதை வாசிப்பதால் வழக்கறிஞர்–வாடிக்கையாளர் உறவு உருவாகாது. இந்திய வழக்கறிஞர் கழக விதி 36 (BCI Rule 36) விதிகளுக்கு இணங்க, இத்தளத்தில் "வழக்கறிஞரைத் தேடு" (Find an Advocate), கட்டணப் பட்டியல் அல்லது வெற்றி விகித விளம்பரங்கள் எதுவும் வழங்கப்படவில்லை.'
-              : 'All content here is general legal information, not legal advice, and creates no advocate-client relationship. In strict compliance with Bar Council of India Rule 36, this site provides no searchable, categorised, or ranked public "find an advocate" directory, fee schedule, or success-rate claims.'}
-          </p>
-        </div>
+        {/* Statutory Helpline Quick-Dial Ledger */}
+        <Reveal className="helpline-ledger" as="section" aria-label="Verified Statutory Helplines">
+          <div className="helpline-cell">
+            <strong>NALSA National Helpline</strong>
+            <span>15100</span>
+            <small>{lang === 'ta' ? 'அகில இந்திய இலவச சட்ட உதவி' : 'National Legal Services Authority'}</small>
+          </div>
+          <div className="helpline-cell">
+            <strong>TNSLSA Toll-Free</strong>
+            <span>1800 4252 441</span>
+            <small>044-25342441 (10am–6pm) · tnslsa@gmail.com</small>
+          </div>
+          <div className="helpline-cell">
+            <strong>HCLSC Chennai</strong>
+            <span>044-29550126</span>
+            <small>{lang === 'ta' ? 'சென்னை உயர் நீதிமன்றச் சட்ட உதவி' : 'High Court Legal Services Committee'}</small>
+          </div>
+          <div className="helpline-cell">
+            <strong>HCLSC Madurai</strong>
+            <span>0452-2433756</span>
+            <small>{lang === 'ta' ? 'மதுரை கிளை சட்ட உதவி' : 'Madurai Bench Legal Services'}</small>
+          </div>
+        </Reveal>
 
-        <div className="toolbar-row" style={{ marginTop: 24 }}>
+        <div className="filter-bar">
           {allCats.length > 0 && (
-            <div className="chips" style={{ marginBottom: 0 }} role="group" aria-label="Category">
-              <button type="button" className={cat === '' ? 'chip on' : 'chip'} onClick={() => setCat('')}>{t('all')}</button>
+            <div className="tab-strip" role="group" aria-label="Category">
+              <button type="button" className={cat === '' ? 'tab-link on' : 'tab-link'} onClick={() => setCat('')}>{t('all')}</button>
               {allCats.map((c) => (
-                <button type="button" key={c} className={cat === c ? 'chip on' : 'chip'} onClick={() => setCat(c)}>{c}</button>
+                <button type="button" key={c} className={cat === c ? 'tab-link on' : 'tab-link'} onClick={() => setCat(c)}>{c}</button>
               ))}
             </div>
           )}
           <label className="search" style={{ marginBottom: 0 }}>
             <span className="sr-only">{t('search')}</span>
-            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={lang === 'ta' ? 'சட்ட ஆதாரங்களில் தேடு' : 'Search resources'} />
+            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={lang === 'ta' ? 'சட்ட ஆதாரங்களில் தேடு' : 'Search library…'} />
           </label>
         </div>
 
         <Status state={state}>
           {items.length === 0 ? <p className="status">{t('empty_resources')}</p> : (
             <ul className="resource-list">
-              {items.map((r) => {
+              {items.map((r, idx) => {
                 const badge = LANG_BADGE_TEXT[r.language_badge] || LANG_BADGE_TEXT.en;
                 return (
-                  <li key={r.id}>
+                  <Reveal as="li" key={r.id} delay={idx * 35}>
                     <div className="resource-content">
                       <div className="meta-row">
-                        <span className="badge badge-dark">{r.category}</span>
-                        <span className="badge badge-muted">{lang === 'ta' ? badge.ta : badge.en}</span>
+                        <span className="stamp stamp-dark">{r.category}</span>
+                        <span className="stamp">{lang === 'ta' ? badge.ta : badge.en}</span>
                         {!r.source_verified ? (
-                          <span className="badge badge-warn">{lang === 'ta' ? 'இணைப்புச் சரிபார்ப்பு நிலுவை' : 'Link check pending'}</span>
+                          <span className="stamp stamp-warn">{lang === 'ta' ? 'இணைப்புச் சரிபார்ப்பு நிலுவை' : 'Link check pending'}</span>
                         ) : null}
                       </div>
                       <h3>{pick(r, 'title')}</h3>
@@ -102,14 +117,18 @@ export default function Resources() {
                       ) : null}
                       {pick(r, 'description') ? <p>{pick(r, 'description')}</p> : null}
                       {pick(r, 'later_developments') ? (
-                        <div className="subjudice-box">
-                          <strong>{lang === 'ta' ? 'பிற்கால மாற்றங்கள் / மேல் தீர்ப்பு:' : 'Later Developments:'}</strong>{' '}
-                          {pick(r, 'later_developments')}
+                        <div className="subjudice-split" style={{ gridTemplateColumns: '1fr', padding: '10px 0' }}>
+                          <div className="subjudice-col">
+                            <strong>{lang === 'ta' ? 'பிற்கால மாற்றங்கள் / மேல் தீர்ப்பு' : 'Later Developments'}</strong>
+                            <span>{pick(r, 'later_developments')}</span>
+                          </div>
                         </div>
                       ) : null}
-                      <p className="resource-meta">
-                        {r.last_reviewed ? `${lang === 'ta' ? 'மறுஆய்வு தேதி:' : 'Last reviewed:'} ${r.last_reviewed}` : ''}
-                      </p>
+                      {r.last_reviewed ? (
+                        <p className="resource-meta">
+                          {lang === 'ta' ? 'மறுஆய்வு தேதி:' : 'Last reviewed:'} {r.last_reviewed}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="resource-actions">
                       {r.file_url ? (
@@ -119,7 +138,7 @@ export default function Resources() {
                         <a className="btn btn-small btn-ghost" href={r.external_url} target="_blank" rel="noopener noreferrer">{t('open_link')} ↗</a>
                       ) : null}
                     </div>
-                  </li>
+                  </Reveal>
                 );
               })}
             </ul>
@@ -127,7 +146,9 @@ export default function Resources() {
         </Status>
 
         <section className="sub-section">
-          <h2 className="h-sub">{lang === 'ta' ? 'உங்கள் உரிமைகளை அறியுங்கள் (பொதுத் தகவல்)' : 'Know Your Rights — Quick Reference FAQs'}</h2>
+          <Reveal>
+            <h2 className="h-sub">{lang === 'ta' ? 'உங்கள் உரிமைகளை அறியுங்கள் (பொதுத் தகவல்)' : 'Know Your Rights — Quick Reference'}</h2>
+          </Reveal>
           <div className="faq-list">
             {RIGHTS_FAQS.map((f, idx) => (
               <details key={idx} className="faq-item">
@@ -136,12 +157,21 @@ export default function Resources() {
               </details>
             ))}
           </div>
-          <p style={{ marginTop: 20 }}>
+          <p style={{ marginTop: 24 }}>
             <Link className="btn" to={lp('/contact#helpdesk')}>
-              {lang === 'ta' ? 'கழக சட்ட உதவிப் படிவத்தைத் திறக்க' : 'Open Intra-Party Helpdesk Request Form'}
+              {lang === 'ta' ? 'கழக சட்ட உதவிப் படிவத்தைத் திறக்க' : 'Open Intra-Party Helpdesk Form'}
             </Link>
           </p>
         </section>
+
+        <aside className="compliance-colophon" role="note">
+          <h2>{lang === 'ta' ? 'சட்ட மறுப்பு & BCI விதி 36 இணக்கம்' : 'BCI Rule 36 Compliance & Legal Disclaimer'}</h2>
+          <p>
+            {lang === 'ta'
+              ? 'இந்தப் பக்கத்தில் உள்ள தகவல்கள் பொது விழிப்புணர்வுக்காக மட்டுமே; இவை சட்ட ஆலோசனை அல்ல. இதை வாசிப்பதால் வழக்கறிஞர்–வாடிக்கையாளர் உறவு உருவாகாது. இந்திய வழக்கறிஞர் கழக விதி 36-க்கு இணங்க, இத்தளத்தில் "வழக்கறிஞரைத் தேடு" (Find an Advocate), கட்டணப் பட்டியல் அல்லது வெற்றி விகித விளம்பரங்கள் எதுவும் வழங்கப்படவில்லை.'
+              : 'All content here is general legal information, not legal advice, and creates no advocate-client relationship. In strict compliance with Bar Council of India Rule 36, this site provides no searchable, categorised, or ranked public "find an advocate" directory, fee schedule, or success-rate claims.'}
+          </p>
+        </aside>
       </div>
     </>
   );

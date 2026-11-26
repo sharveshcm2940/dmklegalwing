@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActorBadge, PageTitle, Status, VerificationBanner } from '../components.jsx';
+import { ActorBadge, PageTitle, Reveal, Status, VerificationBanner } from '../components.jsx';
 import { fileUrl, useFetch } from '../api.js';
 import { useLang } from '../i18n.jsx';
 
@@ -15,7 +15,7 @@ const ACTORS = [
 export function ActivityRow({ a }) {
   const { t, lang, pick, fmtDate } = useLang();
   return (
-    <li className="activity">
+    <Reveal as="li" className="activity">
       <time className="date-block" dateTime={a.event_date}>
         <span className="date-day">{fmtDate(a.event_date, { day: 'numeric' })}</span>
         <span className="date-month">{fmtDate(a.event_date, { month: 'short', year: 'numeric' })}</span>
@@ -23,8 +23,8 @@ export function ActivityRow({ a }) {
       <div className="activity-body">
         <div className="meta-row">
           <ActorBadge actor={a.actor} />
-          <span className="badge badge-muted">{a.category}</span>
-          {a.sub_judice ? <span className="badge badge-warn">{t('sub_judice_badge')}</span> : null}
+          <span className="stamp">{a.category}</span>
+          {a.sub_judice ? <span className="stamp stamp-warn">{t('sub_judice_badge')}</span> : null}
         </div>
         <h3>{pick(a, 'title')}</h3>
         {pick(a, 'location') ? <p className="activity-place">{pick(a, 'location')}</p> : null}
@@ -40,19 +40,21 @@ export function ActivityRow({ a }) {
           <p className="hint-text"><strong>{lang === 'ta' ? 'பங்கேற்பு:' : 'Participants:'}</strong> {a.participants}</p>
         ) : null}
         {a.sub_judice && (a.court_order_summary || a.party_allegations) ? (
-          <div className="subjudice-box">
-            {a.court_order_summary ? (
-              <p><strong>{lang === 'ta' ? 'நீதிமன்ற உத்தரவு / நிலை:' : 'Court Order / Procedural Fact:'}</strong> {a.court_order_summary}</p>
-            ) : null}
-            {a.party_allegations ? (
-              <p><strong>{lang === 'ta' ? 'மனுதாரர் தரப்பு:' : 'Party Position (Untested Allegations):'}</strong> {a.party_allegations}</p>
-            ) : null}
+          <div className="subjudice-split">
+            <div className="subjudice-col">
+              <strong>{lang === 'ta' ? 'நீதிமன்ற உத்தரவு / நிலை' : 'Court Order / Procedural Fact'}</strong>
+              <span>{a.court_order_summary || '—'}</span>
+            </div>
+            <div className="subjudice-col">
+              <strong>{lang === 'ta' ? 'மனுதாரர் தரப்பு' : 'Party Position (Untested Allegations)'}</strong>
+              <span>{a.party_allegations || '—'}</span>
+            </div>
           </div>
         ) : null}
         {a.source_note ? <p className="source-line">{lang === 'ta' ? 'ஆதாரம்:' : 'Source:'} {a.source_note}</p> : null}
       </div>
       {a.cover_image ? <img className="activity-img" src={fileUrl(a.cover_image)} alt="" loading="lazy" /> : null}
-    </li>
+    </Reveal>
   );
 }
 
@@ -72,10 +74,11 @@ export default function Activities() {
   return (
     <>
       <PageTitle
-        eyebrow={lang === 'ta' ? 'பொறுப்பாளர் அடையாளத்துடன் (Who Acted)' : 'Dated Record Tagged by Actor'}
+        eyebrow={lang === 'ta' ? 'பொறுப்பாளர் அடையாளத்துடன் (Who Acted)' : 'Judicial & Field Docket'}
         lead={lang === 'ta'
           ? 'சட்டத்துறை மேற்கொண்ட பணிகள், திமுக கழகம் தாக்கல் செய்த மனுக்கள் மற்றும் மு. க. ஸ்டாலின் தனிப்பட்ட மனுக்கள் ஆகியவை தெளிவாகப் பிரித்துக் காட்டப்பட்டுள்ளன.'
-          : 'Every activity is explicitly tagged by who acted—separating Legal Wing actions from DMK party filings, personal petitions, and pre-May 2026 state government suits.'}
+          : 'Every dated record is tagged by who acted—separating Legal Wing actions from DMK party filings, personal petitions, and pre-May 2026 state government suits.'}
+        meta={lang === 'ta' ? '2017–2026 சரிபார்க்கப்பட்ட பதிவுகள்' : '2017–2026 Verified Docket'}
       >
         {t('activities_title')}
       </PageTitle>
@@ -87,16 +90,16 @@ export default function Activities() {
             : 'For sub judice matters, actual court orders are recorded separately from party allegations. Outcomes of the Jul 2024 criminal-laws writ, Nov 2025 SIR petition, and any Kolathur appeal remain pending client confirmation.'}
         />
 
-        <div className="filter-panel">
-          <div className="chips" role="group" aria-label={lang === 'ta' ? 'யார் செயல்பட்டது' : 'Filter by actor'}>
+        <div className="filter-bar">
+          <div className="tab-strip" role="group" aria-label={lang === 'ta' ? 'யார் செயல்பட்டது' : 'Filter by actor'}>
             {ACTORS.map(([val, en, ta]) => (
-              <button key={val} type="button" className={actor === val ? 'chip on' : 'chip'} onClick={() => setActor(val)}>
+              <button key={val} type="button" className={actor === val ? 'tab-link on' : 'tab-link'} onClick={() => setActor(val)}>
                 {lang === 'ta' ? ta : en}
               </button>
             ))}
           </div>
 
-          <div className="toolbar-row">
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
             <select
               className="select-input"
               aria-label={lang === 'ta' ? 'வகை' : 'Category'}
@@ -112,7 +115,7 @@ export default function Activities() {
                 type="search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder={lang === 'ta' ? 'வழக்கு, இடம் அல்லது குறிச்சொல் தேடு' : 'Search activity, court or place'}
+                placeholder={lang === 'ta' ? 'வழக்கு, இடம் தேடு' : 'Search docket…'}
               />
             </label>
           </div>
