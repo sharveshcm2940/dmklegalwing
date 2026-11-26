@@ -1,0 +1,16 @@
+# /etc/systemd/system/dmk-legal-wing.service
+[Unit]
+Description=DMK Legal Wing API (gunicorn)
+After=network.target mysql.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/dmk-legal-wing/server
+EnvironmentFile=/var/www/dmk-legal-wing/server/.env
+ExecStart=/var/www/dmk-legal-wing/server/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:5000 wsgi:app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
